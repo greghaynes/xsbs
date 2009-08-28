@@ -1,3 +1,5 @@
+subdirs(enet)
+
 set(xsbs_srcs
 	engine/server.cpp
 	engine/command.cpp
@@ -7,9 +9,6 @@ set(xsbs_srcs
 	shared/crypto.cpp
 	shared/stream.cpp
 	shared/tools.cpp)
-
-add_library(enet STATIC IMPORTED)
-set_property(TARGET enet PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/src/enet/libenet.a)
 
 add_definitions(-DSTANDALONE)
 
