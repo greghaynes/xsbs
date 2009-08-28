@@ -13,9 +13,9 @@ set_property(TARGET enet PROPERTY IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/src/enet
 
 add_definitions(-DSTANDALONE)
 
-include_directories(engine fpsgame shared enet/include)
+include_directories(engine fpsgame shared include enet/include)
 
 add_executable(xsbs
 	${xsbs_srcs})
 
-target_link_libraries(xsbs enet)
+target_link_libraries(xsbs enet z)
