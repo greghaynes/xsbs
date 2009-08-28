@@ -1,0 +1,3 @@
+project(xsbs)
+
+subdirs(src)
