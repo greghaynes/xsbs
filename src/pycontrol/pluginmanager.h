@@ -14,7 +14,7 @@ class PluginManager
 	public:
 		static PluginManager &instance();
 		
-		std::vector<char *> paths();
+		std::vector<std::string> &paths();
 		void reload();
 		const std::vector<Plugin*> &plugins() const;
 	
@@ -22,7 +22,10 @@ class PluginManager
 		PluginManager();
 		~PluginManager();
 		
-		std::vector<char *> _paths;
+		void clearPlugins();
+		std::vector<std::string> *dirsIn(const std::string &path);
+		
+		std::vector<std::string> _paths;
 		std::vector<Plugin*> _plugins;
 		std::string _path;
 	
