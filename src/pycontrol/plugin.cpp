@@ -1,53 +1,48 @@
 #include "plugin.h"
+#include "eventmanager.h"
 #include "event.h"
 
 namespace SbPyControl
 {
 
-const char *Plugin::name() const
-{
-	return _name.c_str();
-}
-
-PluginHandler::PluginHandler()
-: _event(0)
+PluginEventHandler::PluginEventHandler()
 {
 }
 
-PluginHandler::~PluginHandler()
+PluginEventHandler::~PluginEventHandler()
 {
 	if(_event)
 		delete _event;
 }
 
-Event *PluginHandler::event() const
+void PluginEventHandler::setEvent(Event *event)
 {
-	return _event;
-}
-
-void PluginHandler::setEvent(Event *event)
-{
-	if(_event)
+	if(_event && event != _event)
 		delete _event;
 	_event = event;
 }
 
-const char *PluginHandler::module() const
+const Event *PluginEventHandler::event() const
+{
+	return _event;
+}
+
+const char *PluginEventHandler::module() const
 {
 	return _module.c_str();
 }
 
-void PluginHandler::setModule(const char *module)
+void PluginEventHandler::setModule(const char *module)
 {
 	_module = module;
 }
 
-const char *PluginHandler::handler() const
+const char *PluginEventHandler::handler() const
 {
 	return _handler.c_str();
 }
 
-void PluginHandler::setHandler(const char *handler)
+void PluginEventHandler::setHandler(const char *handler)
 {
 	_handler = handler;
 }
@@ -55,6 +50,11 @@ void PluginHandler::setHandler(const char *handler)
 Plugin::Plugin(const char *name)
 : _name(name)
 {
+}
+
+const char *Plugin::name() const
+{
+	return _name.c_str();
 }
 	
 }
