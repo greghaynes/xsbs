@@ -1,6 +1,6 @@
 subdirs(enet)
 
-find_package(PythonLibrary REQUIRED)
+find_package(PythonLibs REQUIRED)
 
 set(xsbs_srcs
 	engine/server.cpp
