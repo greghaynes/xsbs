@@ -10,11 +10,14 @@ set(xsbs_srcs
 
 	shared/crypto.cpp
 	shared/stream.cpp
-	shared/tools.cpp)
+	shared/tools.cpp
+	
+	pycontrol/pluginmanager.cpp
+	pycontrol/eventmanager.cpp)
 
 add_definitions(-DSTANDALONE)
 
-include_directories(engine fpsgame shared include enet/include ${PYTHON_INCLUDE_PATH})
+include_directories(engine fpsgame shared include pycontrol enet/include ${PYTHON_INCLUDE_PATH})
 
 add_executable(xsbs
 	${xsbs_srcs})
