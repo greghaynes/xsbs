@@ -1,6 +1,4 @@
 #include "plugin.h"
-#include "eventmanager.h"
-#include "event.h"
 
 namespace SbPyControl
 {
@@ -11,20 +9,16 @@ PluginEventHandler::PluginEventHandler()
 
 PluginEventHandler::~PluginEventHandler()
 {
-	if(_event)
-		delete _event;
 }
 
-void PluginEventHandler::setEvent(Event *event)
+void PluginEventHandler::setEvent(const char *event)
 {
-	if(_event && event != _event)
-		delete _event;
 	_event = event;
 }
 
-const Event *PluginEventHandler::event() const
+const char *PluginEventHandler::event() const
 {
-	return _event;
+	return _event.c_str();
 }
 
 const char *PluginEventHandler::module() const
@@ -55,6 +49,11 @@ Plugin::Plugin(const char *name)
 const char *Plugin::name() const
 {
 	return _name.c_str();
+}
+
+std::vector<PluginEventHandler*> &Plugin::eventHandlers()
+{
+	return _eventHandlers;
 }
 	
 }

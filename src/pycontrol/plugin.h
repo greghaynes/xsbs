@@ -7,23 +7,21 @@
 namespace SbPyControl
 {
 
-class Event;
-
 class PluginEventHandler
 {
 	public:
 		PluginEventHandler();
 		~PluginEventHandler();
 
-		void setEvent(Event *event);
-		const Event *event() const;
+		void setEvent(const char *event);
+		const char *event() const;
 		const char *module() const;
 		void setModule(const char *module);
 		const char *handler() const;
 		void setHandler(const char *function);
 		
 	private:
-		Event *_event;
+		std::string _event;
 		std::string _module;
 		std::string _handler;
 	
@@ -35,10 +33,12 @@ class Plugin
 		explicit Plugin(const char *name);
 		
 		const char *name() const;
-		const std::vector<PluginEventHandler*> eventHandlers;
+		const std::vector<PluginEventHandler*> &eventHandlers() const;
+		std::vector<PluginEventHandler*> &eventHandlers();
 	
 	private:
 		std::string _name;
+		std::vector<PluginEventHandler*> _eventHandlers;
 	
 };
 
