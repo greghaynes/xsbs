@@ -1,5 +1,7 @@
 subdirs(enet)
 
+find_package(PythonLibrary REQUIRED)
+
 set(xsbs_srcs
 	engine/server.cpp
 	engine/command.cpp
@@ -12,7 +14,7 @@ set(xsbs_srcs
 
 add_definitions(-DSTANDALONE)
 
-include_directories(engine fpsgame shared include enet/include)
+include_directories(engine fpsgame shared include enet/include ${PYTHON_INCLUDE_PATH})
 
 add_executable(xsbs
 	${xsbs_srcs})

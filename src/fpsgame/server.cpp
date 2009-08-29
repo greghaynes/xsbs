@@ -1,4 +1,5 @@
 #include "game.h"
+#include "Python.h"
 
 namespace game
 {
@@ -451,6 +452,7 @@ namespace server
             case 'p': setsvar("adminpass", &arg[2]); return true;
             case 'o': setvar("publicserver", atoi(&arg[2])); return true;
             case 'g': setvar("serverbotlimit", atoi(&arg[2])); return true;
+			case 's': setsvar("pyscriptpath", &arg[2]); return true;
         }
         return false;
     }
