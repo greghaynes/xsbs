@@ -13,7 +13,9 @@ set(xsbs_srcs
 	shared/tools.cpp
 	
 	pycontrol/pluginmanager.cpp
-	pycontrol/eventmanager.cpp)
+	pycontrol/eventmanager.cpp
+	pycontrol/plugin.cpp
+	pycontrol/event.cpp)
 
 add_definitions(-DSTANDALONE)
 

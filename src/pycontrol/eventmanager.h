@@ -6,6 +6,15 @@
 namespace SbPyControl
 {
 
+class PluginHandler;
+
+class Event
+{
+	public:
+		Event(const char *category,
+			const char *name);
+};
+
 class EventManager
 {
 
