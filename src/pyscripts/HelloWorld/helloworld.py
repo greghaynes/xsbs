@@ -4,7 +4,7 @@ def talkteam(cn, text):
 	print 'user ' + cn + ' said ' + text
 
 def greet(cn):
-	sbserver.message("Hello, user")
+	sbserver.message("Hello, " + sbserver.playerName(cn) + ".")
 	print 'greeted'
 
 def sayHello():

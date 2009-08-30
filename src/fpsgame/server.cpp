@@ -2594,8 +2594,16 @@ namespace server
 
 namespace SbPy
 {
+	static int getIntFromTupleAt(PyObject *pTuple, int n)
+	{
+		PyObject *pInt;
+		pInt = PyTuple_GetItem(pTuple, n);
+		n = PyInt_AsLong(pInt);
+		Py_DECREF(pInt);
+		return n;
+	}
 
-	static PyObject *num_clients(PyObject *self, PyObject *args)
+	static PyObject *numClients(PyObject *self, PyObject *args)
 	{
 		return Py_BuildValue("i", server::numclients());
 	}
@@ -2617,9 +2625,34 @@ namespace SbPy
 		return Py_None;
 	}
 	
+	static PyObject *playerName(PyObject *self, PyObject *args)
+	{
+		int cn = getIntFromTupleAt(args, 0);
+		server::clientinfo *ci = server::getinfo(cn);
+		if(ci && ci->name)
+		{
+			std::cout << ci->name;
+			return Py_BuildValue("s", ci->name);
+		}
+		else
+			std::cout << "Error: Invalid cn or no name assigned to client.";
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	
+	static PyObject *playerIpLong(PyObject *self, PyObject *args)
+	{
+		int cn = getIntFromTupleAt(args, 0);
+		server::clientinfo *ci = server::getinfo(cn);
+		if(ci)
+			return Py_BuildValue("s", getclientip(ci->clientnum));
+	}
+	
 	static PyMethodDef ModuleMethods[] = {
-		{"num_clients", num_clients, METH_VARARGS, "Return the number of clients on the server."},
+		{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 		{"message", message, METH_VARARGS, "Send a server message."},
+		{"playerName", playerName, METH_VARARGS, "Get name of player from cn."},
+		{"playerIpLong", playerIpLong, METH_VARARGS, "Get IP of player from cn."},
 		{NULL, NULL, 0, NULL}
 	};
 	
