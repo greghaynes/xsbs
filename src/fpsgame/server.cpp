@@ -233,7 +233,7 @@ namespace server
         int ping, aireinit;
         string clientmap;
         int mapcrc;
-        bool warned, gameclip;
+        bool warned, gameclip, active;
 
         clientinfo() { reset(); }
         ~clientinfo() { events.deletecontentsp(); }
@@ -1936,6 +1936,7 @@ namespace server
                 if(m_demo) setupdemoplayback();
 
                 if(servermotd[0]) sendf(sender, 1, "ris", SV_SERVMSG, servermotd);
+				SbPy::triggerEventInt("player_connect", ci->clientnum);
             }
         }
         else if(chan==2)
@@ -1982,8 +1983,16 @@ namespace server
                         cp->position.setsizenodelete(0);
                         while(curmsg<p.length()) cp->position.add(p.buf[curmsg++]);
                     }
-                    if(smode && cp->state.state==CS_ALIVE) smode->moved(cp, cp->state.o, cp->gameclip, pos, (physstate&0x80)!=0);
-                    cp->state.o = pos;
+					if(cp->state.state == CS_ALIVE)
+					{
+						if(smode) smode->moved(cp, cp->state.o, cp->gameclip, pos, (physstate&0x80)!=0);
+						if(!cp->active)
+						{
+							cp->active = true;
+							SbPy::triggerEventInt("player_active", cp->clientnum);
+						}
+					}
+					cp->state.o = pos;
                     cp->gameclip = (physstate&0x80)!=0;
                 }
                 break;
@@ -2094,7 +2103,11 @@ namespace server
 
             case SV_SUICIDE:
             {
-                if(cq) cq->addevent(new suicideevent);
+                if(cq)
+				{
+				    cq->addevent(new suicideevent);
+					SbPy::triggerEventInt("player_suicide", cq->clientnum);
+				}
                 break;
             }
 
@@ -2186,6 +2199,7 @@ namespace server
                 getstring(text, p);
                 filtertext(ci->name, text, false, MAXNAMELEN);
                 if(!ci->name[0]) copystring(ci->name, "unnamed");
+				SbPy::triggerEventIntString("player_name_changed", ci->clientnum, ci->name);
                 QUEUE_STR(ci->name);
                 break;
             }
@@ -2344,6 +2358,7 @@ namespace server
                     b.time = totalmillis;
                     b.ip = getclientip(victim);
                     allowedips.removeobj(b.ip);
+					SbPy::triggerEventInt("player_kicked", ci->clientnum);
                     disconnect_client(victim, DISC_KICK);
                 }
                 break;
@@ -2473,12 +2488,14 @@ namespace server
             case SV_ADDBOT:
             {
                 aiman::reqadd(ci, getint(p));
+				SbPy::triggerEventInt("game_bot_added", ci->clientnum);
                 break;
             }
 
             case SV_DELBOT:
             {
                 aiman::reqdel(ci);
+				SbPy::triggerEventInt("game_bot_removed", ci->clientnum);
                 break;
             }
 
