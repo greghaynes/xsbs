@@ -32,21 +32,44 @@ std::vector<std::string> &PluginManager::paths()
 
 void PluginManager::reload()
 {
+	std::vector<std::string> *pluginPaths, *tmpPaths;
+	std::vector<std::string>::iterator itr, itr2;
+	Plugin *plugin;
+	
 	std::cout << "Loading plugins...\n";
 	clearPlugins();
-	std::vector<std::string> *pluginPaths;
-	std::vector<std::string>::iterator itr;
-	std::vector<std::string>::iterator itr2;
+	
+	pluginPaths = new std::vector<std::string>;
 	for(itr = paths().begin(); itr != paths().end(); itr++)
 	{
-		std::cout << "Checking path: " << *itr << "\n";
-		pluginPaths = dirsIn(*itr);
-		for(itr2 = pluginPaths->begin(); itr2 != pluginPaths->end(); itr2++)
+		tmpPaths = dirsIn(*itr);
+		for(itr2 = tmpPaths->begin(); itr2 != tmpPaths->end(); itr2++)
 		{
-			std::cout << "Found plugin: " << *itr2 << "\n";
+			pluginPaths->push_back(*itr2);
 		}
-		delete pluginPaths;
+		delete tmpPaths;
 	}
+	
+	for(itr = pluginPaths->begin(); itr != pluginPaths->end(); itr++)
+	{
+		plugin = pluginFromPath(*itr);
+		if(plugin)
+			_plugins.push_back(plugin);
+		else
+			std::cout << "Error loading plugin: " << *itr << "\n";
+
+	}
+	delete pluginPaths;
+}
+
+const std::vector<Plugin*> &PluginManager::plugins() const
+{
+	return _plugins;
+}
+
+Plugin *PluginManager::pluginFromPath(const std::string &path)
+{
+	return 0;
 }
 
 void PluginManager::clearPlugins()

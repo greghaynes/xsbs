@@ -17,6 +17,7 @@ class PluginManager
 		std::vector<std::string> &paths();
 		void reload();
 		const std::vector<Plugin*> &plugins() const;
+		Plugin *pluginFromPath(const std::string &path);
 	
 	private:
 		PluginManager();
