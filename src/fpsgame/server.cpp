@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#define PYSCRIPTS_PATH "~/.config/xsbs/pyscripts"
+#define PYSCRIPTS_PATH "/home/greghaynes/.config/xsbs/pyscripts"
 
 namespace SbPy
 {
@@ -475,7 +475,7 @@ namespace server
 		
 		// Initialize python modules
 		SbPy::init("sauer_server", PYSCRIPTS_PATH, "sbserver");
-		//SbPy::triggerEvent("server_start", 0);
+		SbPy::triggerEvent("server_start", 0);
     }
 
     int numclients(int exclude = -1, bool nospec = true, bool noai = true)
@@ -2669,11 +2669,12 @@ namespace SbPy
 	{
 		char *pn = new char[strlen(prog_name)+1];
 		strcpy(pn, prog_name);
-		Py_SetProgramName(pn);
 		if(-1 == chdir(pyscripts_path))
 		{
-			fprintf(stderr, "could not chdir into pyscripts path\n");
+			perror("could not chdir into pyscripts path");
 		}
+		setenv("PYTHONPATH", pyscripts_path, 1);
+		Py_SetProgramName(pn);
 		Py_Initialize();
 		initModule(module_name);
 		if(!initPy(pyscripts_path))
