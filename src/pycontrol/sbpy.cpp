@@ -25,8 +25,6 @@
 namespace SbPy
 {
 
-static PyObject *pluginsModule, *eventsModule;
-
 #define SBPY_ERR(x) \
 	if(!x) \
 	{ \
@@ -37,7 +35,7 @@ static PyObject *pluginsModule, *eventsModule;
 
 bool initPy()
 {
-	PyObject *pFunc, *pArgs, *pValue, *triggerFunc;
+	PyObject *pFunc, *pArgs, *pValue, *triggerFunc, *pluginsModule, *eventsModule;
 	
 	std::string path;
 	pluginsModule = PyImport_ImportModule("sbplugins");
@@ -69,6 +67,8 @@ bool initPy()
 		return false;
 	}
 	Py_DECREF(triggerFunc);
+	Py_DECREF(pluginsModule);
+	Py_DECREF(eventsModule);
 	
 	return true;
 }
@@ -80,10 +80,12 @@ void deinitPy()
 
 bool triggerEvent(const char *name, std::vector<PyObject*> *args)
 {
-	PyObject *pArgs, *pArgsArgs, *pName, *pValue, *pFunc;
+	PyObject *pArgs, *pArgsArgs, *pName, *pValue, *pFunc, *eventsModule;
 	std::vector<PyObject*>::const_iterator itr;
 	int i = 0;
 	
+	eventsModule = PyImport_ImportModule("sbevents");
+	SBPY_ERR(eventsModule)
 	pArgs = PyTuple_New(2);
 	pName = PyString_FromString(name);
 	SBPY_ERR(pName)
@@ -107,6 +109,7 @@ bool triggerEvent(const char *name, std::vector<PyObject*> *args)
 	Py_DECREF(pName);
 	Py_DECREF(pArgs);
 	Py_DECREF(pArgsArgs);
+	Py_DECREF(eventsModule);
 	if(!pValue)
 	{
 		fprintf(stderr, "Error triggering event.\n");
