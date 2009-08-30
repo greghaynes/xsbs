@@ -33,11 +33,11 @@ namespace SbPy
 		return false;\
 	}
 
-static PyObject *eventsModule;
+static PyObject *eventsModule, *triggerEventFunc;
 
 bool initPy(const char *pyscripts_path)
 {
-	PyObject *pFunc, *pArgs, *pValue, *triggerFunc, *pluginsModule;
+	PyObject *pFunc, *pArgs, *pValue, *pluginsModule;
 	
 	std::string path;
 	pluginsModule = PyImport_ImportModule("sbplugins");
@@ -61,14 +61,13 @@ bool initPy(const char *pyscripts_path)
 		return false;
 	}
 	Py_DECREF(pValue);
-	triggerFunc = PyObject_GetAttrString(eventsModule, "triggerEvent");
-	SBPY_ERR(triggerFunc);
-	if(!PyCallable_Check(triggerFunc))
+	triggerEventFunc = PyObject_GetAttrString(eventsModule, "triggerEvent");
+	SBPY_ERR(triggerEventFunc);
+	if(!PyCallable_Check(triggerEventFunc))
 	{
 		fprintf(stderr, "Error: triggerEvent function could not be loaded.\n");
 		return false;
 	}
-	Py_DECREF(triggerFunc);
 	Py_DECREF(pluginsModule);
 	
 	return true;
@@ -81,10 +80,12 @@ void deinitPy()
 
 bool triggerEvent(const char *name, std::vector<PyObject*> *args)
 {
-	PyObject *pArgs, *pArgsArgs, *pName, *pValue, *pFunc;
+	PyObject *pArgs, *pArgsArgs, *pName, *pValue;
 	std::vector<PyObject*>::const_iterator itr;
 	int i = 0;
 	
+	if(!triggerEventFunc)
+		return false;
 	pArgs = PyTuple_New(2);
 	pName = PyString_FromString(name);
 	SBPY_ERR(pName)
@@ -101,13 +102,8 @@ bool triggerEvent(const char *name, std::vector<PyObject*> *args)
 	else
 		pArgsArgs = PyTuple_New(0);
 	PyTuple_SetItem(pArgs, 1, pArgsArgs);
-	pFunc = PyObject_GetAttrString(eventsModule, "triggerEvent");
-	SBPY_ERR(pFunc)
-	pValue = PyObject_CallObject(pFunc, pArgs);
-	Py_DECREF(pFunc);
-	Py_DECREF(pName);
+	pValue = PyObject_CallObject(triggerEventFunc, pArgs);
 	Py_DECREF(pArgs);
-	Py_DECREF(pArgsArgs);
 	if(!pValue)
 	{
 		fprintf(stderr, "Error triggering event.\n");
@@ -123,7 +119,6 @@ bool triggerEventInt(const char *name, int cn)
 	PyObject *pCn = PyInt_FromLong(cn);
 	args.push_back(pCn);
 	bool val = triggerEvent(name, &args);
-	Py_DECREF(pCn);
 	return val;
 }
 
@@ -135,7 +130,6 @@ bool triggerEventIntString(const char *name, int cn, const char *text)
 	args.push_back(pText);
 	args.push_back(pCn);
 	bool val = triggerEvent(name, &args);
-	Py_DECREF(pCn);
 	return val;
 }
 

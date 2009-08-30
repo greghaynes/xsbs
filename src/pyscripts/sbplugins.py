@@ -7,12 +7,15 @@ config_filename = 'plugin.conf'
 
 class Plugin:
 	def __init__(self, path, config_path):
-		self.abspath = os.path.abspath(path)
 		conf = ConfigParser()
 		conf.read(config_path)
 		self.initmodule = conf.get('Plugin', 'module')
-		if self.initmodule:
-			__import__(os.path.basename(self.abspath) + '.' + self.initmodule)
+		if conf.has_option('Plugin', 'enable'):
+			self.isenabled = 'yes' == conf.get('Plugin', 'enable')
+		else:
+			self.isenabled = False
+		if self.initmodule and self.isenabled:
+			__import__(os.path.basename(path) + '.' + self.initmodule)
 
 def loadPlugins():
 	del plugins[:]

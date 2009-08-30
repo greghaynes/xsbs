@@ -257,7 +257,7 @@ namespace server
             mapcrc = 0;
             warned = false;
             gameclip = false;
-			SbPy::triggerEvent("mapchange", 0);
+           // SbPy::triggerEvent("mapchange", 0);
         }
 
         void reassign()
@@ -2603,7 +2603,6 @@ namespace SbPy
 		PyObject *pInt;
 		pInt = PyTuple_GetItem(pTuple, n);
 		n = PyInt_AsLong(pInt);
-		Py_DECREF(pInt);
 		return n;
 	}
 
@@ -2618,10 +2617,8 @@ namespace SbPy
 		if(pMsg)
 		{
 			char *msg = PyString_AsString(pMsg);
-			fprintf(stdout, msg);
 			if(msg)
 				server::sendservmsg(msg);
-			Py_DECREF(pMsg);
 		}
 		else
 			fprintf(stderr, "Error sending message");
@@ -2635,7 +2632,7 @@ namespace SbPy
 		server::clientinfo *ci = server::getinfo(cn);
 		if(ci && ci->name)
 		{
-			std::cout << ci->name;
+			std::cout << "Name: " << ci->name << "\n";
 			return Py_BuildValue("s", ci->name);
 		}
 		else
@@ -2670,13 +2667,14 @@ namespace SbPy
 	bool init(const char *prog_name, const char *pyscripts_path, const char *module_name)
 	{
 		char *pn = new char[strlen(prog_name)+1];
-		strcpy(pn, prog_name);
 		if(-1 == chdir(pyscripts_path))
 		{
 			perror("could not chdir into pyscripts path");
 		}
 		setenv("PYTHONPATH", pyscripts_path, 1);
+		strcpy(pn, prog_name);
 		Py_SetProgramName(pn);
+		delete pn;
 		Py_Initialize();
 		initModule(module_name);
 		if(!initPy(pyscripts_path))
@@ -2684,7 +2682,6 @@ namespace SbPy
 			fprintf(stderr, "Error initializing python modules.\n");
 			return false;
 		}
-		delete pn;
 		return true;
 	}
 	
