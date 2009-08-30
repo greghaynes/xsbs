@@ -1,6 +1,6 @@
 #include "game.h"
 #include "Python.h"
-#include "pluginmanager.h"
+#include "sbpy.h"
 
 namespace game
 {
@@ -462,9 +462,9 @@ namespace server
     {
         smapname[0] = '\0';
         resetitems();
-		SbPyControl::PluginManager *pm = &SbPyControl::PluginManager::instance();
-		pm->paths().push_back("/Users/gregoryhaynes/Projects/xsbs/src/pyscripts");
-		pm->reload();
+		
+		// Initialize python modules
+		SbPyModule::initPy("sauer_server", "/Users/gregoryhaynes/Projects/xsbs/src/pyscripts");
     }
 
     int numclients(int exclude = -1, bool nospec = true, bool noai = true)

@@ -12,9 +12,7 @@ set(xsbs_srcs
 	shared/stream.cpp
 	shared/tools.cpp
 	
-	pycontrol/pluginmanager.cpp
-	pycontrol/plugin.cpp
-	pycontrol/eventtable.cpp)
+	pycontrol/sbpy.cpp)
 
 add_definitions(-DSTANDALONE)
 
@@ -23,4 +21,4 @@ include_directories(engine fpsgame shared include pycontrol enet/include ${PYTHO
 add_executable(xsbs
 	${xsbs_srcs})
 
-target_link_libraries(xsbs enet z)
+target_link_libraries(xsbs enet z ${PYTHON_LIBRARIES})

@@ -1,2 +1,4 @@
+import sbpy
+
 def sayHello(server, player):
-	server.sendMessageToPlayer(player, "Hello, World!")
+	print sbpy.hello_world()
