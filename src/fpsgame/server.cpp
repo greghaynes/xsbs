@@ -399,7 +399,7 @@ namespace server
     SVAR(serverpass, "");
     SVAR(adminpass, "");
     VARF(publicserver, 0, 0, 1, { mastermask = publicserver ? MM_PUBSERV : MM_PRIVSERV; });
-    SVAR(servermotd, "");
+    SVAR(pyscriptspath, "");
 
     void *newclientinfo() { return new clientinfo; }
     void deleteclientinfo(void *ci) { delete (clientinfo *)ci; }
@@ -463,7 +463,7 @@ namespace server
             case 'p': setsvar("adminpass", &arg[2]); return true;
             case 'o': setvar("publicserver", atoi(&arg[2])); return true;
             case 'g': setvar("serverbotlimit", atoi(&arg[2])); return true;
-			case 's': setsvar("pyscriptpath", &arg[2]); return true;
+            case 's': setsvar("pyscriptspath", &arg[2]); return true;
         }
         return false;
     }
@@ -473,9 +473,12 @@ namespace server
         smapname[0] = '\0';
         resetitems();
 		
-		// Initialize python modules
-		SbPy::init("sauer_server", PYSCRIPTS_PATH, "sbserver");
-		SbPy::triggerEvent("server_start", 0);
+        // Initialize python modules
+        if(pyscriptspath[0])
+            SbPy::init("sauer_server", pyscriptspath, "sbserver");
+	else
+            SbPy::init("sauer_server", PYSCRIPTS_PATH, "sbserver");
+        SbPy::triggerEvent("server_start", 0);
     }
 
     int numclients(int exclude = -1, bool nospec = true, bool noai = true)
@@ -1937,8 +1940,7 @@ namespace server
 
                 if(m_demo) setupdemoplayback();
 
-                if(servermotd[0]) sendf(sender, 1, "ris", SV_SERVMSG, servermotd);
-				SbPy::triggerEventInt("player_connect", ci->clientnum);
+                SbPy::triggerEventInt("player_connect", ci->clientnum);
             }
         }
         else if(chan==2)
