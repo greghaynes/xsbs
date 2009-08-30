@@ -2,6 +2,8 @@
 #include "Python.h"
 #include "sbpy.h"
 
+#include <iostream>
+
 namespace SbPy
 {
 	bool init(const char *, const char *, const char *);
@@ -2157,6 +2159,7 @@ namespace server
                 QUEUE_MSG;
                 getstring(text, p);
                 filtertext(text, text);
+				SbPy::triggerEventIntString("player_message", ci->clientnum, text);
                 QUEUE_STR(text);
                 break;
             }
@@ -2164,6 +2167,9 @@ namespace server
             case SV_SAYTEAM:
             {
                 getstring(text, p);
+				
+				// TODO: Should this event be triggered before or after check?
+				SbPy::triggerEventIntString("player_message_team", ci->clientnum, text);
                 if(!ci || !cq || (ci->state.state==CS_SPECTATOR && !ci->local && !ci->privilege) || !m_teammode || !cq->team[0]) break;
                 loopv(clients)
                 {
@@ -2171,7 +2177,6 @@ namespace server
                     if(t==cq || t->state.state==CS_SPECTATOR || t->state.aitype != AI_NONE || strcmp(cq->team, t->team)) continue;
                     sendf(t->clientnum, 1, "riis", SV_SAYTEAM, cq->clientnum, text);
                 }
-				SbPy::triggerEventCnText("player_team_message", cq->clientnum, text);
                 break;
             }
 
@@ -2308,7 +2313,8 @@ namespace server
                             loopv(clients) allowedips.add(getclientip(clients[i]->clientnum));
                         }
                         defformatstring(s)("mastermode is now %s (%d)", mastermodename(mastermode), mastermode);
-                        sendservmsg(s);
+                        SbPy::triggerEventInt("server_mastermode_changed", mastermode);
+						sendservmsg(s);
                     }
                     else
                     {

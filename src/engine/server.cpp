@@ -643,7 +643,7 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
                 copystring(c.hostname, (enet_address_get_host_ip(&c.peer->address, hn, sizeof(hn))==0) ? hn : "unknown");
                 printf("client connected (%s)\n", c.hostname);
 				
-				SbPy::triggerEventCn("player_connect", c.num);
+				SbPy::triggerEventInt("player_connect", c.num);
 				
                 int reason = server::clientconnect(c.num, c.peer->address.host);
                 if(!reason) nonlocalclients++;
@@ -664,6 +664,9 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
                 if(!c) break;
                 printf("disconnected client (%s)\n", c->hostname);
                 server::clientdisconnect(c->num);
+				
+				SbPy::triggerEventInt("player_disconnect", c->num);
+				
                 nonlocalclients--;
                 c->type = ST_EMPTY;
                 event.peer->data = NULL;

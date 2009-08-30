@@ -21,9 +21,9 @@ bool initPy()
 	PyObject *pFunc, *pArgs, *pValue, *triggerFunc;
 	
 	std::string path;
-	pluginsModule = PyImport_ImportModule("plugins");
+	pluginsModule = PyImport_ImportModule("sbplugins");
 	SBPY_ERR(pluginsModule)
-	eventsModule = PyImport_ImportModule("events");
+	eventsModule = PyImport_ImportModule("sbevents");
 	SBPY_ERR(eventsModule)
 	pFunc = PyObject_GetAttrString(pluginsModule, "loadPlugins");
 	SBPY_ERR(pFunc)
@@ -97,7 +97,7 @@ bool triggerEvent(const char *name, std::vector<PyObject*> *args)
 	return true;
 }
 
-bool triggerEventCn(const char *name, int cn)
+bool triggerEventInt(const char *name, int cn)
 {
 	std::vector<PyObject*> args;
 	PyObject *pCn = PyInt_FromLong(cn);
@@ -107,7 +107,7 @@ bool triggerEventCn(const char *name, int cn)
 	return val;
 }
 
-bool triggerEventCnText(const char *name, int cn, const char *text)
+bool triggerEventIntString(const char *name, int cn, const char *text)
 {
 	std::vector<PyObject*> args;
 	PyObject *pText = PyString_FromString(text);
