@@ -2,6 +2,7 @@
 // runs dedicated or as client coroutine
 
 #include "engine.h"
+#include "sbpy.h"
 
 #ifdef STANDALONE
 void fatal(const char *s, ...) 
@@ -641,6 +642,9 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
                 char hn[1024];
                 copystring(c.hostname, (enet_address_get_host_ip(&c.peer->address, hn, sizeof(hn))==0) ? hn : "unknown");
                 printf("client connected (%s)\n", c.hostname);
+				
+				SbPy::triggerEventCn("player_connect", c.num);
+				
                 int reason = server::clientconnect(c.num, c.peer->address.host);
                 if(!reason) nonlocalclients++;
                 else disconnect_client(c.num, reason);

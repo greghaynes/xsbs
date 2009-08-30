@@ -5,7 +5,7 @@ def registerEventHandler(event, handler):
 		events[event] = []
 	events[event].append(handler)
 
-def triggerEvent(event):
+def triggerEvent(event, args):
 	if events.has_key(event):
 		for handler in events[event]:
-			handler()
+			handler(*args)

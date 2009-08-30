@@ -4,12 +4,14 @@
 #include <Python.h>
 #include <vector>
 
-namespace SbPyModule
+namespace SbPy
 {
 
-bool initPy(const char *prog_name, const char *pyscripts_path);
+bool initPy();
 void deinitPy();
-bool triggerEvent(const char *event_name, std::vector<PyObject*> &args);
+bool triggerEvent(const char *event_name, std::vector<PyObject*> *args);
+bool triggerEventCn(const char *event_name, int cn);
+bool triggerEventCnText(const char *event_name, int cn, const char *text);
 
 }
 

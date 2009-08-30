@@ -2,6 +2,11 @@
 #include "Python.h"
 #include "sbpy.h"
 
+namespace SbPy
+{
+	bool init(const char *, const char *, const char *);
+}
+
 namespace game
 {
     void parseoptions(vector<const char *> &args)
@@ -248,6 +253,7 @@ namespace server
             mapcrc = 0;
             warned = false;
             gameclip = false;
+			SbPy::triggerEvent("mapchange", 0);
         }
 
         void reassign()
@@ -464,9 +470,8 @@ namespace server
         resetitems();
 		
 		// Initialize python modules
-		SbPyModule::initPy("sauer_server", "/Users/gregoryhaynes/Projects/xsbs/src/pyscripts");
-		std::vector<PyObject*> args;
-		SbPyModule::triggerEvent("server_start", args);
+		SbPy::init("sauer_server", "/Users/gregoryhaynes/Projects/xsbs/src/pyscripts", "sbserver");
+		SbPy::triggerEvent("server_start", 0);
     }
 
     int numclients(int exclude = -1, bool nospec = true, bool noai = true)
@@ -1748,8 +1753,9 @@ namespace server
         ci->clientnum = ci->ownernum = n;
         ci->connectmillis = totalmillis;
         ci->sessionid = (rnd(0x1000000)*((totalmillis%10000)+1))&0xFFFFFF;
-
+		
         connects.add(ci);
+		
         if(!m_mp(gamemode)) return DISC_PRIVATE;
         sendservinfo(ci);
         return DISC_NONE;
@@ -2165,6 +2171,7 @@ namespace server
                     if(t==cq || t->state.state==CS_SPECTATOR || t->state.aitype != AI_NONE || strcmp(cq->team, t->team)) continue;
                     sendf(t->clientnum, 1, "riis", SV_SAYTEAM, cq->clientnum, text);
                 }
+				SbPy::triggerEventCnText("player_team_message", cq->clientnum, text);
                 break;
             }
 
@@ -2562,3 +2569,61 @@ namespace server
     #include "aiman.h"
 }
 
+namespace SbPy
+{
+
+	static PyObject *num_clients(PyObject *self, PyObject *args)
+	{
+		return Py_BuildValue("i", server::numclients());
+	}
+	
+	static PyObject *message(PyObject *self, PyObject *args)
+	{
+		PyObject *pMsg = PyTuple_GetItem(args, 0);
+		if(pMsg)
+		{
+			char *msg = PyString_AsString(pMsg);
+			fprintf(stdout, msg);
+			if(msg)
+				server::sendservmsg(msg);
+			Py_DECREF(pMsg);
+		}
+		else
+			fprintf(stderr, "Error sending message");
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	
+	static PyMethodDef ModuleMethods[] = {
+		{"num_clients", num_clients, METH_VARARGS, "Return the number of clients on the server."},
+		{"message", message, METH_VARARGS, "Send a server message."},
+		{NULL, NULL, 0, NULL}
+	};
+	
+	PyMODINIT_FUNC
+	initModule(const char *module_name)
+	{
+		(void) Py_InitModule(module_name, ModuleMethods);
+		return;
+	}
+	
+	bool init(const char *prog_name, const char *pyscripts_path, const char *module_name)
+	{
+		char *pn = new char[strlen(prog_name)+1];
+		strcpy(pn, prog_name);
+		Py_SetProgramName(pn);
+		if(-1 == chdir(pyscripts_path))
+			return false;
+		setenv("PYTHONPATH", pyscripts_path, 1);
+		Py_Initialize();
+		initModule(module_name);
+		if(!initPy())
+		{
+			fprintf(stderr, "Error initializing python modules.\n");
+			return false;
+		}
+		delete pn;
+		return true;
+	}
+	
+}
