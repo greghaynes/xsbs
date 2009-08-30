@@ -33,7 +33,7 @@ namespace SbPy
 		return false;\
 	}
 
-bool initPy()
+bool initPy(const char *pyscripts_path)
 {
 	PyObject *pFunc, *pArgs, *pValue, *triggerFunc, *pluginsModule, *eventsModule;
 	
@@ -80,6 +80,8 @@ void deinitPy()
 
 bool triggerEvent(const char *name, std::vector<PyObject*> *args)
 {
+	if(!args)
+		return true;
 	PyObject *pArgs, *pArgsArgs, *pName, *pValue, *pFunc, *eventsModule;
 	std::vector<PyObject*>::const_iterator itr;
 	int i = 0;
