@@ -16,6 +16,7 @@ class Plugin:
 
 def loadPlugins():
 	del plugins[:]
+	print 'Loading plugins...'
 	for path in paths:
 		files = os.listdir(path)
 		for file in files:

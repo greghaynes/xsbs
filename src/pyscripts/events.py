@@ -1,10 +1,11 @@
 events = {}
 
-def register_event_handler(event, handler):
+def registerEventHandler(event, handler):
 	if not events.has_key(event):
 		events[event] = []
 	events[event].append(handler)
 
-def trigger_event(event, args):
-	for handler in events[event]:
-		handler(*args)
+def triggerEvent(event):
+	if events.has_key(event):
+		for handler in events[event]:
+			handler()

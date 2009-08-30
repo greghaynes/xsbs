@@ -465,6 +465,8 @@ namespace server
 		
 		// Initialize python modules
 		SbPyModule::initPy("sauer_server", "/Users/gregoryhaynes/Projects/xsbs/src/pyscripts");
+		std::vector<PyObject*> args;
+		SbPyModule::triggerEvent("server_start", args);
     }
 
     int numclients(int exclude = -1, bool nospec = true, bool noai = true)

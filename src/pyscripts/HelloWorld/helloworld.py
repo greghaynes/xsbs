@@ -1,4 +1,10 @@
-import sbpy
+import events
 
-def sayHello(server, player):
-	print sbpy.hello_world()
+def sayHello():
+	print "Hello"
+
+def init():
+	events.registerEventHandler("server_start", sayHello)
+	return 0
+
+init();
