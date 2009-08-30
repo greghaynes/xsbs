@@ -4,6 +4,8 @@
 #include "engine.h"
 #include "sbpy.h"
 
+#include <signal.h>
+
 #ifdef STANDALONE
 void fatal(const char *s, ...) 
 { 
@@ -707,13 +709,25 @@ void localconnect()
 }
 #endif
 
+static bool rundedicated = true;
+
+void quit()
+{
+    rundedicated = false;
+}
+
+void sigint(int signal)
+{
+    quit();
+}
+
 void rundedicatedserver()
 {
     #ifdef WIN32
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
     #endif
     printf("dedicated server started, waiting for clients...\nCtrl-C to exit\n\n");
-    for(;;) serverslice(true, 5);
+    for(;rundedicated;) serverslice(true, 4);
 }
 
 bool servererror(bool dedicated, const char *desc)
@@ -769,6 +783,7 @@ void initserver(bool listen, bool dedicated)
     if(listen) setuplistenserver(dedicated);
 
     server::serverinit();
+    signal(SIGINT, sigint);
 
     if(listen)
     {
