@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#define PYSCRIPTS_PATH "/home/greghaynes/.config/xsbs/pyscripts"
+#define PYSCRIPTS_PATH "/home/greghaynes/Projects/xsbs/src/pyscripts"
 
 namespace SbPy
 {
