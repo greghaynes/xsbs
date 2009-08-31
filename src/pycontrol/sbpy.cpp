@@ -92,7 +92,10 @@ bool triggerFuncEvent(const char *name, std::vector<PyObject*> *args, PyObject *
 	int i = 0;
 	
 	if(!func)
+	{
+		std::cout << "Invalid function handler to trigger event.\n";
 		return false;
+	}
 	pArgs = PyTuple_New(2);
 	pName = PyString_FromString(name);
 	SBPY_ERR(pName)
@@ -113,14 +116,14 @@ bool triggerFuncEvent(const char *name, std::vector<PyObject*> *args, PyObject *
 	Py_DECREF(pArgs);
 	if(!pValue)
 	{
+		PyErr_Print();
 		fprintf(stderr, "Error triggering event.\n");
 		return false;
 	}
 	if(PyBool_Check(pValue))
 	{
-		bool ret = pValue == Py_True;
+		bool ret = (pValue == Py_True);
 		Py_DECREF(pValue);
-		std::cout << ret << "\n";
 		return ret;
 	}
 	Py_DECREF(pValue);
@@ -134,8 +137,7 @@ bool triggerFuncEventInt(const char *name, int cn, PyObject *func)
 	std::vector<PyObject*> args;
 	PyObject *pCn = PyInt_FromLong(cn);
 	args.push_back(pCn);
-	bool val = triggerFuncEvent(name, &args, func);
-	return val;
+	return triggerFuncEvent(name, &args, func);
 }
 
 bool triggerFuncEventIntString(const char *name, int cn, const char *text, PyObject *func)
@@ -143,25 +145,24 @@ bool triggerFuncEventIntString(const char *name, int cn, const char *text, PyObj
 	std::vector<PyObject*> args;
 	PyObject *pText = PyString_FromString(text);
 	PyObject *pCn = PyInt_FromLong(cn);
-	args.push_back(pText);
 	args.push_back(pCn);
-	bool val = triggerFuncEvent(name, &args, func);
-	return val;
+	args.push_back(pText);
+	return triggerFuncEvent(name, &args, func);
 }
 
 bool triggerEvent(const char*name, std::vector<PyObject*>* args)
 {
-	triggerFuncEvent(name, args, triggerEventFunc);
+	return triggerFuncEvent(name, args, triggerEventFunc);
 }
 
 bool triggerEventInt(const char *name, int cn)
 {
-	triggerFuncEventInt(name, cn, triggerEventFunc);
+	return triggerFuncEventInt(name, cn, triggerEventFunc);
 }
 
 bool triggerEventIntString(const char *name, int cn, const char *text)
 {
-	triggerFuncEventIntString(name, cn, text, triggerEventFunc);
+	return triggerFuncEventIntString(name, cn, text, triggerEventFunc);
 }
 
 bool triggerPolicyEventIntString(const char *name, int cn, const char *text)
