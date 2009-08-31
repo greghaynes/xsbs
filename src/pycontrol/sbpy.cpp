@@ -165,6 +165,16 @@ bool triggerEventIntString(const char *name, int cn, const char *text)
 	return triggerFuncEventIntString(name, cn, text, triggerEventFunc);
 }
 
+bool triggerEventIntInt(const char *name, int cn1, int cn2)
+{
+	std::vector<PyObject*> args;
+	PyObject *pCn1 = PyInt_FromLong(cn1);
+	PyObject *pCn2 = PyInt_FromLong(cn2);
+	args.push_back(pCn1);
+	args.push_back(pCn2);
+	return triggerFuncEvent(name, &args, triggerEventFunc);
+}
+
 bool triggerPolicyEventIntString(const char *name, int cn, const char *text)
 {
 	return triggerFuncEventIntString(name, cn, text, triggerPolicyEventFunc);

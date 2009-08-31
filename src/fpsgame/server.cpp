@@ -1445,6 +1445,7 @@ namespace server
             if(smode) smode->died(target, actor);
             ts.state = CS_DEAD;
             ts.lastdeath = gamemillis;
+			SbPy::triggerEventIntInt("player_frag", actor->clientnum, target->clientnum);
             // don't issue respawn yet until DEATHMILLIS has elapsed
             // ts.respawn();
         }
