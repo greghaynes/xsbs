@@ -2609,9 +2609,8 @@ namespace SbPy
 			str = PyString_AsString(pStr);
 			return str;
 		}
-		else
-			std::cout << "Could not get string.\n";
-			return 0;
+		std::cout << "Could not get string.\n";
+		return 0;
 	}
 
 	static int getIntFromTupleAt(PyObject *pTuple, int n)
@@ -2642,11 +2641,22 @@ namespace SbPy
 		return Py_None;
 	}
 
+	static PyObject *players(PyObject *self, PyObject *args)
+	{
+	}
+
+	static PyObject *clients(PyObject *self, PyObject *args)
+	{
+	}
+
+	static PyObject *spectators(PyObject *self, PyObject *args)
+	{
+	}
+
 	static PyObject *playerMessage(PyObject *self, PyObject *args)
 	{
 		int cn = getIntFromTupleAt(args, 0);
 		char *text = getStringFromTupleAt(args, 1);
-		std::cout << cn << text;
                 sendf(cn, 1, "ris", SV_SERVMSG, text);
 		Py_INCREF(Py_None);
 		return Py_None;
@@ -2657,10 +2667,7 @@ namespace SbPy
 		int cn = getIntFromTupleAt(args, 0);
 		server::clientinfo *ci = server::getinfo(cn);
 		if(ci && ci->name)
-		{
-			std::cout << "Name: " << ci->name << "\n";
 			return Py_BuildValue("s", ci->name);
-		}
 		else
 			std::cout << "Error: Invalid cn or no name assigned to client.";
 		Py_INCREF(Py_None);
@@ -2683,13 +2690,21 @@ namespace SbPy
 		return Py_None;
 	}
 
+	static PyObject *playerBan(PyObject *self, PyObject *args)
+	{
+	}
+
 	static PyMethodDef ModuleMethods[] = {
 		{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 		{"message", message, METH_VARARGS, "Send a server message."},
+		{"clients", clients, METH_VARARGS, "List of client numbers."},
+		{"players", players, METH_VARARGS, "List of client numbers of active clients."},
+		{"spectators", spectators, METH_VARARGS, "List of client numbers of spectating clients."},
 		{"playerMessage", playerMessage, METH_VARARGS, "Send a message to player."},
 		{"playerName", playerName, METH_VARARGS, "Get name of player from cn."},
 		{"playerIpLong", playerIpLong, METH_VARARGS, "Get IP of player from cn."},
 		{"playerKick", playerKick, METH_VARARGS, "Kick player from server."},
+		{"playerBan", playerBan, METH_VARARGS, "Ban player from server."},
 		{NULL, NULL, 0, NULL}
 	};
 	
