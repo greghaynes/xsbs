@@ -340,7 +340,6 @@ namespace server
     stream *mapdata = NULL;
 
     vector<uint> allowedips;
-    vector<ban> bannedips;
     vector<clientinfo *> connects, clients, bots;
     vector<worldstate *> worldstates;
     bool reliablemessages = false;
@@ -1644,7 +1643,6 @@ namespace server
             if(smode) smode->update();
         }
 
-        while(bannedips.length() && bannedips[0].time-totalmillis>4*60*60000) bannedips.remove(0);
         loopv(connects) if(totalmillis-connects[i]->connectmillis>15000) disconnect_client(connects[i]->clientnum, DISC_TIMEOUT);
 
         if(masterupdate)
@@ -1733,7 +1731,6 @@ namespace server
 
     void noclients()
     {
-        bannedips.setsize(0);
         aiman::clearai();
     }
 
@@ -1800,7 +1797,6 @@ namespace server
         if(adminpass[0] && checkpassword(ci, adminpass, pwd)) return DISC_NONE;
         if(numclients(-1, false, true)>=maxclients) return DISC_MAXCLIENTS;
         uint ip = getclientip(ci->clientnum);
-        loopv(bannedips) if(bannedips[i].ip==ip) return DISC_IPBAN;
         if(mastermode>=MM_PRIVATE && allowedips.find(ip)<0) return DISC_PRIVATE;
         return DISC_NONE;
     }
@@ -2354,8 +2350,7 @@ namespace server
             {
                 if(ci->privilege || ci->local)
                 {
-                    bannedips.setsize(0);
-		    SbPy::triggerEvent("server_bans_cleared", 0);
+                    SbPy::triggerEventInt("server_clear_bans", ci->clientnum);
                     sendservmsg("cleared all bans");
                 }
                 break;
@@ -2366,10 +2361,6 @@ namespace server
                 int victim = getint(p);
                 if((ci->privilege || ci->local) && ci->clientnum!=victim && getclientinfo(victim)) // no bots
                 {
-                    ban &b = bannedips.add();
-                    b.time = totalmillis;
-                    b.ip = getclientip(victim);
-                    allowedips.removeobj(b.ip);
                     SbPy::triggerEventInt("player_kicked", ci->clientnum);
                     disconnect_client(victim, DISC_KICK);
                 }
@@ -2725,7 +2716,6 @@ namespace SbPy
 		{"playerName", playerName, METH_VARARGS, "Get name of player from cn."},
 		{"playerIpLong", playerIpLong, METH_VARARGS, "Get IP of player from cn."},
 		{"playerKick", playerKick, METH_VARARGS, "Kick player from server."},
-		{"playerBan", playerBan, METH_VARARGS, "Ban player from server."},
 		{NULL, NULL, 0, NULL}
 	};
 	
