@@ -1,5 +1,5 @@
 [Plugin]
 name = geoip
-author = Jon Limle
+author = Greg Haynes
 module = geoip
 enable = yes
