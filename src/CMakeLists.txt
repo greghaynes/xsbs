@@ -11,6 +11,19 @@ set(xsbs_srcs
 
 	pycontrol/sbpy.cpp)
 
+include(CheckFunctionExists)
+include(CheckSymbolExists)
+
+check_function_exists(gethostbyaddr_r, HAS_GETHOSTBYADDR_R)
+check_function_exists(gethostbyname_r, HAS_GETHOSTBYNAME_R)
+check_function_exists(poll, HAS_POLL)
+check_function_exists(fcntl, HAS_FCNTL)
+check_function_exists(inet_pton, HAS_INET_PTON)
+check_function_exists(inet_ntop, HAS_INET_NTOP)
+
+check_symbol_exists("struct msghdr.msg_flags" "sys/socket.h" HAS_MSGHDR_FLAGS)
+check_symbol_exists("socklen_t" "sys/types.h;sys/socket.h" HAS_SOCKLEN_T)
+
 add_definitions(-DSTANDALONE)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/engine

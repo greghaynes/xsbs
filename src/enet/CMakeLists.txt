@@ -1,3 +1,5 @@
+project(enet)
+
 set(enet_srcs
 	host.c
 	list.c
@@ -7,6 +9,7 @@ set(enet_srcs
 	protocol.c
 	unix.c
 	win32.c)
+
 
 add_definitions(-DHAS_SOCKLEN_T)
 
