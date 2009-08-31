@@ -5,7 +5,7 @@ prefixes = []
 
 def allowMsg(cn, text):
 	if prefixes.find(text[0]) != -1:
-		sbevents.triggerEvent("player_command", [cn, text[1:]])
+		sbevents.triggerEvent("player_command", (cn, text[1:]))
 		return False
 	return True
 

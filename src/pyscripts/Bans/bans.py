@@ -11,6 +11,9 @@ default_reason = 'unspecified reason'
 def onMessage(cn, text):
 	sp = text.split(' ')
 	if sp[0] == ban_command and sp[1]:
+		if sbserver.playerPrivilege(cn) == 0:
+			sbserver.playerMessage(cn, 'Insufficient privileges.')
+			return
 		tcn = int(sp[1])
 		ip = sbserver.playerIpLong(tcn)
 		if not ip:

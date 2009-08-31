@@ -2744,8 +2744,29 @@ namespace SbPy
 
 	static PyObject *playerKick(PyObject *self, PyObject *args)
 	{
-		int cn = getIntFromTupleAt(args, 0);
+		int cn;
+		if(!PyArg_ParseTuple(args, "i", &cn))
+		{
+			// TODO: Should throw exception
+			Py_INCREF(Py_None);
+			return Py_None;
+		}
 		disconnect_client(cn, DISC_KICK);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	static PyObject *playerPrivilege(PyObject *self, PyObject *args)
+	{
+		int cn;
+		if(!PyArg_ParseTuple(args, "i", &cn))
+		{
+			Py_INCREF(Py_None);
+			return Py_None;
+		}
+		server::clientinfo *ci = server::getinfo(cn);
+		if(ci)
+			return Py_BuildValue("i", ci->privilege);
 		Py_INCREF(Py_None);
 		return Py_None;
 	}
@@ -2760,6 +2781,7 @@ namespace SbPy
 		{"playerName", playerName, METH_VARARGS, "Get name of player from cn."},
 		{"playerIpLong", playerIpLong, METH_VARARGS, "Get IP of player from cn."},
 		{"playerKick", playerKick, METH_VARARGS, "Kick player from server."},
+		{"playerPrivilege", playerPrivilege, METH_VARARGS, "Integer representing player privilege"},
 		{NULL, NULL, 0, NULL}
 	};
 	
