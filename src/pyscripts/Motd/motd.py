@@ -1,4 +1,4 @@
-import sbevents, sbserver
+import sbevents, sbserver, sbtools
 import string
 from ConfigParser import ConfigParser
 
@@ -19,7 +19,7 @@ def compilemotd():
 		for option in options:
 			if option != 'template':
 				formatdict[option] = conf.get('MOTD', option)
-		motdstring = string.Template(conf.get('MOTD', 'template'))
+		motdstring = string.Template(sbtools.orange(conf.get('MOTD', 'template')))
 		motdstring = motdstring.substitute(formatdict)
 		return motdstring
 
