@@ -2176,7 +2176,7 @@ namespace server
                 QUEUE_MSG;
                 getstring(text, p);
                 filtertext(text, text);
-				SbPy::triggerEventIntString("player_message", ci->clientnum, text);
+                SbPy::triggerEventIntString("player_message", ci->clientnum, text);
                 QUEUE_STR(text);
                 break;
             }
@@ -2185,8 +2185,8 @@ namespace server
             {
                 getstring(text, p);
 				
-				// TODO: Should this event be triggered before or after check?
-				SbPy::triggerEventIntString("player_message_team", ci->clientnum, text);
+                // TODO: Should this event be triggered before or after check?
+                SbPy::triggerEventIntString("player_message_team", ci->clientnum, text);
                 if(!ci || !cq || (ci->state.state==CS_SPECTATOR && !ci->local && !ci->privilege) || !m_teammode || !cq->team[0]) break;
                 loopv(clients)
                 {
@@ -2203,7 +2203,7 @@ namespace server
                 getstring(text, p);
                 filtertext(ci->name, text, false, MAXNAMELEN);
                 if(!ci->name[0]) copystring(ci->name, "unnamed");
-				SbPy::triggerEventIntString("player_name_changed", ci->clientnum, ci->name);
+                SbPy::triggerEventIntString("player_name_changed", ci->clientnum, ci->name);
                 QUEUE_STR(ci->name);
                 break;
             }
@@ -2230,6 +2230,7 @@ namespace server
                         aiman::changeteam(ci);
                         sendf(-1, 1, "riis", SV_SETTEAM, sender, ci->team);
                     }
+                    SbPy::triggerEventInt("player_team_changed", ci->clientnum);
                 }
                 break;
             }
@@ -2348,6 +2349,7 @@ namespace server
                 if(ci->privilege || ci->local)
                 {
                     bannedips.setsize(0);
+		    SbPy::triggerEvent("server_bans_cleared", 0);
                     sendservmsg("cleared all bans");
                 }
                 break;
