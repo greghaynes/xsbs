@@ -5,6 +5,7 @@
 #include <iostream>
 
 #define PYSCRIPTS_PATH "/home/greghaynes/Projects/xsbs/src/pyscripts"
+#define MSG_COMMAND_CHAR '#'
 
 namespace SbPy
 {
@@ -257,7 +258,6 @@ namespace server
             mapcrc = 0;
             warned = false;
             gameclip = false;
-           // SbPy::triggerEvent("mapchange", 0);
         }
 
         void reassign()
@@ -2108,10 +2108,10 @@ namespace server
             case SV_SUICIDE:
             {
                 if(cq)
-				{
-				    cq->addevent(new suicideevent);
-					SbPy::triggerEventInt("player_suicide", cq->clientnum);
-				}
+                {
+                    cq->addevent(new suicideevent);
+                    SbPy::triggerEventInt("player_suicide", cq->clientnum);
+                }
                 break;
             }
 
@@ -2184,7 +2184,6 @@ namespace server
             case SV_SAYTEAM:
             {
                 getstring(text, p);
-				
                 // TODO: Should this event be triggered before or after check?
                 SbPy::triggerEventIntString("player_message_team", ci->clientnum, text);
                 if(!ci || !cq || (ci->state.state==CS_SPECTATOR && !ci->local && !ci->privilege) || !m_teammode || !cq->team[0]) break;
@@ -2600,6 +2599,21 @@ namespace server
 
 namespace SbPy
 {
+	static char *getStringFromTupleAt(PyObject *pTuple, int n)
+	{
+		PyObject *pStr;
+		char *str;
+		pStr = PyTuple_GetItem(pTuple, n);
+		if(pStr)
+		{
+			str = PyString_AsString(pStr);
+			return str;
+		}
+		else
+			std::cout << "Could not get string.\n";
+			return 0;
+	}
+
 	static int getIntFromTupleAt(PyObject *pTuple, int n)
 	{
 		PyObject *pInt;
@@ -2624,6 +2638,16 @@ namespace SbPy
 		}
 		else
 			fprintf(stderr, "Error sending message");
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	static PyObject *playerMessage(PyObject *self, PyObject *args)
+	{
+		int cn = getIntFromTupleAt(args, 0);
+		char *text = getStringFromTupleAt(args, 1);
+		std::cout << cn << text;
+                sendf(cn, 1, "ris", SV_SERVMSG, text);
 		Py_INCREF(Py_None);
 		return Py_None;
 	}
@@ -2658,10 +2682,11 @@ namespace SbPy
 		Py_INCREF(Py_None);
 		return Py_None;
 	}
-	
+
 	static PyMethodDef ModuleMethods[] = {
 		{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 		{"message", message, METH_VARARGS, "Send a server message."},
+		{"playerMessage", playerMessage, METH_VARARGS, "Send a message to player."},
 		{"playerName", playerName, METH_VARARGS, "Get name of player from cn."},
 		{"playerIpLong", playerIpLong, METH_VARARGS, "Get IP of player from cn."},
 		{"playerKick", playerKick, METH_VARARGS, "Kick player from server."},
