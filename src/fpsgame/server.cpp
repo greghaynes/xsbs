@@ -2364,7 +2364,7 @@ namespace server
                     b.time = totalmillis;
                     b.ip = getclientip(victim);
                     allowedips.removeobj(b.ip);
-					SbPy::triggerEventInt("player_kicked", ci->clientnum);
+                    SbPy::triggerEventInt("player_kicked", ci->clientnum);
                     disconnect_client(victim, DISC_KICK);
                 }
                 break;
@@ -2650,12 +2650,21 @@ namespace SbPy
 		if(ci)
 			return Py_BuildValue("s", getclientip(ci->clientnum));
 	}
+
+	static PyObject *playerKick(PyObject *self, PyObject *args)
+	{
+		int cn = getIntFromTupleAt(args, 0);
+		disconnect_client(cn, DISC_KICK);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
 	
 	static PyMethodDef ModuleMethods[] = {
 		{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 		{"message", message, METH_VARARGS, "Send a server message."},
 		{"playerName", playerName, METH_VARARGS, "Get name of player from cn."},
 		{"playerIpLong", playerIpLong, METH_VARARGS, "Get IP of player from cn."},
+		{"playerKick", playerKick, METH_VARARGS, "Kick player from server."},
 		{NULL, NULL, 0, NULL}
 	};
 	
