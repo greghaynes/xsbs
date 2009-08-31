@@ -2655,10 +2655,58 @@ namespace SbPy
 
 	static PyObject *players(PyObject *self, PyObject *args)
 	{
+		server::clientinfo *ci;
+		std::vector<int> spects;
+		std::vector<int>::iterator itr;
+		PyObject *pTuple;
+		PyObject *pInt;
+		int y = 0;
+		
+		loopv(server::clients)
+		{
+			ci = server::getinfo(i);
+			if(ci->state.state != CS_SPECTATOR)
+			{
+				spects.push_back(i);
+			}
+		}
+		pTuple = PyTuple_New(spects.size());
+		
+		for(itr = spects.begin(); itr != spects.end(); itr++)
+		{
+			pInt = PyInt_FromLong(*itr);
+			PyTuple_SetItem(pTuple, y, pInt);
+			y++;
+		}
+		return pTuple;
 	}
 
 	static PyObject *spectators(PyObject *self, PyObject *args)
 	{
+		server::clientinfo *ci;
+		std::vector<int> spects;
+		std::vector<int>::iterator itr;
+		PyObject *pTuple;
+		PyObject *pInt;
+		int y = 0;
+		
+		loopv(server::clients)
+		{
+			ci = server::getinfo(i);
+			if(ci->state.state == CS_SPECTATOR)
+			{
+				spects.push_back(i);
+			}
+		}
+		pTuple = PyTuple_New(spects.size());
+		
+		for(itr = spects.begin(); itr != spects.end(); itr++)
+		{
+			pInt = PyInt_FromLong(*itr);
+			PyTuple_SetItem(pTuple, y, pInt);
+			y++;
+		}
+		return pTuple;
 	}
 
 	static PyObject *playerMessage(PyObject *self, PyObject *args)
