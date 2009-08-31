@@ -31,7 +31,7 @@ void deinitPy();
 bool triggerEvent(const char *event_name, std::vector<PyObject*> *args);
 bool triggerEventInt(const char *event_name, int cn);
 bool triggerEventIntString(const char *event_name, int cn, const char *text);
+bool triggerPolicyEventIntString(const char *event_name, int cn, const char *text);
 
 }
-
 #endif

@@ -1,4 +1,5 @@
 events = {}
+policy_events = {}
 
 def registerEventHandler(event, handler):
 	if not events.has_key(event):
@@ -9,3 +10,10 @@ def triggerEvent(event, args):
 	if events.has_key(event):
 		for handler in events[event]:
 			handler(*args)
+
+def triggerPolicyEvent(event, args):
+	if policy_events.has_key(event):
+		for handler in policy_events[event]:
+			if not handler(*args):
+				return False
+	return True

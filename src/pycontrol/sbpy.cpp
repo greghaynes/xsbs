@@ -33,7 +33,7 @@ namespace SbPy
 		return false;\
 	}
 
-static PyObject *eventsModule, *triggerEventFunc;
+static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc;
 
 bool initPy(const char *pyscripts_path)
 {
@@ -68,6 +68,13 @@ bool initPy(const char *pyscripts_path)
 		fprintf(stderr, "Error: triggerEvent function could not be loaded.\n");
 		return false;
 	}
+	triggerPolicyEventFunc = PyObject_GetAttrString(eventsModule, "triggerPolicyEvent");
+	SBPY_ERR(triggerPolicyEventFunc);
+	if(!PyCallable_Check(triggerPolicyEventFunc))
+	{
+		fprintf(stderr, "Error: triggerPolicyEvent function could not be loaded.\n");
+		return false;
+	}
 	Py_DECREF(pluginsModule);
 	
 	return true;
@@ -78,13 +85,13 @@ void deinitPy()
 	Py_Finalize();
 }
 
-bool triggerEvent(const char *name, std::vector<PyObject*> *args)
+bool triggerFuncEvent(const char *name, std::vector<PyObject*> *args, PyObject *func)
 {
 	PyObject *pArgs, *pArgsArgs, *pName, *pValue;
 	std::vector<PyObject*>::const_iterator itr;
 	int i = 0;
 	
-	if(!triggerEventFunc)
+	if(!func)
 		return false;
 	pArgs = PyTuple_New(2);
 	pName = PyString_FromString(name);
@@ -102,37 +109,64 @@ bool triggerEvent(const char *name, std::vector<PyObject*> *args)
 	else
 		pArgsArgs = PyTuple_New(0);
 	PyTuple_SetItem(pArgs, 1, pArgsArgs);
-	pValue = PyObject_CallObject(triggerEventFunc, pArgs);
+	pValue = PyObject_CallObject(func, pArgs);
 	Py_DECREF(pArgs);
 	if(!pValue)
 	{
 		fprintf(stderr, "Error triggering event.\n");
 		return false;
 	}
+	if(PyBool_Check(pValue))
+	{
+		bool ret = pValue == Py_True;
+		Py_DECREF(pValue);
+		std::cout << ret << "\n";
+		return ret;
+	}
 	Py_DECREF(pValue);
 	return true;
 }
 
-bool triggerEventInt(const char *name, int cn)
+#undef SBPY_ERR
+
+bool triggerFuncEventInt(const char *name, int cn, PyObject *func)
 {
 	std::vector<PyObject*> args;
 	PyObject *pCn = PyInt_FromLong(cn);
 	args.push_back(pCn);
-	bool val = triggerEvent(name, &args);
+	bool val = triggerFuncEvent(name, &args, func);
 	return val;
 }
 
-bool triggerEventIntString(const char *name, int cn, const char *text)
+bool triggerFuncEventIntString(const char *name, int cn, const char *text, PyObject *func)
 {
 	std::vector<PyObject*> args;
 	PyObject *pText = PyString_FromString(text);
 	PyObject *pCn = PyInt_FromLong(cn);
 	args.push_back(pText);
 	args.push_back(pCn);
-	bool val = triggerEvent(name, &args);
+	bool val = triggerFuncEvent(name, &args, func);
 	return val;
 }
 
-#undef SBPY_ERR
+bool triggerEvent(const char*name, std::vector<PyObject*>* args)
+{
+	triggerFuncEvent(name, args, triggerEventFunc);
+}
+
+bool triggerEventInt(const char *name, int cn)
+{
+	triggerFuncEventInt(name, cn, triggerEventFunc);
+}
+
+bool triggerEventIntString(const char *name, int cn, const char *text)
+{
+	triggerFuncEventIntString(name, cn, text, triggerEventFunc);
+}
+
+bool triggerPolicyEventIntString(const char *name, int cn, const char *text)
+{
+	return triggerFuncEventIntString(name, cn, text, triggerPolicyEventFunc);
+}
 
 }

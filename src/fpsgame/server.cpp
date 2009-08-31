@@ -2172,12 +2172,15 @@ namespace server
 
             case SV_TEXT:
             {
-                QUEUE_AI;
-                QUEUE_MSG;
                 getstring(text, p);
                 filtertext(text, text);
-                SbPy::triggerEventIntString("player_message", ci->clientnum, text);
-                QUEUE_STR(text);
+                if(SbPy::triggerPolicyEventIntString("allow_message", ci->clientnum, text))
+                {
+                    SbPy::triggerEventIntString("player_message", ci->clientnum, text);
+                    QUEUE_AI;
+                    QUEUE_INT(SV_TEXT);
+                    QUEUE_STR(text);
+                }
                 break;
             }
 
@@ -2185,13 +2188,16 @@ namespace server
             {
                 getstring(text, p);
                 // TODO: Should this event be triggered before or after check?
-                SbPy::triggerEventIntString("player_message_team", ci->clientnum, text);
                 if(!ci || !cq || (ci->state.state==CS_SPECTATOR && !ci->local && !ci->privilege) || !m_teammode || !cq->team[0]) break;
-                loopv(clients)
+                if(SbPy::triggerPolicyEventIntString("allow_message_team", ci->clientnum, text))
                 {
-                    clientinfo *t = clients[i];
-                    if(t==cq || t->state.state==CS_SPECTATOR || t->state.aitype != AI_NONE || strcmp(cq->team, t->team)) continue;
-                    sendf(t->clientnum, 1, "riis", SV_SAYTEAM, cq->clientnum, text);
+                    SbPy::triggerEventIntString("player_message_team", ci->clientnum, text);
+                    loopv(clients)
+                    {
+                        clientinfo *t = clients[i];
+                        if(t==cq || t->state.state==CS_SPECTATOR || t->state.aitype != AI_NONE || strcmp(cq->team, t->team)) continue;
+                        sendf(t->clientnum, 1, "riis", SV_SAYTEAM, cq->clientnum, text);
+                    }
                 }
                 break;
             }
@@ -2641,11 +2647,21 @@ namespace SbPy
 		return Py_None;
 	}
 
-	static PyObject *players(PyObject *self, PyObject *args)
+	static PyObject *clients(PyObject *self, PyObject *args)
 	{
+		PyObject *pTuple = PyTuple_New(server::numclients());
+		PyObject *pInt;
+		int y = 0;
+		loopv(server::clients)
+		{
+			pInt = PyInt_FromLong(i);
+			PyTuple_SetItem(pTuple, i, pInt);
+			y++;
+		}
+		return pTuple;
 	}
 
-	static PyObject *clients(PyObject *self, PyObject *args)
+	static PyObject *players(PyObject *self, PyObject *args)
 	{
 	}
 
