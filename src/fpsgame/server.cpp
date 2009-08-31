@@ -2698,7 +2698,9 @@ namespace SbPy
 		int cn = getIntFromTupleAt(args, 0);
 		server::clientinfo *ci = server::getinfo(cn);
 		if(ci)
-			return Py_BuildValue("s", getclientip(ci->clientnum));
+			return Py_BuildValue("i", getclientip(ci->clientnum));
+		Py_INCREF(Py_None);
+		return Py_None;
 	}
 
 	static PyObject *playerKick(PyObject *self, PyObject *args)

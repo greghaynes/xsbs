@@ -5,7 +5,8 @@ from ConfigParser import ConfigParser
 motdstring = ''
 
 def greet(cn):
-	sbserver.playerMessage(cn, motdstring)
+    sbserver.playerMessage(cn, motdstring)
+    print sbserver.playerIpLong(cn)
 
 def compilemotd():
 	conf = ConfigParser()
