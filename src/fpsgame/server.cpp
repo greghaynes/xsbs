@@ -1987,16 +1987,16 @@ namespace server
                         cp->position.setsizenodelete(0);
                         while(curmsg<p.length()) cp->position.add(p.buf[curmsg++]);
                     }
-					if(cp->state.state == CS_ALIVE)
-					{
-						if(smode) smode->moved(cp, cp->state.o, cp->gameclip, pos, (physstate&0x80)!=0);
-						if(!cp->active)
-						{
-							cp->active = true;
-							SbPy::triggerEventInt("player_active", cp->clientnum);
-						}
-					}
-					cp->state.o = pos;
+                    if(cp->state.state == CS_ALIVE)
+                    {
+                        if(smode) smode->moved(cp, cp->state.o, cp->gameclip, pos, (physstate&0x80)!=0);
+                        if(!cp->active)
+                        {
+                            cp->active = true;
+                            SbPy::triggerEventInt("player_active", cp->clientnum);
+                        }
+                    }
+                    cp->state.o = pos;
                     cp->gameclip = (physstate&0x80)!=0;
                 }
                 break;
@@ -2657,7 +2657,9 @@ namespace SbPy
 	{
 		int cn = getIntFromTupleAt(args, 0);
 		char *text = getStringFromTupleAt(args, 1);
-                sendf(cn, 1, "ris", SV_SERVMSG, text);
+		server::clientinfo *ci = server::getinfo(cn);
+		if(ci && ci->state.aitype == AI_NONE)
+                	sendf(cn, 1, "ris", SV_SERVMSG, text);
 		Py_INCREF(Py_None);
 		return Py_None;
 	}
