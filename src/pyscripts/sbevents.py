@@ -1,6 +1,11 @@
 events = {}
 policy_events = {}
 
+def registerPolicyEventHandler(event, handler):
+	if not events.has_key(event):
+		events[event] = []
+	events[event].append(handler)
+
 def registerEventHandler(event, handler):
 	if not events.has_key(event):
 		events[event] = []
