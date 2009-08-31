@@ -1,7 +1,7 @@
 def textcolor(color, text):
 	if text:
 		return '\fs\f' + color + text + '\fr'
-	else
+	else:
 		return '\f' + color
 def green(text):
 	return textcolor(0, text)
