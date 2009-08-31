@@ -1,6 +1,7 @@
 subdirs(enet shared)
 
 find_package(PythonLibs REQUIRED)
+find_package(ZLIB REQUIRED)
 
 set(xsbs_srcs
 	engine/server.cpp
@@ -18,9 +19,10 @@ include_directories(${CMAKE_SOURCE_DIR}/src/engine
 	${CMAKE_SOURCE_DIR}/src/include
 	${CMAKE_SOURCE_DIR}/src/pycontrol
 	${CMAKE_SOURCE_DIR}/src/enet/include
-	${PYTHON_INCLUDE_PATH})
+	${PYTHON_INCLUDE_PATH}
+	${ZLIB_INCLUDE_PATH})
 
 add_executable(xsbs
 	${xsbs_srcs})
 
-target_link_libraries(xsbs enet sauertools z ${PYTHON_LIBRARIES})
+target_link_libraries(xsbs enet sauertools ${PYTHON_LIBRARIES} ${ZLIB_LIBRARIES})
