@@ -764,6 +764,14 @@ template<class T> inline T bigswap(T n) { return *(const uchar *)&islittleendian
 template<class T> inline void bigswap(T *buf, int len) { if(*(const uchar *)&islittleendian) endianswap(buf, len); }
 #endif
 
+#ifdef getchar
+#undef getchar
+#endif
+#ifdef putchar
+#undef putchar
+#endif
+
+
 struct stream
 {
     virtual ~stream() {}
