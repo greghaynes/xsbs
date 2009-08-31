@@ -5,7 +5,6 @@ from ConfigParser import ConfigParser
 motdstring = ''
 
 def greet(cn):
-	print motdstring
 	sbserver.message(motdstring)
 
 def compilemotd():

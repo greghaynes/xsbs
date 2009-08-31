@@ -1,0 +1,12 @@
+XSBS is a protocol compatible Sauerbraten server which allows for server side modifications through a python plugin system.
+
+INSTALL
+-------
+cd into xsbs folder
+cmake .
+make
+
+RUN XSBS
+-------
+cd into xsbs/src
+./xsbs -s {path/to/pyscripts/folder}
