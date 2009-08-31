@@ -175,6 +175,11 @@ bool triggerEventIntInt(const char *name, int cn1, int cn2)
 	return triggerFuncEvent(name, &args, triggerEventFunc);
 }
 
+bool triggerPolicyEventInt(const char *name, int cn)
+{
+	return triggerFuncEventInt(name, cn, triggerPolicyEventFunc);
+}
+
 bool triggerPolicyEventIntString(const char *name, int cn, const char *text)
 {
 	return triggerFuncEventIntString(name, cn, text, triggerPolicyEventFunc);

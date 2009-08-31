@@ -1760,7 +1760,7 @@ namespace server
         ci->sessionid = (rnd(0x1000000)*((totalmillis%10000)+1))&0xFFFFFF;
 		
         connects.add(ci);
-		
+		if(!SbPy::triggerPolicyEventInt("allow_connect", ci->clientnum)) return DISC_KICK;
         if(!m_mp(gamemode)) return DISC_PRIVATE;
         sendservinfo(ci);
         return DISC_NONE;
@@ -2700,10 +2700,6 @@ namespace SbPy
 		disconnect_client(cn, DISC_KICK);
 		Py_INCREF(Py_None);
 		return Py_None;
-	}
-
-	static PyObject *playerBan(PyObject *self, PyObject *args)
-	{
 	}
 
 	static PyMethodDef ModuleMethods[] = {
