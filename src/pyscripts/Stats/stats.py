@@ -5,18 +5,19 @@ template = string.Template("$name: $frags frags $deaths deaths $teamkills teamki
 
 def onCommand(cn, command):
 	sp = command.split(' ')
+	tcn = cn
 	if len(sp) > 2:
 		sbserver.playerMessage(cn, "Usage: #stats <cn>")
 		return
 	if len(sp) == 2:
-		cn = int(sp[1])
+		tcn = int(sp[1])
 	if sp[0] == 'stats':
-		name = sbserver.playerName(cn)
-		frags = sbserver.playerFrags(cn)
-		deaths = sbserver.playerDeaths(cn)
-		teamkills = sbserver.playerTeamkills(cn)
-		shots = sbserver.playerShots(cn)
-		hits = sbserver.playerHits(cn)
+		name = sbserver.playerName(tcn)
+		frags = sbserver.playerFrags(tcn)
+		deaths = sbserver.playerDeaths(tcn)
+		teamkills = sbserver.playerTeamkills(tcn)
+		shots = sbserver.playerShots(tcn)
+		hits = sbserver.playerHits(tcn)
 		accuracy = 0
 		if shots != 0:
 			accuracy = hits / float(shots)
