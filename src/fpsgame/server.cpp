@@ -5,7 +5,6 @@
 #include <iostream>
 
 #define PYSCRIPTS_PATH "/home/greghaynes/Projects/xsbs/src/pyscripts"
-#define MSG_COMMAND_CHAR '#'
 
 namespace SbPy
 {
@@ -136,7 +135,7 @@ namespace server
         projectilestate<8> rockets, grenades;
         int frags, flags, deaths, teamkills, shotdamage, damage;
         int lasttimeplayed, timeplayed;
-	int shots, hits;
+		int shots, hits;
         float effectiveness;
 
         gamestate() : state(CS_DEAD), editstate(CS_DEAD) {}
@@ -157,11 +156,10 @@ namespace server
             maxhealth = 100;
             rockets.reset();
             grenades.reset();
-
             timeplayed = 0;
             effectiveness = 0;
             frags = flags = deaths = teamkills = shotdamage = damage = 0;
-
+            shots = hits = 0;
             respawn();
         }
 
@@ -2767,91 +2765,79 @@ namespace SbPy
 	static PyObject *playerPrivilege(PyObject *self, PyObject *args)
 	{
 		int cn;
-		if(!PyArg_ParseTuple(args, "i", &cn))
+		server::clientinfo *ci;
+		if(!PyArg_ParseTuple(args, "i", &cn)
+		   || !(ci = server::getinfo(cn)))
 		{
 			Py_INCREF(Py_None);
 			return Py_None;
 		}
-		server::clientinfo *ci = server::getinfo(cn);
-		if(ci)
-			return Py_BuildValue("i", ci->privilege);
-		Py_INCREF(Py_None);
-		return Py_None;
+		return Py_BuildValue("i", ci->privilege);
 	}
 
 	static PyObject *playerFrags(PyObject *self, PyObject *args)
 	{
 		int cn;
-		if(!PyArg_ParseTuple(args, "i", &cn))
+		server::clientinfo *ci;
+		if(!PyArg_ParseTuple(args, "i", &cn)
+		   || !(ci = server::getinfo(cn)))
 		{
 			Py_INCREF(Py_None);
 			return Py_None;
 		}
-		server::clientinfo *ci = server::getinfo(cn);
-		if(ci)
-			return Py_BuildValue("i", ci->state.frags);
-		Py_INCREF(Py_None);
-		return Py_None;
+		return Py_BuildValue("i", ci->state.frags);
 	}
 
 	static PyObject *playerTeamkills(PyObject *self, PyObject *args)
 	{
 		int cn;
-		if(!PyArg_ParseTuple(args, "i", &cn))
+		server::clientinfo *ci;
+		if(!PyArg_ParseTuple(args, "i", &cn)
+		   || !(ci = server::getinfo(cn)))
 		{
 			Py_INCREF(Py_None);
 			return Py_None;
 		}
-		server::clientinfo *ci = server::getinfo(cn);
-		if(ci)
-			return Py_BuildValue("i", ci->state.teamkills);
-		Py_INCREF(Py_None);
-		return Py_None;
+		return Py_BuildValue("i", ci->state.teamkills);
 	}
 
 	static PyObject *playerDeaths(PyObject *self, PyObject *args)
 	{
 		int cn;
-		if(!PyArg_ParseTuple(args, "i", &cn))
+		server::clientinfo *ci;
+		if(!PyArg_ParseTuple(args, "i", &cn)
+		   || !(ci = server::getinfo(cn)))
 		{
 			Py_INCREF(Py_None);
 			return Py_None;
 		}
-		server::clientinfo *ci = server::getinfo(cn);
-		if(ci)
-			return Py_BuildValue("i", ci->state.deaths);
-		Py_INCREF(Py_None);
-		return Py_None;
+		return Py_BuildValue("i", ci->state.deaths);
 	}
 
 	static PyObject *playerShots(PyObject *self, PyObject *args)
 	{
 		int cn;
-		if(!PyArg_ParseTuple(args, "i", &cn))
+		server::clientinfo *ci;
+		if(!PyArg_ParseTuple(args, "i", &cn)
+		   || !(ci = server::getinfo(cn)))
 		{
 			Py_INCREF(Py_None);
 			return Py_None;
 		}
-		server::clientinfo *ci = server::getinfo(cn);
-		if(ci)
-			return Py_BuildValue("i", ci->state.shots);
-		Py_INCREF(Py_None);
-		return Py_None;
+		return Py_BuildValue("i", ci->state.shots);
 	}
 
 	static PyObject *playerHits(PyObject *self, PyObject *args)
 	{
 		int cn;
-		if(!PyArg_ParseTuple(args, "i", &cn))
+		server::clientinfo *ci;
+		if(!PyArg_ParseTuple(args, "i", &cn)
+		   || !(ci = server::getinfo(cn)))
 		{
 			Py_INCREF(Py_None);
 			return Py_None;
 		}
-		server::clientinfo *ci = server::getinfo(cn);
-		if(ci)
-			return Py_BuildValue("i", ci->state.hits);
-		Py_INCREF(Py_None);
-		return Py_None;
+		return Py_BuildValue("i", ci->state.hits);
 	}
 
 	static PyMethodDef ModuleMethods[] = {
