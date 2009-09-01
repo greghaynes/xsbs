@@ -2771,6 +2771,36 @@ namespace SbPy
 		return Py_None;
 	}
 
+	static PyObject *playerFrags(PyObject *self, PyObject *args)
+	{
+		int cn;
+		if(!PyArg_ParseTuple(args, "i", &cn))
+		{
+			Py_INCREF(Py_None);
+			return Py_None;
+		}
+		server::clientinfo *ci = server::getinfo(cn);
+		if(ci)
+			return Py_BuildValue("i", ci->state.frags);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	static PyObject *playerTeamkills(PyObject *self, PyObject *args)
+	{
+		int cn;
+		if(!PyArg_ParseTuple(args, "i", &cn))
+		{
+			Py_INCREF(Py_None);
+			return Py_None;
+		}
+		server::clientinfo *ci = server::getinfo(cn);
+		if(ci)
+			return Py_BuildValue("i", ci->state.teamkills);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
 	static PyMethodDef ModuleMethods[] = {
 		{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 		{"message", message, METH_VARARGS, "Send a server message."},
@@ -2782,6 +2812,8 @@ namespace SbPy
 		{"playerIpLong", playerIpLong, METH_VARARGS, "Get IP of player from cn."},
 		{"playerKick", playerKick, METH_VARARGS, "Kick player from server."},
 		{"playerPrivilege", playerPrivilege, METH_VARARGS, "Integer representing player privilege"},
+		{"playerFrags", playerFrags, METH_VARARGS, "Number of frags by player in current match."},
+		{"playerTeamkills", playerTeamkills, METH_VARARGS, "Number of teamkills by player in current match."},
 		{NULL, NULL, 0, NULL}
 	};
 	
