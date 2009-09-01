@@ -1667,6 +1667,8 @@ namespace server
             interm = 0;
             checkvotes(true);
         }
+
+	SbPy::triggerExecQueue();
     }
 
     struct crcinfo
