@@ -10,7 +10,7 @@ default_reason = 'unspecified reason'
 
 def onMessage(cn, text):
 	sp = text.split(' ')
-	if sp[0] == ban_command and sp[1]:
+	if len(sp) >=2 and sp[0] == ban_command and sp[1]:
 		if sbserver.playerPrivilege(cn) == 0:
 			sbserver.playerMessage(cn, 'Insufficient privileges.')
 			return
@@ -54,6 +54,7 @@ def allowClient(cn):
 def init():
 	sbevents.registerPolicyEventHandler("allow_connect", allowClient)
 	sbevents.registerEventHandler("player_command", onMessage)
+	sbevents.registerEventHandler("player_ban", ban)
 
 config = ConfigParser()
 config.read('Bans/plugin.conf')
