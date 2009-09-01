@@ -29,17 +29,19 @@ def onMessage(cn, text):
 			length = int(sp[2])
 		else:
 			return
-		ban(cn, ip, length, reason)
-		sbserver.playerKick(tcn)
+		ban(cn, length, reason)
 
-def ban(cn, ip, seconds, reason):
+def ban(cn, seconds, reason):
+	ip = sbserver.playerIpLong(cn)
 	msg = ban_message.substitute(name=sbserver.playerName(cn), seconds=seconds, reason=reason)
 	sbserver.message(msg)
 	expiration = time.time() + seconds
 	if banned_ips.has_key(ip):
 		if banned_ips[ip] > expiration:
+			sbserver.playerKick(tcn)
 			return
 	banned_ips[ip] = expiration
+	sbserver.playerKick(tcn)
 
 def allowClient(cn):
 	ip = sbserver.playerIpLong(cn)
