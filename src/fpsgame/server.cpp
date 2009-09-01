@@ -136,6 +136,7 @@ namespace server
         projectilestate<8> rockets, grenades;
         int frags, flags, deaths, teamkills, shotdamage, damage;
         int lasttimeplayed, timeplayed;
+	int shots, hits;
         float effectiveness;
 
         gamestate() : state(CS_DEAD), editstate(CS_DEAD) {}
@@ -1523,6 +1524,7 @@ namespace server
                 int(to.x*DMF), int(to.y*DMF), int(to.z*DMF),
                 ci->ownernum);
         gs.shotdamage += guns[gun].damage*(gs.quadmillis ? 4 : 1)*(gun==GUN_SG ? SGRAYS : 1);
+        gs.shots++;
         switch(gun)
         {
             case GUN_RL: gs.rockets.add(id); break;
@@ -1535,6 +1537,8 @@ namespace server
                     hitinfo &h = hits[i];
                     clientinfo *target = getinfo(h.target);
                     if(!target || target->state.state!=CS_ALIVE || h.lifesequence!=target->state.lifesequence || h.rays<1) continue;
+
+                    gs.hits += (ci != target ? 1 : 0);
 
                     totalrays += h.rays;
                     if(totalrays>maxrays) continue;
@@ -2805,6 +2809,51 @@ namespace SbPy
 		return Py_None;
 	}
 
+	static PyObject *playerDeaths(PyObject *self, PyObject *args)
+	{
+		int cn;
+		if(!PyArg_ParseTuple(args, "i", &cn))
+		{
+			Py_INCREF(Py_None);
+			return Py_None;
+		}
+		server::clientinfo *ci = server::getinfo(cn);
+		if(ci)
+			return Py_BuildValue("i", ci->state.deaths);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	static PyObject *playerShots(PyObject *self, PyObject *args)
+	{
+		int cn;
+		if(!PyArg_ParseTuple(args, "i", &cn))
+		{
+			Py_INCREF(Py_None);
+			return Py_None;
+		}
+		server::clientinfo *ci = server::getinfo(cn);
+		if(ci)
+			return Py_BuildValue("i", ci->state.shots);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
+	static PyObject *playerHits(PyObject *self, PyObject *args)
+	{
+		int cn;
+		if(!PyArg_ParseTuple(args, "i", &cn))
+		{
+			Py_INCREF(Py_None);
+			return Py_None;
+		}
+		server::clientinfo *ci = server::getinfo(cn);
+		if(ci)
+			return Py_BuildValue("i", ci->state.hits);
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
 	static PyMethodDef ModuleMethods[] = {
 		{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 		{"message", message, METH_VARARGS, "Send a server message."},
@@ -2818,6 +2867,9 @@ namespace SbPy
 		{"playerPrivilege", playerPrivilege, METH_VARARGS, "Integer representing player privilege"},
 		{"playerFrags", playerFrags, METH_VARARGS, "Number of frags by player in current match."},
 		{"playerTeamkills", playerTeamkills, METH_VARARGS, "Number of teamkills by player in current match."},
+		{"playerDeaths", playerDeaths, METH_VARARGS, "Number of deatds by player in current match."},
+		{"playerShots", playerShots, METH_VARARGS, "Shots by player in current match."},
+		{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
 		{NULL, NULL, 0, NULL}
 	};
 	
