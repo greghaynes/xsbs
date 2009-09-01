@@ -1,7 +1,7 @@
-import sbevents, sbserver
-import string
+import sbevents, sbserver, sbtools
+import string, math
 
-template = string.Template("$name: $frags frags $deaths deaths $teamkills teamkills ($shots shots / $hits hits) $accuracy% accuracy")
+template = string.Template(sbtools.green("$name: ") + sbtools.red("$frags") + sbtools.blue(" frags ") + sbtools.red("$deaths") + sbtools.blue(" deaths ") + sbtools.red("$teamkills") + sbtools.blue(" teamkills (") + sbtools.red("$shots") + sbtools.blue(" shots / ") + sbtools.red("$hits") + sbtools.blue(" hits) ") + sbtools.red("$accuracy") + sbtools.blue("% accuracy"))
 
 def onCommand(cn, command):
 	sp = command.split(' ')
@@ -21,7 +21,7 @@ def onCommand(cn, command):
 		accuracy = 0
 		if shots != 0:
 			accuracy = hits / float(shots)
-			accuracy = accuracy * 100
+			accuracy = math.trunc(accuracy * 100)
 		msg = template.substitute(name=name, frags=frags, deaths=deaths, teamkills=teamkills, shots=shots, hits=hits, accuracy=accuracy)
 		sbserver.playerMessage(cn, msg)
 
