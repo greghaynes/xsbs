@@ -2740,12 +2740,15 @@ namespace SbPy
 	
 	static PyObject *playerIpLong(PyObject *self, PyObject *args)
 	{
-		int cn = getIntFromTupleAt(args, 0);
-		server::clientinfo *ci = server::getinfo(cn);
-		if(ci)
-			return Py_BuildValue("i", getclientip(ci->clientnum));
-		Py_INCREF(Py_None);
-		return Py_None;
+		int cn;
+		server::clientinfo *ci;
+		if(!PyArg_ParseTuple(args, "i", &cn)
+		   || !(ci = server::getinfo(cn)))
+		{
+			Py_INCREF(Py_None);
+			return Py_None;
+		}
+		return Py_BuildValue("i", getclientip(ci->clientnum));
 	}
 
 	static PyObject *playerKick(PyObject *self, PyObject *args)
