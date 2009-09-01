@@ -343,6 +343,8 @@ namespace server
     vector<worldstate *> worldstates;
     bool reliablemessages = false;
 
+    bool checkexecqueue = false;
+
     struct demofile
     {
         string info;
@@ -1666,7 +1668,11 @@ namespace server
             checkvotes(true);
         }
 
-	SbPy::triggerExecQueue();
+        if(checkexecqueue)
+        {
+            checkexecqueue = false;
+	    SbPy::triggerExecQueue();
+        }
     }
 
     struct crcinfo
@@ -2845,6 +2851,19 @@ namespace SbPy
 		return Py_BuildValue("i", ci->state.hits);
 	}
 
+	static PyObject *checkExecQueue(PyObject *self, PyObject *args)
+	{
+		bool check;
+		if(PyArg_ParseTuple(args, "b", &check))
+		{
+			server::checkexecqueue = check;
+		}
+		else
+			std::cout << "Error setting check exec queue value.\n";
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+
 	static PyMethodDef ModuleMethods[] = {
 		{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 		{"message", message, METH_VARARGS, "Send a server message."},
@@ -2861,6 +2880,7 @@ namespace SbPy
 		{"playerDeaths", playerDeaths, METH_VARARGS, "Number of deatds by player in current match."},
 		{"playerShots", playerShots, METH_VARARGS, "Shots by player in current match."},
 		{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
+		{"checkExecQueue", checkExecQueue, METH_VARARGS, "Perform check on pythen exec queue."},
 		{NULL, NULL, 0, NULL}
 	};
 	

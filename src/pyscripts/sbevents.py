@@ -1,4 +1,4 @@
-import thread
+import sbserver, thread
 
 events = {}
 policy_events = {}
@@ -32,6 +32,7 @@ def sbExec(function, args):
 	exec_queue_lock.acquire()
 	exec_queue.append((function, args))
 	exec_queue_lock.release()
+	sbserver.checkExecQueue(True)
 
 def triggerSbExecQueue():
 	if exec_queue_lock:
