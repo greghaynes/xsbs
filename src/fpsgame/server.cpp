@@ -1429,7 +1429,11 @@ namespace server
         if(ts.health<=0)
         {
             target->state.deaths++;
-            if(actor!=target && isteam(actor->team, target->team)) actor->state.teamkills++;
+            if(actor!=target && isteam(actor->team, target->team))
+            {
+                actor->state.teamkills++;
+                SbPy::triggerEventIntInt("player_teamkill", actor->clientnum, target->clientnum);
+            }
             int fragvalue = smode ? smode->fragvalue(target, actor) : (target==actor || isteam(target->team, actor->team) ? -1 : 1);
             actor->state.frags += fragvalue;
             if(fragvalue>0)
@@ -1444,7 +1448,7 @@ namespace server
             if(smode) smode->died(target, actor);
             ts.state = CS_DEAD;
             ts.lastdeath = gamemillis;
-			SbPy::triggerEventIntInt("player_frag", actor->clientnum, target->clientnum);
+            SbPy::triggerEventIntInt("player_frag", actor->clientnum, target->clientnum);
             // don't issue respawn yet until DEATHMILLIS has elapsed
             // ts.respawn();
         }
