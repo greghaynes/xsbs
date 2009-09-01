@@ -13,7 +13,7 @@ else:
 del conf
 
 def getCountry(ip): 
-	 return db.lookup(pygeoip.num_to_addr(ip)).country
+	 return db.lookup(sbtools.ipLongToString(ip)).country
 
 def announce(cn):
 	msg = template.substitute(user=sbserver.playerName(cn), country=getCountry(sbserver.playerIpLong(cn)))
