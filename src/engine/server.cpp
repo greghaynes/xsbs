@@ -727,6 +727,7 @@ void rundedicatedserver()
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
     #endif
     printf("dedicated server started, waiting for clients...\nCtrl-C to exit\n\n");
+    SbPy::triggerEvent("server_start", 0);
     for(;rundedicated;) serverslice(true, 4);
 }
 
@@ -851,6 +852,7 @@ int main(int argc, char* argv[])
     for(int i = 1; i<argc; i++) if(argv[i][0]!='-' || !serveroption(argv[i])) gameargs.add(argv[i]);
     game::parseoptions(gameargs);
     initserver(true, true);
+    SbPy::triggerEvent("server_stop", 0);
     return 0;
 }
 #endif

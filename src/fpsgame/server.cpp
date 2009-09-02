@@ -478,7 +478,6 @@ namespace server
             SbPy::init("sauer_server", pyscriptspath, "sbserver");
 	else
             SbPy::init("sauer_server", PYSCRIPTS_PATH, "sbserver");
-        SbPy::triggerEvent("server_start", 0);
     }
 
     int numclients(int exclude = -1, bool nospec = true, bool noai = true)
