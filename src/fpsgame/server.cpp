@@ -54,7 +54,8 @@ namespace server
     vector<clientinfo *> connects, clients, bots;
     vector<worldstate *> worldstates;
     bool reliablemessages = false;
-	
+    bool checkexecqueue = false;
+
     struct demofile
     {
         string info;
@@ -189,7 +190,6 @@ namespace server
             SbPy::init("sauer_server", pyscriptspath, "sbserver");
 	else
             SbPy::init("sauer_server", PYSCRIPTS_PATH, "sbserver");
-        SbPy::triggerEvent("server_start", 0);
     }
 
     int numclients(int exclude, bool nospec, bool noai)
@@ -1377,6 +1377,12 @@ namespace server
             if(demorecord) enddemorecord();
             interm = 0;
             checkvotes(true);
+        }
+
+        if(checkexecqueue)
+        {
+            checkexecqueue = false;
+	    SbPy::triggerExecQueue();
         }
     }
 

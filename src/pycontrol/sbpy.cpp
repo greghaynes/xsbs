@@ -33,7 +33,7 @@ namespace SbPy
 		return false;\
 	}
 
-static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc;
+static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *triggerExecQueueFunc;
 
 bool initPy(const char *pyscripts_path)
 {
@@ -73,6 +73,13 @@ bool initPy(const char *pyscripts_path)
 	if(!PyCallable_Check(triggerPolicyEventFunc))
 	{
 		fprintf(stderr, "Error: triggerPolicyEvent function could not be loaded.\n");
+		return false;
+	}
+	triggerExecQueueFunc = PyObject_GetAttrString(eventsModule, "triggerSbExecQueue");
+	SBPY_ERR(triggerExecQueueFunc);
+	if(!PyCallable_Check(triggerExecQueueFunc))
+	{
+		fprintf(stderr, "Error: triggerSbExecQueue function could not be loaded.\n");
 		return false;
 	}
 	Py_DECREF(pluginsModule);
@@ -183,6 +190,18 @@ bool triggerPolicyEventInt(const char *name, int cn)
 bool triggerPolicyEventIntString(const char *name, int cn, const char *text)
 {
 	return triggerFuncEventIntString(name, cn, text, triggerPolicyEventFunc);
+}
+
+void triggerExecQueue()
+{
+	PyObject *pargs, *pvalue;
+	pargs = PyTuple_New(0);
+	pvalue = PyObject_CallObject(triggerExecQueueFunc, pargs);
+	Py_DECREF(pargs);
+	if(!pvalue)
+	{
+		PyErr_Print();
+	}
 }
 
 }

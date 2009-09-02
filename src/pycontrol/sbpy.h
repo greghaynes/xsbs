@@ -34,6 +34,7 @@ bool triggerEventIntString(const char *event_name, int cn, const char *text);
 bool triggerEventIntInt(const char *name, int cn1, int cn2);
 bool triggerPolicyEventInt(const char *name, int cn);
 bool triggerPolicyEventIntString(const char *event_name, int cn, const char *text);
+void triggerExecQueue();
 
 }
 #endif
