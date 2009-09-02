@@ -5,11 +5,12 @@ import string
 db = pygeoip.Database('geoip/GeoIP.dat')
 conf = ConfigParser()
 conf.read('geoip/plugin.conf')
-template = ''
+template = sbtools.green('$user') + ' has connected from ' + sbtools.orange('$country')
+
 if conf.has_option('Config', 'template'):
 	template = string.Template(conf.get('Config', 'template'))
 else:
-	template = string.Template('$user has connected from $country.')
+	template = string.Template(template)
 del conf
 
 def getCountry(ip): 
