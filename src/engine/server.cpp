@@ -1,3 +1,9 @@
+/*
+ 
+ This is a modified version of the original sauerbraten source code.
+
+*/
+
 // server.cpp: little more than enhanced multicaster
 // runs dedicated or as client coroutine
 

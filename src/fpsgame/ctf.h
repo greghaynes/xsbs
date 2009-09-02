@@ -1,5 +1,7 @@
 #ifndef PARSEMESSAGES
 
+#define SERVMODE 1
+
 #define ctfteamflag(s) (!strcmp(s, "good") ? 1 : (!strcmp(s, "evil") ? 2 : 0))
 #define ctfflagteam(i) (i==1 ? "good" : (i==2 ? "evil" : NULL))
 

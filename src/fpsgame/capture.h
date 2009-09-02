@@ -1,11 +1,11 @@
 // capture.h: client and server state for capture gamemode
 #ifndef PARSEMESSAGES
 
-#ifdef SERVMODE
+#include "server.h"
+
+#define SERVMODE 1
+
 struct captureservmode : servmode
-#else
-struct captureclientmode : clientmode
-#endif
 {
     static const int CAPTURERADIUS = 64;
     static const int CAPTUREHEIGHT = 24;

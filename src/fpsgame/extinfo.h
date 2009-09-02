@@ -1,3 +1,4 @@
+#include "server.h"
 
 #define EXT_ACK                         -1
 #define EXT_VERSION                     104

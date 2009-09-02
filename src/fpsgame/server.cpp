@@ -1,15 +1,17 @@
+/*
+
+ This is a modified version of the sauerbraten source code.
+ 
+*/
+
 #include "game.h"
-#include "Python.h"
 #include "sbpy.h"
+#include "servermodule.h"
+#include "server.h"
 
 #include <iostream>
 
 #define PYSCRIPTS_PATH "/home/greghaynes/Projects/xsbs/src/pyscripts"
-
-namespace SbPy
-{
-	bool init(const char *, const char *, const char *);
-}
 
 namespace game
 {
@@ -28,307 +30,17 @@ extern ENetAddress masteraddress;
 
 namespace server
 {
-    struct server_entity            // server side version of "entity" type
-    {
-        int type;
-        int spawntime;
-        char spawned;
-    };
 
-    static const int DEATHMILLIS = 300;
-
-    struct clientinfo;
-
-    struct gameevent
-    {
-        virtual ~gameevent() {}
-
-        virtual bool flush(clientinfo *ci, int fmillis);
-        virtual void process(clientinfo *ci) {}
-
-        virtual bool keepable() const { return false; }
-    };
-
-    struct timedevent : gameevent
-    {
-        int millis;
-
-        bool flush(clientinfo *ci, int fmillis);
-    };
-
-    struct hitinfo
-    {
-        int target;
-        int lifesequence;
-        union
-        {
-            int rays;
-            float dist;
-        };
-        vec dir;
-    };
-
-    struct shotevent : timedevent
-    {
-        int id, gun;
-        vec from, to;
-        vector<hitinfo> hits;
-
-        void process(clientinfo *ci);
-    };
-
-    struct explodeevent : timedevent
-    {
-        int id, gun;
-        vector<hitinfo> hits;
-
-        bool keepable() const { return true; }
-
-        void process(clientinfo *ci);
-    };
-
-    struct suicideevent : gameevent
-    {
-        void process(clientinfo *ci);
-    };
-
-    struct pickupevent : gameevent
-    {
-        int ent;
-
-        void process(clientinfo *ci);
-    };
-
-    template <int N>
-    struct projectilestate
-    {
-        int projs[N];
-        int numprojs;
-
-        projectilestate() : numprojs(0) {}
-
-        void reset() { numprojs = 0; }
-
-        void add(int val)
-        {
-            if(numprojs>=N) numprojs = 0;
-            projs[numprojs++] = val;
-        }
-
-        bool remove(int val)
-        {
-            loopi(numprojs) if(projs[i]==val)
-            {
-                projs[i] = projs[--numprojs];
-                return true;
-            }
-            return false;
-        }
-    };
-
-    struct gamestate : fpsstate
-    {
-        vec o;
-        int state, editstate;
-        int lastdeath, lastspawn, lifesequence;
-        int lastshot;
-        projectilestate<8> rockets, grenades;
-        int frags, flags, deaths, teamkills, shotdamage, damage;
-        int lasttimeplayed, timeplayed;
-		int shots, hits;
-        float effectiveness;
-
-        gamestate() : state(CS_DEAD), editstate(CS_DEAD) {}
-
-        bool isalive(int gamemillis)
-        {
-            return state==CS_ALIVE || (state==CS_DEAD && gamemillis - lastdeath <= DEATHMILLIS);
-        }
-
-        bool waitexpired(int gamemillis)
-        {
-            return gamemillis - lastshot >= gunwait;
-        }
-
-        void reset()
-        {
-            if(state!=CS_SPECTATOR) state = editstate = CS_DEAD;
-            maxhealth = 100;
-            rockets.reset();
-            grenades.reset();
-            timeplayed = 0;
-            effectiveness = 0;
-            frags = flags = deaths = teamkills = shotdamage = damage = 0;
-            shots = hits = 0;
-            respawn();
-        }
-
-        void respawn()
-        {
-            fpsstate::respawn();
-            o = vec(-1e10f, -1e10f, -1e10f);
-            lastdeath = 0;
-            lastspawn = -1;
-            lastshot = 0;
-        }
-
-        void reassign()
-        {
-            respawn();
-            rockets.reset();
-            grenades.reset();
-        }
-    };
-
-    struct savedscore
-    {
-        uint ip;
-        string name;
-        int maxhealth, frags, flags, deaths, teamkills, shotdamage, damage;
-        int timeplayed;
-        float effectiveness;
-
-        void save(gamestate &gs)
-        {
-            maxhealth = gs.maxhealth;
-            frags = gs.frags;
-            flags = gs.flags;
-            deaths = gs.deaths;
-            teamkills = gs.teamkills;
-            shotdamage = gs.shotdamage;
-            damage = gs.damage;
-            timeplayed = gs.timeplayed;
-            effectiveness = gs.effectiveness;
-        }
-
-        void restore(gamestate &gs)
-        {
-            if(gs.health==gs.maxhealth) gs.health = maxhealth;
-            gs.maxhealth = maxhealth;
-            gs.frags = frags;
-            gs.flags = flags;
-            gs.deaths = deaths;
-            gs.teamkills = teamkills;
-            gs.shotdamage = shotdamage;
-            gs.damage = damage;
-            gs.timeplayed = timeplayed;
-            gs.effectiveness = effectiveness;
-        }
-    };
-
-    struct clientinfo
-    {
-        int clientnum, ownernum, connectmillis, sessionid;
-        string name, team, mapvote;
-        int playermodel;
-        int modevote;
-        int privilege;
-        bool connected, local, timesync;
-        int gameoffset, lastevent;
-        gamestate state;
-        vector<gameevent *> events;
-        vector<uchar> position, messages;
-        int posoff, poslen, msgoff, msglen;
-        vector<clientinfo *> bots;
-        uint authreq;
-        string authname;
-        int ping, aireinit;
-        string clientmap;
-        int mapcrc;
-        bool warned, gameclip, active;
-
-        clientinfo() { reset(); }
-        ~clientinfo() { events.deletecontentsp(); }
-
-        void addevent(gameevent *e)
-        {
-            if(state.state==CS_SPECTATOR || events.length()>100) delete e;
-            else events.add(e);
-        }
-
-        void mapchange()
-        {
-            mapvote[0] = 0;
-            state.reset();
-            events.deletecontentsp();
-            timesync = false;
-            lastevent = 0;
-            clientmap[0] = '\0';
-            mapcrc = 0;
-            warned = false;
-            gameclip = false;
-        }
-
-        void reassign()
-        {
-            state.reassign();
-            events.deletecontentsp();
-            timesync = false;
-            lastevent = 0;
-        }
-
-        void reset()
-        {
-            name[0] = team[0] = 0;
-            playermodel = -1;
-            privilege = PRIV_NONE;
-            connected = local = false;
-            authreq = 0;
-            position.setsizenodelete(0);
-            messages.setsizenodelete(0);
-            ping = 0;
-            aireinit = 0;
-            mapchange();
-        }
-
-        int geteventmillis(int servmillis, int clientmillis)
-        {
-            if(!timesync || (events.empty() && state.waitexpired(servmillis)))
-            {
-                timesync = true;
-                gameoffset = servmillis - clientmillis;
-                return servmillis;
-            }
-            else return gameoffset + clientmillis;
-        }
-    };
-
-    struct worldstate
-    {
-        int uses;
-        vector<uchar> positions, messages;
-    };
-
-    struct ban
-    {
-        int time;
-        uint ip;
-    };
-
-    namespace aiman
-    {
-        extern void removeai(clientinfo *ci);
-        extern void clearai();
-        extern void checkai();
-        extern void reqadd(clientinfo *ci, int skill);
-        extern void reqdel(clientinfo *ci);
-        extern void setbotlimit(clientinfo *ci, int limit);
-        extern void setbotbalance(clientinfo *ci, bool balance);
-        extern void changemap();
-        extern void addclient(clientinfo *ci);
-        extern void changeteam(clientinfo *ci);
-    }
-
-    #define MM_MODE 0xF
-    #define MM_AUTOAPPROVE 0x1000
-    #define MM_PRIVSERV (MM_MODE | MM_AUTOAPPROVE)
-    #define MM_PUBSERV ((1<<MM_OPEN) | (1<<MM_VETO))
-
+#define MM_MODE 0xF
+#define MM_AUTOAPPROVE 0x1000
+#define MM_PRIVSERV (MM_MODE | MM_AUTOAPPROVE)
+#define MM_PUBSERV ((1<<MM_OPEN) | (1<<MM_VETO))
+	
     bool notgotitems = true;        // true when map has changed and waiting for clients to send item
     int gamemode = 0;
     int gamemillis = 0, gamelimit = 0;
     bool gamepaused = false;
-
+	
     string smapname = "";
     int interm = 0, minremain = 0;
     bool mapreload = false;
@@ -337,33 +49,33 @@ namespace server
     int currentmaster = -1;
     bool masterupdate = false;
     stream *mapdata = NULL;
-
+	
     vector<uint> allowedips;
     vector<clientinfo *> connects, clients, bots;
     vector<worldstate *> worldstates;
     bool reliablemessages = false;
-
+	
     struct demofile
     {
         string info;
         uchar *data;
         int len;
     };
-
-    #define MAXDEMOS 5
+	
+#define MAXDEMOS 5
     vector<demofile> demos;
-
+	
     bool demonextmatch = false;
     stream *demotmp = NULL, *demorecord = NULL, *demoplayback = NULL;
     int nextplayback = 0, demomillis = 0;
-
+	
     struct servmode
     {
         virtual ~servmode() {}
-
+		
         virtual void entergame(clientinfo *ci) {}
         virtual void leavegame(clientinfo *ci, bool disconnecting = false) {}
-
+		
         virtual void moved(clientinfo *ci, const vec &oldpos, bool oldclip, const vec &newpos, bool newclip) {}
         virtual bool canspawn(clientinfo *ci, bool connecting = false) { return true; }
         virtual void spawned(clientinfo *ci) {}
@@ -384,12 +96,13 @@ namespace server
         virtual void getteamscores(vector<teamscore> &scores) {}
         virtual bool extinfoteam(const char *team, ucharbuf &p) { return false; }
     };
+	
+#define SERVMODE 1
+	
+#include "capture.h"
+#include "ctf.h"
 
-    #define SERVMODE 1
-    #include "capture.h"
-    #include "ctf.h"
-
-    captureservmode capturemode;
+	captureservmode capturemode;
     ctfservmode ctfmode;
     servmode *smode = NULL;
 
@@ -479,7 +192,7 @@ namespace server
         SbPy::triggerEvent("server_start", 0);
     }
 
-    int numclients(int exclude = -1, bool nospec = true, bool noai = true)
+    int numclients(int exclude, bool nospec, bool noai)
     {
         int n = 0;
         loopv(clients) if(i!=exclude && (!nospec || clients[i]->state.state!=CS_SPECTATOR) && (!noai || clients[i]->state.aitype == AI_NONE)) n++;
@@ -2599,295 +2312,4 @@ namespace server
     }
 
     #include "aiman.h"
-}
-
-namespace SbPy
-{
-	static char *getStringFromTupleAt(PyObject *pTuple, int n)
-	{
-		PyObject *pStr;
-		char *str;
-		pStr = PyTuple_GetItem(pTuple, n);
-		if(pStr)
-		{
-			str = PyString_AsString(pStr);
-			return str;
-		}
-		std::cout << "Could not get string.\n";
-		return 0;
-	}
-
-	static int getIntFromTupleAt(PyObject *pTuple, int n)
-	{
-		PyObject *pInt;
-		pInt = PyTuple_GetItem(pTuple, n);
-		n = PyInt_AsLong(pInt);
-		return n;
-	}
-
-	static PyObject *numClients(PyObject *self, PyObject *args)
-	{
-		return Py_BuildValue("i", server::numclients());
-	}
-	
-	static PyObject *message(PyObject *self, PyObject *args)
-	{
-		PyObject *pMsg = PyTuple_GetItem(args, 0);
-		if(pMsg)
-		{
-			char *msg = PyString_AsString(pMsg);
-			if(msg)
-				server::sendservmsg(msg);
-		}
-		else
-			fprintf(stderr, "Error sending message");
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
-
-	static PyObject *clients(PyObject *self, PyObject *args)
-	{
-		PyObject *pTuple = PyTuple_New(server::numclients());
-		PyObject *pInt;
-		int y = 0;
-		loopv(server::clients)
-		{
-			pInt = PyInt_FromLong(i);
-			PyTuple_SetItem(pTuple, i, pInt);
-			y++;
-		}
-		return pTuple;
-	}
-
-	static PyObject *players(PyObject *self, PyObject *args)
-	{
-		server::clientinfo *ci;
-		std::vector<int> spects;
-		std::vector<int>::iterator itr;
-		PyObject *pTuple;
-		PyObject *pInt;
-		int y = 0;
-		
-		loopv(server::clients)
-		{
-			ci = server::getinfo(i);
-			if(ci->state.state != CS_SPECTATOR)
-			{
-				spects.push_back(i);
-			}
-		}
-		pTuple = PyTuple_New(spects.size());
-		
-		for(itr = spects.begin(); itr != spects.end(); itr++)
-		{
-			pInt = PyInt_FromLong(*itr);
-			PyTuple_SetItem(pTuple, y, pInt);
-			y++;
-		}
-		return pTuple;
-	}
-
-	static PyObject *spectators(PyObject *self, PyObject *args)
-	{
-		server::clientinfo *ci;
-		std::vector<int> spects;
-		std::vector<int>::iterator itr;
-		PyObject *pTuple;
-		PyObject *pInt;
-		int y = 0;
-		
-		loopv(server::clients)
-		{
-			ci = server::getinfo(i);
-			if(ci->state.state == CS_SPECTATOR)
-			{
-				spects.push_back(i);
-			}
-		}
-		pTuple = PyTuple_New(spects.size());
-		
-		for(itr = spects.begin(); itr != spects.end(); itr++)
-		{
-			pInt = PyInt_FromLong(*itr);
-			PyTuple_SetItem(pTuple, y, pInt);
-			y++;
-		}
-		return pTuple;
-	}
-
-	static PyObject *playerMessage(PyObject *self, PyObject *args)
-	{
-		int cn = getIntFromTupleAt(args, 0);
-		char *text = getStringFromTupleAt(args, 1);
-		server::clientinfo *ci = server::getinfo(cn);
-		if(ci && ci->state.aitype == AI_NONE)
-                	sendf(cn, 1, "ris", SV_SERVMSG, text);
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
-	
-	static PyObject *playerName(PyObject *self, PyObject *args)
-	{
-		int cn = getIntFromTupleAt(args, 0);
-		server::clientinfo *ci = server::getinfo(cn);
-		if(ci && ci->name)
-			return Py_BuildValue("s", ci->name);
-		else
-			std::cout << "Error: Invalid cn or no name assigned to client.";
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
-	
-	static PyObject *playerIpLong(PyObject *self, PyObject *args)
-	{
-		int cn;
-		server::clientinfo *ci;
-		if(!PyArg_ParseTuple(args, "i", &cn)
-		   || !(ci = server::getinfo(cn)))
-		{
-			Py_INCREF(Py_None);
-			return Py_None;
-		}
-		return Py_BuildValue("i", getclientip(ci->clientnum));
-	}
-
-	static PyObject *playerKick(PyObject *self, PyObject *args)
-	{
-		int cn;
-		if(!PyArg_ParseTuple(args, "i", &cn))
-		{
-			// TODO: Should throw exception
-			Py_INCREF(Py_None);
-			return Py_None;
-		}
-		disconnect_client(cn, DISC_KICK);
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
-
-	static PyObject *playerPrivilege(PyObject *self, PyObject *args)
-	{
-		int cn;
-		server::clientinfo *ci;
-		if(!PyArg_ParseTuple(args, "i", &cn)
-		   || !(ci = server::getinfo(cn)))
-		{
-			Py_INCREF(Py_None);
-			return Py_None;
-		}
-		return Py_BuildValue("i", ci->privilege);
-	}
-
-	static PyObject *playerFrags(PyObject *self, PyObject *args)
-	{
-		int cn;
-		server::clientinfo *ci;
-		if(!PyArg_ParseTuple(args, "i", &cn)
-		   || !(ci = server::getinfo(cn)))
-		{
-			Py_INCREF(Py_None);
-			return Py_None;
-		}
-		return Py_BuildValue("i", ci->state.frags);
-	}
-
-	static PyObject *playerTeamkills(PyObject *self, PyObject *args)
-	{
-		int cn;
-		server::clientinfo *ci;
-		if(!PyArg_ParseTuple(args, "i", &cn)
-		   || !(ci = server::getinfo(cn)))
-		{
-			Py_INCREF(Py_None);
-			return Py_None;
-		}
-		return Py_BuildValue("i", ci->state.teamkills);
-	}
-
-	static PyObject *playerDeaths(PyObject *self, PyObject *args)
-	{
-		int cn;
-		server::clientinfo *ci;
-		if(!PyArg_ParseTuple(args, "i", &cn)
-		   || !(ci = server::getinfo(cn)))
-		{
-			Py_INCREF(Py_None);
-			return Py_None;
-		}
-		return Py_BuildValue("i", ci->state.deaths);
-	}
-
-	static PyObject *playerShots(PyObject *self, PyObject *args)
-	{
-		int cn;
-		server::clientinfo *ci;
-		if(!PyArg_ParseTuple(args, "i", &cn)
-		   || !(ci = server::getinfo(cn)))
-		{
-			Py_INCREF(Py_None);
-			return Py_None;
-		}
-		return Py_BuildValue("i", ci->state.shots);
-	}
-
-	static PyObject *playerHits(PyObject *self, PyObject *args)
-	{
-		int cn;
-		server::clientinfo *ci;
-		if(!PyArg_ParseTuple(args, "i", &cn)
-		   || !(ci = server::getinfo(cn)))
-		{
-			Py_INCREF(Py_None);
-			return Py_None;
-		}
-		return Py_BuildValue("i", ci->state.hits);
-	}
-
-	static PyMethodDef ModuleMethods[] = {
-		{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
-		{"message", message, METH_VARARGS, "Send a server message."},
-		{"clients", clients, METH_VARARGS, "List of client numbers."},
-		{"players", players, METH_VARARGS, "List of client numbers of active clients."},
-		{"spectators", spectators, METH_VARARGS, "List of client numbers of spectating clients."},
-		{"playerMessage", playerMessage, METH_VARARGS, "Send a message to player."},
-		{"playerName", playerName, METH_VARARGS, "Get name of player from cn."},
-		{"playerIpLong", playerIpLong, METH_VARARGS, "Get IP of player from cn."},
-		{"playerKick", playerKick, METH_VARARGS, "Kick player from server."},
-		{"playerPrivilege", playerPrivilege, METH_VARARGS, "Integer representing player privilege"},
-		{"playerFrags", playerFrags, METH_VARARGS, "Number of frags by player in current match."},
-		{"playerTeamkills", playerTeamkills, METH_VARARGS, "Number of teamkills by player in current match."},
-		{"playerDeaths", playerDeaths, METH_VARARGS, "Number of deatds by player in current match."},
-		{"playerShots", playerShots, METH_VARARGS, "Shots by player in current match."},
-		{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
-		{NULL, NULL, 0, NULL}
-	};
-	
-	PyMODINIT_FUNC
-	initModule(const char *module_name)
-	{
-		(void) Py_InitModule(module_name, ModuleMethods);
-		return;
-	}
-	
-	bool init(const char *prog_name, const char *pyscripts_path, const char *module_name)
-	{
-		char *pn = new char[strlen(prog_name)+1];
-		if(-1 == chdir(pyscripts_path))
-		{
-			perror("could not chdir into pyscripts path");
-		}
-		setenv("PYTHONPATH", pyscripts_path, 1);
-		strcpy(pn, prog_name);
-		Py_SetProgramName(pn);
-		delete pn;
-		Py_Initialize();
-		initModule(module_name);
-		if(!initPy(pyscripts_path))
-		{
-			fprintf(stderr, "Error initializing python modules.\n");
-			return false;
-		}
-		return true;
-	}
-	
 }

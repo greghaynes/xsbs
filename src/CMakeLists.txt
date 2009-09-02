@@ -9,7 +9,8 @@ set(xsbs_srcs
 
 	fpsgame/server.cpp
 
-	pycontrol/sbpy.cpp)
+	pycontrol/sbpy.cpp
+	pycontrol/servermodule.cpp)
 
 include(CheckFunctionExists)
 include(CheckSymbolExists)
