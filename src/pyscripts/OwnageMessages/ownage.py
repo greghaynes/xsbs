@@ -12,7 +12,7 @@ def onPlayerActive(cn):
 
 def onPlayerFrag(cn, tcn):
 	killsprees[cn] = killsprees[cn] + 1
-	if messages.has_key(killsprees[tcn]):
+	if killsprees[tcn] > 5:
 		sbserver.message(endmsg.substitute(name=sbserver.playerName(tcn), endername=sbserver.playerName(cn)))
 	killsprees[tcn] = 0
 	if messages.has_key(killsprees[cn]):
