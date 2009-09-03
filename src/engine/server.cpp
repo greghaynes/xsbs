@@ -669,9 +669,9 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
                 if(!c) break;
                 printf("disconnected client (%s)\n", c->hostname);
                 server::clientdisconnect(c->num);
-				
+
                SbPy::triggerEventInt("player_disconnect", c->num);
-				
+
                 nonlocalclients--;
                 c->type = ST_EMPTY;
                 event.peer->data = NULL;
