@@ -310,25 +310,5 @@ initModule(const char *module_name)
 	return;
 }
 
-bool init(const char *prog_name, const char *pyscripts_path, const char *module_name)
-{
-	char *pn = new char[strlen(prog_name)+1];
-	if(-1 == chdir(pyscripts_path))
-	{
-		perror("could not chdir into pyscripts path");
-	}
-	setenv("PYTHONPATH", pyscripts_path, 1);
-	strcpy(pn, prog_name);
-	Py_SetProgramName(pn);
-	delete pn;
-	Py_Initialize();
-	initModule(module_name);
-	if(!initPy(pyscripts_path))
-	{
-		fprintf(stderr, "Error initializing python modules.\n");
-		return false;
-	}
-	return true;
-}
 
 }

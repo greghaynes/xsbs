@@ -25,7 +25,7 @@
 namespace SbPy
 {
 
-bool init(const char *, const char *, const char *);
+
 
 }
 

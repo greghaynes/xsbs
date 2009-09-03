@@ -789,7 +789,11 @@ void initserver(bool listen, bool dedicated)
 
     if(listen) setuplistenserver(dedicated);
 
-    server::serverinit();
+    if(!server::serverinit())
+    {
+        conoutf("Fatal error loading python modules.");
+        return;
+    }
     signal(SIGINT, sigint);
 
     if(listen)

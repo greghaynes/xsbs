@@ -26,7 +26,8 @@
 namespace SbPy
 {
 
-bool initPy(const char *pyscripts_path);
+bool init(const char*, const char*, const char *);
+bool initPy();
 void deinitPy();
 bool triggerEvent(const char *event_name, std::vector<PyObject*> *args);
 bool triggerEventInt(const char *event_name, int cn);

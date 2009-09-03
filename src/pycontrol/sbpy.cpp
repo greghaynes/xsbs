@@ -25,6 +25,39 @@
 namespace SbPy
 {
 
+static char *pyscripts_path;
+
+PyMODINIT_FUNC initModule(const char *);
+
+void loadPyscriptsPath()
+{
+	char *path = getenv("SB_PYSCRIPTS_PATH");
+	if(!path)
+		pyscripts_path = path;
+}
+
+void initEnv()
+{
+	char *pythonpath, *newpath;
+	if(!pyscripts_path)
+		return;
+       	pythonpath = getenv("PYTHONPATH");
+	if(!pythonpath)
+	{
+		newpath = new char[strlen(pyscripts_path)+1];
+		strcpy(newpath, pyscripts_path);
+	}
+	else
+	{
+		newpath = new char[strlen(pyscripts_path)+strlen(pythonpath)+2];
+		strcpy(newpath, pythonpath);
+		strcat(newpath, ":");
+		strcat(newpath, pyscripts_path);
+	}
+	setenv("PYTHONPATH", newpath, 1);
+	delete newpath;
+}
+
 #define SBPY_ERR(x) \
 	if(!x) \
 	{ \
@@ -35,11 +68,10 @@ namespace SbPy
 
 static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *triggerExecQueueFunc;
 
-bool initPy(const char *pyscripts_path)
+bool initPy()
 {
 	PyObject *pFunc, *pArgs, *pValue, *pluginsModule;
 	
-	std::string path;
 	pluginsModule = PyImport_ImportModule("sbplugins");
 	SBPY_ERR(pluginsModule)
 	eventsModule = PyImport_ImportModule("sbevents");
@@ -92,6 +124,43 @@ void deinitPy()
 	Py_Finalize();
 }
 
+bool init(const char *prog_name, const char *arg_pyscripts_path, const char *module_name)
+{
+	// Setup env vars and chdir
+	char *pn = new char[strlen(prog_name)+1];
+	if(arg_pyscripts_path[0])
+	{
+		pyscripts_path = new char[strlen(arg_pyscripts_path)+1];
+		strcpy(pyscripts_path, arg_pyscripts_path);
+	}
+	else loadPyscriptsPath();
+	if(!pyscripts_path)
+	{
+		fprintf(stderr, "Could not locate a pyscripts directory.");
+	}
+	initEnv();
+	if(-1 == chdir(pyscripts_path))
+	{
+		perror("could not chdir into pyscripts path");
+		return false;
+	}
+
+	// Set program name
+	strcpy(pn, prog_name);
+	Py_SetProgramName(pn);
+	delete pn;
+
+	// Initialize
+	Py_Initialize();
+	initModule(module_name);
+	if(!initPy())
+	{
+		fprintf(stderr, "Error initializing python modules.\n");
+		return false;
+	}
+	return true;
+}
+
 bool triggerFuncEvent(const char *name, std::vector<PyObject*> *args, PyObject *func)
 {
 	PyObject *pArgs, *pArgsArgs, *pName, *pValue;
@@ -100,7 +169,7 @@ bool triggerFuncEvent(const char *name, std::vector<PyObject*> *args, PyObject *
 	
 	if(!func)
 	{
-		std::cout << "Invalid function handler to trigger event.\n";
+		fprintf(stderr, "Python Error: Invalid handler to triggerEvent function.\n");
 		return false;
 	}
 	pArgs = PyTuple_New(2);

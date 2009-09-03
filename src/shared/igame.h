@@ -91,7 +91,7 @@ namespace server
 {
     extern void *newclientinfo();
     extern void deleteclientinfo(void *ci);
-    extern void serverinit();
+    extern bool serverinit();
     extern int reserveclients();
     extern void clientdisconnect(int n);
     extern int clientconnect(int n, uint ip);

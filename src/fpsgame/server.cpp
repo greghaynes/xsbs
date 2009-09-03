@@ -11,8 +11,6 @@
 
 #include <iostream>
 
-#define PYSCRIPTS_PATH "/home/greghaynes/Projects/xsbs/src/pyscripts"
-
 namespace game
 {
     void parseoptions(vector<const char *> &args)
@@ -180,15 +178,12 @@ namespace server
         return false;
     }
 
-    void serverinit()
+    bool serverinit()
     {
         smapname[0] = '\0';
         resetitems();
         // Initialize python modules
-        if(pyscriptspath[0])
-            SbPy::init("sauer_server", pyscriptspath, "sbserver");
-        else
-            SbPy::init("sauer_server", PYSCRIPTS_PATH, "sbserver");
+        return SbPy::init("sauer_server", pyscriptspath, "sbserver");
     }
 
     int numclients(int exclude, bool nospec, bool noai)
