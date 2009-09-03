@@ -35,12 +35,12 @@ namespace server
 #define MM_AUTOAPPROVE 0x1000
 #define MM_PRIVSERV (MM_MODE | MM_AUTOAPPROVE)
 #define MM_PUBSERV ((1<<MM_OPEN) | (1<<MM_VETO))
-	
+
     bool notgotitems = true;        // true when map has changed and waiting for clients to send item
     int gamemode = 0;
     int gamemillis = 0, gamelimit = 0;
     bool gamepaused = false;
-	
+
     string smapname = "";
     int interm = 0, minremain = 0;
     bool mapreload = false;
@@ -49,7 +49,7 @@ namespace server
     int currentmaster = -1;
     bool masterupdate = false;
     stream *mapdata = NULL;
-	
+
     vector<uint> allowedips;
     vector<clientinfo *> connects, clients, bots;
     vector<worldstate *> worldstates;
@@ -62,21 +62,21 @@ namespace server
         uchar *data;
         int len;
     };
-	
+
 #define MAXDEMOS 5
     vector<demofile> demos;
-	
+
     bool demonextmatch = false;
     stream *demotmp = NULL, *demorecord = NULL, *demoplayback = NULL;
     int nextplayback = 0, demomillis = 0;
-	
+
     struct servmode
     {
         virtual ~servmode() {}
-		
+
         virtual void entergame(clientinfo *ci) {}
         virtual void leavegame(clientinfo *ci, bool disconnecting = false) {}
-		
+
         virtual void moved(clientinfo *ci, const vec &oldpos, bool oldclip, const vec &newpos, bool newclip) {}
         virtual bool canspawn(clientinfo *ci, bool connecting = false) { return true; }
         virtual void spawned(clientinfo *ci) {}
@@ -97,13 +97,13 @@ namespace server
         virtual void getteamscores(vector<teamscore> &scores) {}
         virtual bool extinfoteam(const char *team, ucharbuf &p) { return false; }
     };
-	
+
 #define SERVMODE 1
-	
+
 #include "capture.h"
 #include "ctf.h"
 
-	captureservmode capturemode;
+    captureservmode capturemode;
     ctfservmode ctfmode;
     servmode *smode = NULL;
 
@@ -184,11 +184,10 @@ namespace server
     {
         smapname[0] = '\0';
         resetitems();
-		
         // Initialize python modules
         if(pyscriptspath[0])
             SbPy::init("sauer_server", pyscriptspath, "sbserver");
-	else
+        else
             SbPy::init("sauer_server", PYSCRIPTS_PATH, "sbserver");
     }
 
@@ -1382,7 +1381,7 @@ namespace server
         if(checkexecqueue)
         {
             checkexecqueue = false;
-	    SbPy::triggerExecQueue();
+            SbPy::triggerExecQueue();
         }
     }
 
@@ -1483,9 +1482,9 @@ namespace server
         ci->clientnum = ci->ownernum = n;
         ci->connectmillis = totalmillis;
         ci->sessionid = (rnd(0x1000000)*((totalmillis%10000)+1))&0xFFFFFF;
-		
+
         connects.add(ci);
-		if(!SbPy::triggerPolicyEventInt("allow_connect", ci->clientnum)) return DISC_KICK;
+        if(!SbPy::triggerPolicyEventInt("allow_connect", ci->clientnum)) return DISC_KICK;
         if(!m_mp(gamemode)) return DISC_PRIVATE;
         sendservinfo(ci);
         return DISC_NONE;
@@ -2060,7 +2059,7 @@ namespace server
                         }
                         defformatstring(s)("mastermode is now %s (%d)", mastermodename(mastermode), mastermode);
                         SbPy::triggerEventInt("server_mastermode_changed", mastermode);
-						sendservmsg(s);
+                        sendservmsg(s);
                     }
                     else
                     {
@@ -2216,14 +2215,14 @@ namespace server
             case SV_ADDBOT:
             {
                 aiman::reqadd(ci, getint(p));
-				SbPy::triggerEventInt("game_bot_added", ci->clientnum);
+                SbPy::triggerEventInt("game_bot_added", ci->clientnum);
                 break;
             }
 
             case SV_DELBOT:
             {
                 aiman::reqdel(ci);
-				SbPy::triggerEventInt("game_bot_removed", ci->clientnum);
+                SbPy::triggerEventInt("game_bot_removed", ci->clientnum);
                 break;
             }
 
