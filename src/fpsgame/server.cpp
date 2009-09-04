@@ -1149,11 +1149,16 @@ namespace server
         if(ts.health<=0)
         {
             target->state.deaths++;
-            if(actor!=target && isteam(actor->team, target->team))
+			if(actor==target)
+				fprintf(eventlog.file(), "player %s commited suicide\n", actor->name);
+            else if(isteam(actor->team, target->team))
             {
                 actor->state.teamkills++;
+				fprintf(eventlog.file(), "player %s teamkilled player %s\n", actor->name, target->name);
                 SbPy::triggerEventIntInt("player_teamkill", actor->clientnum, target->clientnum);
             }
+			else
+				fprintf(eventlog.file(), "player %s fragged player %s\n", actor->name, target->name);
             int fragvalue = smode ? smode->fragvalue(target, actor) : (target==actor || isteam(target->team, actor->team) ? -1 : 1);
             actor->state.frags += fragvalue;
             if(fragvalue>0)
@@ -1906,6 +1911,7 @@ namespace server
                 filtertext(text, text);
                 if(SbPy::triggerPolicyEventIntString("allow_message", ci->clientnum, text))
                 {
+					fprintf(eventlog.file(), "%s: %s\n", ci->name, text);
                     SbPy::triggerEventIntString("player_message", ci->clientnum, text);
                     QUEUE_AI;
                     QUEUE_INT(SV_TEXT);
@@ -1921,6 +1927,7 @@ namespace server
                 if(!ci || !cq || (ci->state.state==CS_SPECTATOR && !ci->local && !ci->privilege) || !m_teammode || !cq->team[0]) break;
                 if(SbPy::triggerPolicyEventIntString("allow_message_team", ci->clientnum, text))
                 {
+                    fprintf(eventlog.file(), "%s (team): %s\n", ci->name, text);
                     SbPy::triggerEventIntString("player_message_team", ci->clientnum, text);
                     loopv(clients)
                     {
