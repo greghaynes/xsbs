@@ -29,7 +29,8 @@ void conoutfv(int type, const char *fmt, va_list args)
     vformatstring(sf, fmt, args);
     filtertext(sp, sf);
     //puts(sp);
-	server::eventlog.write(sp);
+    if(server::eventlog.isOpen())
+        server::eventlog.write(sp);
 }
 
 void conoutf(const char *fmt, ...)
