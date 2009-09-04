@@ -5,7 +5,7 @@ import getopt
 
 logfile = ''
 servername = 'irc.gamesurge.net'
-nickname = 'xsbs-serverbot'
+nickname = 'xsbs-unnamedbot'
 channel = '#xsbs'
 adminpass = 'foo'
 
@@ -80,6 +80,8 @@ if __name__ == "__main__":
 			logfile = arg
 		elif opt in ('-c', '--channel'):
 			channel = arg
+		elif opt in ('-n', '--nickname'):
+			nickname = arg
 	if logfile != '' and servername != '' and channel != '' and nickname != '' and adminpass != '':
 		main()
 	else:
