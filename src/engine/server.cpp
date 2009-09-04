@@ -335,6 +335,7 @@ void disconnect_client(int n, int reason)
     clients[n]->info = NULL;
     defformatstring(s)("client (%s) disconnected because: %s", clients[n]->hostname, disc_reasons[reason]);
     server::eventlog.write(s);
+    server::eventlog.write("\n")
     server::sendservmsg(s);
 }
 
@@ -742,8 +743,8 @@ void rundedicatedserver()
     #ifdef WIN32
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
     #endif
-    fprintf(server::eventlog.file(), "dedicated server started, waiting for clients...");
-	puts("dedicated server started...\nCtrl-C to exit\n\n");
+    fprintf(server::eventlog.file(), "dedicated server started, waiting for clients...\n");
+    puts("dedicated server started...\nCtrl-C to exit\n\n");
     SbPy::triggerEvent("server_start", 0);
     for(;rundedicated;) serverslice(true, 4);
 }
