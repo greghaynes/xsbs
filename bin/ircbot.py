@@ -71,7 +71,7 @@ def help():
 	print 'usage: python ircbot.py --logfile <path-to-log> --server <irc server> --channel <channel> --nickname <nickname> --adminpass <admin password>'
 	
 if __name__ == "__main__":
-	opts, args = getopt.getopt(sys.argv[1:], 'hlscnp', ['help', 'logfile='])
+	opts, args = getopt.getopt(sys.argv[1:], 'hlscnp', ['help', 'logfile=', 'nickname='])
 	logfile = ''
 	for opt, arg in opts:
 		if opt in ('-h', '--help'):
