@@ -9,6 +9,7 @@
 
 #include "engine.h"
 #include "sbpy.h"
+#include "server.h"
 
 #include <signal.h>
 
@@ -27,7 +28,8 @@ void conoutfv(int type, const char *fmt, va_list args)
     string sf, sp;
     vformatstring(sf, fmt, args);
     filtertext(sp, sf);
-    puts(sp);
+    //puts(sp);
+	server::eventlog.write(sp);
 }
 
 void conoutf(const char *fmt, ...)
@@ -176,7 +178,8 @@ vector<client *> clients;
 
 ENetHost *serverhost = NULL;
 size_t bsend = 0, brec = 0;
-int laststatus = 0; 
+int laststatus = 0;
+int lastlogflush = 0;
 ENetSocket pongsock = ENET_SOCKET_NULL, lansock = ENET_SOCKET_NULL;
 
 void cleanupserver()
@@ -330,7 +333,7 @@ void disconnect_client(int n, int reason)
     server::deleteclientinfo(clients[n]->info);
     clients[n]->info = NULL;
     defformatstring(s)("client (%s) disconnected because: %s", clients[n]->hostname, disc_reasons[reason]);
-    puts(s);
+    server::eventlog.write(s);
     server::sendservmsg(s);
 }
 
@@ -413,7 +416,7 @@ ENetSocket connectmaster()
     if(masteraddress.host == ENET_HOST_ANY)
     {
 #ifdef STANDALONE
-        printf("looking up %s...\n", mastername);
+        fprintf(server::eventlog.file(), "looking up %s...\n", mastername);
 #endif
         masteraddress.port = server::masterport();
         if(!resolverwait(mastername, &masteraddress)) return ENET_SOCKET_NULL;
@@ -469,9 +472,9 @@ void processmasterinput()
         while(args < end && isspace(*args)) args++;
 
         if(!strncmp(input, "failreg", cmdlen))
-            conoutf(CON_ERROR, "master server registration failed: %s", args);
+            conoutf(CON_ERROR, "master server registration failed: %s\n", args);
         else if(!strncmp(input, "succreg", cmdlen))
-            conoutf("master server registration succeeded");
+            conoutf("master server registration succeeded\n");
         else server::processmasterinput(input, cmdlen, args);
 
         masterinpos = end - masterin.getbuf();
@@ -626,9 +629,15 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
     if(totalmillis-laststatus>60*1000)   // display bandwidth stats, useful for server ops
     {
         laststatus = totalmillis;     
-        if(nonlocalclients || bsend || brec) printf("status: %d remote clients, %.1f send, %.1f rec (K/sec)\n", nonlocalclients, bsend/60.0f/1024, brec/60.0f/1024);
+        if(nonlocalclients || bsend || brec) fprintf(server::eventlog.file(), "status: %d remote clients, %.1f send, %.1f rec (K/sec)\n", nonlocalclients, bsend/60.0f/1024, brec/60.0f/1024);
         bsend = brec = 0;
     }
+	
+	if(totalmillis-lastlogflush>1000)
+	{
+		lastlogflush = totalmillis;
+		server::eventlog.flush();
+	}
 
     ENetEvent event;
     bool serviced = false;
@@ -649,7 +658,7 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
                 c.peer->data = &c;
                 char hn[1024];
                 copystring(c.hostname, (enet_address_get_host_ip(&c.peer->address, hn, sizeof(hn))==0) ? hn : "unknown");
-                printf("client connected (%s)\n", c.hostname);
+                fprintf(server::eventlog.file(), "client connected (%s)\n", c.hostname);
                 int reason = server::clientconnect(c.num, c.peer->address.host);
                 if(!reason) nonlocalclients++;
                 else disconnect_client(c.num, reason);
@@ -667,11 +676,9 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
             {
                 client *c = (client *)event.peer->data;
                 if(!c) break;
-                printf("disconnected client (%s)\n", c->hostname);
+                fprintf(server::eventlog.file(), "disconnected client (%s)\n", c->hostname);
                 server::clientdisconnect(c->num);
-
-               SbPy::triggerEventInt("player_disconnect", c->num);
-
+                SbPy::triggerEventInt("player_disconnect", c->num);
                 nonlocalclients--;
                 c->type = ST_EMPTY;
                 event.peer->data = NULL;
@@ -732,7 +739,8 @@ void rundedicatedserver()
     #ifdef WIN32
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
     #endif
-    printf("dedicated server started, waiting for clients...\nCtrl-C to exit\n\n");
+    fprintf(server::eventlog.file(), "dedicated server started, waiting for clients...");
+	puts("dedicated server started...\nCtrl-C to exit\n\n");
     SbPy::triggerEvent("server_start", 0);
     for(;rundedicated;) serverslice(true, 4);
 }
@@ -791,7 +799,7 @@ void initserver(bool listen, bool dedicated)
 
     if(!server::serverinit())
     {
-        conoutf("Fatal error loading python modules.");
+        conoutf("Server initialization failed.");
         return;
     }
     signal(SIGINT, sigint);

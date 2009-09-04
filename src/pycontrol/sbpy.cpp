@@ -136,12 +136,13 @@ bool init(const char *prog_name, const char *arg_pyscripts_path, const char *mod
 	else loadPyscriptsPath();
 	if(!pyscripts_path)
 	{
-		fprintf(stderr, "Could not locate a pyscripts directory.");
+		fprintf(stderr, "Fatal Error: Could not locate a pyscripts directory.\n");
+		return false;
 	}
 	initEnv();
 	if(-1 == chdir(pyscripts_path))
 	{
-		perror("could not chdir into pyscripts path");
+		perror("Could not chdir into pyscripts path.\n");
 		return false;
 	}
 

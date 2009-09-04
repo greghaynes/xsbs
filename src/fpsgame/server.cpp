@@ -1,10 +1,9 @@
 /*
 
- This is a modified version of the sauerbraten source code.
+ This is a modified version of the original Sauerbraten source code.
  
 */
 
-#include "game.h"
 #include "sbpy.h"
 #include "servermodule.h"
 #include "server.h"
@@ -53,6 +52,7 @@ namespace server
     vector<worldstate *> worldstates;
     bool reliablemessages = false;
     bool checkexecqueue = false;
+	Log eventlog;
 
     struct demofile
     {
@@ -110,6 +110,7 @@ namespace server
     SVAR(adminpass, "");
     VARF(publicserver, 0, 0, 1, { mastermask = publicserver ? MM_PUBSERV : MM_PRIVSERV; });
     SVAR(pyscriptspath, "");
+	SVAR(logpath, "");
 
     void *newclientinfo() { return new clientinfo; }
     void deleteclientinfo(void *ci) { delete (clientinfo *)ci; }
@@ -174,6 +175,7 @@ namespace server
             case 'o': setvar("publicserver", atoi(&arg[2])); return true;
             case 'g': setvar("serverbotlimit", atoi(&arg[2])); return true;
             case 's': setsvar("pyscriptspath", &arg[2]); return true;
+            case 'l': setsvar("logpath", &arg[2]); return true;
         }
         return false;
     }
@@ -182,8 +184,20 @@ namespace server
     {
         smapname[0] = '\0';
         resetitems();
-        // Initialize python modules
-        return SbPy::init("sauer_server", pyscriptspath, "sbserver");
+		if(!logpath[0])
+		{
+			fprintf(stderr, "No log file specified.  Use -llogfile.\n");
+			return false;
+		}
+		if(!eventlog.open(logpath))
+		{
+			perror("Could not open log file");
+			return false;
+		}
+		// Initialize python modules
+        if(!SbPy::init("sauer_server", pyscriptspath, "sbserver"))
+			return false;
+		return true;
     }
 
     int numclients(int exclude, bool nospec, bool noai)
