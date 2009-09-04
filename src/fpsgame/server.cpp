@@ -1150,15 +1150,15 @@ namespace server
         {
             target->state.deaths++;
 			if(actor==target)
-				fprintf(eventlog.file(), "player %s commited suicide\n", actor->name);
+				fprintf(eventlog.file(), "player %s (%i) commited suicide\n", actor->name, actor->clientnum);
             else if(isteam(actor->team, target->team))
             {
                 actor->state.teamkills++;
-				fprintf(eventlog.file(), "player %s teamkilled player %s\n", actor->name, target->name);
+				fprintf(eventlog.file(), "player %s (%i) teamkilled player %s (%i)\n", actor->name, actor->clientnum, target->name, target->clientnum);
                 SbPy::triggerEventIntInt("player_teamkill", actor->clientnum, target->clientnum);
             }
 			else
-				fprintf(eventlog.file(), "player %s fragged player %s\n", actor->name, target->name);
+				fprintf(eventlog.file(), "player %s (%i) fragged player %s\n", actor->name, actor->clientnum, target->name);
             int fragvalue = smode ? smode->fragvalue(target, actor) : (target==actor || isteam(target->team, actor->team) ? -1 : 1);
             actor->state.frags += fragvalue;
             if(fragvalue>0)
