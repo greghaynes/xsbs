@@ -186,7 +186,7 @@ namespace server
         resetitems();
 		if(!logpath[0])
 		{
-			fprintf(stderr, "No log file specified.  Use -llogfile.\n");
+			fprintf(stderr, "No log file specified.  Use --logfile path/to/logfile.\n");
 			return false;
 		}
 		if(!eventlog.open(logpath))
