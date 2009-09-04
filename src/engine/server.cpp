@@ -335,7 +335,7 @@ void disconnect_client(int n, int reason)
     clients[n]->info = NULL;
     defformatstring(s)("client (%s) disconnected because: %s", clients[n]->hostname, disc_reasons[reason]);
     server::eventlog.write(s);
-    server::eventlog.write("\n")
+    server::eventlog.write("\n");
     server::sendservmsg(s);
 }
 
