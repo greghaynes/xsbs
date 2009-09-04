@@ -1728,6 +1728,7 @@ namespace server
                         if(!cp->active)
                         {
                             cp->active = true;
+			    fprintf(eventlog.file(), "player %s (%i) is now active", cp->name, cp->clientnum);
                             SbPy::triggerEventInt("player_active", cp->clientnum);
                         }
                     }
@@ -1911,7 +1912,7 @@ namespace server
                 filtertext(text, text);
                 if(SbPy::triggerPolicyEventIntString("allow_message", ci->clientnum, text))
                 {
-					fprintf(eventlog.file(), "%s: %s\n", ci->name, text);
+					fprintf(eventlog.file(), "%s (%i): %s\n", ci->name, ci->clientnum, text);
                     SbPy::triggerEventIntString("player_message", ci->clientnum, text);
                     QUEUE_AI;
                     QUEUE_INT(SV_TEXT);
@@ -1943,6 +1944,7 @@ namespace server
             {
                 QUEUE_MSG;
                 getstring(text, p);
+		fprintf(eventlog.file(), "%s (%i) changed name to %s", ci->name, ci->clientnum, text);
                 filtertext(ci->name, text, false, MAXNAMELEN);
                 if(!ci->name[0]) copystring(ci->name, "unnamed");
                 SbPy::triggerEventIntString("player_name_changed", ci->clientnum, ci->name);
@@ -1972,6 +1974,7 @@ namespace server
                         aiman::changeteam(ci);
                         sendf(-1, 1, "riis", SV_SETTEAM, sender, ci->team);
                     }
+		    fprintf(eventlog.file(), "player %s switched team", ci->name);
                     SbPy::triggerEventInt("player_team_changed", ci->clientnum);
                 }
                 break;

@@ -4,10 +4,10 @@ import threading
 import getopt
 
 logfile = ''
-server = ''
-nick = ''
-channel = ''
-adminpass = ''
+servername = 'irc.gamesurge.net'
+nickname = 'xsbs-serverbot'
+channel = '#xsbs'
+adminpass = 'foo'
 
 _win = (sys.platform == 'win32')
 
@@ -37,7 +37,6 @@ class FileMonitor(threading.Thread):
 			self.mtimes[filename] = mtime
 			return
 		if mtime != self.mtimes[filename]:
-			print 'modified'
 			self.lock.acquire()
 			self.queue.append(filename)
 			self.lock.release()
@@ -48,18 +47,18 @@ def onWelcome(server, event):
 
 def main():
 	f = open(logfile, 'r')
-	f.seek(os.SEEK_END)
+	f.seek(0, os.SEEK_END)
 	irc = irclib.IRC()
 	server = irc.server()
 	lock = threading.Lock()
 	mon = FileMonitor(logfile, lock)
 	mon.start()
 	server.add_global_handler('welcome', onWelcome)
-	server.connect(server, 6667, nickname)
+	server.connect(servername, 6667, nickname)
 	while 1:
 		if len(mon.queue) > 0:
 			lock.acquire()
-			buff = f.read(4096)
+			buff = f.read()
 			lines = buff.split('\n')
 			for line in lines:
 					server.privmsg(channel, line)
@@ -69,28 +68,19 @@ def main():
 
 def help():
 	print 'XSBS Server IRC Bot'
-	print 'usage python ircbot.py --logfile <path-to-log> --server <irc server> --channel <channel> --nickname <nickname> --adminpass <admin password>'
+	print 'usage: python ircbot.py --logfile <path-to-log> --server <irc server> --channel <channel> --nickname <nickname> --adminpass <admin password>'
 	
 if __name__ == "__main__":
-	opts, args = getopt.getopt(sys.argv[1:], 'hlscnp', ['help', 'logfile=',
-		'server=', 'channel=', 'nickname=', 'adminpass='])
+	opts, args = getopt.getopt(sys.argv[1:], 'hlscnp', ['help', 'logfile='])
 	logfile = ''
-	print opts, args
 	for opt, arg in opts:
 		if opt in ('-h', '--help'):
 			help()
 		elif opt in ('-l', '--logfile'):
 			logfile = arg
-		elif opt in ('-s', '--server'):
-			server = arg
 		elif opt in ('-c', '--channel'):
 			channel = arg
-		elif opt in ('-n', '--nickname'):
-			nickname = arg
-		elif opt in ('-p', '--adminpass'):
-			adminpass = arg
-	if logfile != '' and server != '' and channel != ''
-		and nickname != '' and adminpass != '':
+	if logfile != '' and servername != '' and channel != '' and nickname != '' and adminpass != '':
 		main()
 	else:
 		help()

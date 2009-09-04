@@ -626,12 +626,14 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
         lastupdatemaster = totalmillis;
     }
     
+ /*
     if(totalmillis-laststatus>60*1000)   // display bandwidth stats, useful for server ops
     {
         laststatus = totalmillis;     
         if(nonlocalclients || bsend || brec) fprintf(server::eventlog.file(), "status: %d remote clients, %.1f send, %.1f rec (K/sec)\n", nonlocalclients, bsend/60.0f/1024, brec/60.0f/1024);
         bsend = brec = 0;
     }
+*/
 	
 	if(totalmillis-lastlogflush>1000)
 	{
