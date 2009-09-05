@@ -1035,6 +1035,8 @@ namespace server
             demonextmatch = false;
             setupdemorecord();
         }
+	fprintf(eventlog.file(), "Map changed to %s (%s)\n", smapname, gamemodes[mode]);
+	SbPy::triggerEventStrInt("map_changed", smapname, mode);
     }
 
     struct votecount
