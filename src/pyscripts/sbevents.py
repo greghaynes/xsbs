@@ -1,10 +1,12 @@
 import sbserver, thread
+import socketmonitor
 
 events = {}
 policy_events = {}
 
 exec_queue = []
 exec_queue_lock = thread.allocate_lock()
+sockmon = socketmonitor.SocketMonitor()
 
 def registerPolicyEventHandler(event, handler):
 	if not policy_events.has_key(event):
@@ -44,3 +46,4 @@ def triggerSbExecQueue():
 		except:
 			print 'Error occoured with enqueued exec action'
 	exec_queue_lock.release()
+
