@@ -8,7 +8,8 @@ set(xsbs_srcs
 	engine/command.cpp
 
 	fpsgame/server.cpp
-	fpsgame/logging.cpp
+
+	tools/logging.cpp
 
 	pycontrol/sbpy.cpp
 	pycontrol/servermodule.cpp)
