@@ -1035,7 +1035,7 @@ namespace server
             demonextmatch = false;
             setupdemorecord();
         }
-	fprintf(eventlog.file(), "Map changed to %s (%s)\n", smapname, gamemodes[mode]);
+	fprintf(eventlog.file(), "Map changed to %s (%s)\n", smapname, gamemodes[mode].name);
 	SbPy::triggerEventStrInt("map_changed", smapname, mode);
     }
 
