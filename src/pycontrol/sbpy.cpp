@@ -66,7 +66,7 @@ void initEnv()
 		return false;\
 	}
 
-static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *triggerExecQueueFunc;
+static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *triggerExecQueueFunc, *triggerSocketMonitorFunc;
 
 bool initPy()
 {
@@ -112,6 +112,13 @@ bool initPy()
 	if(!PyCallable_Check(triggerExecQueueFunc))
 	{
 		fprintf(stderr, "Error: triggerSbExecQueue function could not be loaded.\n");
+		return false;
+	}
+	triggerSocketMonitorFunc = PyObject_GetAttrString(eventsModule, "triggerSocketMonitor");
+	SBPY_ERR(triggerSocketMonitorFunc);
+	if(!PyCallable_Check(triggerSocketMonitorFunc))
+	{
+		fprintf(stderr, "Error: triggerSocketMonitor function could not be loaded.\n");
 		return false;
 	}
 	Py_DECREF(pluginsModule);
@@ -162,6 +169,16 @@ bool init(const char *prog_name, const char *arg_pyscripts_path, const char *mod
 	return true;
 }
 
+PyObject *callPyFunc(PyObject *func, PyObject *args)
+{
+	PyObject *val;
+	val = PyObject_CallObject(func, args);
+	Py_DECREF(args);
+	if(!val)
+		PyErr_Print();
+	return val;
+}
+
 bool triggerFuncEvent(const char *name, std::vector<PyObject*> *args, PyObject *func)
 {
 	PyObject *pArgs, *pArgsArgs, *pName, *pValue;
@@ -189,11 +206,9 @@ bool triggerFuncEvent(const char *name, std::vector<PyObject*> *args, PyObject *
 	else
 		pArgsArgs = PyTuple_New(0);
 	PyTuple_SetItem(pArgs, 1, pArgsArgs);
-	pValue = PyObject_CallObject(func, pArgs);
-	Py_DECREF(pArgs);
+	pValue = callPyFunc(func, pArgs);
 	if(!pValue)
 	{
-		PyErr_Print();
 		fprintf(stderr, "Error triggering event.\n");
 		return false;
 	}
@@ -277,12 +292,18 @@ void triggerExecQueue()
 {
 	PyObject *pargs, *pvalue;
 	pargs = PyTuple_New(0);
-	pvalue = PyObject_CallObject(triggerExecQueueFunc, pargs);
-	Py_DECREF(pargs);
-	if(!pvalue)
-	{
-		PyErr_Print();
-	}
+	pvalue = callPyFunc(triggerExecQueueFunc, pargs);
+	if(pvalue)
+		Py_DECREF(pvalue);
+}
+
+void triggerSocketMonitor()
+{
+	PyObject *pargs, *pvalue;
+	pargs = PyTuple_New(0);
+	pvalue = callPyFunc(triggerSocketMonitorFunc, pargs);
+	if(pvalue)
+		Py_DECREF(pvalue);
 }
 
 }

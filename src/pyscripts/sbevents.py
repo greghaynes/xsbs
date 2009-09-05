@@ -8,6 +8,9 @@ exec_queue = []
 exec_queue_lock = thread.allocate_lock()
 sockmon = socketmonitor.SocketMonitor()
 
+def triggerSocketMonitor():
+	sockmon.pollOnce(0)
+
 def registerPolicyEventHandler(event, handler):
 	if not policy_events.has_key(event):
 		policy_events[event] = []

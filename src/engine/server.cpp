@@ -573,6 +573,7 @@ void checkserversockets()        // reply all server info requests
     }
 
     if(mastersock != ENET_SOCKET_NULL && ENET_SOCKETSET_CHECK(sockset, mastersock)) flushmasterinput();
+
 }
 
 #define DEFAULTCLIENTS 8
@@ -608,6 +609,9 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
         server::sendpackets();
         return;
     }
+
+    // process python sockets
+    SbPy::triggerSocketMonitor();
        
     // below is network only
 

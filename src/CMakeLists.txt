@@ -32,7 +32,7 @@ add_definitions(-DSTANDALONE)
 include_directories(${CMAKE_SOURCE_DIR}/src/engine
 	${CMAKE_SOURCE_DIR}/src/fpsgame
 	${CMAKE_SOURCE_DIR}/src/shared
-	${CMAKE_SOURCE_DIR}/src/include
+	${CMAKE_SOURCE_DIR}/src/tools
 	${CMAKE_SOURCE_DIR}/src/pycontrol
 	${CMAKE_SOURCE_DIR}/src/enet/include
 	${PYTHON_INCLUDE_PATH}
