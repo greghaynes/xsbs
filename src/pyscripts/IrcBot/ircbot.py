@@ -1,5 +1,10 @@
-import sbevents
+import sbevents, sbserver
 import socket
+
+channel = '#xsbs'
+server = 'irc.gamesurge.net'
+nickname = 'xsbs-serverbot'
+port = 6667
 
 class IrcBot:
 	def __init__(self, servername, nickname, port=6667):
@@ -32,7 +37,7 @@ class IrcBot:
 		else:
 			self.channels.append(channel)
 	def privMsg(self, user, message):
-		self.socket.send('PRIVMSG %s %s\r\n' % (user, message))
+		self.socket.send('PRIVMSG %s :%s\r\n' % (user, message))
 	def processData(self):
 		self.buff += self.socket.recv(4096)
 		print self.buff,
@@ -46,7 +51,21 @@ class IrcBot:
 				if not self.isConnected and line[3] == ':+iw':
 					self.onWelcome()
 
-bot = IrcBot('irc.gamesurge.net', 'xsbs-serverbot')
+bot = IrcBot(server, nickname, port)
 bot.connect()
-bot.join('#xsbs')
+bot.join(channel)
+
+def onPlayerActive(cn):
+	bot.privMsg(channel, 'Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
+
+def onMsg(cn, text):
+	bot.privMsg(channel, '%s (%i): %s' % (sbserver.playerName(cn), cn, text))
+
+def onTeamMsg(cn, text):
+	bot.privMsg(channel, '%s (%i) (Team): %s', % (sbserver.playerName(cn), cn, text))
+
+sbevents.registerEventHandler('player_active', onPlayerActive)
+sbevents.registerEventHandler('player_message', onMsg)
+# uncomment to display team messages
+#sbevents.registerEventHandler('player_message_team', onTeamMsg)
 
