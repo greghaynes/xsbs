@@ -881,6 +881,7 @@ int main(int argc, char* argv[])
     game::parseoptions(gameargs);
     initserver(true, true);
     SbPy::triggerEvent("server_stop", 0);
+    SbPy::deinitPy();
     return 0;
 }
 #endif
