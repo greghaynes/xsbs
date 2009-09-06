@@ -632,7 +632,7 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
         lastupdatemaster = totalmillis;
     }
     
- /*
+/*
     if(totalmillis-laststatus>60*1000)   // display bandwidth stats, useful for server ops
     {
         laststatus = totalmillis;     
@@ -641,11 +641,13 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
     }
 */
 	
-	if(totalmillis-lastlogflush>1000)
-	{
-		lastlogflush = totalmillis;
-		server::eventlog.flush();
-	}
+    if(totalmillis-lastlogflush>1000)
+    {
+        lastlogflush = totalmillis;
+        server::eventlog.flush();
+    }
+
+    SbPy::setTime(totalmillis);
 
     ENetEvent event;
     bool serviced = false;

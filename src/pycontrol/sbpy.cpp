@@ -66,7 +66,7 @@ void initEnv()
 		return false;\
 	}
 
-static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *triggerExecQueueFunc, *triggerSocketMonitorFunc;
+static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *triggerExecQueueFunc, *triggerSocketMonitorFunc, *setTimeFunc;
 
 bool initPy()
 {
@@ -119,6 +119,13 @@ bool initPy()
 	if(!PyCallable_Check(triggerSocketMonitorFunc))
 	{
 		fprintf(stderr, "Error: triggerSocketMonitor function could not be loaded.\n");
+		return false;
+	}
+	setTimeFunc = PyObject_GetAttrString(eventsModule, "setTime");
+	SBPY_ERR(setTimeFunc);
+	if(!PyCallable_Check(setTimeFunc))
+	{
+		fprintf(stderr, "Error: setTime function could not be loaded.\n");
 		return false;
 	}
 	Py_DECREF(pluginsModule);
@@ -302,6 +309,17 @@ void triggerSocketMonitor()
 	PyObject *pargs, *pvalue;
 	pargs = PyTuple_New(0);
 	pvalue = callPyFunc(triggerSocketMonitorFunc, pargs);
+	if(pvalue)
+		Py_DECREF(pvalue);
+}
+
+void setTime(int millis)
+{
+	PyObject *pargs, *pvalue, *pint;
+	pint = PyInt_FromLong(millis);
+	pargs = PyTuple_New(1);
+	PyTuple_SetItem(pargs, 0, pint);
+	pvalue = callPyFunc(setTimeFunc, pargs);
 	if(pvalue)
 		Py_DECREF(pvalue);
 }

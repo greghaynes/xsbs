@@ -38,6 +38,7 @@ bool triggerPolicyEventInt(const char *name, int cn);
 bool triggerPolicyEventIntString(const char *event_name, int cn, const char *text);
 void triggerExecQueue();
 void triggerSocketMonitor();
+void setTime(int);
 
 }
 #endif

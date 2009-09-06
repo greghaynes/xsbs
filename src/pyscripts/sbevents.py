@@ -7,7 +7,7 @@ policy_events = {}
 exec_queue = []
 exec_queue_lock = thread.allocate_lock()
 sockmon = socketmonitor.SocketMonitor()
-timerman = timermanager.TimerManager()
+timerman = timermanager.TimerManager(0)
 
 def triggerSocketMonitor():
 	sockmon.pollOnce(0)
