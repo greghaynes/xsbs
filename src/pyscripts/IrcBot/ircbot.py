@@ -62,7 +62,7 @@ def onMsg(cn, text):
 	bot.privMsg(channel, '%s (%i): %s' % (sbserver.playerName(cn), cn, text))
 
 def onTeamMsg(cn, text):
-	bot.privMsg(channel, '%s (%i) (Team): %s', % (sbserver.playerName(cn), cn, text))
+	bot.privMsg(channel, '%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
 
 sbevents.registerEventHandler('player_active', onPlayerActive)
 sbevents.registerEventHandler('player_message', onMsg)
