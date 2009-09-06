@@ -22,6 +22,8 @@
 #include <string>
 #include <iostream>
 
+extern int totalmillis;
+
 namespace SbPy
 {
 
@@ -129,7 +131,7 @@ bool initPy()
 		return false;
 	}
 	Py_DECREF(pluginsModule);
-	
+	setTime(totalmillis);
 	return true;
 }
 
