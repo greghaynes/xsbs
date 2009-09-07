@@ -3,7 +3,7 @@ import socket
 from ConfigParser import ConfigParser
 
 channel = ''
-server = ''
+servername = ''
 nickname = ''
 port = 6667
 
@@ -54,22 +54,22 @@ class IrcBot:
 					self.onWelcome()
 			elif line[1] == 'PRIVMSG':
 				user = line[0].split('!')
-				text = line[3][1:])
-				for handler in msg_handlers:
+				text = line[3][1:]
+				for handler in self.msg_handlers:
 					handler(self, user, text)
 
 config = ConfigParser()
 config.read('IrcBot/plugin.conf')
 
 if config.has_option('Bot', 'servername'):
-	server = config.get('Bot', 'servername')
+	servername = config.get('Bot', 'servername')
 if config.has_option('Bot', 'channel'):
 	channel = config.get('Bot', 'channel')
 if config.has_option('Bot', 'nickname'):
 	nickname = config.get('Bot', 'nickname')
 
 if channel != '' and servername != '' and nickname != '':
-	bot = IrcBot(server, nickname, port)
+	bot = IrcBot(servername, nickname, port)
 	bot.connect()
 	bot.join(channel)
 else:
@@ -91,8 +91,8 @@ if config.has_option('Abilities', 'player_active') and config.get('Abilities', '
 	sbevents.registerEventHandler('player_active', onPlayerActive)
 if config.has_option('Abilities', 'message') and config.get('Abilities', 'message') == 'yes':
 	sbevents.registerEventHandler('player_message', onMsg)
-if config.has_option('Abilities', 'team_message') and config.get('Abilities', 'team_message') == 'yes':
+if config.has_option('Abilities', 'message_team') and config.get('Abilities', 'message_team') == 'yes':
 	sbevents.registerEventHandler('player_message_team', onTeamMsg)
-if config.has_option('Abilities', 'msg_gateway') and config.get('Abilities', 'msg_gateway') == 'yes':
+if config.has_option('Abilities', 'message_gateway') and config.get('Abilities', 'message_gateway') == 'yes':
 	bot.msg_handlers.append(onIrcMsg)
 
