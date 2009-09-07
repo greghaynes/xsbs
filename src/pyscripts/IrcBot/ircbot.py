@@ -1,9 +1,10 @@
 import sbevents, sbserver
 import socket
+from ConfigParser import ConfigParser
 
-channel = '#xsbs'
-server = 'irc.gamesurge.net'
-nickname = 'xsbs-serverbot'
+channel = ''
+server = ''
+nickname = ''
 port = 6667
 
 class IrcBot:
@@ -51,9 +52,22 @@ class IrcBot:
 				if not self.isConnected and line[3] == ':+iw':
 					self.onWelcome()
 
-bot = IrcBot(server, nickname, port)
-bot.connect()
-bot.join(channel)
+config = ConfigParser()
+config.read('IrcBot/plugin.conf')
+
+if config.has_option('Bot', 'servername'):
+	server = config.get('Bot', 'servername')
+if config.has_option('Bot', 'channel'):
+	channel = config.get('Bot', 'channel')
+if config.has_option('Bot', 'nickname'):
+	nickname = config.get('Bot', 'nickname')
+
+if channel != '' and servername != '' and nickname != '':
+	bot = IrcBot(server, nickname, port)
+	bot.connect()
+	bot.join(channel)
+else:
+	print 'Could not start IRC Bot.  You must supply a servername, channel, and nickname.'
 
 def onPlayerActive(cn):
 	bot.privMsg(channel, 'Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
@@ -64,8 +78,10 @@ def onMsg(cn, text):
 def onTeamMsg(cn, text):
 	bot.privMsg(channel, '%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
 
-sbevents.registerEventHandler('player_active', onPlayerActive)
-sbevents.registerEventHandler('player_message', onMsg)
-# uncomment to display team messages
-#sbevents.registerEventHandler('player_message_team', onTeamMsg)
+if config.has_option('Abilities', 'player_active') and config.get('Abilities', 'player_active') == 'yes':
+	sbevents.registerEventHandler('player_active', onPlayerActive)
+if config.has_option('Abilities', 'message') and config.get('Abilities', 'message') == 'yes':
+	sbevents.registerEventHandler('player_message', onMsg)
+if config.has_option('Abilities', 'team_message') and config.get('Abilities', 'team_message') == 'yes':
+	sbevents.registerEventHandler('player_message_team', onTeamMsg)
 
