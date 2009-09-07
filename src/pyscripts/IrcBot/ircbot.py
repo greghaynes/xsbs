@@ -16,6 +16,7 @@ class IrcBot:
 		self.socket.setblocking(0)
 		self.isConnected = False
 		self.channels = []
+		self.msg_handlers = []
 	def connect(self):
 		sbevents.sockmon.onRead(self.socket, self.onConnect, (), False)
 		try:
@@ -48,9 +49,14 @@ class IrcBot:
 			line = line.strip().split()
 			if line[0] == 'PING':
 				self.socket.send('PONG %s\r\n' % line[1])
-			if line[1] == 'MODE':
+			elif line[1] == 'MODE':
 				if not self.isConnected and line[3] == ':+iw':
 					self.onWelcome()
+			elif line[1] == 'PRIVMSG':
+				user = line[0].split('!')
+				text = line[3][1:])
+				for handler in msg_handlers:
+					handler(self, user, text)
 
 config = ConfigParser()
 config.read('IrcBot/plugin.conf')
@@ -69,6 +75,9 @@ if channel != '' and servername != '' and nickname != '':
 else:
 	print 'Could not start IRC Bot.  You must supply a servername, channel, and nickname.'
 
+def onIrcMsg(bot, username, msg):
+	sbserver.msg('(Remote User) %s: %s' % (username, msg))
+
 def onPlayerActive(cn):
 	bot.privMsg(channel, 'Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
 
@@ -84,4 +93,6 @@ if config.has_option('Abilities', 'message') and config.get('Abilities', 'messag
 	sbevents.registerEventHandler('player_message', onMsg)
 if config.has_option('Abilities', 'team_message') and config.get('Abilities', 'team_message') == 'yes':
 	sbevents.registerEventHandler('player_message_team', onTeamMsg)
+if config.has_option('Abilities', 'msg_gateway') and config.get('Abilities', 'msg_gateway') == 'yes':
+	bot.msg_handlers.append(onIrcMsg)
 
