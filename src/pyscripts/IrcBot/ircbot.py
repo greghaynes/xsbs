@@ -53,7 +53,7 @@ class IrcBot:
 				if not self.isConnected and line[3] == ':+iw':
 					self.onWelcome()
 			elif line[1] == 'PRIVMSG':
-				user = line[0].split('!')
+				user = line[0].split('!')[0]
 				text = line[3][1:]
 				for handler in self.msg_handlers:
 					handler(self, user, text)
