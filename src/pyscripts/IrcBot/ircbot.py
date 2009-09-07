@@ -42,7 +42,6 @@ class IrcBot:
 		self.socket.send('PRIVMSG %s :%s\r\n' % (user, message))
 	def processData(self):
 		self.buff += self.socket.recv(4096)
-		print self.buff,
 		tmp_buff = self.buff.split('\n')
 		self.buff = tmp_buff.pop()
 		for line in tmp_buff:
@@ -68,6 +67,8 @@ if config.has_option('Bot', 'channel'):
 if config.has_option('Bot', 'nickname'):
 	nickname = config.get('Bot', 'nickname')
 
+bot = False
+
 if channel != '' and servername != '' and nickname != '':
 	bot = IrcBot(servername, nickname, port)
 	bot.connect()
@@ -81,18 +82,26 @@ def onIrcMsg(bot, username, msg):
 def onPlayerActive(cn):
 	bot.privMsg(channel, 'Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
 
+def onPlayerDisconnect(cn):
+	bot.privMsg(channel, 'Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn))
+
 def onMsg(cn, text):
 	bot.privMsg(channel, '%s (%i): %s' % (sbserver.playerName(cn), cn, text))
 
 def onTeamMsg(cn, text):
 	bot.privMsg(channel, '%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
 
-if config.has_option('Abilities', 'player_active') and config.get('Abilities', 'player_active') == 'yes':
-	sbevents.registerEventHandler('player_active', onPlayerActive)
-if config.has_option('Abilities', 'message') and config.get('Abilities', 'message') == 'yes':
-	sbevents.registerEventHandler('player_message', onMsg)
-if config.has_option('Abilities', 'message_team') and config.get('Abilities', 'message_team') == 'yes':
-	sbevents.registerEventHandler('player_message_team', onTeamMsg)
-if config.has_option('Abilities', 'message_gateway') and config.get('Abilities', 'message_gateway') == 'yes':
-	bot.msg_handlers.append(onIrcMsg)
+event_abilities = {
+	'player_active': ('player_active', onPlayerActive),
+	'message': ('player_message', onMsg),
+	'message_team': ('player_message_team', onTeamMsg) }
+
+if bot:
+		for key in event_abilities.keys():
+			if config.has_option('Abilities', key) and config.get('Abilities', key) == 'yes':
+				ev = event_abilities[key]
+				sbevents.registerEventHandler(ev[0], ev[1])
+
+		if config.has_option('Abilities', 'message_gateway') and config.get('Abilities', 'message_gateway') == 'yes':
+			bot.msg_handlers.append(onIrcMsg)
 
