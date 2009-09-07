@@ -93,6 +93,7 @@ def onTeamMsg(cn, text):
 
 event_abilities = {
 	'player_active': ('player_active', onPlayerActive),
+	'player_disconnect': ('player_disconnect', onPlayerDisconnect),
 	'message': ('player_message', onMsg),
 	'message_team': ('player_message_team', onTeamMsg) }
 
