@@ -76,7 +76,7 @@ else:
 	print 'Could not start IRC Bot.  You must supply a servername, channel, and nickname.'
 
 def onIrcMsg(bot, username, msg):
-	sbserver.msg('(Remote User) %s: %s' % (username, msg))
+	sbserver.message('(Remote User) %s: %s' % (username, msg))
 
 def onPlayerActive(cn):
 	bot.privMsg(channel, 'Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
