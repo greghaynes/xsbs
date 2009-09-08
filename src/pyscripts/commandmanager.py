@@ -9,7 +9,7 @@ class CommandManager:
 		if not self.command_handlers.has_key(command):
 			self.command_handlers[command] = []
 		self.command_handlers[command].append(func)
-	def trigger(self, cn, command):
+	def trigger(self, cn, command, text):
 		if self.command_handlers.has_key(command):
 			for func in self.command_handlers[command]:
 				func(cn, str)
@@ -17,8 +17,8 @@ class CommandManager:
 			sbserver.playerMessage(cn, sbtools.red('Command not found.'))
 	def onMsg(self, cn, text):
 		if self.prefixes.find(text[0]) != -1:
-			cmd = text.split(' ')[0][1:]
-			self.trigger(cn, text[len(cmd)+2:])
+			cmd = text[1:].split(' ')[0]
+			self.trigger(cn, cmd, text[len(cmd)+2:])
 			return False
 		return True
 
