@@ -5,7 +5,7 @@ import string
 db = pygeoip.Database('geoip/GeoIP.dat')
 conf = ConfigParser()
 conf.read('geoip/plugin.conf')
-template = sbtools.green('$user') + ' has connected from ' + sbtools.orange('$country')
+template = sbtools.green('$user') + sbtools.yellow(' has connected from ') + sbtools.orange('$country')
 
 if conf.has_option('Config', 'template'):
 	template = string.Template(conf.get('Config', 'template'))
