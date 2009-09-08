@@ -34,7 +34,9 @@ def triggerEvent(event, args):
 			handler(*args)
 
 def triggerPolicyEvent(event, args):
+	print 'triggering %s' % event
 	if policy_events.has_key(event):
+		print 'has %i handlers' % len(policy_events[event])
 		for handler in policy_events[event]:
 			if not handler(*args):
 				return False

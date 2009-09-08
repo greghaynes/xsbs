@@ -283,6 +283,24 @@ static PyObject *setBotLimit(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *hashPass(PyObject *self, PyObject *args)
+{
+	PyObject *pstr;
+	int cn;
+	char *pass;
+	server::clientinfo *ci;
+	string string;
+	if(!PyArg_ParseTuple(args, "is", &cn, &pass)
+		|| !(ci = server::getinfo(cn)))
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+	server::hashpassword(cn, ci->sessionid, pass, string, sizeof(string));
+	pstr = PyString_FromString(string);
+	return pstr;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -300,6 +318,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"playerShots", playerShots, METH_VARARGS, "Shots by player in current match."},
 	{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
 	{"setBotLimit", setBotLimit, METH_VARARGS, "Set server bot limit."},
+	{"hashPassword", hashPass, METH_VARARGS, "Return hash for user + password"},
 	{NULL, NULL, 0, NULL}
 };
 

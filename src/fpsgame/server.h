@@ -320,6 +320,7 @@ namespace server
 	int numclients(int exclude = -1, bool nospec = true, bool noai = true);
 	void sendservmsg(const char *s);
 	clientinfo *getinfo(int n);
+	void hashPassword(int cn, int sessionid, char *pass, char *dest, int len);
 
 }
 

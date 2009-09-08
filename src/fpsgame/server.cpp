@@ -594,9 +594,15 @@ namespace server
                 else return;
             }
             if(haspass) ci->privilege = PRIV_ADMIN;
+	    else if(SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass))
+            {
+                // We cant have multiple masters
+                loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
+                ci->privilege = PRIV_MASTER;
+            }
             else if(!authname && !(mastermask&MM_AUTOAPPROVE) && !ci->privilege && !ci->local)
             {
-                sendf(ci->clientnum, 1, "ris", SV_SERVMSG, "This server requires you to use the \"/auth\" command to gain master.");
+                sendf(ci->clientnum, 1, "ris", SV_SERVMSG, "This server requires you to use a valid \"/setmaster username/password\" or \"/auth\" command to gain master.");
                 return;
             }
             else

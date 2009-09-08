@@ -137,11 +137,11 @@ bool initPy()
 
 void deinitPy()
 {
-	Py_DECREF(triggerEventFunc);
-	Py_DECREF(triggerPolicyEventFunc);
-	Py_DECREF(triggerExecQueueFunc);
-	Py_DECREF(triggerSocketMonitorFunc);
-	Py_DECREF(setTimeFunc);
+	Py_XDECREF(triggerEventFunc);
+	Py_XDECREF(triggerPolicyEventFunc);
+	Py_XDECREF(triggerExecQueueFunc);
+	Py_XDECREF(triggerSocketMonitorFunc);
+	Py_XDECREF(setTimeFunc);
 	Py_Finalize();
 }
 
