@@ -1,9 +1,22 @@
 import sbserver, sbevents, sbtools
+from ConfigParser import ConfigParser
+import string
+
+banners = []
+timeout = 180000
 
 def showBanner():
-	sbserver.message(sbtools.yellow('This is a ' + sbtools.blue('XSBS') + ' server.'))
-	sbserver.message(sbtools.yellow('For information about ' + sbtools.blue('XSBS') + ' join ' + sbtools.orange('#xsbs') + ' on ' + sbtools.orange('irc.gamesurge.net') + '.'))
-	sbevents.timerman.addTimer(180000, showBanner, ())
+	for banner in banners:
+		sbserver.message(banner)
+	sbevents.timerman.addTimer(timeout, showBanner, ())
+
+conf = ConfigParser()
+conf.read('Banner/plugin.conf')
+for template in conf.options('Templates'):
+	banners.append(string.Template(conf.get('Templates', template)).substitute(sbtools.colordict))
+if conf.has_option('Banner', 'delay'):
+	timeout = int(conf.get('Banner', 'delay'))
+del conf
 
 showBanner()
 

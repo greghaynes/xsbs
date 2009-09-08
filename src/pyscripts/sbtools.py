@@ -20,7 +20,7 @@ def white(text=None):
 
 colordict = { 'green': green(),
 	'blue' : blue(),
-	'yelllow' : yellow(),
+	'yellow' : yellow(),
 	'red' : red(),
 	'magenta': magenta(),
 	'orange': orange(),
