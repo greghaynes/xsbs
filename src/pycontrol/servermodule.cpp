@@ -301,6 +301,19 @@ static PyObject *hashPass(PyObject *self, PyObject *args)
 	return pstr;
 }
 
+static PyObject *setMaster(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(PyArg_ParseTuple(args, "i", &cn)
+		&& !(ci = server::getinfo(cn)))
+	{
+		server::setcimaster(ci);
+	}
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -319,6 +332,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
 	{"setBotLimit", setBotLimit, METH_VARARGS, "Set server bot limit."},
 	{"hashPassword", hashPass, METH_VARARGS, "Return hash for user + password"},
+	{"setMaster", setMaster, METH_VARARGS, "Set cn to master."},
 	{NULL, NULL, 0, NULL}
 };
 

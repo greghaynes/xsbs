@@ -110,7 +110,7 @@ namespace server
     SVAR(adminpass, "");
     VARF(publicserver, 0, 0, 1, { mastermask = publicserver ? MM_PUBSERV : MM_PRIVSERV; });
     SVAR(pyscriptspath, "");
-	SVAR(logpath, "");
+    SVAR(logpath, "");
 
     void *newclientinfo() { return new clientinfo; }
     void deleteclientinfo(void *ci) { delete (clientinfo *)ci; }
@@ -184,20 +184,20 @@ namespace server
     {
         smapname[0] = '\0';
         resetitems();
-		if(!logpath[0])
-		{
-			fprintf(stderr, "No log file specified.  Use -l/path/to/log.\n");
-			return false;
-		}
-		if(!eventlog.open(logpath))
-		{
-			perror("Could not open log file");
-			return false;
-		}
-		// Initialize python modules
+        if(!logpath[0])
+        {
+        fprintf(stderr, "No log file specified.  Use -l/path/to/log.\n");
+        return false;
+        }
+        if(!eventlog.open(logpath))
+        {
+            perror("Could not open log file");
+            return false;
+        }
+        // Initialize python modules
         if(!SbPy::init("sauer_server", pyscriptspath, "sbserver"))
-			return false;
-		return true;
+            return false;
+        return true;
     }
 
     int numclients(int exclude, bool nospec, bool noai)
@@ -575,6 +575,12 @@ namespace server
         if(ci->state.state==CS_SPECTATOR && !ci->local) aiman::removeai(ci);
     }
 
+    void setcimaster(clientinfo *ci)
+    {
+        loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
+        ci->privilege = PRIV_MASTER;
+    }
+
     void setmaster(clientinfo *ci, bool val, const char *pass = "", const char *authname = NULL)
     {
         if(authname && !val) return;
@@ -596,9 +602,7 @@ namespace server
             if(haspass) ci->privilege = PRIV_ADMIN;
 	    else if(SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass))
             {
-                // We cant have multiple masters
-                loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
-                ci->privilege = PRIV_MASTER;
+                setcimaster(ci);
             }
             else if(!authname && !(mastermask&MM_AUTOAPPROVE) && !ci->privilege && !ci->local)
             {

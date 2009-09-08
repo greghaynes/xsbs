@@ -321,6 +321,7 @@ namespace server
 	void sendservmsg(const char *s);
 	clientinfo *getinfo(int n);
 	void hashPassword(int cn, int sessionid, char *pass, char *dest, int len);
+	void setcimaster(clientinfo *ci);
 
 }
 
