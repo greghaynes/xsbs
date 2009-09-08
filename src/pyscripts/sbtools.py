@@ -3,20 +3,28 @@ def textcolor(color, text):
 		return '\fs\f' + str(color) + text + '\fr'
 	else:
 		return '\f' + str(color)
-def green(text):
+def green(text=None):
 	return textcolor(0, text)
-def blue(text):
+def blue(text=None):
 	return textcolor(1, text)
-def yellow(text):
+def yellow(text=None):
 	return textcolor(2, text)
-def red(text):
+def red(text=None):
 	return textcolor(3, text)
-def magenta(text):
+def magenta(text=None):
 	return textcolor(5, text)
-def orange(text):
+def orange(text=None):
 	return textcolor(6, text)
-def white(text):
+def white(text=None):
 	return textcolor(10, text)
+
+colordict = { 'green': green(),
+	'blue' : blue(),
+	'yelllow' : yellow(),
+	'red' : red(),
+	'magenta': magenta(),
+	'orange': orange(),
+	'white': white() }
 
 def colorstring(str, text):
 	if str == 'green':

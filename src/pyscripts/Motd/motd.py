@@ -9,23 +9,20 @@ def greet(cn):
 
 def compilemotd():
 	conf = ConfigParser()
+	str = ''
 	if not conf.read('Motd/plugin.conf'):
 		print 'Could not read MOTD config.'
 	if not conf.has_option('MOTD', 'template'):
-		motdstring = 'Welcome to a XSBS server.'
+		str = 'Welcome to a XSBS server.'
 	else:
-		options = conf.options('MOTD')
-		formatdict = {}
-		for option in options:
-			if option != 'template':
-				formatdict[option] = conf.get('MOTD', option)
-		motdstring = string.Template(sbtools.orange(conf.get('MOTD', 'template')))
-		motdstring = motdstring.substitute(formatdict)
-		return motdstring
+		str = conf.get('MOTD', 'template')
+		str = string.Template(str).substitute(sbtools.colordict)
+	del conf
+	return str
 
 def init():
 	sbevents.registerEventHandler("player_active", greet)
 
-init()
 motdstring = compilemotd()
+init()
 
