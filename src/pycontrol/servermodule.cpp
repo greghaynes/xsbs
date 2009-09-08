@@ -306,7 +306,7 @@ static PyObject *setMaster(PyObject *self, PyObject *args)
 	int cn;
 	server::clientinfo *ci;
 	if(PyArg_ParseTuple(args, "i", &cn)
-		&& !(ci = server::getinfo(cn)))
+		&& (ci = server::getinfo(cn)))
 	{
 		server::setcimaster(ci);
 	}

@@ -12,7 +12,7 @@ class CommandManager:
 	def trigger(self, cn, command, text):
 		if self.command_handlers.has_key(command):
 			for func in self.command_handlers[command]:
-				func(cn, str)
+				func(cn, text)
 		else:
 			sbserver.playerMessage(cn, sbtools.red('Command not found.'))
 	def onMsg(self, cn, text):

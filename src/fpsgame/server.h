@@ -316,6 +316,7 @@ namespace server
 
 	extern vector<clientinfo *> connects, clients, bots;
 	extern Log eventlog;
+	extern bool masterupdate;
 
 	int numclients(int exclude = -1, bool nospec = true, bool noai = true);
 	void sendservmsg(const char *s);

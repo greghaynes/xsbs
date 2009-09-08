@@ -577,8 +577,13 @@ namespace server
 
     void setcimaster(clientinfo *ci)
     {
+        string msg;
+        formatstring(msg)("%s claimed master", colorname(ci));
         loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
         ci->privilege = PRIV_MASTER;
+	currentmaster = ci->clientnum;
+	masterupdate = true;
+	sendservmsg(msg);
     }
 
     void setmaster(clientinfo *ci, bool val, const char *pass = "", const char *authname = NULL)
