@@ -586,6 +586,17 @@ namespace server
 	sendservmsg(msg);
     }
 
+    void setciadmin(clientinfo *ci)
+    {
+        string msg;
+        formatstring(msg)("%s claimed admin", colorname(ci));
+        loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
+        ci->privilege = PRIV_ADMIN;
+	currentmaster = ci->clientnum;
+	masterupdate = true;
+	sendservmsg(msg);
+    }
+
     void setmaster(clientinfo *ci, bool val, const char *pass = "", const char *authname = NULL)
     {
         if(authname && !val) return;

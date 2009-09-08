@@ -16,6 +16,14 @@ def onGiveMaster(cn, string):
 	else:
 		sbserver.playerMessage(cn, sbtools.red('Insufficient privileges.'))
 
+def onGiveAdmin(cn, string):
+	tcn = int(string)
+	if sbserver.playerPrivilege(cn) > 1:
+		sbserver.setAdmin(tcn)
+	else:
+		sbserver.playerMessage(cn, sbtools.red('Insufficient privileges.'))
+
 sbevents.registerPolicyEventHandler('player_setmaster', onPlayerSetMaster)
 sbevents.registerCommandHandler('givemaster', onGiveMaster)
+sbevents.registerCommandHandler('giveadmin', onGiveAdmin)
 

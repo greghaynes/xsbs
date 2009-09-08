@@ -323,6 +323,7 @@ namespace server
 	clientinfo *getinfo(int n);
 	void hashPassword(int cn, int sessionid, char *pass, char *dest, int len);
 	void setcimaster(clientinfo *ci);
+	void setciadmin(clientinfo *ci);
 
 }
 
