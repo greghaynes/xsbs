@@ -1,13 +1,6 @@
 import sbserver, thread
-import socketmonitor, timermanager
+import socketmonitor, timermanager, commandmanager
 
-events = {}
-policy_events = {}
-
-exec_queue = []
-exec_queue_lock = thread.allocate_lock()
-sockmon = socketmonitor.SocketMonitor()
-timerman = timermanager.TimerManager(0)
 
 def triggerSocketMonitor():
 	sockmon.pollOnce(0)
@@ -27,6 +20,9 @@ def registerEventHandler(event, handler):
 	if not events.has_key(event):
 		events[event] = []
 	events[event].append(handler)
+
+def registerCommandHandler(command, func):
+	commandman.register(command, func)
 
 def triggerEvent(event, args):
 	if events.has_key(event):
@@ -58,4 +54,13 @@ def triggerSbExecQueue():
 		except:
 			print 'Error occoured with enqueued exec action'
 	exec_queue_lock.release()
+
+events = {}
+policy_events = {}
+
+exec_queue = []
+exec_queue_lock = thread.allocate_lock()
+sockmon = socketmonitor.SocketMonitor()
+timerman = timermanager.TimerManager(0)
+commandman = commandmanager.CommandManager()
 
