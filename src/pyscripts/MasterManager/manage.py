@@ -1,8 +1,10 @@
 import sbevents, sbserver
 
+master_pass = 'x5b5m45t3r'
+
 def onPlayerSetMaster(cn, string):
-	fooHash = sbserver.hashPassword(cn, 'foo')
-	if string == fooHash:
+	hash = sbserver.hashPassword(cn, master_pass)
+	if string == hash:
 		return True
 	else:
 		return False
