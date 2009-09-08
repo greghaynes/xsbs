@@ -25,9 +25,12 @@ class IrcBot:
 			pass
 	def onConnect(self):
 		sbevents.sockmon.onRead(self.socket, self.processData, (), True)
-		self.buff = self.socket.recv(4096)
-		self.socket.send('NICK %s\r\n' % self.nickname)
-		self.socket.send('USER %s %s %s :%s\r\n' % (self.nickname, self.nickname, self.nickname, self.nickname))
+		try:
+			self.buff = self.socket.recv(4096)
+			self.socket.send('NICK %s\r\n' % self.nickname)
+			self.socket.send('USER %s %s %s :%s\r\n' % (self.nickname, self.nickname, self.nickname, self.nickname))
+		except:
+			print 'Error connecting to IRC server.'
 	def onWelcome(self):
 		self.isConnected = True
 		for channel in self.channels:
@@ -39,27 +42,33 @@ class IrcBot:
 		else:
 			self.channels.append(channel)
 	def privMsg(self, user, message):
-		self.socket.send('PRIVMSG %s :%s\r\n' % (user, message))
+		try:
+			self.socket.send('PRIVMSG %s :%s\r\n' % (user, message))
+		except:
+			print 'Error sending IRC message.'
 	def processData(self):
-		self.buff += self.socket.recv(4096)
-		tmp_buff = self.buff.split('\n')
-		self.buff = tmp_buff.pop()
-		for line in tmp_buff:
-			line = line.strip().split()
-			if line[0] == 'PING':
-				self.socket.send('PONG %s\r\n' % line[1])
-			elif line[1] == 'MODE':
-				if not self.isConnected and line[3] == ':+iw':
-					self.onWelcome()
-			elif line[1] == 'PRIVMSG':
-				user = line[0].split('!')[0][1:]
-				text = line[3][1:]
-				if len(line) >= 4:
-					for t in line[4:]:
-						text += ' '
-						text += t
-				for handler in self.msg_handlers:
-					handler(self, user, text)
+		try:
+			self.buff += self.socket.recv(4096)
+			tmp_buff = self.buff.split('\n')
+			self.buff = tmp_buff.pop()
+			for line in tmp_buff:
+				line = line.strip().split()
+				if line[0] == 'PING':
+					self.socket.send('PONG %s\r\n' % line[1])
+				elif line[1] == 'MODE':
+					if not self.isConnected and line[3] == ':+iw':
+						self.onWelcome()
+				elif line[1] == 'PRIVMSG':
+					user = line[0].split('!')[0][1:]
+					text = line[3][1:]
+					if len(line) >= 4:
+						for t in line[4:]:
+							text += ' '
+							text += t
+					for handler in self.msg_handlers:
+						handler(self, user, text)
+		except:
+			print 'Error processing data from IRC.'
 
 config = ConfigParser()
 config.read('IrcBot/plugin.conf')
