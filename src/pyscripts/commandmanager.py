@@ -15,7 +15,7 @@ class CommandManager:
 				func(cn, str)
 		else:
 			sbserver.messagePlayer(cn, sbtools.red('Command not found.'))
-	def onMsg(cn, text):
+	def onMsg(self, cn, text):
 		if prefixes.find(text[0]) != -1:
 			cmd = text.split(' ')[0][1:]
 			self.triggerCommand(cmd, cn, text[len(cmd)+2:])
