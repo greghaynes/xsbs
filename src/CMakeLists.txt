@@ -2,6 +2,7 @@ subdirs(enet shared)
 
 find_package(PythonLibs REQUIRED)
 find_package(ZLIB REQUIRED)
+find_package(Threads REQUIRED)
 
 set(xsbs_srcs
 	engine/server.cpp
@@ -16,6 +17,8 @@ set(xsbs_srcs
 
 include(CheckFunctionExists)
 include(CheckSymbolExists)
+
+set(CMAKE_CXX_FLAGS "-rdynamic")
 
 check_function_exists(gethostbyaddr_r, HAS_GETHOSTBYADDR_R)
 check_function_exists(gethostbyname_r, HAS_GETHOSTBYNAME_R)
@@ -41,4 +44,4 @@ include_directories(${CMAKE_SOURCE_DIR}/src/engine
 add_executable(xsbs
 	${xsbs_srcs})
 
-target_link_libraries(xsbs enet sauertools ${PYTHON_LIBRARIES} ${ZLIB_LIBRARIES})
+target_link_libraries(xsbs enet sauertools ${PYTHON_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
