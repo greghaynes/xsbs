@@ -263,6 +263,7 @@ namespace server
             messages.setsizenodelete(0);
             ping = 0;
             aireinit = 0;
+	    active = false;
             mapchange();
         }
 		
