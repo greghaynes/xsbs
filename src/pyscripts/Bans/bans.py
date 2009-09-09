@@ -38,10 +38,10 @@ def ban(cn, seconds, reason):
 	expiration = time.time() + seconds
 	if banned_ips.has_key(ip):
 		if banned_ips[ip] > expiration:
-			sbserver.playerKick(tcn)
+			sbserver.playerKick(cn)
 			return
 	banned_ips[ip] = expiration
-	sbserver.playerKick(tcn)
+	sbserver.playerKick(cn)
 
 def allowClient(cn):
 	ip = sbserver.playerIpLong(cn)

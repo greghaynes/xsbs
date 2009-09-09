@@ -1,5 +1,5 @@
 from DB.db import dbmanager
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relation
 from sqlalchemy.ext.declarative import declarative_base
 import sbserver, sbevents, sbtools
@@ -35,8 +35,9 @@ def isLoggedIn(cn):
 
 def login(cn, user):
 	if not verified_users.has_key(cn):
-		sbserver.message(sbtools.green(sbserver.playerName(cn)) + ' is ' + sbtools.orange('verified') + '.')
 		verified_users[cn] = user
+		sbevents.triggerEvent('player_logged_in', cn)
+		sbserver.message(sbtools.green(sbserver.playerName(cn)) + ' is ' + sbtools.orange('verified') + '.')
 
 def userAuth(email, password):
 	user = session.query(User).filter(User.email==email).filter(User.password==password).one()
