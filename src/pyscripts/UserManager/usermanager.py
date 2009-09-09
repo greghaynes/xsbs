@@ -2,6 +2,7 @@ from DB.db import dbmanager
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relation
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm.exc import NoResultFound
 import sbserver, sbevents, sbtools
 
 Base = declarative_base()
@@ -48,11 +49,13 @@ def onRegisterCommand(cn, args):
 	if len(args) != 2:
 		sbserver.playerMessage(cn, sbtools.red('Usage: #register <email> <password>'))
 		return
-	elif session.query(User).filter(User.email==args[0]).one():
-		sbserver.playerMessage(cn, sbtools.red('An account with that email address already exists.'))
-	else:
+	try:
+		session.query(User).filter(User.email==args[0]).one()
+	except NoResultFound:
 		user = User(args[0], args[1])
 		session.add(user)
+		return
+	sbserver.playerMessage(cn, sbtools.red('An account with that email address already exists.'))
 
 def onLoginCommand(cn, args):
 	args = args.split(' ')
