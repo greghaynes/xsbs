@@ -39,17 +39,15 @@ def login(cn, user):
 		verified_users[cn] = user
 
 def userAuth(email, password):
-	users = session.query(User).filter(User.email==email).filter(User.password==password).all()
-	if len(users) == 0:
-		return False
-	return users[0]
+	user = session.query(User).filter(User.email==email).filter(User.password==password).one()
+	return user
 
 def onRegisterCommand(cn, args):
 	args = args.split(' ')
 	if len(args) != 2:
 		sbserver.playerMessage(cn, sbtools.red('Usage: #register <email> <password>'))
 		return
-	elif len(session.query(User).filter(User.email==args[0]).all()) >= 1:
+	elif session.query(User).filter(User.email==args[0]).one():
 		sbserver.playerMessage(cn, sbtools.red('An account with that email address already exists.'))
 	else:
 		user = User(args[0], args[1])
@@ -80,11 +78,10 @@ def onLinkName(cn, args):
 
 def onSetMaster(cn, givenhash):
 	nick = sbserver.playerName(cn)
-	na = session.query(NickAccount).filter(NickAccount.nick==nick).all()
+	na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
 	if not na:
 		sbserver.playerMessage(cn, sbtools.red('Your name is not assigned to any accounts.'))
 		return
-	na = na[0]
 	nickhash = sbserver.hashPassword(cn, na.user.password)
 	if givenhash == nickhash:
 		login(cn, na.user)
