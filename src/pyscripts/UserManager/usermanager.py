@@ -51,6 +51,12 @@ def onLoginCommand(cn, args):
 	else:
 		sbserver.playerMessage(cn, sbtools.red('Invalid login.'))
 
+def onDisconnect(cn):
+	try:
+		verified_users.remove(cn)
+	except ValueError:
+		pass
+
 def onShutdown():
 	session.commit()
 
@@ -59,4 +65,5 @@ Base.metadata.create_all(dbmanager.engine)
 sbevents.registerCommandHandler('register', onRegisterCommand)
 sbevents.registerCommandHandler('login', onLoginCommand)
 sbevents.registerEventHandler('server_stop', onShutdown)
+sbevents.registerEventHandler('player_disconnect', onDisconnect)
 
