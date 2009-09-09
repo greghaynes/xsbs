@@ -9,9 +9,11 @@ class TimerManager():
 			self.timers.append(nt)
 			return
 		for timer in self.timers:
-			if timer[0] < nt[0]:
+			if nt[0] < timer[0]:
 				self.timers.insert(i, nt)
+				return
 			i += 1
+		self.timers.append(nt)
 	def setTime(self, msecs):
 		if self.currmsecs == 0:
 			for timer in self.timers:
