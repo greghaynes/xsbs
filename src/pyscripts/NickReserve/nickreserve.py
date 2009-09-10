@@ -48,6 +48,7 @@ def onReserveCommand(cn, args):
 		return
 	rn = ReservedNick(nick, user.id)
 	session.add(rn)
+	sbserver.playerMessage(cn, sbtools.green('Your account has been created.'))
 
 sbevents.registerEventHandler('player_active', onPlayerActive)
 sbevents.registerEventHandler('player_name_changed', onPlayerNameChanged)
