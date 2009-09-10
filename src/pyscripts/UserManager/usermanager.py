@@ -41,7 +41,10 @@ def login(cn, user):
 		sbserver.message(sbtools.green(sbserver.playerName(cn)) + ' is ' + sbtools.orange('verified') + '.')
 
 def userAuth(email, password):
-	user = session.query(User).filter(User.email==email).filter(User.password==password).one()
+	try:
+		user = session.query(User).filter(User.email==email).filter(User.password==password).one()
+	except NoResultFound:
+		return False
 	return user
 
 def onRegisterCommand(cn, args):
@@ -82,8 +85,9 @@ def onLinkName(cn, args):
 
 def onSetMaster(cn, givenhash):
 	nick = sbserver.playerName(cn)
-	na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
-	if not na:
+	try:
+		na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
+	except NoResultFound:
 		sbserver.playerMessage(cn, sbtools.red('Your name is not assigned to any accounts.'))
 		return
 	nickhash = sbserver.hashPassword(cn, na.user.password)
