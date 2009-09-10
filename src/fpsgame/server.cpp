@@ -622,7 +622,7 @@ namespace server
             }
             else if(!authname && !(mastermask&MM_AUTOAPPROVE) && !ci->privilege && !ci->local)
             {
-                sendf(ci->clientnum, 1, "ris", SV_SERVMSG, "This server requires you to use a valid \"/setmaster username/password\" or \"/auth\" command to gain master.");
+                // sendf(ci->clientnum, 1, "ris", SV_SERVMSG, "This server requires you to use a valid \"/setmaster username/password\" or \"/auth\" command to gain master.");
                 return;
             }
             else
