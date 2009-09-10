@@ -15,12 +15,11 @@ class DatabaseManager:
 uri = 'sqlite://xsbs.sql'
 
 conf = ConfigParser()
-conf.read('DB/plugin.conf')
+conf.read('Config/db.conf')
 if conf.has_option('Database', 'uri'):
 	uri = conf.get('Database', 'uri')
 dbmanager = DatabaseManager(uri)
-if conf.has_option('Plugin', 'enable') and conf.get('Plugin', 'enable') == 'yes':
-	dbmanager.connect()
+dbmanager.connect()
 
 del conf
 

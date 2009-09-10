@@ -10,7 +10,7 @@ def showBanner(msg, timeout):
 	sbevents.timerman.addTimer(timeout, showBanner, (msg, timeout))
 
 conf = ConfigParser()
-conf.read('Banner/plugin.conf')
+conf.read('Config/banner.conf')
 for template in conf.options('Templates'):
 	delay = timeout
 	if conf.has_option('Delays', template):

@@ -71,7 +71,7 @@ class IrcBot:
 			print 'Error processing data from IRC.'
 
 config = ConfigParser()
-config.read('IrcBot/plugin.conf')
+config.read('Config/ircbot.conf')
 
 if config.has_option('Bot', 'servername'):
 	servername = config.get('Bot', 'servername')
