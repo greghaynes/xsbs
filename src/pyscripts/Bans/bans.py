@@ -1,4 +1,5 @@
 import sbserver, sbevents
+from settings import loadConfigFile
 import time, string
 from ConfigParser import ConfigParser
 
@@ -58,8 +59,7 @@ def init():
 	sbevents.registerEventHandler("player_command", onMessage)
 	sbevents.registerEventHandler("player_ban", ban)
 
-config = ConfigParser()
-config.read('Bans/plugin.conf')
+config = loadConfigFile('bans')
 if config.has_option('Config', 'ban_command'):
 	ban_command = config.get('Config', 'ban_command')
 if config.has_option('Config', 'default_ban_length'):

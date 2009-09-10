@@ -1,4 +1,4 @@
-from ConfigParser import ConfigParser
+from settings import loadConfigFile
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -14,8 +14,7 @@ class DatabaseManager:
 
 uri = 'sqlite://xsbs.sql'
 
-conf = ConfigParser()
-conf.read('Config/db.conf')
+conf = loadConfigFile('db')
 if conf.has_option('Database', 'uri'):
 	uri = conf.get('Database', 'uri')
 dbmanager = DatabaseManager(uri)

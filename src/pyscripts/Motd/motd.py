@@ -1,6 +1,6 @@
 import sbevents, sbserver, sbtools
+from settings import loadConfigFile
 import string
-from ConfigParser import ConfigParser
 
 motdstring = ''
 
@@ -8,10 +8,7 @@ def greet(cn):
 	sbserver.playerMessage(cn, motdstring)
 
 def compilemotd():
-	conf = ConfigParser()
-	str = ''
-	if not conf.read('Motd/plugin.conf'):
-		print 'Could not read MOTD config.'
+	conf = loadConfigFile('motd')
 	if not conf.has_option('MOTD', 'template'):
 		str = 'Welcome to a XSBS server.'
 	else:

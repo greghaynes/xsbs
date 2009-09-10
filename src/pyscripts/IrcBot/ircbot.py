@@ -1,4 +1,5 @@
 import sbevents, sbserver
+from settings import loadConfigFile
 import socket
 from ConfigParser import ConfigParser
 
@@ -70,9 +71,7 @@ class IrcBot:
 		except:
 			print 'Error processing data from IRC.'
 
-config = ConfigParser()
-config.read('Config/ircbot.conf')
-
+config = loadConfigFile('ircbot')
 if config.has_option('Bot', 'servername'):
 	servername = config.get('Bot', 'servername')
 if config.has_option('Bot', 'channel'):

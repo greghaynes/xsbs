@@ -1,4 +1,5 @@
-import sbserver, sbevents, sbtools
+import sbserver, sbevents, sbtools, settings
+from settings import loadConfigFile
 from ConfigParser import ConfigParser
 import string
 
@@ -9,8 +10,7 @@ def showBanner(msg, timeout):
 	sbserver.message(msg)
 	sbevents.timerman.addTimer(timeout, showBanner, (msg, timeout))
 
-conf = ConfigParser()
-conf.read('Config/banner.conf')
+conf = loadConfigFile('banner')
 for template in conf.options('Templates'):
 	delay = timeout
 	if conf.has_option('Delays', template):
