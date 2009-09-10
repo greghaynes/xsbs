@@ -1,4 +1,4 @@
-from settings import loadConfigFile
+from settings import PluginConfig
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -12,13 +12,10 @@ class DatabaseManager:
 			self.isConnected = True
 			self.session = sessionmaker(bind=self.engine)
 
-uri = 'sqlite://xsbs.sql'
+config = PluginConfig('db')
+uri = config.getOption('Config', 'uri', 'sqlite:///xsbs.db')
+del config
 
-conf = loadConfigFile('db')
-if conf.has_option('Database', 'uri'):
-	uri = conf.get('Database', 'uri')
 dbmanager = DatabaseManager(uri)
 dbmanager.connect()
-
-del conf
 

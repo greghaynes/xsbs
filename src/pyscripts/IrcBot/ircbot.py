@@ -1,12 +1,13 @@
 import sbevents, sbserver
-from settings import loadConfigFile
+from settings import PluginConfig
 import socket
-from ConfigParser import ConfigParser
 
-channel = ''
-servername = ''
-nickname = ''
-port = 6667
+config = PluginConfig('ircbot')
+channel = config.getOption('Config', 'channel', '#xsbs-newserver')
+servername = config.getOption('Config', 'servername', 'irc.gamesurge.net')
+nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
+port = int(config.getOption('Config', 'port', '6667'))
+del config
 
 class IrcBot:
 	def __init__(self, servername, nickname, port=6667):
@@ -71,22 +72,9 @@ class IrcBot:
 		except:
 			print 'Error processing data from IRC.'
 
-config = loadConfigFile('ircbot')
-if config.has_option('Bot', 'servername'):
-	servername = config.get('Bot', 'servername')
-if config.has_option('Bot', 'channel'):
-	channel = config.get('Bot', 'channel')
-if config.has_option('Bot', 'nickname'):
-	nickname = config.get('Bot', 'nickname')
-
-bot = False
-
-if channel != '' and servername != '' and nickname != '':
-	bot = IrcBot(servername, nickname, port)
-	bot.connect()
-	bot.join(channel)
-else:
-	print 'Could not start IRC Bot.  You must supply a servername, channel, and nickname.'
+bot = IrcBot(servername, nickname, port)
+bot.connect()
+bot.join(channel)
 
 def onIrcMsg(bot, username, msg):
 	sbserver.message('(Remote User) %s: %s' % (username, msg))

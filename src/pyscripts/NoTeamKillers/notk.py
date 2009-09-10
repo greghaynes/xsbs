@@ -1,19 +1,14 @@
 import sbserver, sbevents
-from settings import loadConfigFile
-from ConfigParser import ConfigParser
+from settings import PluginConfig
 
-limit = 5
-duration = 3600
+config = PluginConfig('notk')
+limit = int(config.getOption('Config', 'teamkill_limit', '5'))
+duration = int(config.getOption('Config', 'ban_time', '3600'))
+del config
 
 def onTeamkill(cn, tcn):
 	if sbserver.playerTeamkills(cn) >= limit:
 		sbevents.triggerEvent('player_ban', (cn, duration, 'Teamkilling'))
-
-config = loadConfigFile('notk')
-if config.has_option('Config', 'limit'):
-	limit = config.get('Config', 'limit')
-if config.has_option('Config', 'duration'):
-	duration = config.get('Config', 'duration')
 
 sbevents.registerEventHandler('player_teamkill', onTeamkill)
 

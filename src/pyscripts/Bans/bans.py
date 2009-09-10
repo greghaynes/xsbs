@@ -1,13 +1,16 @@
 import sbserver, sbevents
-from settings import loadConfigFile
+from settings import PluginConfig
 import time, string
-from ConfigParser import ConfigParser
 
 banned_ips = {}
-ban_command = 'ban'
-default_ban_length = 3600
-ban_message = string.Template('Banning $name for $seconds seconds for $reason.')
-default_reason = 'unspecified reason'
+
+config = PluginConfig('bans')
+ban_command = config.getOption('Config', 'ban_command', 'ban')
+default_ban_length = config.getOption('Config', 'default_ban_time', 3600)
+ban_message = config.getOption('Config', 'message', 'Banning $name for $seconds seconds for $red$reason$white.')
+ban_message = string.Template(ban_message)
+default_reason = config.getOption('Config', 'default_reason', 'unspecified reason')
+del config
 
 def onMessage(cn, text):
 	sp = text.split(' ')
@@ -58,16 +61,5 @@ def init():
 	sbevents.registerPolicyEventHandler("allow_connect", allowClient)
 	sbevents.registerEventHandler("player_command", onMessage)
 	sbevents.registerEventHandler("player_ban", ban)
-
-config = loadConfigFile('bans')
-if config.has_option('Config', 'ban_command'):
-	ban_command = config.get('Config', 'ban_command')
-if config.has_option('Config', 'default_ban_length'):
-	default_ban_length = config.get('Config', 'default_ban_length')
-if config.has_option('Config', 'ban_message'):
-	ban_message = config.get('Config', 'ban_message')
-if config.has_option('Config', 'default_reason'):
-	default_reason = config.get('Config', 'default_reason')
-del config
 
 init()
