@@ -1,4 +1,5 @@
 from DB.db import dbmanager
+from sqlalchemy.orm.exc import NoResultFound
 from UserManager.usermanager import session, NickAccount, isLoggedIn, loggedInAs
 from Bans.bans import ban
 import sbserver, sbevents, sbtools
@@ -24,9 +25,9 @@ def warnNickReserved(cn, nickacct, count):
 
 def onPlayerActive(cn):
 	nick = sbserver.playerName(cn)
-	nickacct = session.query(NickAccount).filter(NickAccount.nick==nick).one()
-	if not nickacct:
-		print 'not reserved'
+	try:
+		nickacct = session.query(NickAccount).filter(NickAccount.nick==nick).one()
+	except NoResultFound:
 		return
 	warnNickReserved(cn, nickacct, 0)
 
