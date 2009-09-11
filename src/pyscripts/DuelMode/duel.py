@@ -23,8 +23,6 @@ def onMapChange(mapname, mode):
 		endDuel()
 
 def onPlayerDisconnect(cn):
-	print 'player %i disconnected ' % cn
-	print duelers
 	if currently_dueling[0] and [duelers[0] == cn or duelers[1] == cn]:
 		print 'cancel'
 		cancelDuel()
