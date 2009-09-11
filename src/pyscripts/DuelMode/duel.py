@@ -24,7 +24,6 @@ def onMapChange(mapname, mode):
 
 def onPlayerDisconnect(cn):
 	if currently_dueling[0] and [duelers[0] == cn or duelers[1] == cn]:
-		print 'cancel'
 		cancelDuel()
 	if cn in duelers:
 		duelers[duelers.index(cn)] = -1
@@ -44,21 +43,27 @@ def duelCountdown(count, map, mode):
 
 def onDuelCommand(cn, args):
 	args = args.split(' ')
-	if len(args) == 2:
-		map = args[0]
-		mode = int(args[1])
-		players = sbserver.players()
-		if len(players) != 2:
-			sbserver.message(cn, sbtools.red('There must be only two unspectated players to enter duel mode.'))
-			if sbserver.playerPrivilege(cn) > 0:
-				sbserver.message(cn, sbtools.red('Use #duel <cn> <cn> to force a duel.'))
+	players = sbserver.players()
+	if len(players) != 2:
+		sbserver.message(cn, sbtools.red('There must be only two unspectated players to enter duel mode.'))
+		if sbserver.playerPrivilege(cn) > 0:
+			sbserver.message(cn, sbtools.red('Use #duel <cn> <cn> to force a duel.'))
+	else:
+		if len(args) == 2:
+			map = args[0]
+			mode = int(args[1])
+		elif len(args) == 1:
+			map = args[0]
+			mode = sbserver.masterMode()
 		else:
-			duelers[0] = players[0]
-			duelers[1] = players[1]
-			prev_mastermode = sbserver.masterMode()
-			sbserver.setMasterMode(2)
-			sbserver.message(sbtools.green('Duel begins in...'))
-			duelCountdown(5, map, mode)
+			sbserver.message(cn, sbtools.red('Usage: #duel <mapname> (mode)'))
+			return
+		duelers[0] = players[0]
+		duelers[1] = players[1]
+		prev_mastermode = sbserver.masterMode()
+		sbserver.setMasterMode(2)
+		sbserver.message(sbtools.green('Duel begins in...'))
+		duelCountdown(5, map, mode)
 
 sbevents.registerCommandHandler('duel', onDuelCommand)
 sbevents.registerEventHandler('player_disconnect', onPlayerDisconnect)
