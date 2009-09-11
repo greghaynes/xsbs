@@ -1071,6 +1071,18 @@ namespace server
 	changemap(s, mode);
     }
 
+    void setmastermode(int mastermode)
+    {
+        allowedips.setsize(0);
+        if(mastermode>=MM_PRIVATE)
+        {
+            loopv(clients) allowedips.add(getclientip(clients[i]->clientnum));
+        }
+        defformatstring(s)("mastermode is now %s (%d)", mastermodename(mastermode), mastermode);
+        SbPy::triggerEventInt("server_mastermode_changed", mastermode);
+        sendservmsg(s);
+    }
+
     struct votecount
     {
         char *map;

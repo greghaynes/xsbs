@@ -348,6 +348,17 @@ static PyObject *setMap(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *setMasterMode(PyObject *self, PyObject *args)
+{
+	int mm;
+	if(PyArg_ParseTuple(args, "i", &mm))
+	{
+		server::setmastermode(mm);
+	}
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
