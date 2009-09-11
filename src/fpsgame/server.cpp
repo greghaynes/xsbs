@@ -1065,6 +1065,12 @@ namespace server
 	SbPy::triggerEventStrInt("map_changed", smapname, mode);
     }
 
+    void setmap(const char *s, int mode)
+    {
+        sendf(-1, 1, "risii", SV_MAPCHANGE, s, mode, 1);
+	changemap(s, mode);
+    }
+
     struct votecount
     {
         char *map;

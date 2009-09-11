@@ -336,6 +336,18 @@ static PyObject *setPaused(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *setMap(PyObject *self, PyObject *args)
+{
+	const char *map;
+	int mode;
+	if(PyArg_ParseTuple(args, "si", &map, &mode))
+	{
+		server::setmap(map, mode);
+	}
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -357,6 +369,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"setMaster", setMaster, METH_VARARGS, "Set cn to master."},
 	{"setAdmin", setAdmin, METH_VARARGS, "Set cn to admin."},
 	{"setPaused", setPaused, METH_VARARGS, "Set game to be paused."},
+	{"setMap", setMap, METH_VARARGS, "Set to map and mode."},
 	{NULL, NULL, 0, NULL}
 };
 

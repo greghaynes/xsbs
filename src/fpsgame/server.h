@@ -326,6 +326,7 @@ namespace server
 	void setcimaster(clientinfo *ci);
 	void setciadmin(clientinfo *ci);
 	void pausegame(bool);
+	void setmap(const char *, int);
 
 }
 
