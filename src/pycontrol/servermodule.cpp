@@ -359,6 +359,13 @@ static PyObject *setMasterMode(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *masterMode(PyObject *self, PyObject *args)
+{
+	PyObject *ret;
+	ret = PyInt_FromLong(server::mastermode);
+	return ret;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -381,6 +388,8 @@ static PyMethodDef ModuleMethods[] = {
 	{"setAdmin", setAdmin, METH_VARARGS, "Set cn to admin."},
 	{"setPaused", setPaused, METH_VARARGS, "Set game to be paused."},
 	{"setMap", setMap, METH_VARARGS, "Set to map and mode."},
+	{"setMasterMode", setMasterMode, METH_VARARGS, "Set server master mode."},
+	{"masterMode", masterMode, METH_VARARGS, "Server master mode."},
 	{NULL, NULL, 0, NULL}
 };
 
