@@ -14,7 +14,7 @@ def onCommand(cn, command):
 	accuracy = 0
 	if shots != 0:
 		accuracy = hits / float(shots)
-		accuracy = math.trunc(accuracy * 100)
+		accuracy = math.floor(accuracy * 100)
 	msg = template.substitute(name=name, frags=frags, deaths=deaths, teamkills=teamkills, shots=shots, hits=hits, accuracy=accuracy)
 	sbserver.playerMessage(cn, msg)
 
