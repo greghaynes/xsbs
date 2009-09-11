@@ -7,7 +7,6 @@ channel = config.getOption('Config', 'channel', '#xsbs-newserver')
 servername = config.getOption('Config', 'servername', 'irc.gamesurge.net')
 nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
 port = int(config.getOption('Config', 'port', '6667'))
-del config
 
 class IrcBot:
 	def __init__(self, servername, nickname, port=6667):
@@ -97,12 +96,11 @@ event_abilities = {
 	'message': ('player_message', onMsg),
 	'message_team': ('player_message_team', onTeamMsg) }
 
-if bot:
-		for key in event_abilities.keys():
-			if config.has_option('Abilities', key) and config.get('Abilities', key) == 'yes':
-				ev = event_abilities[key]
-				sbevents.registerEventHandler(ev[0], ev[1])
-
-		if config.has_option('Abilities', 'message_gateway') and config.get('Abilities', 'message_gateway') == 'yes':
-			bot.msg_handlers.append(onIrcMsg)
+for key in event_abilities.keys():
+	if config.getOption('Abilities', key, 'no') == 'yes':
+		ev = event_abilities[key]
+		sbevents.registerEventHandler(ev[0], ev[1])
+if config.getOption('Abilities', 'message_gateway', 'no') == 'yes':
+	bot.msg_handlers.append(onIrcMsg)
+del config
 
