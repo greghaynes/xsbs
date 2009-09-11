@@ -33,5 +33,5 @@ if xsbs_bin_path == '':
 if not os.path.isfile(xsbs_bin_path):
 	os.execlpe('xsbs', 'xsbs', '-lsauer.log', '-s'+pyscripts_path, os.environ)
 else:
-	os.execle(xsbs_bin_path, '-lsauer.log', '-s'+pyscripts_path, os.environ)
+	os.execle(xsbs_bin_path, 'xsbs' '-lsauer.log', '-s'+pyscripts_path, os.environ)
 
