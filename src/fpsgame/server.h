@@ -325,6 +325,7 @@ namespace server
 	void hashPassword(int cn, int sessionid, char *pass, char *dest, int len);
 	void setcimaster(clientinfo *ci);
 	void setciadmin(clientinfo *ci);
+	void pausegame(bool);
 
 }
 

@@ -327,6 +327,15 @@ static PyObject *setAdmin(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *setPaused(PyObject *self, PyObject *args)
+{
+	bool val;
+	if(PyArg_ParseTuple(args, "b", &val))
+		server::pausegame(val);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -347,6 +356,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"hashPassword", hashPass, METH_VARARGS, "Return hash for user + password"},
 	{"setMaster", setMaster, METH_VARARGS, "Set cn to master."},
 	{"setAdmin", setAdmin, METH_VARARGS, "Set cn to admin."},
+	{"setPaused", setPaused, METH_VARARGS, "Set game to be paused."},
 	{NULL, NULL, 0, NULL}
 };
 
