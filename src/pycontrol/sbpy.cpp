@@ -40,24 +40,22 @@ void loadPyscriptsPath()
 
 void initEnv()
 {
-	char *pythonpath, *newpath;
+	std::string newpath;
+	const char *pp;
 	if(!pyscripts_path)
 		return;
-       	pythonpath = getenv("PYTHONPATH");
-	if(!pythonpath)
+       	pp = getenv("PYTHONPATH");
+	if(!pp)
 	{
-		newpath = new char[strlen(pyscripts_path)+1];
-		strcpy(newpath, pyscripts_path);
+		newpath = pyscripts_path;
 	}
 	else
 	{
-		newpath = new char[strlen(pyscripts_path)+strlen(pythonpath)+2];
-		strcpy(newpath, pythonpath);
-		strcat(newpath, ":");
-		strcat(newpath, pyscripts_path);
+		newpath = pp;
+		newpath.append(":");
+		newpath.append(pyscripts_path);
 	}
-	setenv("PYTHONPATH", newpath, 1);
-	delete newpath;
+	setenv("PYTHONPATH", newpath.c_str(), 1);
 }
 
 #define SBPY_ERR(x) \
@@ -137,6 +135,7 @@ bool initPy()
 
 void deinitPy()
 {
+	std::cout << "Cleaning up";
 	Py_XDECREF(triggerEventFunc);
 	Py_XDECREF(triggerPolicyEventFunc);
 	Py_XDECREF(triggerExecQueueFunc);
@@ -170,7 +169,6 @@ bool init(const char *prog_name, const char *arg_pyscripts_path, const char *mod
 	// Set program name
 	strcpy(pn, prog_name);
 	Py_SetProgramName(pn);
-	delete pn;
 
 	// Initialize
 	Py_Initialize();
