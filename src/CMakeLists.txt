@@ -45,3 +45,6 @@ add_executable(xsbs
 	${xsbs_srcs})
 
 target_link_libraries(xsbs enet sauertools ${PYTHON_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
+install(TARGETS xsbs DESTINATION bin)
+
