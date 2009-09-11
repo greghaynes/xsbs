@@ -20,6 +20,10 @@ helptexts = {
 		('#giveadmin <cn>', '#giveadmin <name>'),
 		('Give admin to a player.  You must be admin to use this command.',)
 		),
+	'duel': (True,
+		('#duel <mapname> (mode)',),
+		('Begin a duel on specified map using specified game mode.',),
+		),
 }
 
 ### DO NOT MODIFY BELOW HERE ###
