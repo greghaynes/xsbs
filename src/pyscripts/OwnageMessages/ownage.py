@@ -20,6 +20,10 @@ def onPlayerFrag(cn, tcn):
 	if messages.has_key(killsprees[cn]):
 		sbserver.message(messages[killsprees[cn]].substitute(name=sbserver.playerName(cn)))
 
+def onPlayerTeamKill(cn, tcn):
+	killsprees[cn] = 0
+
 sbevents.registerEventHandler('player_active', onPlayerActive)
 sbevents.registerEventHandler('player_frag', onPlayerFrag)
+sbevents.registerEventHandler('player_teamkill', onPlayerTeamKill)
 
