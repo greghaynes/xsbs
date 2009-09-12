@@ -45,16 +45,14 @@ def onDuelCommand(cn, args):
 	args = args.split(' ')
 	players = sbserver.players()
 	if len(players) != 2:
-		sbserver.message(cn, sbtools.red('There must be only two unspectated players to enter duel mode.'))
-		if sbserver.playerPrivilege(cn) > 0:
-			sbserver.message(cn, sbtools.red('Use #duel <cn> <cn> to force a duel.'))
+		sbserver.playerMessage(cn, sbtools.red('There must be only two unspectated players to enter duel mode.'))
 	else:
 		if len(args) == 2:
 			map = args[0]
 			mode = int(args[1])
 		elif len(args) == 1:
 			map = args[0]
-			mode = sbserver.masterMode()
+			mode = sbserver.mapMode()
 		else:
 			sbserver.message(cn, sbtools.red('Usage: #duel <mapname> (mode)'))
 			return
