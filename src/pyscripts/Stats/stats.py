@@ -4,8 +4,18 @@ import string, math
 template = string.Template(sbtools.green("$name: ") + sbtools.red("$frags") + sbtools.blue(" frags ") + sbtools.red("$deaths") + sbtools.blue(" deaths ") + sbtools.red("$teamkills") + sbtools.blue(" teamkills (") + sbtools.red("$shots") + sbtools.blue(" shots / ") + sbtools.red("$hits") + sbtools.blue(" hits) ") + sbtools.red("$accuracy") + sbtools.blue("% accuracy"))
 
 def onCommand(cn, command):
-	tcn = cn
+	if command != '':
+		try:
+			tcn = int(command)
+		except ValueError:
+			sbserver.playerMessage(cn, sbtools.red('Usage: #stats (cn)'))
+			return
+	else:
+		tcn = cn
 	name = sbserver.playerName(tcn)
+	if not name:
+		sbserver.playerMessage(cn, sbtools.red('You must use a valid cn'))
+		return
 	frags = sbserver.playerFrags(tcn)
 	deaths = sbserver.playerDeaths(tcn)
 	teamkills = sbserver.playerTeamkills(tcn)
