@@ -1,4 +1,5 @@
 import sbserver, sbevents
+from Bans.bans import ban
 from settings import PluginConfig
 
 config = PluginConfig('notk')
@@ -8,7 +9,7 @@ del config
 
 def onTeamkill(cn, tcn):
 	if sbserver.playerTeamkills(cn) >= limit:
-		sbevents.triggerEvent('player_ban', (cn, duration, 'Teamkilling'))
+		ban(cn, duration, 'killing teammates')
 
 sbevents.registerEventHandler('player_teamkill', onTeamkill)
 

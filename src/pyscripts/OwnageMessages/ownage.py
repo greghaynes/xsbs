@@ -11,6 +11,8 @@ def onPlayerActive(cn):
 	killsprees[cn] = 0
 
 def onPlayerFrag(cn, tcn):
+	if cn not in sbserver.players():
+		print 'player_frag event has lost its marbles: cn is %i' % cn
 	killsprees[cn] = killsprees[cn] + 1
 	if killsprees[tcn] > 5:
 		sbserver.message(endmsg.substitute(name=sbserver.playerName(tcn), endername=sbserver.playerName(cn)))

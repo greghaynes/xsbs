@@ -47,7 +47,7 @@ def ban(cn, seconds, reason):
 			sbserver.playerKick(cn)
 			return
 	banned_ips[ip] = expiration
-	sbserver.playerKick(cn)
+	sbevents.sbExec(sbserver.playerKick, (cn,))
 
 def allowClient(cn):
 	ip = sbserver.playerIpLong(cn)

@@ -74,6 +74,7 @@ static PyObject *clients(PyObject *self, PyObject *args)
 	int y = 0;
 	loopv(server::clients)
 	{
+
 		pInt = PyInt_FromLong(i);
 		PyTuple_SetItem(pTuple, i, pInt);
 		y++;
@@ -93,10 +94,8 @@ static PyObject *players(PyObject *self, PyObject *args)
 	loopv(server::clients)
 	{
 		ci = server::getinfo(i);
-		if(ci->state.state != CS_SPECTATOR)
-		{
+		if(ci && ci->state.state != CS_SPECTATOR)
 			spects.push_back(i);
-		}
 	}
 	pTuple = PyTuple_New(spects.size());
 	

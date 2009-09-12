@@ -1195,12 +1195,12 @@ namespace server
         if(ts.health<=0)
         {
             target->state.deaths++;
-			if(actor==target)
-				fprintf(eventlog.file(), "player %s (%i) commited suicide\n", actor->name, actor->clientnum);
+            if(actor==target)
+                fprintf(eventlog.file(), "player %s (%i) commited suicide\n", actor->name, actor->clientnum);
             else if(isteam(actor->team, target->team))
             {
                 actor->state.teamkills++;
-				fprintf(eventlog.file(), "player %s (%i) teamkilled player %s (%i)\n", actor->name, actor->clientnum, target->name, target->clientnum);
+                fprintf(eventlog.file(), "player %s (%i) teamkilled player %s (%i)\n", actor->name, actor->clientnum, target->name, target->clientnum);
                 SbPy::triggerEventIntInt("player_teamkill", actor->clientnum, target->clientnum);
             }
 			else
@@ -1438,7 +1438,7 @@ namespace server
             checkvotes(true);
         }
 
-        if(checkexecqueue)
+        if(true)
         {
             checkexecqueue = false;
             SbPy::triggerExecQueue();
