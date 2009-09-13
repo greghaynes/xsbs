@@ -147,6 +147,7 @@ static PyObject *playerMessage(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+// TODO: should except for bad cn
 static PyObject *playerName(PyObject *self, PyObject *args)
 {
 	int cn = getIntFromTupleAt(args, 0);
@@ -165,10 +166,7 @@ static PyObject *playerIpLong(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "i", &cn)
 	   || !(ci = server::getinfo(cn)))
-	{
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	return Py_BuildValue("i", getclientip(ci->clientnum));
 }
 
@@ -176,11 +174,7 @@ static PyObject *playerKick(PyObject *self, PyObject *args)
 {
 	int cn;
 	if(!PyArg_ParseTuple(args, "i", &cn))
-	{
-		// TODO: Should throw exception
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	disconnect_client(cn, DISC_KICK);
 	Py_INCREF(Py_None);
 	return Py_None;
@@ -192,10 +186,7 @@ static PyObject *playerPrivilege(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "i", &cn)
 	   || !(ci = server::getinfo(cn)))
-	{
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	return Py_BuildValue("i", ci->privilege);
 }
 
@@ -205,10 +196,7 @@ static PyObject *playerFrags(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "i", &cn)
 	   || !(ci = server::getinfo(cn)))
-	{
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	return Py_BuildValue("i", ci->state.frags);
 }
 
@@ -218,10 +206,7 @@ static PyObject *playerTeamkills(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "i", &cn)
 	   || !(ci = server::getinfo(cn)))
-	{
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	return Py_BuildValue("i", ci->state.teamkills);
 }
 
@@ -231,10 +216,7 @@ static PyObject *playerDeaths(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "i", &cn)
 	   || !(ci = server::getinfo(cn)))
-	{
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	return Py_BuildValue("i", ci->state.deaths);
 }
 
@@ -244,10 +226,7 @@ static PyObject *playerShots(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "i", &cn)
 	   || !(ci = server::getinfo(cn)))
-	{
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	return Py_BuildValue("i", ci->state.shots);
 }
 
@@ -257,23 +236,18 @@ static PyObject *playerHits(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "i", &cn)
 	   || !(ci = server::getinfo(cn)))
-	{
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	return Py_BuildValue("i", ci->state.hits);
 }
 
+// TODO: This should except on isufficient permissions
 static PyObject *setBotLimit(PyObject *self, PyObject *args)
 {
 	int cn, limit;
 	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "ii", &cn, &limit)
 	   || !(ci = server::getinfo(cn)))
-	{
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	if(!ci->local && ci->privilege < PRIV_ADMIN)
 		sendf(cn, 1, "ris", SV_SERVMSG, "Insufficient permissions to add bot.");
 	else
@@ -291,10 +265,7 @@ static PyObject *hashPass(PyObject *self, PyObject *args)
 	string string;
 	if(!PyArg_ParseTuple(args, "is", &cn, &pass)
 		|| !(ci = server::getinfo(cn)))
-	{
-		Py_INCREF(Py_None);
-		return Py_None;
-	}
+		return 0;
 	server::hashpassword(cn, ci->sessionid, pass, string, sizeof(string));
 	pstr = PyString_FromString(string);
 	return pstr;
@@ -306,9 +277,9 @@ static PyObject *setMaster(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(PyArg_ParseTuple(args, "i", &cn)
 		&& (ci = server::getinfo(cn)))
-	{
 		server::setcimaster(ci);
-	}
+	else
+		return 0;
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -319,9 +290,9 @@ static PyObject *setAdmin(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(PyArg_ParseTuple(args, "i", &cn)
 		&& (ci = server::getinfo(cn)))
-	{
 		server::setciadmin(ci);
-	}
+	else
+		return 0;
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -331,6 +302,8 @@ static PyObject *setPaused(PyObject *self, PyObject *args)
 	bool val;
 	if(PyArg_ParseTuple(args, "b", &val))
 		server::pausegame(val);
+	else
+		return 0;
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -340,9 +313,9 @@ static PyObject *setMap(PyObject *self, PyObject *args)
 	const char *map;
 	int mode;
 	if(PyArg_ParseTuple(args, "si", &map, &mode))
-	{
 		server::setmap(map, mode);
-	}
+	else
+		return 0;
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -351,9 +324,9 @@ static PyObject *setMasterMode(PyObject *self, PyObject *args)
 {
 	int mm;
 	if(PyArg_ParseTuple(args, "i", &mm))
-	{
 		server::setmastermode(mm);
-	}
+	else
+		return 0;
 	Py_INCREF(Py_None);
 	return Py_None;
 }
