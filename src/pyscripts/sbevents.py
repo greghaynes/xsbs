@@ -47,6 +47,7 @@ def triggerSbExecQueue():
 			action[0](*action[1])
 		except:
 			print 'Error occoured with enqueued exec action'
+	del exec_queue[:]
 
 events = {}
 policy_events = {}

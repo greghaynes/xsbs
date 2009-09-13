@@ -1544,7 +1544,6 @@ namespace server
         ci->sessionid = (rnd(0x1000000)*((totalmillis%10000)+1))&0xFFFFFF;
 
         connects.add(ci);
-        if(!SbPy::triggerPolicyEventInt("allow_connect", ci->clientnum)) return DISC_KICK;
         if(!m_mp(gamemode)) return DISC_PRIVATE;
         sendservinfo(ci);
         return DISC_NONE;
@@ -1582,6 +1581,7 @@ namespace server
         if(numclients(-1, false, true)>=maxclients) return DISC_MAXCLIENTS;
         uint ip = getclientip(ci->clientnum);
         if(mastermode>=MM_PRIVATE && allowedips.find(ip)<0) return DISC_PRIVATE;
+        if(!SbPy::triggerPolicyEventInt("allow_connect", ci->clientnum)) return DISC_KICK;
         return DISC_NONE;
     }
 
