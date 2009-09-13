@@ -365,6 +365,13 @@ static PyObject *masterMode(PyObject *self, PyObject *args)
 	return ret;
 }
 
+static PyObject *restartPy(PyObject *self, PyObject *args)
+{
+	server::restart_py = true;
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -389,6 +396,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"setMap", setMap, METH_VARARGS, "Set to map and mode."},
 	{"setMasterMode", setMasterMode, METH_VARARGS, "Set server master mode."},
 	{"masterMode", masterMode, METH_VARARGS, "Server master mode."},
+	{"reload", restartPy, METH_VARARGS, "Reload python modules."},
 	{NULL, NULL, 0, NULL}
 };
 

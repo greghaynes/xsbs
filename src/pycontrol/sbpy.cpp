@@ -70,12 +70,10 @@ static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *trig
 
 bool initPy()
 {
-	PyObject *pFunc, *pArgs, *pValue, *pluginsModule;
+	PyObject *pFunc = 0, *pArgs = 0, *pValue = 0, *pluginsModule = 0;
 	
 	pluginsModule = PyImport_ImportModule("sbplugins");
 	SBPY_ERR(pluginsModule)
-	eventsModule = PyImport_ImportModule("sbevents");
-	SBPY_ERR(eventsModule)
 	pFunc = PyObject_GetAttrString(pluginsModule, "loadPlugins");
 	SBPY_ERR(pFunc)
 	if(!PyCallable_Check(pFunc))
@@ -87,6 +85,8 @@ bool initPy()
 	pValue = PyObject_CallObject(pFunc, pArgs);
 	Py_DECREF(pArgs);
 	Py_DECREF(pFunc);
+	eventsModule = PyImport_ImportModule("sbevents");
+	SBPY_ERR(eventsModule)
 	if(!pValue)
 	{
 		PyErr_Print();
@@ -135,13 +135,23 @@ bool initPy()
 
 void deinitPy()
 {
-	std::cout << "Cleaning up";
+	std::cout << "Cleaning up\n";
 	Py_XDECREF(triggerEventFunc);
 	Py_XDECREF(triggerPolicyEventFunc);
 	Py_XDECREF(triggerExecQueueFunc);
 	Py_XDECREF(triggerSocketMonitorFunc);
 	Py_XDECREF(setTimeFunc);
 	Py_Finalize();
+}
+
+bool restartPy()
+{
+	deinitPy();
+	Py_Initialize();
+	initModule("sbserver");
+	initPy();
+	// Initialize
+	return initPy();
 }
 
 bool init(const char *prog_name, const char *arg_pyscripts_path, const char *module_name)

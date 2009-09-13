@@ -52,7 +52,8 @@ namespace server
     vector<worldstate *> worldstates;
     bool reliablemessages = false;
     bool checkexecqueue = false;
-	Log eventlog;
+    Log eventlog;
+    bool restart_py = false;
 
     struct demofile
     {
@@ -1443,6 +1444,12 @@ namespace server
             checkexecqueue = false;
             SbPy::triggerExecQueue();
         }
+
+	if(restart_py)
+	{
+		SbPy::restartPy();
+		restart_py = false;
+	}
     }
 
     struct crcinfo
