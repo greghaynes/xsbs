@@ -739,7 +739,7 @@ void quit()
     rundedicated = false;
 }
 
-void sigint(int signal)
+void server_sigint(int signal)
 {
     quit();
 }
@@ -812,7 +812,7 @@ void initserver(bool listen, bool dedicated)
         conoutf("Server initialization failed.");
         return;
     }
-    signal(SIGINT, sigint);
+    signal(SIGINT, server_sigint);
 
     if(listen)
     {

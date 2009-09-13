@@ -333,5 +333,7 @@ namespace server
 
 }
 
+extern void server_sigint(int);
+
 #endif
 

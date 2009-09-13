@@ -18,6 +18,8 @@ class IrcBot:
 		self.isConnected = False
 		self.channels = []
 		self.msg_handlers = []
+	def __del__(self):
+		self.socket.close()
 	def connect(self):
 		sbevents.sockmon.onRead(self.socket, self.onConnect, (), False)
 		try:

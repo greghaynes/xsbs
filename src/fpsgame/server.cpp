@@ -10,6 +10,8 @@
 
 #include <iostream>
 
+#include <signal.h>
+
 namespace game
 {
     void parseoptions(vector<const char *> &args)
@@ -1449,6 +1451,8 @@ namespace server
 	{
 		SbPy::restartPy();
 		restart_py = false;
+		signal(SIGINT, server_sigint);
+		sendservmsg("Reloading completed.");
 	}
     }
 
