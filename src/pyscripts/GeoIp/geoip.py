@@ -2,9 +2,9 @@ import sbevents, sbserver, sbtools, pygeoip
 from ConfigParser import ConfigParser
 import string
 
-db = pygeoip.Database('geoip/GeoIP.dat')
+db = pygeoip.Database('GeoIp/GeoIP.dat')
 conf = ConfigParser()
-conf.read('geoip/plugin.conf')
+conf.read('GeoIp/plugin.conf')
 template = sbtools.green('$user') + sbtools.yellow(' has connected from ') + sbtools.orange('$country')
 
 if conf.has_option('Config', 'template'):
