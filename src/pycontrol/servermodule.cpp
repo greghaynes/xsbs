@@ -25,46 +25,9 @@
 namespace SbPy
 {
 
-static char *getStringFromTupleAt(PyObject *pTuple, int n)
-{
-	PyObject *pStr;
-	char *str;
-	pStr = PyTuple_GetItem(pTuple, n);
-	if(pStr)
-	{
-		str = PyString_AsString(pStr);
-		return str;
-	}
-	std::cout << "Could not get string.\n";
-	return 0;
-}
-
-static int getIntFromTupleAt(PyObject *pTuple, int n)
-{
-	PyObject *pInt;
-	pInt = PyTuple_GetItem(pTuple, n);
-	n = PyInt_AsLong(pInt);
-	return n;
-}
-
 static PyObject *numClients(PyObject *self, PyObject *args)
 {
 	return Py_BuildValue("i", server::numclients());
-}
-
-static PyObject *message(PyObject *self, PyObject *args)
-{
-	PyObject *pMsg = PyTuple_GetItem(args, 0);
-	if(pMsg)
-	{
-		char *msg = PyString_AsString(pMsg);
-		if(msg)
-			server::sendservmsg(msg);
-	}
-	else
-		fprintf(stderr, "Error sending message");
-	Py_INCREF(Py_None);
-	return Py_None;
 }
 
 static PyObject *clients(PyObject *self, PyObject *args)
@@ -136,28 +99,62 @@ static PyObject *spectators(PyObject *self, PyObject *args)
 	return pTuple;
 }
 
-static PyObject *playerMessage(PyObject *self, PyObject *args)
+static PyObject *message(PyObject *self, PyObject *args)
 {
-	int cn = getIntFromTupleAt(args, 0);
-	char *text = getStringFromTupleAt(args, 1);
-	server::clientinfo *ci = server::getinfo(cn);
-	if(ci && ci->state.aitype == AI_NONE)
-		sendf(cn, 1, "ris", SV_SERVMSG, text);
+	PyObject *pMsg = PyTuple_GetItem(args, 0);
+	if(pMsg)
+	{
+		char *msg = PyString_AsString(pMsg);
+		if(msg)
+			server::sendservmsg(msg);
+	}
+	else
+		fprintf(stderr, "Error sending message");
 	Py_INCREF(Py_None);
 	return Py_None;
 }
 
-// TODO: should except for bad cn
-static PyObject *playerName(PyObject *self, PyObject *args)
+static PyObject *playerMessage(PyObject *self, PyObject *args)
 {
-	int cn = getIntFromTupleAt(args, 0);
-	server::clientinfo *ci = server::getinfo(cn);
-	if(ci && ci->name)
-		return Py_BuildValue("s", ci->name);
-	else
-		std::cout << "Error: Invalid cn or no name assigned to client.";
+	int cn;
+	char *text;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "is", &cn, &text))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	if(ci->state.aitype != AI_NONE)
+	{
+		PyErr_SetString(PyExc_ValueError, "Cannot send message to AI client");
+		return 0;
+	}
+	sendf(cn, 1, "ris", SV_SERVMSG, text);
 	Py_INCREF(Py_None);
 	return Py_None;
+}
+
+static PyObject *playerName(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "i", &cn))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified.");
+		return 0;
+	}
+	if(!ci->name)
+	{
+		PyErr_SetString(PyExc_RuntimeError, "Client cn is valid but has no name.");
+		return 0;
+	}
+	return Py_BuildValue("s", ci->name);
 }
 
 static PyObject *playerIpLong(PyObject *self, PyObject *args)

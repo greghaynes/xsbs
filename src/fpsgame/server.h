@@ -120,7 +120,7 @@ namespace server
         projectilestate<8> rockets, grenades;
         int frags, flags, deaths, teamkills, shotdamage, damage;
         int lasttimeplayed, timeplayed;
-		int shots, hits;
+        int shots, hits;
         float effectiveness;
 		
         gamestate() : state(CS_DEAD), editstate(CS_DEAD) {}
