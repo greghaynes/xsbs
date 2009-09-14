@@ -24,6 +24,10 @@ helptexts = {
 		('#duel <mapname> (mode)',),
 		('Begin a duel on specified map using specified game mode.',),
 		),
+        'trans': (True,
+		('#trans <word> or #trans <sentence/word> <from_lang> <to_lang> ',),
+		('Language codes: en, sv, de, it and lots more.',),
+		)
 }
 
 ### DO NOT MODIFY BELOW HERE ###
