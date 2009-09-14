@@ -237,6 +237,16 @@ static PyObject *playerHits(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ci->state.hits);
 }
 
+static PyObject *playerPing(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "i", &cn)
+	   || !(ci = server::getinfo(cn)))
+		return 0;
+	return Py_BuildValue("i", ci->ping);
+}
+
 // TODO: This should except on isufficient permissions
 static PyObject *setBotLimit(PyObject *self, PyObject *args)
 {
@@ -358,6 +368,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"playerDeaths", playerDeaths, METH_VARARGS, "Number of deatds by player in current match."},
 	{"playerShots", playerShots, METH_VARARGS, "Shots by player in current match."},
 	{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
+	{"playerPing", playerPing, METH_VARARGS, "Current ping of player."},
 	{"setBotLimit", setBotLimit, METH_VARARGS, "Set server bot limit."},
 	{"hashPassword", hashPass, METH_VARARGS, "Return hash for user + password"},
 	{"setMaster", setMaster, METH_VARARGS, "Set cn to master."},
