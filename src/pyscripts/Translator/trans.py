@@ -3,11 +3,6 @@ from xsbs.commands import registerCommandHandler
 from xsbs.colors import red
 import socket, re, asyncore
 
-#If Google changes behaviour this script will stop working.
-query=""
-from_lang=""
-to_lang="" 
-
 url = "http://ajax.googleapis.com/ajax/services/language/translate"
 langslist = ['af','sq','am','ar','hy',
 		'az','eu','be','bn','bh','bg','my',
@@ -59,7 +54,7 @@ class SocketDispatch(asyncore.dispatcher):
 			try:
 				sbserver.message(m.group(1))
 			except:
-				sbserver.playerMessage(cn,"Translation failed")
+				sbserver.playerMessage(cn, "Translation failed")
 	def write(self,query, from_lang="en", to_lang="sv"):
 		self.writebuff += header % (from_lang, to_lang, query)
 		self.handle_write()
@@ -85,4 +80,4 @@ def onCommand(cn, command):
 		else:
 			sbserver.playerMessage(cn, red("You've made a mistake with the syntax. Type #trans to show syntax"))
 
-registerCommandHandler('trans', onCommand)
+registerCommandHandler('translate', onCommand)
