@@ -23,11 +23,11 @@ class SocketMonitor:
 		for sock in o:
 			event = self.writes[sock]
 			if not event[2]:
-				self.writes.remove(sock)
+				del self.writes[sock]
 			event[0](*event[1])
 		for sock in e:
 			event = self.errors[sock]
 			if not event[2]:
-				self.errors.remove(sock)
+				del self.errors[sock]
 			event[0](*event[1])
 
