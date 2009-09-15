@@ -332,11 +332,15 @@ static PyObject *setMaster(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(PyArg_ParseTuple(args, "i", &cn)
-		&& (ci = server::getinfo(cn)))
-		server::setcimaster(ci);
-	else
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	server::setcimaster(ci);
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -345,11 +349,15 @@ static PyObject *setAdmin(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(PyArg_ParseTuple(args, "i", &cn)
-		&& (ci = server::getinfo(cn)))
-		server::setciadmin(ci);
-	else
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	server::setciadmin(ci);
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -357,10 +365,9 @@ static PyObject *setAdmin(PyObject *self, PyObject *args)
 static PyObject *setPaused(PyObject *self, PyObject *args)
 {
 	bool val;
-	if(PyArg_ParseTuple(args, "b", &val))
-		server::pausegame(val);
-	else
+	if(!PyArg_ParseTuple(args, "b", &val))
 		return 0;
+	server::pausegame(val);
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -369,10 +376,9 @@ static PyObject *setMap(PyObject *self, PyObject *args)
 {
 	const char *map;
 	int mode;
-	if(PyArg_ParseTuple(args, "si", &map, &mode))
-		server::setmap(map, mode);
-	else
+	if(!PyArg_ParseTuple(args, "si", &map, &mode))
 		return 0;
+	server::setmap(map, mode);
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -380,10 +386,9 @@ static PyObject *setMap(PyObject *self, PyObject *args)
 static PyObject *setMasterMode(PyObject *self, PyObject *args)
 {
 	int mm;
-	if(PyArg_ParseTuple(args, "i", &mm))
-		server::setmastermode(mm);
-	else
+	if(!PyArg_ParseTuple(args, "i", &mm))
 		return 0;
+	server::setmastermode(mm);
 	Py_INCREF(Py_None);
 	return Py_None;
 }

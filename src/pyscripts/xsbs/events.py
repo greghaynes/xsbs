@@ -17,34 +17,47 @@ class EventManager:
 		except KeyError:
 			pass
 
+class PolicyEventManager(EventManager):
+	def __init__(self):
+		EventManager.__init__(self)
+	def trigger(self, event, args=()):
+		try:
+			for event in self.events[event]:
+				if not event(*args):
+					return False
+		except KeyError:
+			return True
+		return True
+
 server_events = EventManager()
-policy_events = EventManager()
-postevent_handlers = []
+policy_events = PolicyEventManager()
+exec_queue = []
 
 def registerServerEventHandler(event, func):
 	server_events.connect(event, func)
 
 def triggerServerEvent(event, args):
-	del postevent_handlers[:]
 	server_events.trigger(event, args)
-	triggerPostEventHandlers()
 
 def registerPolicyEventHandler(event, func):
 	policy_events.connect(event, func)
 
 def triggerPolicyEvent(event, args):
-	del postevent_handlers[:]
-	policy_events.trigger(event, args)
-	triggerPostEventHandlers()
+	return policy_events.trigger(event, args)
 
-def registerPostEventHandler(func, args):
-	postevent_handlers.append((func, args))
+def execLater(func, args):
+	exec_queue.append((func, args))
 
-def triggerPostEventHandlers():
-	for event in postevent_handlers:
-		event[0](event[1])
+def triggerExecQueue():
+	for event in exec_queue:
+		try:
+			event[0](*event[1])
+		except:
+			print 'Error executing execLater op.'
+	del exec_queue[:]
 
 def update():
 	timers.update()
 	asyncore.loop(0, False, None, count=1)
+	triggerExecQueue()
 
