@@ -161,9 +161,14 @@ static PyObject *playerIpLong(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "i", &cn)
-	   || !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	return Py_BuildValue("i", getclientip(ci->clientnum));
 }
 
@@ -181,9 +186,14 @@ static PyObject *playerPrivilege(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "i", &cn)
-	   || !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	return Py_BuildValue("i", ci->privilege);
 }
 
@@ -191,9 +201,14 @@ static PyObject *playerFrags(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "i", &cn)
-	   || !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	return Py_BuildValue("i", ci->state.frags);
 }
 
@@ -201,9 +216,14 @@ static PyObject *playerTeamkills(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "i", &cn)
-	   || !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	return Py_BuildValue("i", ci->state.teamkills);
 }
 
@@ -211,9 +231,14 @@ static PyObject *playerDeaths(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "i", &cn)
-	   || !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	return Py_BuildValue("i", ci->state.deaths);
 }
 
@@ -221,9 +246,14 @@ static PyObject *playerShots(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "i", &cn)
-	   || !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	return Py_BuildValue("i", ci->state.shots);
 }
 
@@ -231,9 +261,14 @@ static PyObject *playerHits(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "i", &cn)
-	   || !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	return Py_BuildValue("i", ci->state.hits);
 }
 
@@ -241,9 +276,14 @@ static PyObject *playerPing(PyObject *self, PyObject *args)
 {
 	int cn;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "i", &cn)
-	   || !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	return Py_BuildValue("i", ci->ping);
 }
 
@@ -252,9 +292,14 @@ static PyObject *setBotLimit(PyObject *self, PyObject *args)
 {
 	int cn, limit;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "ii", &cn, &limit)
-	   || !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "ii", &cn, &limit))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	if(!ci->local && ci->privilege < PRIV_ADMIN)
 		sendf(cn, 1, "ris", SV_SERVMSG, "Insufficient permissions to add bot.");
 	else
@@ -270,9 +315,14 @@ static PyObject *hashPass(PyObject *self, PyObject *args)
 	char *pass;
 	server::clientinfo *ci;
 	string string;
-	if(!PyArg_ParseTuple(args, "is", &cn, &pass)
-		|| !(ci = server::getinfo(cn)))
+	if(!PyArg_ParseTuple(args, "is", &cn, &pass))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	server::hashpassword(cn, ci->sessionid, pass, string, sizeof(string));
 	pstr = PyString_FromString(string);
 	return pstr;

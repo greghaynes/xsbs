@@ -19,18 +19,30 @@ class EventManager:
 
 server_events = EventManager()
 policy_events = EventManager()
+postevent_handlers = []
 
 def registerServerEventHandler(event, func):
 	server_events.connect(event, func)
 
 def triggerServerEvent(event, args):
+	del postevent_handlers[:]
 	server_events.trigger(event, args)
+	triggerPostEventHandlers()
 
 def registerPolicyEventHandler(event, func):
 	policy_events.connect(event, func)
 
 def triggerPolicyEvent(event, args):
+	del postevent_handlers[:]
 	policy_events.trigger(event, args)
+	triggerPostEventHandlers()
+
+def registerPostEventHandler(func, args):
+	postevent_handlers.append((func, args))
+
+def triggerPostEventHandlers():
+	for event in postevent_handlers:
+		event[0](event[1])
 
 def update():
 	timers.update()

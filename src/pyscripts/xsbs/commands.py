@@ -29,5 +29,3 @@ commandmanager = CommandManager()
 def registerCommandHandler(command, func):
 	commandmanager.register(command, func)
 
-registerServerEventHandler('player_message', commandmanager.onMsg)
-
