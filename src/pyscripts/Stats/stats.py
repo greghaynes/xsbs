@@ -1,7 +1,13 @@
-import sbevents, sbserver, sbtools
+import sbserver
 import string, math
+from xsbs.commands import registerCommandHandler
+from xsbs.colors import colordict
+from xsbs.settings import PluginConfig
 
-template = string.Template(sbtools.green("$name: ") + sbtools.red("$frags") + sbtools.blue(" frags ") + sbtools.red("$deaths") + sbtools.blue(" deaths ") + sbtools.red("$teamkills") + sbtools.blue(" teamkills (") + sbtools.red("$shots") + sbtools.blue(" shots / ") + sbtools.red("$hits") + sbtools.blue(" hits) ") + sbtools.red("$accuracy") + sbtools.blue("% accuracy"))
+config = PluginConfig('stats')
+template = config.getOption('Config', 'template', '${white}Stats for ${orange}${name}\n${white}Frags: ${green}${frags} ${white}Deaths: ${red}${deaths} ${white}Teamkills: ${magenta}${teamkills}')
+template = string.Template(template)
+del config
 
 def onCommand(cn, command):
 	if command != '':
@@ -25,8 +31,8 @@ def onCommand(cn, command):
 	if shots != 0:
 		accuracy = hits / float(shots)
 		accuracy = math.floor(accuracy * 100)
-	msg = template.substitute(name=name, frags=frags, deaths=deaths, teamkills=teamkills, shots=shots, hits=hits, accuracy=accuracy)
+	msg = template.substitute(colordict, name=name, frags=frags, deaths=deaths, teamkills=teamkills, shots=shots, hits=hits, accuracy=accuracy)
 	sbserver.playerMessage(cn, msg)
 
-sbevents.registerCommandHandler('stats', onCommand)
+registerCommandHandler('stats', onCommand)
 
