@@ -16,7 +16,7 @@ def magenta(text=None):
 def orange(text=None):
 	return textcolor(6, text)
 def white(text=None):
-	return textcolor(10, text)
+	return textcolor(7, text)
 
 colordict = { 'green': green(),
 	'blue' : blue(),
