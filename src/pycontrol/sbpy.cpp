@@ -85,14 +85,14 @@ bool initPy()
 	pValue = PyObject_CallObject(pFunc, pArgs);
 	Py_DECREF(pArgs);
 	Py_DECREF(pFunc);
-	eventsModule = PyImport_ImportModule("sbevents");
-	SBPY_ERR(eventsModule)
 	if(!pValue)
 	{
 		PyErr_Print();
 		return false;
 	}
 	Py_DECREF(pValue);
+	eventsModule = PyImport_ImportModule("sbevents");
+	SBPY_ERR(eventsModule)
 	triggerEventFunc = PyObject_GetAttrString(eventsModule, "triggerEvent");
 	SBPY_ERR(triggerEventFunc);
 	if(!PyCallable_Check(triggerEventFunc))
