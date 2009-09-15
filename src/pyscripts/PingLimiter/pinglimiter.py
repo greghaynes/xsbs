@@ -1,4 +1,5 @@
-import sbevents, sbserver
+import sbserver
+from xsbs.events import addTimer
 from Bans.bans import ban
 
 class PingLimiter:
@@ -19,8 +20,8 @@ class PingLimiter:
 				sbserver.playerMessage(cn, 'Your ping is too high.  You will be kicked if it is not lowered.')
 				self.warned_cns.append(lagger)
 				i += 1
-		sbevents.timerman.addTimer(5000, limiter.checkPlayers, ())
+		addTimer(5000, limiter.checkPlayers, ())
 
 limiter = PingLimiter()
-sbevents.timerman.addTimer(5000, limiter.checkPlayers, ())
+addTimer(5000, limiter.checkPlayers, ())
 

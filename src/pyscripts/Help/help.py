@@ -1,4 +1,7 @@
-import sbserver, sbevents, sbtools
+import sbserver
+from xsbs.events import registerServerEventHandler
+from xsbs.commands import registerCommandHandler
+from xsbs.colors import blue, red, orange
 
 helptexts = {
 	'help': (True,
@@ -33,8 +36,8 @@ helptexts = {
 ### DO NOT MODIFY BELOW HERE ###
 # UNLESS YOU HAVE SUPER POWERS #
 
-available_commands_str = sbtools.blue('Available commands: ')
-available_commands_str += sbtools.orange()
+available_commands_str = blue('Available commands: ')
+available_commands_str += orange()
 for command in helptexts.items():
 	if command[1][0]:
 		available_commands_str += '#' + command[0] + ' '
@@ -46,13 +49,13 @@ def msgHelpText(cn, cmd):
 	try:
 		helpinfo = helptexts[cmd]
 	except KeyError:
-		sbserver.playerMessage(cn, sbtools.red('Command not found'))
+		sbserver.playerMessage(cn, red('Command not found'))
 	else:
 		msgs = []
 		for usage in helpinfo[1]:
-			msgs.append(sbtools.red(usage))
+			msgs.append(red(usage))
 		for desc in helpinfo[2]:
-			msgs.append(sbtools.blue(desc))
+			msgs.append(blue(desc))
 		for msg in msgs:
 			sbserver.playerMessage(cn, msg)
 
@@ -63,6 +66,6 @@ def onHelpCommand(cn, args):
 	else:
 		msgHelpText(cn, args[0])
 
-sbevents.registerEventHandler('player_active', onPlayerActive)
-sbevents.registerCommandHandler('help', onHelpCommand)
+registerServerEventHandler('player_active', onPlayerActive)
+registerCommandHandler('help', onHelpCommand)
 

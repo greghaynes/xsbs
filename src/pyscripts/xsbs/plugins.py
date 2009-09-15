@@ -1,6 +1,6 @@
 from ConfigParser import ConfigParser
 import os, sys, __builtin__
-import sbserver, sbevents
+import sbserver, xsbs.events
 
 plugins = []
 paths = [os.curdir]

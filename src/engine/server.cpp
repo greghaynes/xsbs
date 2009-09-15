@@ -610,8 +610,8 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
         return;
     }
 
-    // process python sockets
-    SbPy::triggerSocketMonitor();
+    // Run python event loop
+    SbPy::update();
        
     // below is network only
 
@@ -646,8 +646,6 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
         lastlogflush = totalmillis;
         server::eventlog.flush();
     }
-
-    SbPy::setTime(totalmillis);
 
     ENetEvent event;
     bool serviced = false;

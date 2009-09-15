@@ -1,4 +1,4 @@
-from settings import PluginConfig
+from xsbs.settings import PluginConfig
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 

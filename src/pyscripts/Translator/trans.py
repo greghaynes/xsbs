@@ -2,7 +2,7 @@ import sbevents, sbserver, sbtools
 import urllib2, urllib
 jsonlib = None
 try:
-	import json#standard in python 2.6
+	import json #standard in python 2.6
 	jsonlib = json
 except:
         try:

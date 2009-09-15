@@ -1,18 +1,23 @@
-import sbserver, sbevents, sbtools, settings
-from settings import PluginConfig
+import sbserver
+from xsbs.settings import PluginConfig
+from xsbs.timers import addTimer
+from xsbs.colors import colordict
 import string
+
+class Banner:
+	def __init__(self, message, delay):
+		self.msg = string.Template(message).substitute(colordict)
+		addTimer(delay, self.sendMessage, (), True)
+	def sendMessage(self):
+		sbserver.message(self.msg)
 
 banners = []
 
 config = PluginConfig('banner')
 default_timeout = config.getOption('Config', 'default_timeout', 180000)
 for option in config.getAllOptions('Banners'):
-	banner = option[1]
+	msg = option[1]
 	delay = config.getOption('Timeouts', option[0], default_timeout, False)
-	banners.append((banner, delay))
+	banners.append(Banner(msg, delay))
 del config
-
-def showBanner(msg, timeout):
-	sbserver.message(msg)
-	sbevents.timerman.addTimer(timeout, showBanner, (msg, timeout))
 

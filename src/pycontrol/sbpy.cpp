@@ -66,13 +66,13 @@ void initEnv()
 		return false;\
 	}
 
-static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *triggerExecQueueFunc, *triggerSocketMonitorFunc, *setTimeFunc;
+static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *updateFunc;
 
 bool initPy()
 {
 	PyObject *pFunc = 0, *pArgs = 0, *pValue = 0, *pluginsModule = 0;
 	
-	pluginsModule = PyImport_ImportModule("sbplugins");
+	pluginsModule = PyImport_ImportModule("xsbs.plugins");
 	SBPY_ERR(pluginsModule)
 	pFunc = PyObject_GetAttrString(pluginsModule, "loadPlugins");
 	SBPY_ERR(pFunc)
@@ -91,9 +91,9 @@ bool initPy()
 		return false;
 	}
 	Py_DECREF(pValue);
-	eventsModule = PyImport_ImportModule("sbevents");
+	eventsModule = PyImport_ImportModule("xsbs.events");
 	SBPY_ERR(eventsModule)
-	triggerEventFunc = PyObject_GetAttrString(eventsModule, "triggerEvent");
+	triggerEventFunc = PyObject_GetAttrString(eventsModule, "triggerServerEvent");
 	SBPY_ERR(triggerEventFunc);
 	if(!PyCallable_Check(triggerEventFunc))
 	{
@@ -107,29 +107,14 @@ bool initPy()
 		fprintf(stderr, "Error: triggerPolicyEvent function could not be loaded.\n");
 		return false;
 	}
-	triggerExecQueueFunc = PyObject_GetAttrString(eventsModule, "triggerSbExecQueue");
-	SBPY_ERR(triggerExecQueueFunc);
-	if(!PyCallable_Check(triggerExecQueueFunc))
+	updateFunc = PyObject_GetAttrString(eventsModule, "update");
+	SBPY_ERR(updateFunc);
+	if(!PyCallable_Check(updateFunc))
 	{
-		fprintf(stderr, "Error: triggerSbExecQueue function could not be loaded.\n");
-		return false;
-	}
-	triggerSocketMonitorFunc = PyObject_GetAttrString(eventsModule, "triggerSocketMonitor");
-	SBPY_ERR(triggerSocketMonitorFunc);
-	if(!PyCallable_Check(triggerSocketMonitorFunc))
-	{
-		fprintf(stderr, "Error: triggerSocketMonitor function could not be loaded.\n");
-		return false;
-	}
-	setTimeFunc = PyObject_GetAttrString(eventsModule, "setTime");
-	SBPY_ERR(setTimeFunc);
-	if(!PyCallable_Check(setTimeFunc))
-	{
-		fprintf(stderr, "Error: setTime function could not be loaded.\n");
+		fprintf(stderr, "Error: update function could not be loaded.\n");
 		return false;
 	}
 	Py_DECREF(pluginsModule);
-	setTime(totalmillis);
 	return true;
 }
 
@@ -138,9 +123,7 @@ void deinitPy()
 	std::cout << "Cleaning up\n";
 	Py_XDECREF(triggerEventFunc);
 	Py_XDECREF(triggerPolicyEventFunc);
-	Py_XDECREF(triggerExecQueueFunc);
-	Py_XDECREF(triggerSocketMonitorFunc);
-	Py_XDECREF(setTimeFunc);
+	Py_XDECREF(updateFunc);
 	Py_Finalize();
 }
 
@@ -310,31 +293,11 @@ bool triggerPolicyEventIntString(const char *name, int cn, const char *text)
 	return triggerFuncEventIntString(name, cn, text, triggerPolicyEventFunc);
 }
 
-void triggerExecQueue()
+void update()
 {
 	PyObject *pargs, *pvalue;
 	pargs = PyTuple_New(0);
-	pvalue = callPyFunc(triggerExecQueueFunc, pargs);
-	if(pvalue)
-		Py_DECREF(pvalue);
-}
-
-void triggerSocketMonitor()
-{
-	PyObject *pargs, *pvalue;
-	pargs = PyTuple_New(0);
-	pvalue = callPyFunc(triggerSocketMonitorFunc, pargs);
-	if(pvalue)
-		Py_DECREF(pvalue);
-}
-
-void setTime(int millis)
-{
-	PyObject *pargs, *pvalue, *pint;
-	pint = PyInt_FromLong(millis);
-	pargs = PyTuple_New(1);
-	PyTuple_SetItem(pargs, 0, pint);
-	pvalue = callPyFunc(setTimeFunc, pargs);
+	pvalue = callPyFunc(updateFunc, pargs);
 	if(pvalue)
 		Py_DECREF(pvalue);
 }

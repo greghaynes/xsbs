@@ -1,26 +1,24 @@
-import sbevents, sbserver, sbtools, pygeoip
-from ConfigParser import ConfigParser
+import sbserver
+from xsbs.settings import PluginConfig
+from xsbs.colors import colordict
+from xsbs.events import registerServerEventHandler
+from xsbs.net import ipLongToString
 import string
+import pygeoip
 
 db = pygeoip.Database('GeoIp/GeoIP.dat')
-conf = ConfigParser()
-conf.read('GeoIp/plugin.conf')
-template = sbtools.green('$user') + sbtools.yellow(' has connected from ') + sbtools.orange('$country')
 
-if conf.has_option('Config', 'template'):
-	template = string.Template(conf.get('Config', 'template'))
-else:
-	template = string.Template(template)
+conf = PluginConfig('geoip')
+template = '${green}${user} ${yellow}has connected from ${orange}${country}'
+template = conf.getOption('Config', 'template', template)
 del conf
 
 def getCountry(ip): 
-	 return db.lookup(sbtools.ipLongToString(ip)).country
+	 return db.lookup(ipLongToString(ip)).country
 
 def announce(cn):
-	msg = template.substitute(user=sbserver.playerName(cn), country=getCountry(sbserver.playerIpLong(cn)))
+	msg = string.Template(template).substitute(colordict, user=sbserver.playerName(cn), country=getCountry(sbserver.playerIpLong(cn)))
 	sbserver.message(msg)
 
-def init():
-	sbevents.registerEventHandler("player_active", announce)
+registerServerEventHandler("player_active", announce)
 
-init()

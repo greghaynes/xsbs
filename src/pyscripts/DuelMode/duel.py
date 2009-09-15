@@ -1,4 +1,8 @@
-import sbserver, sbevents, sbtools
+import sbserver
+from xsbs.colors import red, green
+from xsbs.timers import addTimer
+from xsbs.events import registerServerEventHandler
+from xsbs.commands import registerCommandHandler
 
 currently_dueling = [False, False]
 prev_mastermode = 0
@@ -15,7 +19,7 @@ def finishDuel():
 
 def cancelDuel():
 	endDuel()
-	sbserver.message(sbtools.red('Duel cancelled.'))
+	sbserver.message(red('Duel cancelled.'))
 
 def onMapChange(mapname, mode):
 	if currently_dueling[1]:
@@ -34,18 +38,18 @@ def duelCountdown(count, map, mode):
 		cancelDuel()
 	elif count == 0:
 		currently_dueling[0] = True
-		sbserver.message(sbtools.green('Fight!'))
+		sbserver.message(green('Fight!'))
 		sbserver.setMap(map, mode)
 		sbserver.setPaused(False)
 	else:
-		sbserver.message(sbtools.green('%i seconds' % count))
-		sbevents.timerman.addTimer(1000, duelCountdown, (count-1, map, mode))
+		sbserver.message(green('%i seconds' % count))
+		addTimer(1000, duelCountdown, (count-1, map, mode))
 
 def onDuelCommand(cn, args):
 	args = args.split(' ')
 	players = sbserver.players()
 	if len(players) != 2:
-		sbserver.playerMessage(cn, sbtools.red('There must be only two unspectated players to enter duel mode.'))
+		sbserver.playerMessage(cn, red('There must be only two unspectated players to enter duel mode.'))
 	else:
 		if len(args) == 2:
 			map = args[0]
@@ -54,16 +58,16 @@ def onDuelCommand(cn, args):
 			map = args[0]
 			mode = sbserver.mapMode()
 		else:
-			sbserver.message(cn, sbtools.red('Usage: #duel <mapname> (mode)'))
+			sbserver.message(cn, red('Usage: #duel <mapname> (mode)'))
 			return
 		duelers[0] = players[0]
 		duelers[1] = players[1]
 		prev_mastermode = sbserver.masterMode()
 		sbserver.setMasterMode(2)
-		sbserver.message(sbtools.green('Duel begins in...'))
+		sbserver.message(green('Duel begins in...'))
 		duelCountdown(5, map, mode)
 
-sbevents.registerCommandHandler('duel', onDuelCommand)
-sbevents.registerEventHandler('player_disconnect', onPlayerDisconnect)
-sbevents.registerEventHandler('map_changed', onMapChange)
+registerCommandHandler('duel', onDuelCommand)
+registerServerEventHandler('player_disconnect', onPlayerDisconnect)
+registerServerEventHandler('map_changed', onMapChange)
 

@@ -1,11 +1,13 @@
-import sbevents, sbserver, sbtools
+import sbserver
+from xsbs.colors import green, orange
+from xsbs.events import registerServerEventHandler
 import string
 
 killsprees = {}
-messages = { 5: string.Template(sbtools.green('$name') + ' is on a ' + sbtools.orange('KILLING SPREE!')),
-	10: string.Template(sbtools.green('$name') + ' is ' + sbtools.orange('UNSTOPABLE!')),
-	15: string.Template(sbtools.green('$name') + ' is ' + sbtools.orange('GODLIKE!')) }
-endmsg = string.Template(sbtools.orange('$name') + '\'s killing spree ended by ' + sbtools.green('$endername'))
+messages = { 5: string.Template(green('$name') + ' is on a ' + orange('KILLING SPREE!')),
+	10: string.Template(green('$name') + ' is ' + orange('UNSTOPABLE!')),
+	15: string.Template(green('$name') + ' is ' + orange('GODLIKE!')) }
+endmsg = string.Template(orange('$name') + '\'s killing spree ended by ' + green('$endername'))
 
 def onPlayerActive(cn):
 	killsprees[cn] = 0
@@ -23,7 +25,7 @@ def onPlayerFrag(cn, tcn):
 def onPlayerTeamKill(cn, tcn):
 	killsprees[cn] = 0
 
-sbevents.registerEventHandler('player_active', onPlayerActive)
-sbevents.registerEventHandler('player_frag', onPlayerFrag)
-sbevents.registerEventHandler('player_teamkill', onPlayerTeamKill)
+registerServerEventHandler('player_active', onPlayerActive)
+registerServerEventHandler('player_frag', onPlayerFrag)
+registerServerEventHandler('player_teamkill', onPlayerTeamKill)
 

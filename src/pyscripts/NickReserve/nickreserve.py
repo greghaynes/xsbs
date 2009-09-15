@@ -2,7 +2,11 @@ from DB.db import dbmanager
 from sqlalchemy.orm.exc import NoResultFound
 from UserManager.usermanager import session, NickAccount, isLoggedIn, loggedInAs
 from Bans.bans import ban
-import sbserver, sbevents, sbtools
+import sbserver
+from xsbs.events import registerServerEventHandler
+from xsbs.commands import registerCommandHandler
+from xsbs.timers import addTimer
+from xsbs.colors import red, blue
 
 def warnNickReserved(cn, nickacct, count):
 	if cn not in sbserver.clients():
@@ -20,8 +24,8 @@ def warnNickReserved(cn, nickacct, count):
 		ban(cn, 0, 'Use of reserved name')
 		return
 	remaining = 25-(count*5)
-	sbserver.playerMessage(cn, sbtools.red('WARNING: ') + sbtools.blue('Your name is reserved. You have %i seconds to login or be kicked.' % remaining))
-	sbevents.registerTimerHandler(5000, warnNickReserved, (cn, nickacct, count+1))
+	sbserver.playerMessage(cn, red('WARNING: ') + blue('Your name is reserved. You have %i seconds to login or be kicked.' % remaining))
+	addTimer(5000, warnNickReserved, (cn, nickacct, count+1))
 
 def onPlayerActive(cn):
 	nick = sbserver.playerName(cn)
@@ -36,21 +40,21 @@ def onPlayerNameChanged(cn, new_name):
 
 def onReserveCommand(cn, args):
 	if args != '':
-		sbserver.playerMessage(sbtools.red('Usage: #reserve'))
+		sbserver.playerMessage(red('Usage: #reserve'))
 		return
 	nick = sbserver.playerName(cn)
 	if not isLoggedIn(cn):
-		sbserver.playerMessage(sbtools.red('You must be logged in to reserve your name.'))
+		sbserver.playerMessage(red('You must be logged in to reserve your name.'))
 		return
 	user = loggedInAs(cn)
 	if reserver(nick):
-		sbserver.playerMessage(sbtools.red('Name is already reserved.'))
+		sbserver.playerMessage(red('Name is already reserved.'))
 		return
 	rn = ReservedNick(nick, user.id)
 	session.add(rn)
-	sbserver.playerMessage(cn, sbtools.green('Your account has been created.'))
+	sbserver.playerMessage(cn, green('Your account has been created.'))
 
-sbevents.registerEventHandler('player_active', onPlayerActive)
-sbevents.registerEventHandler('player_name_changed', onPlayerNameChanged)
-sbevents.registerCommandHandler('reserve', onReserveCommand)
+registerServerEventHandler('player_active', onPlayerActive)
+registerServerEventHandler('player_name_changed', onPlayerNameChanged)
+registerCommandHandler('reserve', onReserveCommand)
 

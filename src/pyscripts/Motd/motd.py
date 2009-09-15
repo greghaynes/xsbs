@@ -1,5 +1,7 @@
-import sbevents, sbserver, sbtools
-from settings import PluginConfig
+import sbserver
+from xsbs.settings import PluginConfig
+from xsbs.colors import colordict
+from xsbs.events import registerServerEventHandler
 import string
 
 
@@ -9,6 +11,7 @@ def greet(cn):
 config = PluginConfig('motd')
 motdstring = config.getOption('Config', 'template', '${orange}Welcome to a ${red}XSBS ${orange}server')
 del config
-motdstring = string.Template(motdstring).substitute(sbtools.colordict)
-sbevents.registerEventHandler("player_active", greet)
+
+motdstring = string.Template(motdstring).substitute(colordict)
+registerServerEventHandler("player_active", greet)
 

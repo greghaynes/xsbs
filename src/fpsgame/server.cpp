@@ -1445,12 +1445,6 @@ namespace server
             checkvotes(true);
         }
 
-        if(true)
-        {
-            checkexecqueue = false;
-            SbPy::triggerExecQueue();
-        }
-
 	if(restart_py)
 	{
 		SbPy::restartPy();

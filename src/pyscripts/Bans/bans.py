@@ -1,5 +1,8 @@
-import sbserver, sbevents, sbtools
-from settings import PluginConfig
+import sbserver
+from xsbs.settings import PluginConfig
+from xsbs.colors import red, colordict
+from xsbs.events import registerServerEventHandler, registerPolicyEventHandler
+from xsbs.commands import registerCommandHandler
 import time, string
 
 banned_ips = {}
@@ -16,12 +19,13 @@ def onBanCmd(cn, text):
 	sp = text.split(' ')
 	try:
 		if sbserver.playerPrivilege(cn) == 0:
-			sbserver.playerMessage(cn, sbtools.red('Insufficient privileges.'))
+			sbserver.playerMessage(cn, red('Insufficient privileges.'))
 			return
 		tcn = int(sp[0])
-		ip = sbserver.playerIpLong(tcn)
-		if not ip:
-			sbserver.message(cn, 'Invalid cn')
+		try:
+			ip = sbserver.playerIpLong(tcn)
+		except ValueEror:
+			sbserver.message(cn, red('Invalid cn'))
 			return
 		reason = ''
 		length = 0
@@ -35,11 +39,11 @@ def onBanCmd(cn, text):
 			length = int(default_ban_length)
 		ban(cn, length, reason)
 	except (ValueError, KeyError):
-		sbserver.playerMessage(cn, sbtools.red('Usage: #ban <cn> (duration) (reason)'))
+		sbserver.playerMessage(cn, red('Usage: #ban <cn> (duration) (reason)'))
 
 def ban(cn, seconds, reason):
 	ip = sbserver.playerIpLong(cn)
-	msg = ban_message.substitute(sbtools.colordict, name=sbserver.playerName(cn), seconds=seconds, reason=reason)
+	msg = ban_message.substitute(colordict, name=sbserver.playerName(cn), seconds=seconds, reason=reason)
 	sbserver.message(msg)
 	expiration = time.time() + seconds
 	if banned_ips.has_key(ip):
@@ -60,8 +64,8 @@ def allowClient(cn):
 	return True
 
 def init():
-	sbevents.registerPolicyEventHandler("allow_connect", allowClient)
-	sbevents.registerCommandHandler('ban', onBanCmd)
-	sbevents.registerEventHandler("player_ban", ban)
+	registerPolicyEventHandler("allow_connect", allowClient)
+	registerCommandHandler('ban', onBanCmd)
+	registerServerEventHandler("player_ban", ban)
 
 init()
