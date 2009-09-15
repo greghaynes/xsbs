@@ -618,7 +618,11 @@ namespace server
                 else if((authname || ci->local) && clients[i]->privilege<=PRIV_MASTER) continue;
                 else return;
             }
-            if(haspass) ci->privilege = PRIV_ADMIN;
+            if(haspass)
+	    {
+		    ci->privilege = PRIV_ADMIN;
+		    SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass);
+	    }
 	    else if(SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass))
             {
                 setcimaster(ci);

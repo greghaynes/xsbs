@@ -57,6 +57,7 @@ def onRegisterCommand(cn, args):
 	except NoResultFound:
 		user = User(args[0], args[1])
 		session.add(user)
+		sbserver.playerMessage(cn, sbtools.green('Account created'))
 		return
 	sbserver.playerMessage(cn, sbtools.red('An account with that email address already exists.'))
 
@@ -88,7 +89,8 @@ def onSetMaster(cn, givenhash):
 	try:
 		na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
 	except NoResultFound:
-		sbserver.playerMessage(cn, sbtools.red('Your name is not assigned to any accounts.'))
+		if sbserver.playerPrivilege(cn) <= 1:
+			sbserver.playerMessage(cn, sbtools.red('Your name is not assigned to any accounts.'))
 		return
 	nickhash = sbserver.hashPassword(cn, na.user.password)
 	if givenhash == nickhash:
