@@ -34,5 +34,5 @@ def triggerPolicyEvent(event, args):
 
 def update():
 	timers.update()
-	asyncore.loop(0)
+	asyncore.loop(0, False, None, count=1)
 

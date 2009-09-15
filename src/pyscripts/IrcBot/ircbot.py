@@ -15,14 +15,14 @@ class IrcBot(asyncore.dispatcher):
 		self.servername = servername
 		self.nickname = nickname
 		self.port = port
-		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.isConnected = False
 		self.channels = []
 		self.msg_handlers = []
 		self.buff = ''
+		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+		self.connect((self.servername, self.port))
 		self.writebuff = 'NICK %s\r\n' % self.nickname
 		self.writebuff += 'USER %s %s %s :%s\r\n' % (self.nickname, self.nickname, self.nickname, self.nickname)
-		self.connect((self.servername, self.port))
 	def __del__(self):
 		self.close()
 	def handle_connect(self):
