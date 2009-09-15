@@ -315,6 +315,7 @@ namespace server
 namespace server
 {
 
+	extern int gamemillis;
 	extern vector<clientinfo *> connects, clients, bots;
 	extern Log eventlog;
 	extern bool masterupdate;

@@ -352,6 +352,11 @@ static PyObject *restartPy(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *uptime(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("i", server::gamemillis);
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -378,6 +383,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"setMasterMode", setMasterMode, METH_VARARGS, "Set server master mode."},
 	{"masterMode", masterMode, METH_VARARGS, "Server master mode."},
 	{"reload", restartPy, METH_VARARGS, "Reload python modules."},
+	{"uptime", uptime, METH_VARARGS, "Number of milliseconds server has been running."},
 	{NULL, NULL, 0, NULL}
 };
 
