@@ -1,5 +1,5 @@
 import sbserver
-from xsbs.events import addTimer
+from xsbs.timers import addTimer
 from Bans.bans import ban
 
 class PingLimiter:

@@ -21,11 +21,11 @@ class TimerManager:
 	def addTimer(self, delay, func, args=(), persistent=False):
 		timer = Timer(self.currtime, delay, func, args, persistent)
 		i = 0
-		for iter in timers:
+		for iter in self.timers:
 			if not iter.isTimedOut(timer.timeout):
-				timers.insert(i, timer)
+				self.timers.insert(i, timer)
 				return
-		timers.append(timer)
+		self.timers.append(timer)
 	def update(self):
 		self.currtime = sbserver.uptime()
 		i = 0

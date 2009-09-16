@@ -1,29 +1,30 @@
-import sbserver, sbevents, sbtools
-import sbplugins
+import sbserver
+from xsbs.commands import registerCommandHandler
+from xsbs.colors import red, yellow, blue
 
 def onPauseCmd(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, sbtools.red('Usage: #pause'))
+		sbserver.playerMessage(cn, red('Usage: #pause'))
 		return
 	sbserver.setPaused(True)
 
 def onResumeCmd(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, sbtools.red('Usage: #resume'))
+		sbserver.playerMessage(cn, red('Usage: #resume'))
 		return
 	sbserver.setPaused(False)
 
 def onReloadCmd(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, sbtools.red('Usage: #reload'))
+		sbserver.playerMessage(cn, red('Usage: #reload'))
 	else:
 		if sbserver.playerPrivilege(cn) > 1:
-			sbserver.playerMessage(cn, sbtools.yellow('NOTICE: ') + sbtools.blue('Reloading server plugins.  Fasten your seatbelts...'))
+			sbserver.playerMessage(cn, yellow('NOTICE: ') + blue('Reloading server plugins.  Fasten your seatbelts...'))
 			sbplugins.reload()
 		else:
 			sbserver.playerMessage(cn, 'Insufficient privileges')
 
-sbevents.registerCommandHandler('pause', onPauseCmd)
-sbevents.registerCommandHandler('resume', onResumeCmd)
-sbevents.registerCommandHandler('reload', onReloadCmd)
+registerCommandHandler('pause', onPauseCmd)
+registerCommandHandler('resume', onResumeCmd)
+registerCommandHandler('reload', onReloadCmd)
 
