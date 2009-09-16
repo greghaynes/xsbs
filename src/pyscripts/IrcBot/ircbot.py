@@ -28,8 +28,7 @@ class IrcBot(asyncore.dispatcher):
 		if ipaddress != None:
 			self.bind((ipaddress, 0))
 		self.connect((self.servername, self.port))
-		self.writebuff = 'NICK %s\r\n' % self.nickname
-		self.writebuff += 'USER %s %s %s :%s\r\n' % (self.nickname, self.nickname, self.nickname, self.nickname)
+		self.sendNick()
 	def __del__(self):
 		self.close()
 	def handle_connect(self):
@@ -39,6 +38,9 @@ class IrcBot(asyncore.dispatcher):
 		self.writebuff = self.writebuff[sent:]
 	def writeable(self):
 		return len(self.writebuff) > 0
+	def sendNick(self):
+		self.writebuff = 'NICK %s\r\n' % self.nickname
+		self.writebuff += 'USER %s %s %s :%s\r\n' % (self.nickname, self.nickname, self.nickname, self.nickname)
 	def onWelcome(self):
 		self.isConnected = True
 		for channel in self.channels:
@@ -54,6 +56,7 @@ class IrcBot(asyncore.dispatcher):
 	def handle_read(self):
 		self.buff += self.recv(4096)
 		tmp_buff = self.buff.split('\n')
+		print tmp_buff
 		self.buff = tmp_buff.pop()
 		for line in tmp_buff:
 			line = line.strip().split()
@@ -71,6 +74,11 @@ class IrcBot(asyncore.dispatcher):
 						text += t
 				for handler in self.msg_handlers:
 					handler(self, user, text)
+			elif line[1] == '433':
+				print 'IRC Bot: Nickname is in use!'
+				self.nickname = self.nickname + '1'
+				print 'IRC Bot: Using %s' % self.nickname
+				self.sendNick()
 
 bot = IrcBot(servername, nickname, port)
 bot.join(channel)
