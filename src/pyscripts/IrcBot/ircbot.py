@@ -1,4 +1,5 @@
 import sbserver
+from ConfigParser import NoOptionError
 from xsbs.settings import PluginConfig
 from xsbs.events import registerServerEventHandler
 import asyncore, socket
@@ -8,6 +9,10 @@ channel = config.getOption('Config', 'channel', '#xsbs-newserver')
 servername = config.getOption('Config', 'servername', 'irc.gamesurge.net')
 nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
 port = int(config.getOption('Config', 'port', '6667'))
+try:
+	ipaddress = config.getOption('Config', 'ipaddress', None, False)
+except NoOptionError:
+	ipaddress = None
 
 class IrcBot(asyncore.dispatcher):
 	def __init__(self, servername, nickname, port=6667):
@@ -21,6 +26,8 @@ class IrcBot(asyncore.dispatcher):
 		self.buff = ''
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.connect((self.servername, self.port))
+		if ipaddress != None:
+			self.bind(socket.gethostbyaddr(ipaddress))
 		self.writebuff = 'NICK %s\r\n' % self.nickname
 		self.writebuff += 'USER %s %s %s :%s\r\n' % (self.nickname, self.nickname, self.nickname, self.nickname)
 	def __del__(self):
