@@ -66,6 +66,16 @@ def onHelpCommand(cn, args):
 	else:
 		msgHelpText(cn, args[0])
 
+def onPlayerCommands(cn, args):
+	if args != '':
+		sbserver.playerMessage(cn, red('Usage: #playercommands'))
+	else:
+		msg = blue('Available commands: ')
+		for command in helptexts.keys():
+			msg += '#' + command + ' '
+		sbserver.playerMessage(cn, orange(msg))
+
 registerServerEventHandler('player_active', onPlayerActive)
 registerCommandHandler('help', onHelpCommand)
+registerCommandHandler('playercommands', onPlayerCommands)
 

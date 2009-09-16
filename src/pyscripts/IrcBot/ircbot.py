@@ -56,7 +56,6 @@ class IrcBot(asyncore.dispatcher):
 	def handle_read(self):
 		self.buff += self.recv(4096)
 		tmp_buff = self.buff.split('\n')
-		print tmp_buff
 		self.buff = tmp_buff.pop()
 		for line in tmp_buff:
 			line = line.strip().split()
