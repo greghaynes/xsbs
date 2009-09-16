@@ -1,6 +1,7 @@
 import sbserver
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import red, yellow, blue
+from xsbs.plugins import reload as pluginReload
 
 def onPauseCmd(cn, args):
 	if args != '':
@@ -20,7 +21,7 @@ def onReloadCmd(cn, args):
 	else:
 		if sbserver.playerPrivilege(cn) > 1:
 			sbserver.playerMessage(cn, yellow('NOTICE: ') + blue('Reloading server plugins.  Fasten your seatbelts...'))
-			sbplugins.reload()
+			pluginReload()
 		else:
 			sbserver.playerMessage(cn, 'Insufficient privileges')
 

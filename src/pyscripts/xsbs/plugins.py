@@ -49,7 +49,7 @@ def loadPlugins():
 		plugin.load()
 
 def reload():
-	sbevents.triggerEvent('reload', ())
+	xsbs.events.triggerServerEvent('reload', ())
 	sbserver.reload()
 	return
 	for mod in sys.modules.keys():
