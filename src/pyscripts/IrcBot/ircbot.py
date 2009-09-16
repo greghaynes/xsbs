@@ -25,9 +25,9 @@ class IrcBot(asyncore.dispatcher):
 		self.msg_handlers = []
 		self.buff = ''
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.connect((self.servername, self.port))
 		if ipaddress != None:
-			self.bind(socket.gethostbyaddr(ipaddress))
+			self.bind((ipaddress, 0))
+		self.connect((self.servername, self.port))
 		self.writebuff = 'NICK %s\r\n' % self.nickname
 		self.writebuff += 'USER %s %s %s :%s\r\n' % (self.nickname, self.nickname, self.nickname, self.nickname)
 	def __del__(self):
