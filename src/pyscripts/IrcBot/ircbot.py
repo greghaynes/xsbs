@@ -30,6 +30,7 @@ class IrcBot(asyncore.dispatcher):
 		if ipaddress != None:
 			self.bind((ipaddress, 0))
 		self.connect((self.servername, self.port))
+		self.connect_count = 1
 		self.sendNick()
 	def __del__(self):
 		self.close()
@@ -38,9 +39,14 @@ class IrcBot(asyncore.dispatcher):
 	def handle_close(self):
 		print 'IRC Bot: connection closed.'
 		print 'IRC Bot: reconnecting...'
-		self.connect()
+		self.connect_count += 1
+		if self.connect_count >= 5:
+			print 'IRC Bot: Connect failed 5 times.  Quitting.'
+		else:
+			self.connect((self.servername, self.port))
 	def handle_connect(self):
 		print 'IRC Bot: conneced'
+		self.connect_count = 0
 	def handle_write(self):
 		sent = self.send(self.writebuff)
 		self.writebuff = self.writebuff[sent:]
