@@ -2,6 +2,7 @@ import sbserver
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import red, yellow, blue
 from xsbs.plugins import reload as pluginReload
+from Motd.motd import motdstring
 
 def onPauseCmd(cn, args):
 	if args != '':
@@ -25,7 +26,11 @@ def onReloadCmd(cn, args):
 		else:
 			sbserver.playerMessage(cn, 'Insufficient privileges')
 
+def onInfoCmd(cn, args):
+	sbserver.playerMessage(cn, motdstring)
+
 registerCommandHandler('pause', onPauseCmd)
 registerCommandHandler('resume', onResumeCmd)
 registerCommandHandler('reload', onReloadCmd)
+registerCommandHandler('info', onInfoCmd)
 
