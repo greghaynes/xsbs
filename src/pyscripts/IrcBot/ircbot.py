@@ -70,7 +70,7 @@ class IrcBot(asyncore.dispatcher):
 	def sendStatus(self, sender, message):
 		clients = sbserver.clients()
 		players = sbserver.players()
-		msg = '%i clients: %i players, %i spectators' % (len(clients), len(players), len(clients) - len(players))
+		msg = '%i clients: %i players, %i spectators Playing %s on %s' % (len(clients), len(players), len(clients) - len(players), sbserver.modeName(sbserver.gameMode()), sbserver.mapName())
 		self.privMsg(channel, msg)
 	def handle_privmsg(self, sender, message):
 		if message[0] == '!':

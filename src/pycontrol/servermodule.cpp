@@ -406,7 +406,7 @@ static PyObject *gameMode(PyObject *self, PyObject *args)
 
 static PyObject *mapName(PyObject *self, PyObject *args)
 {
-	return Py_BuildValue("i", server::smapname);
+	return Py_BuildValue("s", server::smapname);
 }
 
 static PyObject *modeName(PyObject *self, PyObject *args)
@@ -461,8 +461,8 @@ static PyMethodDef ModuleMethods[] = {
 	{"setMap", setMap, METH_VARARGS, "Set to map and mode."},
 	{"setMasterMode", setMasterMode, METH_VARARGS, "Set server master mode."},
 	{"masterMode", masterMode, METH_VARARGS, "Server master mode."},
-	{"gameMode", masterMode, METH_VARARGS, "Current game mode."},
-	{"mapName", masterMode, METH_VARARGS, "Current map name."},
+	{"gameMode", gameMode, METH_VARARGS, "Current game mode."},
+	{"mapName", mapName, METH_VARARGS, "Current map name."},
 	{"modeName", modeName, METH_VARARGS, "Name of game mode."},
 	{"reload", restartPy, METH_VARARGS, "Reload python modules."},
 	{"uptime", uptime, METH_VARARGS, "Number of milliseconds server has been running."},
