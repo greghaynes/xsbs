@@ -37,7 +37,7 @@ def onBanCmd(cn, text):
 			length = int(sp[1])
 		else:
 			length = int(default_ban_length)
-		ban(cn, length, reason)
+		ban(tcn, length, reason)
 	except (ValueError, KeyError):
 		sbserver.playerMessage(cn, red('Usage: #ban <cn> (duration) (reason)'))
 
