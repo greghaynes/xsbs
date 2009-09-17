@@ -31,6 +31,8 @@ class IrcBot(asyncore.dispatcher):
 		self.sendNick()
 	def __del__(self):
 		self.close()
+	def quit(self):
+		self.send('QUIT :XSBS - eXtensible SauerBraten Server\r\n')
 	def handle_connect(self):
 		pass
 	def handle_write(self):
@@ -97,6 +99,9 @@ def onMsg(cn, text):
 def onTeamMsg(cn, text):
 	bot.privMsg(channel, '%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
 
+def onReload():
+	bot.quit()
+
 event_abilities = {
 	'player_active': ('player_active', onPlayerActive),
 	'player_disconnect': ('player_disconnect', onPlayerDisconnect),
@@ -110,4 +115,6 @@ for key in event_abilities.keys():
 if config.getOption('Abilities', 'message_gateway', 'no') == 'yes':
 	bot.msg_handlers.append(onIrcMsg)
 del config
+
+registerServerEventHandler('reload', onReload)
 
