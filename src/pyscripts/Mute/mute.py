@@ -13,6 +13,9 @@ def allowMsg(cn, text):
 
 def onMuteCommand(cn, args):
 	try:
+		if sbserver.playerPrivilege(cn) == 0:
+			sbserver.playerMessage(cn, red('Insufficient privileges'))
+			return
 		args = args.split(' ')
 		tcn = int(args[0])
 		if len(args) > 1:
@@ -30,6 +33,9 @@ def onMuteCommand(cn, args):
 
 def onUnmuteCommand(cn, args):
 	try:
+		if sbserver.playerPrivilege(cn) == 0:
+			sbserver.playerMessage(cn, red('Insufficient privileges'))
+			return
 		args = args.split(' ')
 		tcn = int(args[0])
 		if len(args) > 1:
