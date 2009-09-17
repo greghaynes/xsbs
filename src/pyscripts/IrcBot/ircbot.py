@@ -35,8 +35,12 @@ class IrcBot(asyncore.dispatcher):
 		self.close()
 	def quit(self):
 		self.send('QUIT :XSBS - eXtensible SauerBraten Server\r\n')
+	def handle_close(self):
+		print 'IRC Bot: connection closed.'
+		print 'IRC Bot: reconnecting...'
+		self.connect()
 	def handle_connect(self):
-		pass
+		print 'IRC Bot: conneced'
 	def handle_write(self):
 		sent = self.send(self.writebuff)
 		self.writebuff = self.writebuff[sent:]
@@ -99,16 +103,19 @@ bot = IrcBot(servername, nickname, port)
 bot.join(channel)
 
 def onPlayerActive(cn):
-	bot.privMsg(channel, 'Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
+	bot.privMsg(channel, 'CONNECT         Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
 
 def onPlayerDisconnect(cn):
-	bot.privMsg(channel, 'Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn))
+	bot.privMsg(channel, 'DISCONNECT      Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn))
 
 def onMsg(cn, text):
-	bot.privMsg(channel, '%s (%i): %s' % (sbserver.playerName(cn), cn, text))
+	bot.privMsg(channel, 'MESSAGE         %s (%i): %s' % (sbserver.playerName(cn), cn, text))
 
 def onTeamMsg(cn, text):
-	bot.privMsg(channel, '%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
+	bot.privMsg(channel, 'MESSAGE (TEAM)  %s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
+
+def onMapChange(map, mode):
+	bot.privMsg(channel, 'MAP CHANGE      %s (%i)' % (map, mode))
 
 def onReload():
 	bot.quit()
@@ -120,7 +127,9 @@ event_abilities = {
 	'player_active': ('player_active', onPlayerActive),
 	'player_disconnect': ('player_disconnect', onPlayerDisconnect),
 	'message': ('player_message', onMsg),
-	'message_team': ('player_message_team', onTeamMsg) }
+	'message_team': ('player_message_team', onTeamMsg),
+	'map_change': ('map_change', onMapChange),
+}
 
 for key in event_abilities.keys():
 	if config.getOption('Abilities', key, 'no') == 'yes':
