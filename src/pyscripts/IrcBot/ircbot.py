@@ -22,8 +22,10 @@ class IrcBot(asyncore.dispatcher):
 		self.port = port
 		self.isConnected = False
 		self.channels = []
-		self.msg_handlers = []
 		self.buff = ''
+		self.msgcommands = {
+				'status': self.sendStatus
+		}
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 		if ipaddress != None:
 			self.bind((ipaddress, 0))
@@ -55,6 +57,19 @@ class IrcBot(asyncore.dispatcher):
 			self.channels.append(channel)
 	def privMsg(self, user, message):
 		self.writebuff += 'PRIVMSG %s :%s\r\n' % (user, message)
+	def sendStatus(self, sender, message):
+		clients = sbserver.clients()
+		players = sbserver.players()
+		msg = '%i clients: %i players, %i spectators' % (len(clients), len(players), len(clients) - len(players))
+		self.privMsg(channel, msg)
+	def handle_privmsg(self, sender, message):
+		if message[0] == '!':
+			try:
+				self.msgcommands[message[1:]](sender, message)
+			except KeyError:
+				self.privMsg(channel, 'Invalid command')
+		else:
+			sbserver.message('(Remote User) %s: %s' % (sender, message))
 	def handle_read(self):
 		self.buff += self.recv(4096)
 		tmp_buff = self.buff.split('\n')
@@ -73,8 +88,7 @@ class IrcBot(asyncore.dispatcher):
 					for t in line[4:]:
 						text += ' '
 						text += t
-				for handler in self.msg_handlers:
-					handler(self, user, text)
+				self.handle_privmsg(user, text)
 			elif line[1] == '433':
 				print 'IRC Bot: Nickname is in use!'
 				self.nickname = self.nickname + '1'
@@ -83,9 +97,6 @@ class IrcBot(asyncore.dispatcher):
 
 bot = IrcBot(servername, nickname, port)
 bot.join(channel)
-
-def onIrcMsg(bot, username, msg):
-	sbserver.message('(Remote User) %s: %s' % (username, msg))
 
 def onPlayerActive(cn):
 	bot.privMsg(channel, 'Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
@@ -102,6 +113,9 @@ def onTeamMsg(cn, text):
 def onReload():
 	bot.quit()
 
+def onStop():
+	bot.quit()
+
 event_abilities = {
 	'player_active': ('player_active', onPlayerActive),
 	'player_disconnect': ('player_disconnect', onPlayerDisconnect),
@@ -112,9 +126,8 @@ for key in event_abilities.keys():
 	if config.getOption('Abilities', key, 'no') == 'yes':
 		ev = event_abilities[key]
 		registerServerEventHandler(ev[0], ev[1])
-if config.getOption('Abilities', 'message_gateway', 'no') == 'yes':
-	bot.msg_handlers.append(onIrcMsg)
 del config
 
 registerServerEventHandler('reload', onReload)
+registerServerEventHandler('server_stop', onStop)
 
