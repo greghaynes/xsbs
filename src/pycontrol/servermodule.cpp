@@ -393,6 +393,21 @@ static PyObject *setMasterMode(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *modeName(PyObject *self, PyObject *args)
+{
+	int mm;
+	const char *name;
+	if(!PyArg_ParseTuple(args, "i", &mm))
+		return 0;
+	if(!m_valid(mm))
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid mode");
+		return 0;
+	}
+	name = server::modename(mm);
+	return Py_BuildValue("s", name);
+}
+
 static PyObject *masterMode(PyObject *self, PyObject *args)
 {
 	PyObject *ret;
@@ -437,6 +452,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"setMap", setMap, METH_VARARGS, "Set to map and mode."},
 	{"setMasterMode", setMasterMode, METH_VARARGS, "Set server master mode."},
 	{"masterMode", masterMode, METH_VARARGS, "Server master mode."},
+	{"modeName", modeName, METH_VARARGS, "Name of game mode."},
 	{"reload", restartPy, METH_VARARGS, "Reload python modules."},
 	{"uptime", uptime, METH_VARARGS, "Number of milliseconds server has been running."},
 	{NULL, NULL, 0, NULL}

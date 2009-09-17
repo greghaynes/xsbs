@@ -115,7 +115,7 @@ def onTeamMsg(cn, text):
 	bot.privMsg(channel, 'MESSAGE (TEAM)  %s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
 
 def onMapChange(map, mode):
-	bot.privMsg(channel, 'MAP CHANGE      %s (%i)' % (map, mode))
+	bot.privMsg(channel, 'MAP CHANGE      %s (%s)' % (map, sbserver.modeName(mode)))
 
 def onReload():
 	bot.quit()
@@ -128,7 +128,7 @@ event_abilities = {
 	'player_disconnect': ('player_disconnect', onPlayerDisconnect),
 	'message': ('player_message', onMsg),
 	'message_team': ('player_message_team', onTeamMsg),
-	'map_change': ('map_change', onMapChange),
+	'map_change': ('map_changed', onMapChange),
 }
 
 for key in event_abilities.keys():
