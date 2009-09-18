@@ -660,7 +660,24 @@ namespace server
         allowedips.setsize(0);
         string msg;
         if(val && authname) formatstring(msg)("%s claimed %s as '\fs\f5%s\fr'", colorname(ci), name, authname);
-        else formatstring(msg)("%s %s %s", colorname(ci), val ? "claimed" : "relinquished", name);
+        else 
+        {
+            formatstring(msg)("%s %s %s", colorname(ci), val ? "claimed" : "relinquished", name);
+	    if(val)
+	    {
+		    if(ci->privilege == PRIV_MASTER)
+		    	SbPy::triggerEventInt("player_gained_master", ci->clientnum);
+		    else
+                        SbPy::triggerEventInt("player_gained_admin", ci->clientnum);
+	    }
+	    else
+	    {
+		    if(ci->privilege == PRIV_MASTER)
+		    	SbPy::triggerEventInt("player_relinq_master", ci->clientnum);
+		    else
+                        SbPy::triggerEventInt("player_relinq_admin", ci->clientnum);
+	    }
+        }
         sendservmsg(msg);
         currentmaster = val ? ci->clientnum : -1;
         masterupdate = true;

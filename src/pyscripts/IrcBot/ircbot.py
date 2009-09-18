@@ -85,7 +85,6 @@ class IrcBot(asyncore.dispatcher):
 		tmp_buff = self.buff.split('\n')
 		self.buff = tmp_buff.pop()
 		for line in tmp_buff:
-			print line
 			line = line.strip().split()
 			if line[0] == 'PING':
 				self.writebuff += 'PONG %s\r\n' % line[1]
@@ -124,6 +123,18 @@ def onTeamMsg(cn, text):
 def onMapChange(map, mode):
 	bot.privMsg(channel, '\x035MAP CHANGE      \x03%s (%s)' % (map, sbserver.modeName(mode)))
 
+def onGainMaster(cn):
+	bot.privMsg(channel, '\x037MASTER          \x03%s gained master' % sbserver.playerName(cn))
+
+def onGainAdmin(cn):
+	bot.privMsg(channel, '\x037ADMIN           \x03%s gained admin' % sbserver.playerName(cn))
+
+def onReleaseAdmin(cn):
+	bot.privMsg(channel, '\x037ADMIN RELINQ    \x03%s released admin' % sbserver.playerName(cn))
+
+def onReleaseMaster(cn):
+	bot.privMsg(channel, '\x037MASTER RELINQ   \x03%s released master' % sbserver.playerName(cn))
+
 def onReload():
 	bot.quit()
 
@@ -136,6 +147,10 @@ event_abilities = {
 	'message': ('player_message', onMsg),
 	'message_team': ('player_message_team', onTeamMsg),
 	'map_change': ('map_changed', onMapChange),
+	'gain_admin': ('player_gained_admin', onGainAdmin),
+	'gain_master': ('player_gained_master', onGainMaster),
+	'relinquish_admin': ('player_relinq_admin', onReleaseAdmin),
+	'relinquish_master': ('player_relinq_master', onReleaseMaster),
 }
 
 for key in event_abilities.keys():
