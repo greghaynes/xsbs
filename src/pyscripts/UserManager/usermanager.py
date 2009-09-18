@@ -116,6 +116,7 @@ registerCommandHandler('register', onRegisterCommand)
 registerCommandHandler('login', onLoginCommand)
 registerCommandHandler('linkname', onLinkName)
 registerServerEventHandler('server_stop', onShutdown)
+registerServerEventHandler('reload', onShutdown)
 registerServerEventHandler('player_disconnect', onDisconnect)
 registerPolicyEventHandler('player_setmaster', onSetMaster)
 
