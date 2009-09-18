@@ -85,6 +85,7 @@ class IrcBot(asyncore.dispatcher):
 		tmp_buff = self.buff.split('\n')
 		self.buff = tmp_buff.pop()
 		for line in tmp_buff:
+			print line
 			line = line.strip().split()
 			if line[0] == 'PING':
 				self.writebuff += 'PONG %s\r\n' % line[1]
@@ -109,19 +110,19 @@ bot = IrcBot(servername, nickname, port)
 bot.join(channel)
 
 def onPlayerActive(cn):
-	bot.privMsg(channel, 'CONNECT         Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
+	bot.privMsg(channel, '\x0311CONNECT         \x03Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
 
 def onPlayerDisconnect(cn):
-	bot.privMsg(channel, 'DISCONNECT      Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn))
+	bot.privMsg(channel, '\x0311DISCONNECT      \x03Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn))
 
 def onMsg(cn, text):
-	bot.privMsg(channel, 'MESSAGE         %s (%i): %s' % (sbserver.playerName(cn), cn, text))
+	bot.privMsg(channel, '\x033MESSAGE         \x03%s (%i): %s' % (sbserver.playerName(cn), cn, text))
 
 def onTeamMsg(cn, text):
-	bot.privMsg(channel, 'MESSAGE (TEAM)  %s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
+	bot.privMsg(channel, '\x033MESSAGE (TEAM)  \x03%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
 
 def onMapChange(map, mode):
-	bot.privMsg(channel, 'MAP CHANGE      %s (%s)' % (map, sbserver.modeName(mode)))
+	bot.privMsg(channel, '\x035MAP CHANGE      \x03%s (%s)' % (map, sbserver.modeName(mode)))
 
 def onReload():
 	bot.quit()
