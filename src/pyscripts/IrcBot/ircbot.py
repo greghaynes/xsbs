@@ -110,10 +110,10 @@ bot = IrcBot(servername, nickname, port)
 bot.join(channel)
 
 def onPlayerActive(cn):
-	bot.privMsg(channel, '\x0311CONNECT         \x03Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
+	bot.privMsg(channel, '\x032CONNECT         \x03Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
 
 def onPlayerDisconnect(cn):
-	bot.privMsg(channel, '\x0311DISCONNECT      \x03Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn))
+	bot.privMsg(channel, '\x032DISCONNECT      \x03Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn))
 
 def onMsg(cn, text):
 	bot.privMsg(channel, '\x033MESSAGE         \x03%s (%i): %s' % (sbserver.playerName(cn), cn, text))
@@ -137,7 +137,13 @@ def onReleaseMaster(cn):
 	bot.privMsg(channel, '\x037MASTER RELINQ   \x03%s released master' % sbserver.playerName(cn))
 
 def onBan(cn, seconds, reason):
-	bot.privMsg(channel, '\x0313BAN            \x03%s banned for %i for %s' % (sbserver.playerName(cn), seconds, reason))
+	bot.privMsg(channel, '\x0313BAN             \x03%s banned for %i for %s' % (sbserver.playerName(cn), seconds, reason))
+
+def onSpectated(cn):
+	bot.privMsg(channel, '\x0314SPECTATED       \x03%s became a spectator' % sbserver.playerName(cn))
+
+def onUnSpectated(cn):
+	bot.privMsg(channel, '\x0314UNSPECTATED     \x03%s unspectated' % sbserver.playerName(cn))
 
 def onReload():
 	bot.quit()
@@ -156,6 +162,8 @@ event_abilities = {
 	'relinquish_admin': ('player_relinq_admin', onReleaseAdmin),
 	'relinquish_master': ('player_relinq_master', onReleaseMaster),
 	'ban': ('player_banned', onBan),
+	'spectate': ('player_spectated', onSpectated),
+	'unspectate': ('player_unspectated', onUnSpectated),
 }
 
 for key in event_abilities.keys():
