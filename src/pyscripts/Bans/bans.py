@@ -1,7 +1,7 @@
 import sbserver
 from xsbs.settings import PluginConfig
 from xsbs.colors import red, colordict
-from xsbs.events import registerServerEventHandler, registerPolicyEventHandler, execLater
+from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, execLater
 from xsbs.commands import registerCommandHandler
 import time, string
 
@@ -51,6 +51,7 @@ def ban(cn, seconds, reason):
 			execLater(sbserver.playerKick, (cn,))
 			return
 	banned_ips[ip] = expiration
+	triggerServerEvent('player_banned', (cn,seconds, reason))
 	execLater(sbserver.playerKick, (cn,))
 
 def allowClient(cn):

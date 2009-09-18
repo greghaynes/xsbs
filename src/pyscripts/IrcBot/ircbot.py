@@ -136,6 +136,9 @@ def onReleaseAdmin(cn):
 def onReleaseMaster(cn):
 	bot.privMsg(channel, '\x037MASTER RELINQ   \x03%s released master' % sbserver.playerName(cn))
 
+def onBan(cn, seconds, reason):
+	bot.privMsg(channel, '\x0313BAN            \x03%s banned for %i for %s' % (sbserver.playerName(cn), seconds, reason))
+
 def onReload():
 	bot.quit()
 
@@ -152,6 +155,7 @@ event_abilities = {
 	'gain_master': ('player_gained_master', onGainMaster),
 	'relinquish_admin': ('player_relinq_admin', onReleaseAdmin),
 	'relinquish_master': ('player_relinq_master', onReleaseMaster),
+	'ban': ('player_banned', onBan),
 }
 
 for key in event_abilities.keys():
