@@ -659,7 +659,11 @@ namespace server
         mastermode = MM_OPEN;
         allowedips.setsize(0);
         string msg;
-        if(val && authname) formatstring(msg)("%s claimed %s as '\fs\f5%s\fr'", colorname(ci), name, authname);
+        if(val && authname)
+        {
+            formatstring(msg)("%s claimed %s as '\fs\f5%s\fr'", colorname(ci), name, authname);
+            SbPy::triggerEventInt("player_gained_master", ci->clientnum);
+        }
         else 
         {
             formatstring(msg)("%s %s %s", colorname(ci), val ? "claimed" : "relinquished", name);
