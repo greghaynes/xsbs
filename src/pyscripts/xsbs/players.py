@@ -26,3 +26,6 @@ def playerConnect(cn):
 		pass
 	players[cn] = Player(cn)
 
+registerServerEventHandler('player_connect', playerConnect)
+registerServerEventHandler('player_disconnect', playerDisconnect)
+

@@ -7,10 +7,10 @@ import sbserver
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import red, green, orange
+from xsbs.players import player
 
 Base = declarative_base()
 session = dbmanager.session()
-verified_users = {}
 
 class User(Base):
 	__tablename__ = 'usermanager_users'
@@ -32,16 +32,21 @@ class NickAccount(Base):
 		self.user_id = user_id
 
 def loggedInAs(cn):
-	return verified_users[cn]
+	return player(cn).user
 
 def isLoggedIn(cn):
-	return verified_users.has_key(cn)
+	try:
+		return player(cn).logged_in
+	except ValueError:
+		print 'Invalid cn'
+	except AttributeError:
+		return False
 
 def login(cn, user):
-	if not verified_users.has_key(cn):
-		verified_users[cn] = user
-		triggerServerEvent('player_logged_in', cn)
-		sbserver.message(green(sbserver.playerName(cn)) + ' is ' + orange('verified') + '.')
+	player(cn).user = user
+	player(cn).logged_in = True
+	triggerServerEvent('player_logged_in', cn)
+	sbserver.message(green(sbserver.playerName(cn)) + ' is ' + orange('verified') + '.')
 
 def userAuth(email, password):
 	try:
@@ -101,12 +106,6 @@ def onSetMaster(cn, givenhash):
 	else:
 		sbserver.playerMessage(cn, red('Invalid password'))
 
-def onDisconnect(cn):
-	try:
-		del verified_users[cn]
-	except KeyError:
-		pass
-
 def onShutdown():
 	session.commit()
 
@@ -117,6 +116,5 @@ registerCommandHandler('login', onLoginCommand)
 registerCommandHandler('linkname', onLinkName)
 registerServerEventHandler('server_stop', onShutdown)
 registerServerEventHandler('reload', onShutdown)
-registerServerEventHandler('player_disconnect', onDisconnect)
 registerPolicyEventHandler('player_setmaster', onSetMaster)
 
