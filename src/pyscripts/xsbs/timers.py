@@ -25,20 +25,28 @@ class TimerManager:
 			if not iter.isTimedOut(timer.timeout):
 				self.timers.insert(i, timer)
 				return
+			i += 1
 		self.timers.append(timer)
 	def update(self):
 		self.currtime = sbserver.uptime()
+		restarts = []
 		i = 0
 		for timer in self.timers:
 			if timer.isTimedOut(self.currtime):
 				timer()
 				if timer.persistent:
 					timer.reload()
+					self.timers.pop(i)
+					restarts.append(timer)
 					i += 1
 				else:
+					print 'deleting timer'
 					del self.timers[i]
 			else:
 				break
+		for timer in restarts:
+			addTimer(timer.delay, timer.func, timer.args, timer.persistent)
+			del timer
 
 timermanager = TimerManager()
 

@@ -56,7 +56,7 @@ def onDuelCommand(cn, args):
 			mode = int(args[1])
 		elif len(args) == 1:
 			map = args[0]
-			mode = sbserver.mapMode()
+			mode = sbserver.gameMode()
 		else:
 			sbserver.message(cn, red('Usage: #duel <mapname> (mode)'))
 			return
