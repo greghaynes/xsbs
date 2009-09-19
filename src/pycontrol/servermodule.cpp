@@ -157,6 +157,21 @@ static PyObject *playerName(PyObject *self, PyObject *args)
 	return Py_BuildValue("s", ci->name);
 }
 
+static PyObject *playerSessionId(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "i", &cn))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	return Py_BuildValue("i", getclientip(ci->sessionid));
+}
+
 static PyObject *playerIpLong(PyObject *self, PyObject *args)
 {
 	int cn;
@@ -444,6 +459,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"spectators", spectators, METH_VARARGS, "List of client numbers of spectating clients."},
 	{"playerMessage", playerMessage, METH_VARARGS, "Send a message to player."},
 	{"playerName", playerName, METH_VARARGS, "Get name of player from cn."},
+	{"playerSessionId", playerSessionId, METH_VARARGS, "Session ID of player."},
 	{"playerIpLong", playerIpLong, METH_VARARGS, "Get IP of player from cn."},
 	{"playerKick", playerKick, METH_VARARGS, "Kick player from server."},
 	{"playerPrivilege", playerPrivilege, METH_VARARGS, "Integer representing player privilege"},

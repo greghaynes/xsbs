@@ -7,13 +7,17 @@ from xsbs.events import registerServerEventHandler
 from xsbs.commands import registerCommandHandler
 from xsbs.timers import addTimer
 from xsbs.colors import red, blue
+from xsbs.players import player
 
-def warnNickReserved(cn, nickacct, count):
-	if cn not in sbserver.clients():
-		return
-	nick = nickacct.nick
-	if nick != sbserver.playerName(cn):
-		onPlayerActive(cn)
+def warnNickReserved(cn, count, sessid):
+	try:
+		p = player(cn)
+		nickacct = p.warn_nickacct
+		if nickacct.nick != sbserver.playerName(cn):
+			return
+		if sessid != sbserver.playerSessionId(cn):
+			return
+	except (AttributeError, ValueError):
 		return
 	if isLoggedIn(cn):
 		user = loggedInAs(cn)
@@ -25,15 +29,20 @@ def warnNickReserved(cn, nickacct, count):
 		return
 	remaining = 25-(count*5)
 	sbserver.playerMessage(cn, red('WARNING: ') + blue('Your name is reserved. You have %i seconds to login or be kicked.' % remaining))
-	addTimer(5000, warnNickReserved, (cn, nickacct, count+1))
+	addTimer(5000, warnNickReserved, (cn, count+1, sessid))
+
+def nickReserver(nick):
+	return session.query(NickAccount).filter(NickAccount.nick==nick).one()
 
 def onPlayerActive(cn):
 	nick = sbserver.playerName(cn)
 	try:
-		nickacct = session.query(NickAccount).filter(NickAccount.nick==nick).one()
+		nickacct = nickReserver(sbserver.playerName(cn))
 	except NoResultFound:
 		return
-	warnNickReserved(cn, nickacct, 0)
+	p = player(cn)
+	p.warn_nickacct = nickacct
+	warnNickReserved(cn, 0, sbserver.playerSessionId(cn))
 
 def onPlayerNameChanged(cn, new_name):
 	onPlayerActive(cn)
