@@ -40,7 +40,6 @@ class TimerManager:
 					restarts.append(timer)
 					i += 1
 				else:
-					print 'deleting timer'
 					del self.timers[i]
 			else:
 				break
