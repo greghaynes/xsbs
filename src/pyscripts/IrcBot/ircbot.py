@@ -43,8 +43,7 @@ class IrcBot(asyncore.dispatcher):
 		self.connect_count += 1
 		if self.connect_count >= 5:
 			print 'IRC Bot: Connect failed 5 times.  Quitting.'
-		else:
-			addTimer(5000, self.connect, ((self.servername, self.port),))
+		self.close()
 	def handle_connect(self):
 		print 'IRC Bot: conneced'
 		self.connect_count = 0

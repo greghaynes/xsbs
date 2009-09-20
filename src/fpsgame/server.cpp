@@ -1108,8 +1108,9 @@ namespace server
 	changemap(s, mode);
     }
 
-    void setmastermode(int mastermode)
+    void setmastermode(int mm)
     {
+        mastermode = mm;
         allowedips.setsize(0);
         if(mastermode>=MM_PRIVATE)
         {
