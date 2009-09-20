@@ -57,6 +57,7 @@ namespace server
     bool checkexecqueue = false;
     Log eventlog;
     bool restart_py = false;
+    bool allow_modevote = false;
 
     struct demofile
     {
@@ -1183,6 +1184,11 @@ namespace server
         clientinfo *ci = getinfo(sender);
         if(!ci || (ci->state.state==CS_SPECTATOR && !ci->privilege && !ci->local) || (!ci->local && !m_mp(reqmode))) return;
         copystring(ci->mapvote, map);
+        if(!allow_modevote && reqmode != gamemode)
+        {
+            sendf(sender, 1, "ris", SV_SERVMSG, "You cannot vote for a new game mode.");
+            return;
+        }
         ci->modevote = reqmode;
         if(!ci->mapvote[0]) return;
         if(ci->local || mapreload || (ci->privilege && mastermode>=MM_VETO))

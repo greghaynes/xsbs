@@ -323,6 +323,7 @@ namespace server
 	extern bool restart_py;
 	extern char smapname[260];
 	extern int gamemode;
+	extern bool allow_modevote;
 
 	int numclients(int exclude = -1, bool nospec = true, bool noai = true);
 	void sendservmsg(const char *s);
