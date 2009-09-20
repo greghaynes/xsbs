@@ -1184,7 +1184,7 @@ namespace server
         clientinfo *ci = getinfo(sender);
         if(!ci || (ci->state.state==CS_SPECTATOR && !ci->privilege && !ci->local) || (!ci->local && !m_mp(reqmode))) return;
         copystring(ci->mapvote, map);
-        if(!allow_modevote && reqmode != gamemode)
+        if(!ci->privilege && !allow_modevote && reqmode != gamemode)
         {
             sendf(sender, 1, "ris", SV_SERVMSG, "You cannot vote for a new game mode.");
             return;
