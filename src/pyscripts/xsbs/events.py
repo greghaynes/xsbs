@@ -10,9 +10,10 @@ class EventManager:
 		except KeyError:
 			self.events[event] = []
 			self.connect(event, func)
-	def trigger(self, event, args=()):
+	def trigger(self, eventname, args=()):
 		try:
-			for event in self.events[event]:
+			for event in self.events[eventname]:
+				print event
 				event(*args)
 		except KeyError:
 			pass

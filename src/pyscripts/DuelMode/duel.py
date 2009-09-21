@@ -29,8 +29,6 @@ def onMapChange(mapname, mode):
 def onPlayerDisconnect(cn):
 	if currently_dueling[0] and [duelers[0] == cn or duelers[1] == cn]:
 		cancelDuel()
-	if cn in duelers:
-		duelers[duelers.index(cn)] = -1
 
 def duelCountdown(count, map, mode):
 	players = sbserver.players()

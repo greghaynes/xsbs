@@ -63,7 +63,7 @@ def onReserveCommand(cn, args):
 	session.add(rn)
 	sbserver.playerMessage(cn, green('Your account has been created.'))
 
-registerServerEventHandler('player_active', onPlayerActive)
+registerServerEventHandler('player_connect_delayed', onPlayerActive)
 registerServerEventHandler('player_name_changed', onPlayerNameChanged)
 registerCommandHandler('reserve', onReserveCommand)
 

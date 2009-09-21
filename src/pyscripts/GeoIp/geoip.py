@@ -20,5 +20,5 @@ def announce(cn):
 	msg = string.Template(template).substitute(colordict, user=sbserver.playerName(cn), country=getCountry(sbserver.playerIpLong(cn)))
 	sbserver.message(msg)
 
-registerServerEventHandler("player_active", announce)
+registerServerEventHandler("player_connect_delayed", announce)
 

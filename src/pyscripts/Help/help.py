@@ -75,7 +75,7 @@ def onPlayerCommands(cn, args):
 			msg += '#' + command + ' '
 		sbserver.playerMessage(cn, orange(msg))
 
-registerServerEventHandler('player_active', onPlayerActive)
+registerServerEventHandler('player_connect_delayed', onPlayerActive)
 registerCommandHandler('help', onHelpCommand)
 registerCommandHandler('playercommands', onPlayerCommands)
 

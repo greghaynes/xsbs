@@ -13,5 +13,5 @@ motdstring = config.getOption('Config', 'template', '${orange}Welcome to a ${red
 del config
 
 motdstring = string.Template(motdstring).substitute(colordict)
-registerServerEventHandler("player_active", greet)
+registerServerEventHandler('player_connect_delayed', greet)
 
