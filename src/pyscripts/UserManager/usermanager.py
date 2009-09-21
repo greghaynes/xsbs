@@ -65,7 +65,7 @@ def onRegisterCommand(cn, args):
 	except NoResultFound:
 		user = User(args[0], args[1])
 		session.add(user)
-		session.flush()
+		session.commit()
 		sbserver.playerMessage(cn, green('Account created'))
 		return
 	sbserver.playerMessage(cn, red('An account with that email address already exists.'))
@@ -91,7 +91,7 @@ def onLinkName(cn, args):
 	user = loggedInAs(cn)
 	nickacct = NickAccount(sbserver.playerName(cn), user.id)
 	session.add(nickacct)
-	session.flush()
+	session.commit()
 	sbserver.playerMessage(cn, green('Your name is now linked to your account.'))
 
 def onSetMaster(cn, givenhash):

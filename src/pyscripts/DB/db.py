@@ -8,7 +8,7 @@ class DatabaseManager:
 		self.isConnected = False
 	def connect(self):
 		if not self.isConnected:
-			self.engine = create_engine(self.uri, echo=True)
+			self.engine = create_engine(self.uri, echo=False)
 			self.isConnected = True
 			self.session = sessionmaker(bind=self.engine, autocommit=False, autoflush=False)
 
