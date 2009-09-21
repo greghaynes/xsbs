@@ -54,6 +54,7 @@ def ban(cn, seconds, reason, banner_cn):
 		banner_nick = ''
 	newban = Ban(ip, expiration, reason, nick, banner_ip, banner_nick)
 	session.add(newban)
+	session.commit()
 	execLater(sbserver.playerKick, (cn,))
 
 config = PluginConfig('bans')
