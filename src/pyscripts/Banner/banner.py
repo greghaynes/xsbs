@@ -7,10 +7,11 @@ import string
 class Banner:
 	def __init__(self, message, delay):
 		self.msg = string.Template(message).substitute(colordict)
+		self.delay = delay
 		addTimer(delay, self.sendMessage, ())
 	def sendMessage(self):
 		sbserver.message(self.msg)
-		addTimer(delay, self.sendMessage, ())
+		addTimer(self.delay, self.sendMessage, ())
 
 banners = []
 
