@@ -1,7 +1,8 @@
 import sbserver
 from xsbs.commands import registerCommandHandler
 from xsbs.settings import PluginConfig
-from xsbs.colors import red
+from xsbs.colors import red, green, white
+from xsbs.ui import info
 import socket, re, asyncore
 
 cmd_name = 'translate'
@@ -12,6 +13,7 @@ player_fd_limit = 10
 config = PluginConfig(cmd_name)
 from_lang = config.getOption('Config', 'from_lang', 'en')
 to_lang = config.getOption('Config', 'to_lang', 'sv')
+broadcast_translations = config.getOption('Config', 'broadcast_translations', 'yes') == 'yes'
 del config
 
 langslist = ['af','sq','am','ar','hy',
@@ -69,7 +71,10 @@ class SocketDispatch(asyncore.dispatcher):
 		if self.buff != "":
 			m = re.search(self.pattern, self.buff)
 			self.buff = ""
-			sbserver.playerMessage(self.cn, 'Translation: ' + m.group(1))
+			if broadcast_translations:
+				info(green('Translation: ') + white(m.group(1)))
+			else:
+				sbserver.playerMessage(self.cn, green('Translation: ') + white(m.group(1)))
 		remove_request(self.cn, self)
 	def write(self,query, from_lang, to_lang):
 		self.writebuff += self.header % (self.url, from_lang, to_lang, query)
