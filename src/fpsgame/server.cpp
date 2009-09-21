@@ -624,8 +624,6 @@ namespace server
             loopv(clients) if(ci!=clients[i] && clients[i]->privilege)
             {
                 if(haspass) clients[i]->privilege = PRIV_NONE;
-                else if((authname || ci->local) && clients[i]->privilege<=PRIV_MASTER) continue;
-                else return;
             }
             if(haspass)
 	    {
@@ -1246,8 +1244,8 @@ namespace server
                 fprintf(eventlog.file(), "player %s (%i) teamkilled player %s (%i)\n", actor->name, actor->clientnum, target->name, target->clientnum);
                 SbPy::triggerEventIntInt("player_teamkill", actor->clientnum, target->clientnum);
             }
-			else
-				fprintf(eventlog.file(), "player %s (%i) fragged player %s\n", actor->name, actor->clientnum, target->name);
+            else
+                fprintf(eventlog.file(), "player %s (%i) fragged player %s\n", actor->name, actor->clientnum, target->name);
             int fragvalue = smode ? smode->fragvalue(target, actor) : (target==actor || isteam(target->team, actor->team) ? -1 : 1);
             actor->state.frags += fragvalue;
             if(fragvalue>0)
