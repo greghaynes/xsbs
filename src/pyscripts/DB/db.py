@@ -10,8 +10,7 @@ class DatabaseManager:
 		if not self.isConnected:
 			self.engine = create_engine(self.uri)
 			self.isConnected = True
-			self.session = sessionmaker(bind=self.engine)
-			self.session.autoflush = True
+			self.session = sessionmaker(bind=self.engine, autoflush=False)
 
 config = PluginConfig('db')
 uri = config.getOption('Config', 'uri', 'sqlite:///xsbs.db')
