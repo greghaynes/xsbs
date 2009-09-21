@@ -33,7 +33,10 @@ class TimerManager:
 		i = 0
 		for timer in self.timers:
 			if timer.isTimedOut(self.currtime):
-				timer()
+				try:
+					timer()
+				except:
+					print 'Error executing timer handler.'
 				if timer.persistent:
 					timer.reload()
 					self.timers.pop(i)
