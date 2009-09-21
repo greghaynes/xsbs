@@ -13,7 +13,6 @@ class EventManager:
 	def trigger(self, eventname, args=()):
 		try:
 			for event in self.events[eventname]:
-				print event
 				event(*args)
 		except KeyError:
 			pass

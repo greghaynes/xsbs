@@ -38,7 +38,6 @@ class TimerManager:
 					timer.reload()
 					self.timers.pop(i)
 					restarts.append(timer)
-					i += 1
 				else:
 					del self.timers[i]
 			else:
