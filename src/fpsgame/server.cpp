@@ -1716,6 +1716,7 @@ namespace server
         mapdata->write(data, len);
         defformatstring(msg)("[%s uploaded map to server, \"/getmap\" to receive it]", colorname(ci));
         sendservmsg(msg);
+	SbPy::triggerEventInt("send_map", sender);
     }
 
     void parsepacket(int sender, int chan, packetbuf &p)     // has to parse exactly each byte of the packet
@@ -2295,6 +2296,7 @@ namespace server
                 {
                     sendf(sender, 1, "ris", SV_SERVMSG, "server sending map...");
                     sendfile(sender, 2, mapdata, "ri", SV_SENDMAP);
+		    SbPy::triggerEventInt("get_map", ci->clientnum);
                 }
                 else sendf(sender, 1, "ris", SV_SERVMSG, "no map to send");
                 break;
