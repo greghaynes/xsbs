@@ -69,10 +69,7 @@ class SocketDispatch(asyncore.dispatcher):
 		if self.buff != "":
 			m = re.search(self.pattern, self.buff)
 			self.buff = ""
-			try:
-				sbserver.message(m.group(1))
-			except:
-				sbserver.playerMessage(self.cn, "Translation failed")
+			sbserver.playerMessage(self.cn, 'Translation: ' + m.group(1))
 		remove_request(self.cn, self)
 	def write(self,query, from_lang, to_lang):
 		self.writebuff += self.header % (self.url, from_lang, to_lang, query)
