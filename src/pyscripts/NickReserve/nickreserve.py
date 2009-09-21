@@ -25,7 +25,7 @@ def warnNickReserved(cn, count, sessid):
 			ban(cn, 0, 'Use of reserved name')
 		return
 	if count > 4:
-		ban(cn, 0, 'Use of reserved name')
+		ban(cn, 0, 'Use of reserved name', -1)
 		return
 	remaining = 25-(count*5)
 	sbserver.playerMessage(cn, red('WARNING: ') + blue('Your name is reserved. You have %i seconds to login or be kicked.' % remaining))

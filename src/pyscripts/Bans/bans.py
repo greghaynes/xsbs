@@ -46,8 +46,12 @@ def ban(cn, seconds, reason, banner_cn):
 	ip = sbserver.playerIpLong(cn)
 	expiration = time.time() + seconds
 	nick = sbserver.playerName(cn)
-	banner_ip = sbserver.playerIpLong(banner_cn)
-	banner_nick = sbserver.playerName(banner_cn)
+	if banner_cn != -1:
+		banner_ip = sbserver.playerIpLong(banner_cn)
+		banner_nick = sbserver.playerName(banner_cn)
+	else:
+		banner_ip = 0
+		banner_nick = ''
 	newban = Ban(ip, expiration, reason, nick, banner_ip, banner_nick)
 	session.add(newban)
 	execLater(sbserver.playerKick, (cn,))
