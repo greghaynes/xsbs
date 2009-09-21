@@ -1481,6 +1481,8 @@ namespace server
             checkvotes(true);
         }
 
+        SbPy::update();
+
 	if(restart_py)
 	{
 		SbPy::restartPy();
@@ -1816,13 +1818,12 @@ namespace server
                     }
                     if(cp->state.state == CS_ALIVE)
                     {
-                        if(smode) smode->moved(cp, cp->state.o, cp->gameclip, pos, (physstate&0x80)!=0);
-                        if(!cp->active)
-                        {
+		        if(!cp->active)
+		        {
                             cp->active = true;
-			    fprintf(eventlog.file(), "player %s (%i) is now active", cp->name, cp->clientnum);
                             SbPy::triggerEventInt("player_active", cp->clientnum);
-                        }
+		        }
+                        if(smode) smode->moved(cp, cp->state.o, cp->gameclip, pos, (physstate&0x80)!=0);
                     }
                     cp->state.o = pos;
                     cp->gameclip = (physstate&0x80)!=0;

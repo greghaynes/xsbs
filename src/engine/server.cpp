@@ -609,9 +609,6 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
         server::sendpackets();
         return;
     }
-
-    // Run python event loop
-    SbPy::update();
        
     // below is network only
 
