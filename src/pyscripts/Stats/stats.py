@@ -5,7 +5,7 @@ from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
 
 config = PluginConfig('stats')
-template = config.getOption('Config', 'template', '${white}Stats for ${orange}${name}\n${white}Frags: ${green}${frags} ${white}Deaths: ${red}${deaths} ${white}Teamkills: ${magenta}${teamkills} ${white}Accuracy: ${yellow}${accuracy}% ${white}KtD: ${orange}${ktd}')
+template = config.getOption('Config', 'template', '${white}Stats for ${orange}${name}\n${white}Frags: ${green}${frags} ${white}Deaths: ${red}${deaths} ${white}Teamkills: ${magenta}${teamkills} ${white}Accuracy: ${yellow}${accuracy}% ${white}KpD: ${orange}${ktd}')
 template = string.Template(template)
 del config
 
@@ -33,7 +33,7 @@ def onCommand(cn, command):
 		accuracy = math.floor(accuracy * 100)
 	ktd = 0
 	if deaths != 0:
-		ktd = kills / float(deaths)
+		ktd = frags / float(deaths)
 	msg = template.substitute(colordict, name=name, frags=frags, deaths=deaths, teamkills=teamkills, shots=shots, hits=hits, accuracy=accuracy, ktd=ktd)
 	sbserver.playerMessage(cn, msg)
 
