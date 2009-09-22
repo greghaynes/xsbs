@@ -7,13 +7,20 @@ import sbserver
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import red, green, orange
+from xsbs.ui import info, error
 from xsbs.players import player
+from xsbs.settings import PluginConfig
+
+config = PluginConfig('usermanager')
+usertable = config.getOption('Config', 'users_tablename', 'usermanager_users')
+nicktable = config.getOption('Config', 'linkednames_table', 'usermanager_nickaccounts')
+del config
 
 Base = declarative_base()
 session = dbmanager.session()
 
 class User(Base):
-	__tablename__ = 'usermanager_users'
+	__tablename__ = usertable
 	id = Column(Integer, primary_key=True)
 	email = Column(String)
 	password = Column(String)
@@ -22,7 +29,7 @@ class User(Base):
 		self.password = password
 
 class NickAccount(Base):
-	__tablename__ = 'usermanager_nickaccounts'
+	__tablename__ = nicktable
 	id = Column(Integer, primary_key=True)
 	nick = Column(String)
 	user_id = Column(Integer, ForeignKey('usermanager_users.id'))
@@ -46,7 +53,7 @@ def login(cn, user):
 	player(cn).user = user
 	player(cn).logged_in = True
 	triggerServerEvent('player_logged_in', cn)
-	sbserver.message(green(sbserver.playerName(cn)) + ' is ' + orange('verified') + '.')
+	sbserver.message(info(green(sbserver.playerName(cn)) + ' is ' + orange('verified') + '.'))
 
 def userAuth(email, password):
 	try:
@@ -58,7 +65,7 @@ def userAuth(email, password):
 def onRegisterCommand(cn, args):
 	args = args.split(' ')
 	if len(args) != 2:
-		sbserver.playerMessage(cn, red('Usage: #register <email> <password>'))
+		sbserver.playerMessage(cn, info('Usage: #register <email> <password>'))
 		return
 	try:
 		session.query(User).filter(User.email==args[0]).one()
@@ -68,31 +75,31 @@ def onRegisterCommand(cn, args):
 		session.commit()
 		sbserver.playerMessage(cn, green('Account created'))
 		return
-	sbserver.playerMessage(cn, red('An account with that email address already exists.'))
+	sbserver.playerMessage(cn, error('An account with that email address already exists.'))
 
 def onLoginCommand(cn, args):
 	args = args.split(' ')
 	if len(args) != 2:
-		sbserver.playerMessage(cn, red('Usage: #login <email> <password>'))
+		sbserver.playerMessage(cn, info('Usage: #login <email> <password>'))
 		return
 	user = userAuth(args[0], args[1])
 	if user:
 		login(cn, user)
 	else:
-		sbserver.playerMessage(cn, red('Invalid login.'))
+		sbserver.playerMessage(cn, error('Invalid login.'))
 
 def onLinkName(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, red('Usage: #linkname'))
+		sbserver.playerMessage(cn, error('Usage: #linkname'))
 		return
 	if not isLoggedIn(cn):
-		sbserver.playerMessage(cn, red('You must be logged in to link a name to your account.'))
+		sbserver.playerMessage(cn, error('You must be logged in to link a name to your account.'))
 		return
 	user = loggedInAs(cn)
 	nickacct = NickAccount(sbserver.playerName(cn), user.id)
 	session.add(nickacct)
 	session.commit()
-	sbserver.playerMessage(cn, green('Your name is now linked to your account.'))
+	sbserver.playerMessage(cn, info('Your name is now linked to your account.'))
 
 def onSetMaster(cn, givenhash):
 	nick = sbserver.playerName(cn)
@@ -100,13 +107,13 @@ def onSetMaster(cn, givenhash):
 		na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
 	except NoResultFound:
 		if sbserver.playerPrivilege(cn) <= 1:
-			sbserver.playerMessage(cn, red('Your name is not assigned to any accounts.'))
+			sbserver.playerMessage(cn, error('Your name is not assigned to any accounts.'))
 		return
 	nickhash = sbserver.hashPassword(cn, na.user.password)
 	if givenhash == nickhash:
 		login(cn, na.user)
 	else:
-		sbserver.playerMessage(cn, red('Invalid password'))
+		sbserver.playerMessage(cn, error('Invalid password'))
 
 def onShutdown():
 	session.commit()

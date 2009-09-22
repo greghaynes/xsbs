@@ -1,12 +1,19 @@
 import sbserver
 from DB.db import dbmanager
 from UserManager.usermanager import User, loggedInAs
-from xsbs.commands import registerCommandHandler
-from xsbs.ui import error, insufficientPermissions
+
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relation
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
+
+from xsbs.commands import registerCommandHandler
+from xsbs.ui import error, insufficientPermissions
+from xsbs.settings import PluginConfig
+
+config = PluginConfig('userprivilege')
+tablename = config.getOption('Config', 'tablename', 'userprivileges')
+del config
 
 Base = declarative_base()
 session = dbmanager.session()
@@ -16,7 +23,7 @@ MASTER = 1
 ADMIN = 2
 
 class UserPrivilege(Base):
-	__tablename__ = 'userprivileges'
+	__tablename__ = tablename
 	id = Column(Integer, primary_key=True)
 	privilege = Column(Integer)
 	user_id = Column(Integer)
