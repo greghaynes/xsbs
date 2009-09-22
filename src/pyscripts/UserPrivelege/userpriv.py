@@ -26,7 +26,7 @@ class UserPrivilege(Base):
 
 def isMaster(user_id):
 	try:
-		priv = session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==USER).one()
+		priv = session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==MASTER).one()
 		return True
 	except NoResultFound:
 		return False
