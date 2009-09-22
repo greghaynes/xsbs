@@ -1,5 +1,6 @@
 import sbserver
 from xsbs.colors import red, green
+from xsbs.ui import info, error
 from xsbs.timers import addTimer
 from xsbs.events import registerServerEventHandler
 from xsbs.commands import registerCommandHandler
@@ -19,7 +20,7 @@ def finishDuel():
 
 def cancelDuel():
 	endDuel()
-	sbserver.message(red('Duel cancelled.'))
+	sbserver.message(info('Duel cancelled.'))
 
 def onMapChange(mapname, mode):
 	if currently_dueling[1]:
@@ -47,7 +48,7 @@ def onDuelCommand(cn, args):
 	args = args.split(' ')
 	players = sbserver.players()
 	if len(players) != 2:
-		sbserver.playerMessage(cn, red('There must be only two unspectated players to enter duel mode.'))
+		sbserver.playerMessage(cn, error('There must be only two unspectated players to enter duel mode.'))
 	else:
 		if len(args) == 2:
 			map = args[0]
@@ -56,7 +57,7 @@ def onDuelCommand(cn, args):
 			map = args[0]
 			mode = sbserver.gameMode()
 		else:
-			sbserver.message(cn, red('Usage: #duel <mapname> (mode)'))
+			sbserver.message(cn, error('Usage: #duel <mapname> (mode)'))
 			return
 		duelers[0] = players[0]
 		duelers[1] = players[1]

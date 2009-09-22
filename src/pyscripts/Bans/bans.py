@@ -1,6 +1,7 @@
 import sbserver
 from xsbs.settings import PluginConfig
 from xsbs.colors import red, colordict
+from xsbs.ui import insufficientPermissions
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, execLater
 from xsbs.commands import registerCommandHandler
 from DB.db import dbmanager
@@ -69,7 +70,7 @@ def onBanCmd(cn, text):
 	sp = text.split(' ')
 	try:
 		if sbserver.playerPrivilege(cn) == 0:
-			sbserver.playerMessage(cn, red('Insufficient privileges.'))
+			insufficientPermissions(cn)
 			return
 		tcn = int(sp[0])
 		try:

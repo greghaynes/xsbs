@@ -2,6 +2,7 @@ import sbserver
 from xsbs.events import registerServerEventHandler
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import blue, red, orange
+from xsbs.ui import error
 
 helptexts = {
 	'help': (True,
@@ -49,7 +50,7 @@ def msgHelpText(cn, cmd):
 	try:
 		helpinfo = helptexts[cmd]
 	except KeyError:
-		sbserver.playerMessage(cn, red('Command not found'))
+		sbserver.playerMessage(cn, error('Command not found'))
 	else:
 		msgs = []
 		for usage in helpinfo[1]:
@@ -68,7 +69,7 @@ def onHelpCommand(cn, args):
 
 def onPlayerCommands(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, red('Usage: #playercommands'))
+		sbserver.playerMessage(cn, error('Usage: #playercommands'))
 	else:
 		msg = blue('Available commands: ')
 		for command in helptexts.keys():

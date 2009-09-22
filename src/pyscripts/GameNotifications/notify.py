@@ -10,14 +10,22 @@ config = PluginConfig('gamenotifications')
 tktemp = config.getOption('Config', 'teamkill', '${red}Player ${green}${tker}${red} has team killed ${orange}${victim}')
 del config
 
-tktemp = string.Template(tktemp)
+if tktemp == 'None':
+	tk_broadcast = 0
+elif tktemp == 'Master':
+	tk_broadgast = 1
+else:
+	tk_broadcast = 2
 
-def teamkill(cn, tcn):
+if tk_broadcast > 0:
+	tktemp = string.Template(tktemp)
+
+def teamkill_broadcast(cn, tcn):
 	info(tktemp.substitute(colordict, tker=sbserver.playerName(cn), victim=sbserver.playerName(tcn)))
 
 def getmap(cn):
 	info('Player %s is downloading map' % sbserver.playerName(cn))
 
-registerServerEventHandler('player_teamkill', teamkill)
+registerServerEventHandler('player_teamkill', teamkill_broadcast)
 registerServerEventHandler('get_map', getmap)
 

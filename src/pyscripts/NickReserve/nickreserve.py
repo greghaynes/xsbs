@@ -7,6 +7,7 @@ from xsbs.events import registerServerEventHandler
 from xsbs.commands import registerCommandHandler
 from xsbs.timers import addTimer
 from xsbs.colors import red, blue
+from xsbs.ui import warning
 from xsbs.players import player
 
 def warnNickReserved(cn, count, sessid):
@@ -28,7 +29,7 @@ def warnNickReserved(cn, count, sessid):
 		ban(cn, 0, 'Use of reserved name', -1)
 		return
 	remaining = 25-(count*5)
-	sbserver.playerMessage(cn, red('WARNING: ') + blue('Your name is reserved. You have %i seconds to login or be kicked.' % remaining))
+	sbserver.playerMessage(cn, warning('Your name is reserved. You have ' + red('%i') + ' seconds to login or be kicked.') % remaining)
 	addTimer(5000, warnNickReserved, (cn, count+1, sessid))
 
 def nickReserver(nick):
