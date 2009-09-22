@@ -1530,10 +1530,12 @@ namespace server
         if(total - unsent < min(total, 4)) return;
         crcs.sort(crcinfo::compare);
         string msg;
+	// TODO: move modified map messages into python
         loopv(clients)
         {
             clientinfo *ci = clients[i];
             if(ci->state.state==CS_SPECTATOR || ci->state.aitype != AI_NONE || ci->clientmap[0] || ci->mapcrc >= 0 || (req < 0 && ci->warned)) continue;
+            SbPy::triggerEventInt("player_modified_map", ci->clientnum);
             formatstring(msg)("%s has modified map \"%s\"", colorname(ci), smapname);
             sendf(req, 1, "ris", SV_SERVMSG, msg);
             if(req < 0) ci->warned = true;
@@ -1546,6 +1548,7 @@ namespace server
             {
                 clientinfo *ci = clients[j];
                 if(ci->state.state==CS_SPECTATOR || ci->state.aitype != AI_NONE || !ci->clientmap[0] || ci->mapcrc != info.crc || (req < 0 && ci->warned)) continue;
+                SbPy::triggerEventInt("player_modified_map", ci->clientnum);
                 formatstring(msg)("%s has modified map \"%s\"", colorname(ci), smapname);
                 sendf(req, 1, "ris", SV_SERVMSG, msg);
                 if(req < 0) ci->warned = true;
