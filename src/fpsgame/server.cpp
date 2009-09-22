@@ -1236,9 +1236,7 @@ namespace server
         if(ts.health<=0)
         {
             target->state.deaths++;
-            if(actor==target)
-                fprintf(eventlog.file(), "player %s (%i) commited suicide\n", actor->name, actor->clientnum);
-            else if(isteam(actor->team, target->team))
+            if(isteam(actor->team, target->team))
             {
                 actor->state.teamkills++;
                 fprintf(eventlog.file(), "player %s (%i) teamkilled player %s (%i)\n", actor->name, actor->clientnum, target->name, target->clientnum);
