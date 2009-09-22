@@ -1,8 +1,8 @@
 import sbserver
-from xsbs.colors import orange, yellow, red
+from xsbs.colors import orange, yellow, red, blue
 
 def notice(message):
-	return orange('Notice: ') + message
+	return blue('Notice: ') + message
 
 def info(message):
 	return yellow('Info: ') + message

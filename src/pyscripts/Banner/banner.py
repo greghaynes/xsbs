@@ -2,6 +2,7 @@ import sbserver
 from xsbs.settings import PluginConfig
 from xsbs.timers import addTimer
 from xsbs.colors import colordict
+from xsbs.ui import notice
 import string
 
 class Banner:
@@ -10,7 +11,7 @@ class Banner:
 		self.delay = delay
 		addTimer(delay, self.sendMessage, ())
 	def sendMessage(self):
-		sbserver.message(self.msg)
+		sbserver.message(notice(self.msg))
 		addTimer(self.delay, self.sendMessage, ())
 
 banners = []
