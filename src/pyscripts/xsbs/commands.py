@@ -1,6 +1,7 @@
 import sbserver
 from events import registerServerEventHandler, registerPolicyEventHandler
 from colors import red
+from xsbs.ui import error
 
 class CommandManager:
 	def __init__(self):
@@ -16,7 +17,7 @@ class CommandManager:
 			for func in self.command_handlers[command]:
 				func(cn, text)
 		else:
-			sbserver.playerMessage(cn, red('Command not found.'))
+			sbserver.playerMessage(cn, error('Command not found'))
 	def onMsg(self, cn, text):
 		if self.prefixes.find(text[0]) != -1:
 			cmd = text[1:].split(' ')[0]
