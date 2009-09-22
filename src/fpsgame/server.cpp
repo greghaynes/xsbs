@@ -2003,7 +2003,6 @@ namespace server
                 filtertext(text, text);
                 if(SbPy::triggerPolicyEventIntString("allow_message", ci->clientnum, text))
                 {
-					fprintf(eventlog.file(), "%s (%i): %s\n", ci->name, ci->clientnum, text);
                     SbPy::triggerEventIntString("player_message", ci->clientnum, text);
                     QUEUE_AI;
                     QUEUE_INT(SV_TEXT);
@@ -2019,7 +2018,6 @@ namespace server
                 if(!ci || !cq || (ci->state.state==CS_SPECTATOR && !ci->local && !ci->privilege) || !m_teammode || !cq->team[0]) break;
                 if(SbPy::triggerPolicyEventIntString("allow_message_team", ci->clientnum, text))
                 {
-                    fprintf(eventlog.file(), "%s (team): %s\n", ci->name, text);
                     SbPy::triggerEventIntString("player_message_team", ci->clientnum, text);
                     loopv(clients)
                     {
@@ -2035,7 +2033,6 @@ namespace server
             {
                 QUEUE_MSG;
                 getstring(text, p);
-		fprintf(eventlog.file(), "%s (%i) changed name to %s", ci->name, ci->clientnum, text);
                 filtertext(ci->name, text, false, MAXNAMELEN);
                 if(!ci->name[0]) copystring(ci->name, "unnamed");
                 SbPy::triggerEventIntString("player_name_changed", ci->clientnum, ci->name);
@@ -2054,7 +2051,7 @@ namespace server
             {
                 getstring(text, p);
                 filtertext(text, text, false, MAXTEAMLEN);
-                if(strcmp(ci->team, text))
+                if(strcmp(ci->team, text) && SbPy::triggerPolicyEventIntString("allow_switch_team", ci->clientnum, ci->team))
                 {
                     if(m_teammode && smode && !smode->canchangeteam(ci, ci->team, text))
                         sendf(sender, 1, "riis", SV_SETTEAM, sender, ci->team);

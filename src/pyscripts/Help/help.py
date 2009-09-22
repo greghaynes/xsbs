@@ -10,7 +10,7 @@ helptexts = {
 		(
 			'View information about a command',
 			'Command arguments enclosed in <brackets> are required.',
-			'Command arguments enclosed in (parenthesis) are optional.'
+			'Use #listcommands to see available commands.'
 		)),
 	'stats': (True,
 		('#stats (cn)','#stats (name)'),
@@ -31,6 +31,10 @@ helptexts = {
         'translate': (True,
 		('#translate <word>', '#translate <sentence/word> <from_lang> <to_lang>',),
 		('Language codes: en, sv, de, it and lots more.',),
+		),
+        'listcommands': (True,
+		('#listcommands',),
+		('List available commands.',),
 		)
 }
 
@@ -78,5 +82,5 @@ def onPlayerCommands(cn, args):
 
 registerServerEventHandler('player_connect_delayed', onPlayerActive)
 registerCommandHandler('help', onHelpCommand)
-registerCommandHandler('playercommands', onPlayerCommands)
+registerCommandHandler('listcommands', onPlayerCommands)
 

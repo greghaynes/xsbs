@@ -30,3 +30,7 @@ commandmanager = CommandManager()
 def registerCommandHandler(command, func):
 	commandmanager.register(command, func)
 
+def allowTeamSwitch(cn, team):
+	sbserver.playerMessage(cn, 'You cannot switch to team %s' % team)
+	return False
+
