@@ -2,7 +2,7 @@ import sbserver
 from xsbs.events import registerServerEventHandler
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import blue, red, orange
-from xsbs.ui import error
+from xsbs.ui import error, info
 
 helptexts = {
 	'help': (True,
@@ -54,17 +54,17 @@ def msgHelpText(cn, cmd):
 	else:
 		msgs = []
 		for usage in helpinfo[1]:
-			msgs.append(red(usage))
+			msgs.append(blue('Usage: ') + usage)
 		for desc in helpinfo[2]:
-			msgs.append(blue(desc))
+			msgs.append(desc)
 		for msg in msgs:
-			sbserver.playerMessage(cn, msg)
+			sbserver.playerMessage(cn, info(msg))
 
 def onHelpCommand(cn, args):
-	args = args.split(' ')
-	if len(args) != 1:
+	if args == '':
 		msgHelpText(cn, 'help')
 	else:
+		args = args.split(' ')
 		msgHelpText(cn, args[0])
 
 def onPlayerCommands(cn, args):
