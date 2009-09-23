@@ -14,7 +14,7 @@ def onPlayerFrag(cn, tcn):
 		p = player(cn)
 		t = player(tcn)
 	except ValueError:
-		pass
+		return
 	if cn == tcn:
 		p.killspree = 0
 	else:
