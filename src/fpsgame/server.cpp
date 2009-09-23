@@ -2157,7 +2157,7 @@ namespace server
                 int mm = getint(p);
                 if((ci->privilege || ci->local) && mm>=MM_OPEN && mm<=MM_PRIVATE)
                 {
-                    if((ci->privilege>=PRIV_ADMIN || ci->local) || (mastermask&(1<<mm)))
+                    if((ci->privilege>=PRIV_MASTER || ci->local) || (mastermask&(1<<mm)))
                     {
                         mastermode = mm;
                         allowedips.setsize(0);
