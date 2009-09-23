@@ -10,8 +10,11 @@ messages = { 5: string.Template(green('$name') + ' is on a ' + orange('KILLING S
 endmsg = string.Template(orange('$name') + '\'s killing spree ended by ' + green('$endername'))
 
 def onPlayerFrag(cn, tcn):
-	p = player(cn)
-	t = player(tcn)
+	try:
+		p = player(cn)
+		t = player(tcn)
+	except ValueError:
+		pass
 	if cn == tcn:
 		p.killspree = 0
 	else:
