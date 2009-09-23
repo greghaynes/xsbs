@@ -45,6 +45,8 @@ def duelCountdown(count, map, mode):
 		addTimer(1000, duelCountdown, (count-1, map, mode))
 
 def onDuelCommand(cn, args):
+	if args == '':
+		sbserver.playerMessage(cn, error('Usage: #duel <mapname> (mode)'))
 	args = args.split(' ')
 	players = sbserver.players()
 	if len(players) != 2:
@@ -57,7 +59,7 @@ def onDuelCommand(cn, args):
 			map = args[0]
 			mode = sbserver.gameMode()
 		else:
-			sbserver.message(cn, error('Usage: #duel <mapname> (mode)'))
+			sbserver.playerMessage(cn, error('Usage: #duel <mapname> (mode)'))
 			return
 		duelers[0] = players[0]
 		duelers[1] = players[1]
