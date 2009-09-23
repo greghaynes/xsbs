@@ -305,6 +305,12 @@ namespace server
         extern void changeteam(clientinfo *ci);
     }
 
+#define MM_MODE 0xF
+#define MM_AUTOAPPROVE 0x1000
+#define MM_PRIVSERV (MM_MODE | MM_AUTOAPPROVE)
+#define MM_PUBSERV ((1<<MM_OPEN) | (1<<MM_VETO))
+#define MM_COOPSERV (MM_AUTOAPPROVE | MM_PUBSERV | (1<<MM_LOCKED))
+
 }
 
 /*
@@ -320,6 +326,7 @@ namespace server
 	extern Log eventlog;
 	extern bool masterupdate;
 	extern int mastermode;
+	extern int mastermask;
 	extern bool restart_py;
 	extern char smapname[260];
 	extern int gamemode;

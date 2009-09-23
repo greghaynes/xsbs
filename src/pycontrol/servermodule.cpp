@@ -408,6 +408,23 @@ static PyObject *setMasterMode(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *setMasterMask(PyObject *self, PyObject *args)
+{
+	int mm;
+	if(!PyArg_ParseTuple(args, "i", &mm))
+		return 0;
+	switch(mm)
+	{
+		case 1: server::mastermask = MM_PUBSERV; break;
+		case 2: server::mastermask = MM_COOPSERV; break;
+		case 3: server::mastermask = MM_AUTOAPPROVE; break;
+		default:
+			PyErr_SetString(PyExc_ValueError, "Invalid master mask.");
+			return 0;
+	}
+	Py_INCREF(Py_None);
+	return Py_None;
+}
 
 static PyObject *masterMode(PyObject *self, PyObject *args)
 {
@@ -477,6 +494,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"setMap", setMap, METH_VARARGS, "Set to map and mode."},
 	{"setMasterMode", setMasterMode, METH_VARARGS, "Set server master mode."},
 	{"masterMode", masterMode, METH_VARARGS, "Server master mode."},
+	{"setMasterMask", setMasterMask, METH_VARARGS, "Set maximum master mode a master can set."},
 	{"gameMode", gameMode, METH_VARARGS, "Current game mode."},
 	{"mapName", mapName, METH_VARARGS, "Current map name."},
 	{"modeName", modeName, METH_VARARGS, "Name of game mode."},
