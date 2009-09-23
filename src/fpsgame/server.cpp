@@ -190,16 +190,7 @@ namespace server
     {
         smapname[0] = '\0';
         resetitems();
-        if(!logpath[0])
-        {
-        fprintf(stderr, "No log file specified.  Use -l/path/to/log.\n");
-        return false;
-        }
-        if(!eventlog.open(logpath))
-        {
-            perror("Could not open log file");
-            return false;
-        }
+	
         // Initialize python modules
         if(!SbPy::init("sauer_server", pyscriptspath, "sbserver"))
             return false;
@@ -1233,11 +1224,8 @@ namespace server
             if(isteam(actor->team, target->team))
             {
                 actor->state.teamkills++;
-                fprintf(eventlog.file(), "player %s (%i) teamkilled player %s (%i)\n", actor->name, actor->clientnum, target->name, target->clientnum);
                 SbPy::triggerEventIntInt("player_teamkill", actor->clientnum, target->clientnum);
             }
-            else
-                fprintf(eventlog.file(), "player %s (%i) fragged player %s\n", actor->name, actor->clientnum, target->name);
             int fragvalue = smode ? smode->fragvalue(target, actor) : (target==actor || isteam(target->team, actor->team) ? -1 : 1);
             actor->state.frags += fragvalue;
             if(fragvalue>0)
