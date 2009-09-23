@@ -95,6 +95,13 @@ def onLinkName(cn, args):
 	if not isLoggedIn(cn):
 		sbserver.playerMessage(cn, error('You must be logged in to link a name to your account.'))
 		return
+	try:
+		session.query(NickAccount).filter(NickAccount.nick==sbserver.playerName(cn)).one()
+	except NoResultFound:
+		pass
+	else:
+		sbserver.playerMessage(cn, error('Your name is already licked to an account.'))
+		return
 	user = loggedInAs(cn)
 	nickacct = NickAccount(sbserver.playerName(cn), user.id)
 	session.add(nickacct)

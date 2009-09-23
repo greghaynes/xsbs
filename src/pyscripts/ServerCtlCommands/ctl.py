@@ -51,6 +51,7 @@ def onMasterMask(cn, args):
 		return
 	if sbserver.playerPrivilege(cn) != 2:
 		sbserver.playerMessage(cn, error('Insufficient permissions.'))
+		return
 	args = args.split(' ')
 	sbserver.setMasterMask(int(args[0]))
 	sbserver.message(info('Master mask is now %s') % args[0])
