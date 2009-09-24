@@ -44,8 +44,6 @@ def loggedInAs(cn):
 def isLoggedIn(cn):
 	try:
 		return player(cn).logged_in
-	except ValueError:
-		print 'Invalid cn'
 	except AttributeError:
 		return False
 

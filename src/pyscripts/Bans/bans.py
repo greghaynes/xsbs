@@ -17,7 +17,7 @@ class Ban(Base):
 	__tablename__='bans'
 	id = Column(Integer, primary_key=True)
 	ip = Column(Integer)
-	expiration = Column(Integer)
+	expiration = Column(Integer) # Epoch seconds
 	reason = Column(String)
 	nick = Column(String)
 	banner_ip = Column(Integer)
@@ -76,7 +76,7 @@ def onBanCmd(cn, text):
 		try:
 			ip = sbserver.playerIpLong(tcn)
 		except ValueEror:
-			sbserver.message(cn, red('Invalid cn'))
+			sbserver.playerMessage(cn, red('Invalid cn'))
 			return
 		reason = ''
 		length = 0
@@ -96,10 +96,14 @@ def allowClient(cn):
 	ip = sbserver.playerIpLong(cn)
 	return not isCurrentlyBanned(ip)
 
+def onKick(tcn, cn):
+	ban(tcn, 14500, 'Unspecified reason', cn)
+
 def init():
 	registerPolicyEventHandler("allow_connect", allowClient)
 	registerCommandHandler('ban', onBanCmd)
-	registerServerEventHandler("player_ban", ban)
+	registerServerEventHandler('player_ban', ban)
+	registerServerEventHandler('player_kicked', onKick)
 	Base.metadata.create_all(dbmanager.engine)
 
 init()

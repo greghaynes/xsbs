@@ -49,7 +49,6 @@ namespace server
     vector<worldstate *> worldstates;
     bool reliablemessages = false;
     bool checkexecqueue = false;
-    Log eventlog;
     bool restart_py = false;
     bool allow_modevote = false;
 
@@ -116,7 +115,6 @@ namespace server
 	}
     });
     SVAR(servermotd, "");
-    SVAR(logpath, "");
 
     void *newclientinfo() { return new clientinfo; }
     void deleteclientinfo(void *ci) { delete (clientinfo *)ci; }
@@ -181,7 +179,6 @@ namespace server
             case 'o': setvar("publicserver", atoi(&arg[2])); return true;
             case 'g': setvar("serverbotlimit", atoi(&arg[2])); return true;
             case 's': setsvar("pyscriptspath", &arg[2]); return true;
-            case 'l': setsvar("logpath", &arg[2]); return true;
         }
         return false;
     }
@@ -1081,7 +1078,6 @@ namespace server
             demonextmatch = false;
             setupdemorecord();
         }
-	fprintf(eventlog.file(), "Map changed to %s (%s)\n", smapname, gamemodes[mode].name);
 	SbPy::triggerEventStrInt("map_changed", smapname, mode);
     }
 
@@ -1750,6 +1746,7 @@ namespace server
 
                 if(m_demo) setupdemoplayback();
 
+		SbPy::triggerEventInt("player_connect_pre", ci->clientnum);
                 SbPy::triggerEventInt("player_connect", ci->clientnum);
             }
         }
@@ -2045,7 +2042,6 @@ namespace server
                         aiman::changeteam(ci);
                         sendf(-1, 1, "riis", SV_SETTEAM, sender, ci->team);
                     }
-		    fprintf(eventlog.file(), "player %s switched team", ci->name);
                     SbPy::triggerEventInt("player_team_changed", ci->clientnum);
                 }
                 break;
@@ -2174,7 +2170,7 @@ namespace server
                 int victim = getint(p);
                 if((ci->privilege || ci->local) && ci->clientnum!=victim && getclientinfo(victim)) // no bots
                 {
-                    SbPy::triggerEventInt("player_kicked", ci->clientnum);
+                    SbPy::triggerEventIntInt("player_kicked", victim, ci->clientnum);
                     disconnect_client(victim, DISC_KICK);
                 }
                 break;

@@ -323,7 +323,6 @@ namespace server
 
 	extern int gamemillis;
 	extern vector<clientinfo *> connects, clients, bots;
-	extern Log eventlog;
 	extern bool masterupdate;
 	extern int mastermode;
 	extern int mastermask;

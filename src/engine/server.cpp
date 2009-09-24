@@ -28,9 +28,6 @@ void conoutfv(int type, const char *fmt, va_list args)
     string sf, sp;
     vformatstring(sf, fmt, args);
     filtertext(sp, sf);
-    //puts(sp);
-    if(server::eventlog.isOpen())
-        server::eventlog.write(sp);
 }
 
 void conoutf(const char *fmt, ...)
@@ -180,7 +177,6 @@ vector<client *> clients;
 ENetHost *serverhost = NULL;
 size_t bsend = 0, brec = 0;
 int laststatus = 0;
-int lastlogflush = 0;
 ENetSocket pongsock = ENET_SOCKET_NULL, lansock = ENET_SOCKET_NULL;
 
 void cleanupserver()
@@ -334,8 +330,6 @@ void disconnect_client(int n, int reason)
     server::deleteclientinfo(clients[n]->info);
     clients[n]->info = NULL;
     defformatstring(s)("client (%s) disconnected because: %s", clients[n]->hostname, disc_reasons[reason]);
-    server::eventlog.write(s);
-    server::eventlog.write("\n");
     server::sendservmsg(s);
 }
 
@@ -417,9 +411,6 @@ ENetSocket connectmaster()
 
     if(masteraddress.host == ENET_HOST_ANY)
     {
-#ifdef STANDALONE
-        fprintf(server::eventlog.file(), "looking up %s...\n", mastername);
-#endif
         masteraddress.port = server::masterport();
         if(!resolverwait(mastername, &masteraddress)) return ENET_SOCKET_NULL;
     }
@@ -638,12 +629,6 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
     }
 */
 	
-    if(totalmillis-lastlogflush>1000)
-    {
-        lastlogflush = totalmillis;
-        server::eventlog.flush();
-    }
-
     ENetEvent event;
     bool serviced = false;
     while(!serviced)
@@ -663,7 +648,6 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
                 c.peer->data = &c;
                 char hn[1024];
                 copystring(c.hostname, (enet_address_get_host_ip(&c.peer->address, hn, sizeof(hn))==0) ? hn : "unknown");
-                fprintf(server::eventlog.file(), "client connected (%s)\n", c.hostname);
                 int reason = server::clientconnect(c.num, c.peer->address.host);
                 if(!reason) nonlocalclients++;
                 else disconnect_client(c.num, reason);
@@ -681,8 +665,8 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
             {
                 client *c = (client *)event.peer->data;
                 if(!c) break;
-                fprintf(server::eventlog.file(), "disconnected client (%s)\n", c->hostname);
                 SbPy::triggerEventInt("player_disconnect", c->num);
+                SbPy::triggerEventInt("player_disconnect_post", c->num);
                 server::clientdisconnect(c->num);
                 nonlocalclients--;
                 c->type = ST_EMPTY;
@@ -744,7 +728,6 @@ void rundedicatedserver()
     #ifdef WIN32
     SetPriorityClass(GetCurrentProcess(), HIGH_PRIORITY_CLASS);
     #endif
-    fprintf(server::eventlog.file(), "dedicated server started, waiting for clients...\n");
     puts("dedicated server started...\nCtrl-C to exit\n\n");
     SbPy::triggerEvent("server_start", 0);
     for(;rundedicated;) serverslice(true, 4);

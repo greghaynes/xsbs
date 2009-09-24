@@ -28,6 +28,6 @@ def playerConnect(cn):
 	players[cn] = Player(cn)
 	addTimer(1000, triggerServerEvent, ('player_connect_delayed', (cn,)))
 
-registerServerEventHandler('player_connect', playerConnect)
-registerServerEventHandler('player_disconnect', playerDisconnect)
+registerServerEventHandler('player_connect_pre', playerConnect)
+registerServerEventHandler('player_disconnect_post', playerDisconnect)
 
