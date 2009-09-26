@@ -2,16 +2,22 @@ import sbserver
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import red, yellow, blue, green
 from xsbs.plugins import reload as pluginReload
-from xsbs.ui import error, info
+from xsbs.ui import error, info, insufficientPermissions
 from Motd.motd import motdstring
 
 def onPauseCmd(cn, args):
+	if sbserver.playerPrivilege(cn) == 0:
+		insufficientPermissions(cn)
+		return
 	if args != '':
 		sbserver.playerMessage(cn, error('Usage: #pause'))
 		return
 	sbserver.setPaused(True)
 
 def onResumeCmd(cn, args):
+	if sbserver.playerPrivilege(cn) == 0:
+		insufficientPermissions(cn)
+		return
 	if args != '':
 		sbserver.playerMessage(cn, error('Usage: #resume'))
 		return
