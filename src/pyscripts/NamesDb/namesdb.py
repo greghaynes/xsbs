@@ -35,7 +35,7 @@ def onConnect(cn):
 	session.add(ent)
 	session.commit()
 
-def onNameChange(cn):
+def onNameChange(cn, newname):
 	onConnect(cn)
 
 def namesCmd(cn, args):
@@ -53,7 +53,7 @@ def namesCmd(cn, args):
 		return
 	namestr = 'Other known names: '
 	for name in names:
-		namestr += name.nick
+		namestr += name.nick + ' '
 	sbserver.playerMessage(cn, info(namestr))
 
 def init():
@@ -61,5 +61,6 @@ def init():
 
 init()
 registerServerEventHandler('player_connect', onConnect)
+registerServerEventHandler('player_name_changed', onNameChange)
 registerCommandHandler('names', namesCmd)
 
