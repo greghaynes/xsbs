@@ -5,7 +5,7 @@ from xsbs.players import player
 import string
 
 messages = { 5: string.Template(green('$name') + ' is on a ' + orange('KILLING SPREE!')),
-	10: string.Template(green('$name') + ' is ' + orange('UNSTOPABLE!')),
+	10: string.Template(green('$name') + ' is ' + orange('UNSTOPPABLE!')),
 	15: string.Template(green('$name') + ' is ' + orange('GODLIKE!')) }
 endmsg = string.Template(orange('$name') + '\'s killing spree ended by ' + green('$endername'))
 
