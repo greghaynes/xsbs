@@ -602,7 +602,11 @@ namespace server
             {
                 if(!adminpass[0] || haspass==(ci->privilege==PRIV_ADMIN)) return;
             }
-            else if(ci->state.state==CS_SPECTATOR && !haspass && !authname && !ci->local) return;
+            else if(ci->state.state==CS_SPECTATOR && !haspass && !authname && !ci->local)
+            {
+                SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass);
+	        return;
+            }
             loopv(clients) if(ci!=clients[i] && clients[i]->privilege)
             {
                 if(haspass) clients[i]->privilege = PRIV_NONE;
