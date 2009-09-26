@@ -21,7 +21,7 @@ if tk_broadcast > 0:
 	tktemp = string.Template(tktemp)
 
 def teamkill_broadcast(cn, tcn):
-	info(tktemp.substitute(colordict, tker=sbserver.playerName(cn), victim=sbserver.playerName(tcn)))
+	sbserver.message(info(tktemp.substitute(colordict, tker=sbserver.playerName(cn), victim=sbserver.playerName(tcn))))
 
 def getmap(cn):
 	info('Player %s is downloading map' % sbserver.playerName(cn))
