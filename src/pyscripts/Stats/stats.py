@@ -31,12 +31,13 @@ def onCommand(cn, command):
 	if shots != 0:
 		accuracy = hits / float(shots)
 		accuracy = math.floor(accuracy * 100)
-	ktd = 0
-	if deaths != 0:
+	if deaths == 0:
+		ktd = frags
+	else:
 		ktd = frags / float(deaths)
 		ktd *= float(100)
 		ktd = math.floor(ktd)
-		ktd /= 100
+		ktd = ktd / 100
 	msg = template.substitute(colordict, name=name, frags=frags, deaths=deaths, teamkills=teamkills, shots=shots, hits=hits, accuracy=accuracy, ktd=ktd)
 	sbserver.playerMessage(cn, msg)
 
