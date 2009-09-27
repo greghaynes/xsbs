@@ -30,7 +30,6 @@ def onConnect(cn):
 			return
 	except NoResultFound:
 		pass
-	print 'inserting'
 	ent = IpToNick(sbserver.playerIpLong(cn), sbserver.playerName(cn))
 	session.add(ent)
 	session.commit()
