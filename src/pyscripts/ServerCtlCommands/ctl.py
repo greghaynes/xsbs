@@ -1,4 +1,5 @@
 import sbserver
+from xsbs.events import triggerServerEvent
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import red, yellow, blue, green
 from xsbs.plugins import reload as pluginReload

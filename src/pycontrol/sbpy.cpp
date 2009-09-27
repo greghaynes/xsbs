@@ -129,12 +129,15 @@ void deinitPy()
 
 bool restartPy()
 {
+	triggerEvent("restart_begin", 0);
 	deinitPy();
 	Py_Initialize();
 	initModule("sbserver");
-	initPy();
 	// Initialize
-	return initPy();
+	bool val = initPy();
+	if(val)
+		triggerEvent("restart_complete", 0);
+	return val;
 }
 
 bool init(const char *prog_name, const char *arg_pyscripts_path, const char *module_name)

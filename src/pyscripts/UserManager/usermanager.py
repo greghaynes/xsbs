@@ -120,15 +120,10 @@ def onSetMaster(cn, givenhash):
 	else:
 		sbserver.playerMessage(cn, error('Invalid password'))
 
-def onShutdown():
-	session.commit()
-
 Base.metadata.create_all(dbmanager.engine)
 
 registerCommandHandler('register', onRegisterCommand)
 registerCommandHandler('login', onLoginCommand)
 registerCommandHandler('linkname', onLinkName)
-registerServerEventHandler('server_stop', onShutdown)
-registerServerEventHandler('reload', onShutdown)
 registerPolicyEventHandler('player_setmaster', onSetMaster)
 
