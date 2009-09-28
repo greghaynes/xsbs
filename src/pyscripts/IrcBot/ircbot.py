@@ -161,7 +161,7 @@ event_abilities = {
 	'map_change': ('map_changed', onMapChange),
 	'gain_admin': ('player_gained_admin', onGainAdmin),
 	'gain_master': ('player_gained_master', onGainMaster),
-	'auth': ('player_auth', onAuth),
+	'auth': ('player_auth_master', onAuth),
 	'relinquish_admin': ('player_relinq_admin', onReleaseAdmin),
 	'relinquish_master': ('player_relinq_master', onReleaseMaster),
 	'ban': ('player_banned', onBan),

@@ -630,7 +630,7 @@ namespace server
             { 
                 if(authname)
                 {
-                    SbPy::triggerEventIntString("player_auth", ci->clientnum, authname);
+                    SbPy::triggerEventIntString("player_auth_master", ci->clientnum, authname);
                     loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
                 }
                 ci->privilege = PRIV_MASTER;
