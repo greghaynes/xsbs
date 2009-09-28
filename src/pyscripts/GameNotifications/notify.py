@@ -7,7 +7,7 @@ from xsbs.settings import PluginConfig
 import string
 
 config = PluginConfig('gamenotifications')
-tktemp = config.getOption('Config', 'teamkill', '${red}Player ${green}${tker}${red} has team killed ${orange}${victim}')
+tktemp = config.getOption('Config', 'teamkill', '$Player ${green}${tker} has ${red}team killed ${orange}${victim}')
 del config
 
 if tktemp == 'None':
