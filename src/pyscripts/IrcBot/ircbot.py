@@ -3,6 +3,7 @@ from ConfigParser import NoOptionError
 from xsbs.settings import PluginConfig
 from xsbs.events import registerServerEventHandler
 from xsbs.timers import addTimer
+from xsbs.colors import red, green
 import asyncore, socket
 
 config = PluginConfig('ircbot')
@@ -79,7 +80,7 @@ class IrcBot(asyncore.dispatcher):
 			except KeyError:
 				self.privMsg(channel, 'Invalid command')
 		else:
-			sbserver.message('(Remote User) %s: %s' % (sender, message))
+			sbserver.message((red('Remote User') + green(' %s') + ': %s') % (sender, message))
 	def handle_read(self):
 		self.buff += self.recv(4096)
 		tmp_buff = self.buff.split('\n')
