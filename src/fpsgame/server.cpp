@@ -607,6 +607,7 @@ namespace server
                 SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass);
 	        return;
             }
+	    if(authname && !SbPy::triggerPolicyEventIntString("allow_auth", ci->clientnum, authname)) return;
             loopv(clients) if(ci!=clients[i] && clients[i]->privilege)
             {
                 if(haspass) clients[i]->privilege = PRIV_NONE;
@@ -616,7 +617,7 @@ namespace server
 		    ci->privilege = PRIV_ADMIN;
 		    SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass);
 	    }
-	    else if(SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass))
+	    else if(!authname && SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass))
             {
                 setcimaster(ci);
             }
@@ -626,9 +627,10 @@ namespace server
                 return;
             }
             else
-            {
+            { 
                 if(authname)
                 {
+                    SbPy::triggerEventIntString("player_auth", ci->clientnum, authname);
                     loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
                 }
                 ci->privilege = PRIV_MASTER;

@@ -129,6 +129,9 @@ def onGainMaster(cn):
 def onGainAdmin(cn):
 	bot.privMsg(channel, '\x037ADMIN           \x03%s gained admin' % sbserver.playerName(cn))
 
+def onAuth(cn, authname):
+	bot.privMsg(channel, '\x037AUTH            \x03%s has authenticated as %s' % (sbserver.playerName(cn), authname))
+
 def onReleaseAdmin(cn):
 	bot.privMsg(channel, '\x037ADMIN RELINQ    \x03%s released admin' % sbserver.playerName(cn))
 
@@ -158,6 +161,7 @@ event_abilities = {
 	'map_change': ('map_changed', onMapChange),
 	'gain_admin': ('player_gained_admin', onGainAdmin),
 	'gain_master': ('player_gained_master', onGainMaster),
+	'auth': ('player_auth', onAuth),
 	'relinquish_admin': ('player_relinq_admin', onReleaseAdmin),
 	'relinquish_master': ('player_relinq_master', onReleaseMaster),
 	'ban': ('player_banned', onBan),
