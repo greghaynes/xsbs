@@ -51,7 +51,7 @@ def login(cn, user):
 	player(cn).user = user
 	player(cn).logged_in = True
 	triggerServerEvent('player_logged_in', cn)
-	sbserver.message(info(green(sbserver.playerName(cn)) + ' is ' + orange('verified') + '.'))
+	sbserver.message(info(green(sbserver.playerName(cn)) + ' is verified.'))
 
 def userAuth(email, password):
 	try:
@@ -80,6 +80,8 @@ def onLoginCommand(cn, args):
 	if len(args) != 2:
 		sbserver.playerMessage(cn, info('Usage: #login <email> <password>'))
 		return
+	if isLoggedIn(cn):
+		sbserver.playerMessage(cn, red('You are already logged in.'))
 	user = userAuth(args[0], args[1])
 	if user:
 		login(cn, user)
