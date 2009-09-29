@@ -109,7 +109,7 @@ class IrcBot(asyncore.dispatcher):
 bot = IrcBot(servername, nickname, port)
 bot.join(channel)
 
-def onPlayerActive(cn):
+def onPlayerConnect(cn):
 	bot.privMsg(channel, '\x032CONNECT         \x03Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
 
 def onPlayerDisconnect(cn):
@@ -155,7 +155,7 @@ def onStop():
 	bot.quit()
 
 event_abilities = {
-	'player_active': ('player_active', onPlayerActive),
+	'player_active': ('player_connect', onPlayerConnect),
 	'player_disconnect': ('player_disconnect', onPlayerDisconnect),
 	'message': ('player_message', onMsg),
 	'message_team': ('player_message_team', onTeamMsg),
