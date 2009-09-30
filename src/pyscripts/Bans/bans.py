@@ -22,13 +22,15 @@ class Ban(Base):
 	nick = Column(String)
 	banner_ip = Column(Integer)
 	banner_nick = Column(String)
-	def __init__(self, ip, expiration, reason, nick, banner_ip, banner_nick):
+	time = Column(Integer)
+	def __init__(self, ip, expiration, reason, nick, banner_ip, banner_nick, time=time.time()):
 		self.ip = ip
 		self.expiration = expiration
 		self.reason = reason
 		self.nick = nick
 		self.banner_ip = banner_ip
 		self.banner_nick = banner_nick
+		self.time = time
 	def isExpired(self):
 		return self.expiration <= time.time()
 
