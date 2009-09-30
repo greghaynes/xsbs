@@ -1,7 +1,7 @@
 import sbserver
 from xsbs.settings import PluginConfig
 from xsbs.colors import red, colordict
-from xsbs.ui import insufficientPermissions
+from xsbs.ui import insufficientPermissions, error, info
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, execLater
 from xsbs.commands import registerCommandHandler
 from DB.db import dbmanager
@@ -23,7 +23,7 @@ class Ban(Base):
 	banner_ip = Column(Integer)
 	banner_nick = Column(String)
 	time = Column(Integer)
-	def __init__(self, ip, expiration, reason, nick, banner_ip, banner_nick, time=time.time()):
+	def __init__(self, ip, expiration, reason, nick, banner_ip, banner_nick, time):
 		self.ip = ip
 		self.expiration = expiration
 		self.reason = reason
@@ -55,7 +55,7 @@ def ban(cn, seconds, reason, banner_cn):
 	else:
 		banner_ip = 0
 		banner_nick = ''
-	newban = Ban(ip, expiration, reason, nick, banner_ip, banner_nick)
+	newban = Ban(ip, expiration, reason, nick, banner_ip, banner_nick, time.time())
 	session.add(newban)
 	session.commit()
 	execLater(sbserver.playerKick, (cn,))
@@ -78,7 +78,7 @@ def onBanCmd(cn, text):
 		try:
 			ip = sbserver.playerIpLong(tcn)
 		except ValueEror:
-			sbserver.playerMessage(cn, red('Invalid cn'))
+			sbserver.playerMessage(cn, error('Invalid cn'))
 			return
 		reason = ''
 		length = 0
@@ -92,7 +92,17 @@ def onBanCmd(cn, text):
 			length = int(default_ban_length)
 		ban(tcn, length, reason, cn)
 	except (ValueError, KeyError):
-		sbserver.playerMessage(cn, red('Usage: #ban <cn> (duration) (reason)'))
+		sbserver.playerMessage(cn, error('Usage: #ban <cn> (duration) (reason)'))
+
+def onRecentBans(cn, args):
+	if sbserver.playerPrivilege(cn) == 0:
+		insufficientPermissions(cn)
+	elif args != '':
+		sbserver.playerMessage(cn, error('Usage: #recentbans'))
+	else:
+		recent = session.query(Ban).order_by(Ban.time.desc())[:5]
+		for ban in recent:
+			sbserver.playerMessage(cn, info('Nick: %s' % ban.nick))
 
 def allowClient(cn):
 	ip = sbserver.playerIpLong(cn)
@@ -104,6 +114,7 @@ def onKick(tcn, cn):
 def init():
 	registerPolicyEventHandler("allow_connect", allowClient)
 	registerCommandHandler('ban', onBanCmd)
+	registerCommandHandler('recentbans', onRecentBans)
 	registerServerEventHandler('player_ban', ban)
 	registerServerEventHandler('player_kicked', onKick)
 	Base.metadata.create_all(dbmanager.engine)
