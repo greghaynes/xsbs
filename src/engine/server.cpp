@@ -12,6 +12,7 @@
 #include "server.h"
 
 #include <signal.h>
+#include <sys/socket.h>
 
 #ifdef STANDALONE
 void fatal(const char *s, ...) 
