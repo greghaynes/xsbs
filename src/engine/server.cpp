@@ -613,7 +613,7 @@ void checkserversockets()        // reply all server info requests
 			{
 				puts("Sockopt error");
 			}
-			else if(!val)
+			else if(val)
 			{
 				puts("Could not connect to master server.");
 				enet_socket_destroy(mastersock);
