@@ -383,6 +383,19 @@ int connectwithtimeout(ENetSocket sock, const char *hostname, const ENetAddress 
     if(result<0) enet_socket_destroy(sock);
     return result;
 }
+
+bool mastersock_connecting = false;
+
+int connectasync(ENetSocket sock, const char *hostname, const ENetAddress &remoteaddress)
+{
+	int result = enet_socket_connect(sock, &remoteaddress);
+	if(false && result<0 && errno != EINPROGRESS)
+	{
+		puts("Destroyed thine socket.\n");
+		enet_socket_destroy(sock);
+	}
+	return result;
+}
 #endif
 
 ENetSocket mastersock = ENET_SOCKET_NULL;
@@ -420,7 +433,14 @@ ENetSocket connectmaster()
         enet_socket_destroy(sock);
         sock = ENET_SOCKET_NULL;
     }
-    if(sock == ENET_SOCKET_NULL || connectwithtimeout(sock, mastername, masteraddress) < 0) 
+	if(sock != ENET_SOCKET_NULL)
+	{
+		puts("Connecting asynchronously to master..");
+    	enet_socket_set_option(sock, ENET_SOCKOPT_NONBLOCK, 1);
+		connectasync(sock, mastername, masteraddress);
+		mastersock_connecting = true;
+	}
+    if(sock == ENET_SOCKET_NULL) 
     {
 #ifdef STANDALONE
         printf(sock==ENET_SOCKET_NULL ? "could not open socket\n" : "could not connect\n"); 
@@ -428,16 +448,25 @@ ENetSocket connectmaster()
         return ENET_SOCKET_NULL;
     }
     
-    enet_socket_set_option(sock, ENET_SOCKOPT_NONBLOCK, 1);
     return sock;
 }
 
 bool requestmaster(const char *req)
 {
+	if(mastersock_connecting)
+	{
+		puts("Cannot make request to master, currently connecting.\n");
+		return false;
+	}
     if(mastersock == ENET_SOCKET_NULL)
     {
         mastersock = connectmaster();
-        if(mastersock == ENET_SOCKET_NULL) return false;
+        if(mastersock == ENET_SOCKET_NULL)
+		{
+			puts("Error connecting to master\n");
+			return false;
+		}
+		return true;
     }
 
     masterout.put(req, strlen(req));
@@ -532,10 +561,18 @@ void sendserverinforeply(ucharbuf &p)
 void checkserversockets()        // reply all server info requests
 {
     static ENetSocketSet sockset;
+    static ENetSocketSet wsockset;
     ENET_SOCKETSET_EMPTY(sockset);
+    ENET_SOCKETSET_EMPTY(wsockset);
     ENetSocket maxsock = pongsock;
     ENET_SOCKETSET_ADD(sockset, pongsock);
-    if(mastersock != ENET_SOCKET_NULL)
+	if(mastersock_connecting && mastersock != ENET_SOCKET_NULL)
+	{
+		fflush(stdout);
+		maxsock = max(maxsock, mastersock);
+		ENET_SOCKETSET_ADD(wsockset, mastersock);
+	}
+	if(!mastersock_connecting && mastersock != ENET_SOCKET_NULL)
     {
         maxsock = max(maxsock, mastersock);
         ENET_SOCKETSET_ADD(sockset, mastersock);
@@ -545,7 +582,7 @@ void checkserversockets()        // reply all server info requests
         maxsock = max(maxsock, lansock);
         ENET_SOCKETSET_ADD(sockset, lansock);
     }
-    if(enet_socketset_select(maxsock, &sockset, NULL, 0) <= 0) return;
+    if(enet_socketset_select(maxsock, &sockset, &wsockset, 0) <= 0) return;
 
     ENetBuffer buf;
     uchar pong[MAXTRANS];
@@ -563,7 +600,17 @@ void checkserversockets()        // reply all server info requests
         server::serverinforeply(req, p);
     }
 
-    if(mastersock != ENET_SOCKET_NULL && ENET_SOCKETSET_CHECK(sockset, mastersock)) flushmasterinput();
+	if(mastersock_connecting)
+	{
+		if(mastersock != ENET_SOCKET_NULL
+			&& ENET_SOCKETSET_CHECK(wsockset, mastersock))
+		{
+			puts("Connected to master server.\n");
+			fflush(stdout);
+			mastersock_connecting = false;
+		}
+	}
+	else if(mastersock != ENET_SOCKET_NULL && ENET_SOCKETSET_CHECK(sockset, mastersock)) flushmasterinput();
 
 }
 
