@@ -605,8 +605,22 @@ void checkserversockets()        // reply all server info requests
 		if(mastersock != ENET_SOCKET_NULL
 			&& ENET_SOCKETSET_CHECK(wsockset, mastersock))
 		{
-			puts("Connected to master server.\n");
-			fflush(stdout);
+		    int val;
+		    socklen_t len;
+			len = sizeof(int);
+			if(getsockopt(mastersock, SOL_SOCKET, SO_ERROR, &val, &len) == -1)
+			{
+				puts("Sockopt error");
+			}
+			else if(!val)
+			{
+				puts("Could not connect to master server.");
+				enet_socket_destroy(mastersock);
+			}
+			else
+			{
+				puts("Connected to master server.\n");
+			}
 			mastersock_connecting = false;
 		}
 	}
