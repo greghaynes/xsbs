@@ -5,6 +5,7 @@ from xsbs.ui import info
 
 def onMapModified(cn):
 	player(cn).gamevars['modified_map'] = True
+	sbserver.spectate(cn)
 
 def checkModified(cn):
 	try:
