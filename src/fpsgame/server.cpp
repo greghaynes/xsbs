@@ -280,6 +280,7 @@ namespace server
         return true;
     }
 
+
     void autoteam()
     {
         static const char *teamnames[2] = {"good", "evil"};
@@ -1271,6 +1272,7 @@ namespace server
         gs.respawn();
     }
 
+
     void suicideevent::process(clientinfo *ci)
     {
         suicide(ci);
@@ -1551,6 +1553,29 @@ namespace server
     void sendservinfo(clientinfo *ci)
     {
         sendf(ci->clientnum, 1, "ri5", SV_SERVINFO, ci->clientnum, PROTOCOL_VERSION, ci->sessionid, serverpass[0] ? 1 : 0);
+    }
+
+    bool spectate(clientinfo *spinfo, bool val, int spectator)
+    {
+        if(spinfo->state.state!=CS_SPECTATOR && val)
+        {
+            if(spinfo->state.state==CS_ALIVE) suicide(spinfo);
+            if(smode) smode->leavegame(spinfo);
+            spinfo->state.state = CS_SPECTATOR;
+            spinfo->state.timeplayed += lastmillis - spinfo->state.lasttimeplayed;
+            if(!spinfo->local && !spinfo->privilege) aiman::removeai(spinfo);
+            SbPy::triggerEventInt("player_spectated", spinfo->clientnum);
+        }
+        else if(spinfo->state.state==CS_SPECTATOR && !val)
+        {
+            spinfo->state.state = CS_DEAD;
+            spinfo->state.respawn();
+            spinfo->state.lasttimeplayed = lastmillis;
+            aiman::addclient(spinfo);
+            if(spinfo->clientmap[0] || spinfo->mapcrc) checkmaps();
+            SbPy::triggerEventInt("player_unspectated", spinfo->clientnum);
+         }
+         sendf(-1, 1, "ri3", SV_SPECTATOR, spectator, val);
     }
 
     void noclients()
@@ -2179,25 +2204,7 @@ namespace server
                 clientinfo *spinfo = (clientinfo *)getclientinfo(spectator); // no bots
                 if(!spinfo || (spinfo->state.state==CS_SPECTATOR ? val : !val)) break;
 
-                if(spinfo->state.state!=CS_SPECTATOR && val)
-                {
-                    if(spinfo->state.state==CS_ALIVE) suicide(spinfo);
-                    if(smode) smode->leavegame(spinfo);
-                    spinfo->state.state = CS_SPECTATOR;
-                    spinfo->state.timeplayed += lastmillis - spinfo->state.lasttimeplayed;
-                    if(!spinfo->local && !spinfo->privilege) aiman::removeai(spinfo);
-                    SbPy::triggerEventInt("player_spectated", spinfo->clientnum);
-                }
-                else if(spinfo->state.state==CS_SPECTATOR && !val)
-                {
-                    spinfo->state.state = CS_DEAD;
-                    spinfo->state.respawn();
-                    spinfo->state.lasttimeplayed = lastmillis;
-                    aiman::addclient(spinfo);
-                    if(spinfo->clientmap[0] || spinfo->mapcrc) checkmaps();
-                    SbPy::triggerEventInt("player_unspectated", spinfo->clientnum);
-                }
-                sendf(-1, 1, "ri3", SV_SPECTATOR, spectator, val);
+		spectate(spinfo, val, spectator);
                 break;
             }
 
