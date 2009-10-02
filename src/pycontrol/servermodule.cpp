@@ -468,6 +468,17 @@ static PyObject *uptime(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", server::gamemillis);
 }
 
+static PyObject *ip(PyObject *self, PyObject *args)
+{
+	if(*serverip)
+		return Py_BuildValue("s", serverip);
+	else
+	{
+		Py_INCREF(Py_None);
+		return Py_None;
+	}
+}
+
 static PyObject *port(PyObject *self, PyObject *args)
 {
 	if(serverport <= 0)
@@ -526,6 +537,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"modeName", modeName, METH_VARARGS, "Name of game mode."},
 	{"reload", restartPy, METH_VARARGS, "Reload python modules."},
 	{"uptime", uptime, METH_VARARGS, "Number of milliseconds server has been running."},
+	{"ip", ip, METH_VARARGS, "Current server ip."},
 	{"port", port, METH_VARARGS, "Current server port."},
 	{"authChallenge", authChal, METH_VARARGS, "Send auth challenge to client."},
 	{NULL, NULL, 0, NULL}
