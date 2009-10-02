@@ -32,7 +32,7 @@ def onReloadCmd(cn, args):
 			sbserver.playerMessage(cn, yellow('NOTICE: ') + blue('Reloading server plugins.  Fasten your seatbelts...'))
 			pluginReload()
 		else:
-			sbserver.playerMessage(cn, error('Insufficient privileges'))
+			insufficientPermissions(cn)
 
 def onInfoCmd(cn, args):
 	sbserver.playerMessage(cn, motdstring)
@@ -50,18 +50,28 @@ def onGiveMaster(cn, args):
 		sbserver.playerMessage(cn, info('You have given master to %s') % sbserver.playerName(tcn))
 		sbserver.setMaster(tcn)
 	else:
-		sbserver.playerMessage(cn, error('Insufficient permissions.'))
+		insufficientPermissions(cn)
 
 def onMasterMask(cn, args):
 	if args == '':
 		sbserver.playerMessage(cn, error('Usage: #mastermask <int>'))
 		return
 	if sbserver.playerPrivilege(cn) != 2:
-		sbserver.playerMessage(cn, error('Insufficient permissions.'))
+		insufficientPermissions(cn)
 		return
 	args = args.split(' ')
 	sbserver.setMasterMask(int(args[0]))
 	sbserver.message(info('Master mask is now %s') % args[0])
+
+def onResize(cn, args):
+	if sbserver.playerPrivilege(cn) != 2:
+		insufficientPermissions(cn)
+	elif args == '':
+		sbserver.playerMessage(cn, error('Usage: #resize <int>'))
+	else:
+		size = int(args)
+		sbserver.setMaxClients(int(args))
+
 
 registerCommandHandler('pause', onPauseCmd)
 registerCommandHandler('resume', onResumeCmd)
@@ -69,4 +79,5 @@ registerCommandHandler('reload', onReloadCmd)
 registerCommandHandler('info', onInfoCmd)
 registerCommandHandler('givemaster', onGiveMaster)
 registerCommandHandler('mastermask', onMasterMask)
+registerCommandHandler('resize', onResize)
 
