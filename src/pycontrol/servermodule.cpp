@@ -470,7 +470,10 @@ static PyObject *uptime(PyObject *self, PyObject *args)
 
 static PyObject *port(PyObject *self, PyObject *args)
 {
-	return Py_BuildValue("i", server::serverport());
+	if(serverport <= 0)
+		return Py_BuildValue("i", server::serverport());
+	else
+		return Py_BuildValue("i", serverport);
 }
 
 static PyObject *authChal(PyObject *self, PyObject *args)

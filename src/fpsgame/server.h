@@ -346,6 +346,7 @@ namespace server
 }
 
 extern void server_sigint(int);
+extern int serverport;
 
 #endif
 
