@@ -18,8 +18,6 @@ class MasterClient(asyncore.dispatcher):
 		self.is_connected = False
 		self.next_auth_id = 0
 		self.auth_map = {}
-		if sbserver.ip():
-			self.bind((sbserver.ip(), 0))
 		self.do_connect()
 		self.register()
 	def handle_close(self):
@@ -37,6 +35,8 @@ class MasterClient(asyncore.dispatcher):
 	def do_connect(self):
 		if not self.is_connected:
 			self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+			if sbserver.ip():
+				self.bind((sbserver.ip(), 0))
 			self.connect((self.hostname, self.port))
 			self.is_connected = True
 	def handle_read(self):
