@@ -1,4 +1,5 @@
 from xsbs.events import registerServerEventHandler
+from xsbs.timers import addTimer
 import sbserver
 import asyncore
 import socket
@@ -36,6 +37,11 @@ class MasterConn(asyncore.dispatcher):
 			elif key == 'succreg':
 				self.is_registered = True
 				print 'Successfully registered with master server'
+				self.close()
 
-mc = MasterConn()
+def updateMaster():
+	mc = MasterConn()
+	addTimer(3600000, updateMaster)
+
+updateMaster()
 
