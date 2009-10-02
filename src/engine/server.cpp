@@ -454,23 +454,7 @@ ENetSocket connectmaster()
 
 bool requestmaster(const char *req)
 {
-	if(mastersock_connecting)
-	{
-		puts("Cannot make request to master, currently connecting.\n");
-		return false;
-	}
-    if(mastersock == ENET_SOCKET_NULL)
-    {
-        mastersock = connectmaster();
-        if(mastersock == ENET_SOCKET_NULL)
-		{
-			puts("Error connecting to master\n");
-			return false;
-		}
-		return true;
-    }
-
-    masterout.put(req, strlen(req));
+    SbPy::triggerEventStr("master_request", req);
     return true;
 }
 
@@ -562,28 +546,15 @@ void sendserverinforeply(ucharbuf &p)
 void checkserversockets()        // reply all server info requests
 {
     static ENetSocketSet sockset;
-    static ENetSocketSet wsockset;
     ENET_SOCKETSET_EMPTY(sockset);
-    ENET_SOCKETSET_EMPTY(wsockset);
     ENetSocket maxsock = pongsock;
     ENET_SOCKETSET_ADD(sockset, pongsock);
-	if(mastersock_connecting && mastersock != ENET_SOCKET_NULL)
-	{
-		fflush(stdout);
-		maxsock = max(maxsock, mastersock);
-		ENET_SOCKETSET_ADD(wsockset, mastersock);
-	}
-	if(!mastersock_connecting && mastersock != ENET_SOCKET_NULL)
-    {
-        maxsock = max(maxsock, mastersock);
-        ENET_SOCKETSET_ADD(sockset, mastersock);
-    }
     if(lansock != ENET_SOCKET_NULL)
     {
         maxsock = max(maxsock, lansock);
         ENET_SOCKETSET_ADD(sockset, lansock);
     }
-    if(enet_socketset_select(maxsock, &sockset, &wsockset, 0) <= 0) return;
+    if(enet_socketset_select(maxsock, &sockset, 0, 0) <= 0) return;
 
     ENetBuffer buf;
     uchar pong[MAXTRANS];
@@ -600,33 +571,6 @@ void checkserversockets()        // reply all server info requests
         p.len += len;
         server::serverinforeply(req, p);
     }
-
-	if(mastersock_connecting)
-	{
-		if(mastersock != ENET_SOCKET_NULL
-			&& ENET_SOCKETSET_CHECK(wsockset, mastersock))
-		{
-		    int val;
-		    socklen_t len;
-			len = sizeof(int);
-			if(getsockopt(mastersock, SOL_SOCKET, SO_ERROR, &val, &len) == -1)
-			{
-				puts("Sockopt error");
-			}
-			else if(val)
-			{
-				puts("Could not connect to master server.");
-				enet_socket_destroy(mastersock);
-			}
-			else
-			{
-				puts("Connected to master server.\n");
-			}
-			mastersock_connecting = false;
-		}
-	}
-	else if(mastersock != ENET_SOCKET_NULL && ENET_SOCKETSET_CHECK(sockset, mastersock)) flushmasterinput();
-
 }
 
 #define DEFAULTCLIENTS 8
@@ -856,7 +800,6 @@ void initserver(bool listen, bool dedicated)
 
     if(listen)
     {
-        updatemasterserver();
         if(dedicated) rundedicatedserver(); // never returns
 #ifndef STANDALONE
         else conoutf("listen server started");
@@ -873,8 +816,6 @@ void startlistenserver(int *usemaster)
  
     if(!setuplistenserver(false)) return;
     
-    updatemasterserver();
-   
     conoutf("listen server started for %d clients%s", maxclients, allowupdatemaster ? " and listed with master server" : ""); 
 }
 COMMAND(startlistenserver, "i");

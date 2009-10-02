@@ -468,6 +468,11 @@ static PyObject *uptime(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", server::gamemillis);
 }
 
+static PyObject *port(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("i", server::serverport);
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -500,6 +505,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"modeName", modeName, METH_VARARGS, "Name of game mode."},
 	{"reload", restartPy, METH_VARARGS, "Reload python modules."},
 	{"uptime", uptime, METH_VARARGS, "Number of milliseconds server has been running."},
+	{"port", port, METH_VARARGS, "Current server port."},
 	{NULL, NULL, 0, NULL}
 };
 
