@@ -77,6 +77,7 @@ class MasterClient(asyncore.dispatcher):
 	def register(self):
 		self.do_connect()
 		self.out_buff.append('regserv %i\n' % sbserver.port())
+		addTimer(3600000, self.register)
 	def update(self):
 		self.register()
 	def tryauth(self, cn, name):
