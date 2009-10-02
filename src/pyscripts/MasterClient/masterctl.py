@@ -44,7 +44,6 @@ class MasterClient(asyncore.dispatcher):
 			if key == 'failreg':
 				self.is_registered = False
 				print 'Failed to register with master server'
-				self.close()
 			elif key == 'succreg':
 				self.is_registered = True
 				print 'Successfully registered with master server'
