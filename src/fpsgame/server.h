@@ -341,6 +341,7 @@ namespace server
 	void pausegame(bool);
 	void setmap(const char *, int);
 	void setmastermode(int);
+	void challengeauth(clientinfo *, uint, const char *);
 
 }
 

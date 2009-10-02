@@ -473,6 +473,24 @@ static PyObject *port(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", server::serverport);
 }
 
+static PyObject *authChal(PyObject *self, PyObject *args)
+{
+	int cn, id;
+	char *chal;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "iis", &cn, &id, &chal))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	server::challengeauth(ci, id, chal);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -506,6 +524,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"reload", restartPy, METH_VARARGS, "Reload python modules."},
 	{"uptime", uptime, METH_VARARGS, "Number of milliseconds server has been running."},
 	{"port", port, METH_VARARGS, "Current server port."},
+	{"authChallenge", authChal, METH_VARARGS, "Send auth challenge to client."},
 	{NULL, NULL, 0, NULL}
 };
 

@@ -1649,10 +1649,18 @@ namespace server
         sendf(ci->clientnum, 1, "risis", SV_AUTHCHAL, "", id, val);
     }
 
+    void challengeauth(clientinfo *ci, uint id, const char *val)
+    {
+	if(!ci) return;
+	sendf(ci->clientnum, 1, "risis", SV_AUTHCHAL, "", id, val);
+    }
+
     uint nextauthreq = 0;
 
     void tryauth(clientinfo *ci, const char *user)
     {
+        SbPy::triggerEventIntString("auth_try", ci->clientnum, user);
+	return;
         if(!nextauthreq) nextauthreq = 1;
         ci->authreq = nextauthreq++;
         filtertext(ci->authname, user, false, 100);
@@ -1665,6 +1673,8 @@ namespace server
 
     void answerchallenge(clientinfo *ci, uint id, char *val)
     {
+        SbPy::triggerEventIntString("auth_ans", id, val);
+	return;
         if(ci->authreq != id) return;
         for(char *s = val; *s; s++)
         {
