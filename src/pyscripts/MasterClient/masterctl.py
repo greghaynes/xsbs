@@ -4,26 +4,31 @@ import sbserver
 import asyncore
 import socket
 
-class MasterConn(asyncore.dispatcher):
+class MasterReg(asyncore.dispatcher):
 	def __init__(self, hostname='sauerbraten.org', port=28787):
 		asyncore.dispatcher.__init__(self)
 		self.hostname = hostname
 		self.port = port
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.connect((hostname, port))
 		self.buff = ''
-		self.do_reg = True
+		self.out_buff = []
 		self.is_registered = False
+		self.is_connected = False
+		self.connect((self.hostname, self.port))
+		self.register()
 	def handle_close(self):
+		self.is_connected = False
 		print 'Master connection closed'
 	def handle_connect(self):
+		self.is_connected = True
 		print 'Connected to master server'
+		addTimer(3600000, self.update)
 	def handle_write(self):
-		if self.do_reg:
-			self.send('regserv %i\n' % sbserver.port())
-			self.do_reg = False
+		for out in self.out_buff:
+			self.send(out)
+		del self.out_buff[:]
 	def writable(self):
-		return self.do_reg
+		return len(self.out_buff) > 0
 	def handle_read(self):
 		self.buff += self.recv(4096)
 		tmp_buff = self.buff.split('\n')
@@ -37,11 +42,12 @@ class MasterConn(asyncore.dispatcher):
 			elif key == 'succreg':
 				self.is_registered = True
 				print 'Successfully registered with master server'
-				self.close()
+	def register(self):
+		self.out_buff.append('regserv %i\n' % sbserver.port())
+	def update(self):
+		if not self.is_connected:
+			self.connect()
+		self.register()
 
-def updateMaster():
-	mc = MasterConn()
-	addTimer(3600000, updateMaster)
-
-updateMaster()
+mr = MasterReg()
 
