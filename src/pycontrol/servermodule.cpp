@@ -287,6 +287,24 @@ static PyObject *playerHits(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ci->state.hits);
 }
 
+static PyObject *spectate(PyObject *self, PyObject *args)
+{
+	int cn;
+	int spectator;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "ii", &cn, &spectator))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	server::spectate(ci, spectator, true);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject *setPlayerTeam(PyObject *self, PyObject *args)
 {
 	int cn;
@@ -556,6 +574,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"playerShots", playerShots, METH_VARARGS, "Shots by player in current match."},
 	{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
 	{"playerPing", playerPing, METH_VARARGS, "Current ping of player."},
+	{"spectate", spectate, METH_VARARGS, "Spectate player."},
 	{"setPlayerTeam", setPlayerTeam, METH_VARARGS, "Set team of player."},
 	{"setBotLimit", setBotLimit, METH_VARARGS, "Set server bot limit."},
 	{"hashPassword", hashPass, METH_VARARGS, "Return hash for user + password"},

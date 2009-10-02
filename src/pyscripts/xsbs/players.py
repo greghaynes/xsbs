@@ -5,8 +5,15 @@ import sbserver
 class Player:
 	def __init__(self, cn):
 		self.cn = cn
+		self.gamevars = {}
+	def newGame(self):
+		del self.gamevars[:]
 
 players = {}
+
+def onMapChanged(mapname, mapmode):
+	for player in players.values():
+		player.newGame();
 
 def player(cn):
 	try:
@@ -35,4 +42,5 @@ def reload():
 registerServerEventHandler('player_connect_pre', playerConnect)
 registerServerEventHandler('player_disconnect_post', playerDisconnect)
 registerServerEventHandler('reload_complete', reload)
+registerServerEventHandler('map_changed', onMapChanged)
 
