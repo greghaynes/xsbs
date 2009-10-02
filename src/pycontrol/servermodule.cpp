@@ -287,6 +287,24 @@ static PyObject *playerHits(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ci->state.hits);
 }
 
+static PyObject *setPlayerTeam(PyObject *self, PyObject *args)
+{
+	int cn;
+	char *team;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "is", &cn, &team))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	server::setteam(ci, team);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject *playerPing(PyObject *self, PyObject *args)
 {
 	int cn;
@@ -538,6 +556,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"playerShots", playerShots, METH_VARARGS, "Shots by player in current match."},
 	{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
 	{"playerPing", playerPing, METH_VARARGS, "Current ping of player."},
+	{"setPlayerTeam", setPlayerTeam, METH_VARARGS, "Set team of player."},
 	{"setBotLimit", setBotLimit, METH_VARARGS, "Set server bot limit."},
 	{"hashPassword", hashPass, METH_VARARGS, "Return hash for user + password"},
 	{"setMaster", setMaster, METH_VARARGS, "Set cn to master."},

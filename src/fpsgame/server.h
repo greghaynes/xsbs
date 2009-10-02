@@ -342,7 +342,7 @@ namespace server
 	void setmap(const char *, int);
 	void setmastermode(int);
 	void challengeauth(clientinfo *, uint, const char *);
-
+	bool setteam(clientinfo *, char *);
 }
 
 extern void server_sigint(int);

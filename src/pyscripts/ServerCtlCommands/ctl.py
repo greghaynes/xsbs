@@ -72,7 +72,6 @@ def onResize(cn, args):
 		size = int(args)
 		sbserver.setMaxClients(int(args))
 
-
 registerCommandHandler('pause', onPauseCmd)
 registerCommandHandler('resume', onResumeCmd)
 registerCommandHandler('reload', onReloadCmd)

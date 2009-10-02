@@ -41,7 +41,6 @@ def flushPlayerSession(cn):
 	user = loggedInAs(cn)
 	UserSessionStats(cn)
 
-
 def onConnect(cn):
 	player(cn).stats_frags = 0
 	player(cn).stats_deaths = 0
