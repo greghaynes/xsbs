@@ -1651,8 +1651,8 @@ namespace server
 
     void challengeauth(clientinfo *ci, uint id, const char *val)
     {
-	if(!ci) return;
-	sendf(ci->clientnum, 1, "risis", SV_AUTHCHAL, "", id, val);
+        if(!ci) return;
+        sendf(ci->clientnum, 1, "risis", SV_AUTHCHAL, "", id, val);
     }
 
     uint nextauthreq = 0;
@@ -1660,43 +1660,13 @@ namespace server
     void tryauth(clientinfo *ci, const char *user)
     {
         SbPy::triggerEventIntString("auth_try", ci->clientnum, user);
-	return;
-        if(!nextauthreq) nextauthreq = 1;
-        ci->authreq = nextauthreq++;
-        filtertext(ci->authname, user, false, 100);
-        if(!requestmasterf("reqauth %u %s\n", ci->authreq, ci->authname))
-        {
-            ci->authreq = 0;
-            sendf(ci->clientnum, 1, "ris", SV_SERVMSG, "not connected to authentication server");
-        }
+        return;
     }
 
     void answerchallenge(clientinfo *ci, uint id, char *val)
     {
         SbPy::triggerEventIntString("auth_ans", id, val);
-	return;
-        if(ci->authreq != id) return;
-        for(char *s = val; *s; s++)
-        {
-            if(!isxdigit(*s)) { *s = '\0'; break; }
-        }
-        if(!requestmasterf("confauth %u %s\n", id, val))
-        {
-            ci->authreq = 0;
-            sendf(ci->clientnum, 1, "ris", SV_SERVMSG, "not connected to authentication server");
-        }
-    }
-
-    void processmasterinput(const char *cmd, int cmdlen, const char *args)
-    {
-        uint id;
-        string val;
-        if(sscanf(cmd, "failauth %u", &id) == 1)
-            authfailed(id);
-        else if(sscanf(cmd, "succauth %u", &id) == 1)
-            authsucceeded(id);
-        else if(sscanf(cmd, "chalauth %u %s", &id, val) == 2)
-            authchallenged(id, val);
+        return;
     }
 
     void receivefile(int sender, uchar *data, int len)

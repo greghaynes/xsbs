@@ -464,38 +464,6 @@ bool requestmasterf(const char *fmt, ...)
     return requestmaster(req);
 }
 
-void processmasterinput()
-{
-    if(masterinpos >= masterin.length()) return;
-
-    char *input = &masterin[masterinpos], *end = (char *)memchr(input, '\n', masterin.length() - masterinpos);
-    while(end)
-    {
-        *end++ = '\0';
-
-        const char *args = input;
-        while(args < end && !isspace(*args)) args++;
-        int cmdlen = args - input;
-        while(args < end && isspace(*args)) args++;
-
-        if(!strncmp(input, "failreg", cmdlen))
-            conoutf(CON_ERROR, "master server registration failed: %s\n", args);
-        else if(!strncmp(input, "succreg", cmdlen))
-            conoutf("master server registration succeeded\n");
-        else server::processmasterinput(input, cmdlen, args);
-
-        masterinpos = end - masterin.getbuf();
-        input = end;
-        end = (char *)memchr(input, '\n', masterin.length() - masterinpos);
-    } 
-
-    if(masterinpos >= masterin.length())
-    {
-        masterin.setsizenodelete(0);
-        masterinpos = 0;
-    }
-}
-
 void flushmasteroutput()
 {
     if(masterout.empty()) return;
@@ -512,23 +480,6 @@ void flushmasteroutput()
             masterout.setsizenodelete(0);
             masteroutpos = 0;
         }
-    }
-    else disconnectmaster();
-}
-
-void flushmasterinput()
-{
-    if(masterin.length() >= masterin.capacity())
-        masterin.reserve(4096);
-
-    ENetBuffer buf;
-    buf.data = &masterin[masterin.length()];
-    buf.dataLength = masterin.capacity() - masterin.length();
-    int recv = enet_socket_receive(mastersock, NULL, &buf, 1);
-    if(recv > 0)
-    {
-        masterin.advance(recv);
-        processmasterinput();
     }
     else disconnectmaster();
 }
