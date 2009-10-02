@@ -2,6 +2,11 @@ import sbserver
 from xsbs.events import registerServerEventHandler
 from xsbs.players import player
 from xsbs.ui import warning
+from xsbs.settings import PluginConfig
+
+config = PluginConfig('cheatdetection')
+spectate_map_modified = (config.getOption('Config', 'spectate_map_modified', 'yes') == 'yes')
+del config
 
 def onMapModified(cn):
 	player(cn).gamevars['modified_map'] = True
@@ -9,7 +14,7 @@ def onMapModified(cn):
 
 def checkModified(cn):
 	try:
-		if player(cn).gamevars['modified_map']:
+		if player(cn).gamevars['modified_map'] and spectate_map_modified:
 			sbserver.playerMessage(cn, warning('You cannot play with a modified map.'))
 			sbserver.spectate(cn, cn)
 	except KeyError:
