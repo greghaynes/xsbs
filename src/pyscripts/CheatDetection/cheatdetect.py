@@ -13,6 +13,7 @@ def checkModified(cn):
 	except KeyError:
 		pass
 
+registerServerEventHandler('player_modified_map', onMapModified)
 registerServerEventHandler('player_active', checkModified)
 registerServerEventHandler('player_unspectated', checkModified)
 
