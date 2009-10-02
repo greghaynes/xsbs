@@ -7,7 +7,7 @@ class Player:
 		self.cn = cn
 		self.gamevars = {}
 	def newGame(self):
-		del self.gamevars[:]
+		self.gamevars.clear()
 
 players = {}
 
