@@ -46,7 +46,7 @@ class MasterClient(asyncore.dispatcher):
 			key = args[0]
 			if key == 'failreg':
 				self.is_registered = False
-				print 'Failed to register with master server'
+				print 'Failed to register with master server: %s' % line[8:]
 				self.is_connected = False
 				self.close()
 			elif key == 'succreg':
