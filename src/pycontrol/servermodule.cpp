@@ -456,6 +456,21 @@ static PyObject *modeName(PyObject *self, PyObject *args)
 	return Py_BuildValue("s", name);
 }
 
+static PyObject *maxClients(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("i", maxclients);
+}
+
+static PyObject *setMaxClients(PyObject *self, PyObject *args)
+{
+	int mm;
+	if(!PyArg_ParseTuple(args, "i", &mm))
+		return 0;
+	maxclients = mm;
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject *restartPy(PyObject *self, PyObject *args)
 {
 	server::restart_py = true;
@@ -535,6 +550,8 @@ static PyMethodDef ModuleMethods[] = {
 	{"gameMode", gameMode, METH_VARARGS, "Current game mode."},
 	{"mapName", mapName, METH_VARARGS, "Current map name."},
 	{"modeName", modeName, METH_VARARGS, "Name of game mode."},
+	{"maxClients", maxClients, METH_VARARGS, "Get current maximum number of allowed clients."},
+	{"setMaxClients", setMaxClients, METH_VARARGS, "Set maximum number of allowed clients."},
 	{"reload", restartPy, METH_VARARGS, "Reload python modules."},
 	{"uptime", uptime, METH_VARARGS, "Number of milliseconds server has been running."},
 	{"ip", ip, METH_VARARGS, "Current server ip."},
