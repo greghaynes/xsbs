@@ -23,6 +23,7 @@ class MasterClient(asyncore.dispatcher):
 		self.register()
 	def handle_close(self):
 		self.is_connected = False
+		self.close()
 		print 'Master connection closed'
 	def handle_connect(self):
 		self.is_connected = True
