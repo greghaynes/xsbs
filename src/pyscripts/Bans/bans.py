@@ -4,11 +4,13 @@ from xsbs.colors import red, colordict
 from xsbs.ui import insufficientPermissions, error, info
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, execLater
 from xsbs.commands import registerCommandHandler
+from xsbs.net import ipLongToString
 from DB.db import dbmanager
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
 import time, string
+import logging
 
 Base = declarative_base()
 session = dbmanager.session()
@@ -59,6 +61,12 @@ def ban(cn, seconds, reason, banner_cn):
 	session.add(newban)
 	session.commit()
 	execLater(sbserver.playerKick, (cn,))
+	logging.info('Player %s (%s) banned for %s by %s (%s)',
+		nick,
+		ipLongToString(ip),
+		reason,
+		banner_nick,
+		ipLongToString(banner_ip))
 
 config = PluginConfig('bans')
 ban_command = config.getOption('Config', 'ban_command', 'ban')
