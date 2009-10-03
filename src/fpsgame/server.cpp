@@ -2017,7 +2017,10 @@ namespace server
                 filtertext(text, text);
                 int reqmode = getint(p);
                 //if(type!=SV_MAPVOTE && !mapreload) break;
-		SbPy::triggerEventIntStringInt("player_map_request", sender, text, reqmode);
+		if(type==SV_MAPVOTE)
+			SbPy::triggerEventIntStringInt("player_map_vote", sender, text, reqmode);
+		else
+			SbPy::triggerEventIntStringInt("player_map_set", sender, text, reqmode);
                 break;
             }
 

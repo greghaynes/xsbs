@@ -39,16 +39,24 @@ def countVotes():
 
 mapreload = [False]
 
-def onMapRequest(cn, mapname, mapmode):
+def onMapSet(cn, mapname, mapmode):
 	if sbserver.mapName() == '':
 		sbserver.setMap(mapname, mapmode)
-	elif sbserver.playerPrivilege(cn) > 0 and sbserver.masterMode() > 0:
+	elif sbserver.playerPrivilege(cn) > 0 and sbserver.masterMode() > 1:
 		sbserver.setMap(mapname, mapmode)
 	elif mapmode != sbserver.gameMode() and not allow_modevote and sbserver.playerPrivilege(cn) == 0:
 		sbserver.playerMessage(cn, error('You cannot request a new game mode'))
 	elif mapreload[0]:
-		mapreload[0] = False
 		sbserver.setMap(mapname, mapmode)
+		mapreload[0] = False
+
+def onMapVote(cn, mapname, mapmode):
+	if sbserver.mapName() == '':
+		sbserver.setMap(mapname, mapmode)
+	elif sbserver.playerPrivilege(cn) > 0 and sbserver.masterMode() > 1:
+		sbserver.setMap(mapname, mapmode)
+	elif mapmode != sbserver.gameMode() and not allow_modevote and sbserver.playerPrivilege(cn) == 0:
+		sbserver.playerMessage(cn, error('You cannot request a new game mode'))
 	else:
 		try:
 			vote = player(cn).gamevars['mapvote']
@@ -65,6 +73,7 @@ def onMapRequest(cn, mapname, mapmode):
 def onIntermEnd():
 	mapreload[0] = True
 
-registerServerEventHandler('player_map_request', onMapRequest)
+registerServerEventHandler('player_map_set', onMapSet)
+registerServerEventHandler('player_map_vote', onMapVote)
 registerServerEventHandler('intermission_ended', onIntermEnd)
 
