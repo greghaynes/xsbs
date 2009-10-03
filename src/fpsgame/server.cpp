@@ -2016,7 +2016,7 @@ namespace server
                 getstring(text, p);
                 filtertext(text, text);
                 int reqmode = getint(p);
-                if(type!=SV_MAPVOTE && !mapreload) break;
+                //if(type!=SV_MAPVOTE && !mapreload) break;
 		SbPy::triggerEventIntStringInt("player_map_request", sender, text, reqmode);
                 break;
             }
