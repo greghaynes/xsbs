@@ -12,9 +12,12 @@ def checkVotes(cn):
 		needed += 1
 	votes = 0
 	for player in players:
-		if player.votekick == cn:
-			votes += 1
-	if votes > needed:
+		try:
+			if player.votekick == cn:
+				votes += 1
+		except AttributeError:
+			pass
+	if votes >= needed:
 		ban(cn, 3600, 'Vote', -1)
 
 def onVoteKick(cn, args):
