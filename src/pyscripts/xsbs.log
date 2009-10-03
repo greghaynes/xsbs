@@ -174,3 +174,29 @@ INFO       2009-10-03 01:48:00,831 plugins: Initializing plugins...
 INFO       2009-10-03 01:48:01,037 masterctl: Connected to master server
 INFO       2009-10-03 01:48:01,050 ircbot: Conneced
 WARNING    2009-10-03 01:48:21,251 masterctl: Failed to register with master server: failed pinging server
+INFO       2009-10-03 01:54:48,063 plugins: Loading plugins...
+INFO       2009-10-03 01:54:48,068 plugins: Skipping HelloWorld plugin
+INFO       2009-10-03 01:54:48,071 plugins: Skipping UserStats plugin
+INFO       2009-10-03 01:54:48,072 plugins: Found 23 plugins
+INFO       2009-10-03 01:54:48,072 plugins: Initializing plugins...
+INFO       2009-10-03 01:54:48,238 plugins: Loading plugins...
+INFO       2009-10-03 01:54:48,239 plugins: Skipping HelloWorld plugin
+INFO       2009-10-03 01:54:48,242 plugins: Skipping UserStats plugin
+INFO       2009-10-03 01:54:48,243 plugins: Found 23 plugins
+INFO       2009-10-03 01:54:48,243 plugins: Initializing plugins...
+INFO       2009-10-03 01:54:48,445 ircbot: Conneced
+INFO       2009-10-03 01:54:48,449 masterctl: Connected to master server
+WARNING    2009-10-03 01:55:07,664 masterctl: Failed to register with master server: failed pinging server
+INFO       2009-10-03 01:57:42,582 plugins: Loading plugins...
+INFO       2009-10-03 01:57:42,587 plugins: Skipping HelloWorld plugin
+INFO       2009-10-03 01:57:42,590 plugins: Skipping UserStats plugin
+INFO       2009-10-03 01:57:42,591 plugins: Found 23 plugins
+INFO       2009-10-03 01:57:42,591 plugins: Initializing plugins...
+INFO       2009-10-03 01:57:42,753 plugins: Loading plugins...
+INFO       2009-10-03 01:57:42,755 plugins: Skipping HelloWorld plugin
+INFO       2009-10-03 01:57:42,757 plugins: Skipping UserStats plugin
+INFO       2009-10-03 01:57:42,757 plugins: Found 23 plugins
+INFO       2009-10-03 01:57:42,758 plugins: Initializing plugins...
+INFO       2009-10-03 01:57:42,965 masterctl: Connected to master server
+INFO       2009-10-03 01:57:42,970 ircbot: Conneced
+WARNING    2009-10-03 01:58:02,174 masterctl: Failed to register with master server: failed pinging server
