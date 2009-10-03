@@ -1406,7 +1406,7 @@ namespace server
         {
             if(demorecord) enddemorecord();
             interm = 0;
-	    mapreload = true;
+            SbPy::triggerEvent("intermission_ended", 0);
             if(clients.length()) sendf(-1, 1, "ri", SV_MAPRELOAD);
         }
 
