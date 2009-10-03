@@ -2,6 +2,7 @@ from ConfigParser import ConfigParser, NoOptionError
 import os, sys, __builtin__
 import sbserver, xsbs.events
 import xsbs.log
+import logging
 
 plugins = {}
 paths = [os.curdir]
@@ -32,7 +33,7 @@ def plugin(name):
 
 def loadPlugins():
 	plugins.clear()
-	print 'Loading plugins...'
+	logging.info('Loading plugins...')
 	for path in paths:
 		files = os.listdir(path)
 		for file in files:
@@ -43,21 +44,15 @@ def loadPlugins():
 				if p.isenabled:
 					plugins[p.name] = p
 				else:
-					print 'Skipping %s plugin' % file
-	print 'Found %i plugins' % len(plugins.keys())
-	print 'Initializing plugins...'
+					logging.info('Skipping %s plugin' % file)
+	logging.info('Found %i plugins' % len(plugins.keys()))
+	logging.info('Initializing plugins...')
 	for plugin in plugins.values():
 		plugin.load()
 
 def reload():
 	xsbs.events.triggerServerEvent('reload', ())
 	sbserver.reload()
-	return
-	for mod in sys.modules.keys():
-		print mod
-		if mod not in init_modules:
-			del sys.modules[mod]
-		else:
-			print 'skipping ', mod
-	loadPlugins()
+
+loadPlugins()
 

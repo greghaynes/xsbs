@@ -5,3 +5,20 @@ INFO       2009-10-02 19:20:43,121 ircbot: Conneced
 INFO       2009-10-02 19:20:58,370 ircbot: Conneced
 INFO       2009-10-02 19:22:17,355 ircbot: Conneced
 INFO       2009-10-02 19:22:17,491 masterctl: Connected to master server
+INFO       2009-10-02 19:25:28,648 plugins: Loading plugins...
+INFO       2009-10-02 19:25:28,653 plugins: Skipping HelloWorld plugin
+INFO       2009-10-02 19:25:28,656 plugins: Skipping UserStats plugin
+INFO       2009-10-02 19:25:28,657 plugins: Found 22 plugins
+INFO       2009-10-02 19:25:28,657 plugins: Initializing plugins...
+INFO       2009-10-02 19:27:00,993 plugins: Loading plugins...
+INFO       2009-10-02 19:27:00,998 plugins: Skipping HelloWorld plugin
+INFO       2009-10-02 19:27:01,001 plugins: Skipping UserStats plugin
+INFO       2009-10-02 19:27:01,001 plugins: Found 22 plugins
+INFO       2009-10-02 19:27:01,002 plugins: Initializing plugins...
+INFO       2009-10-02 19:27:01,171 plugins: Loading plugins...
+INFO       2009-10-02 19:27:01,173 plugins: Skipping HelloWorld plugin
+INFO       2009-10-02 19:27:01,175 plugins: Skipping UserStats plugin
+INFO       2009-10-02 19:27:01,176 plugins: Found 22 plugins
+INFO       2009-10-02 19:27:01,176 plugins: Initializing plugins...
+INFO       2009-10-02 19:27:01,382 masterctl: Connected to master server
+INFO       2009-10-02 19:27:01,407 ircbot: Conneced
