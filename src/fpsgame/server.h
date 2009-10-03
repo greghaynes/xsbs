@@ -8,7 +8,6 @@
 #define SB_SERVER_H
 
 #include "game.h"
-#include "logging.h"
 
 namespace server
 {

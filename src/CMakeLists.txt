@@ -10,8 +10,6 @@ set(xsbs_srcs
 
 	fpsgame/server.cpp
 
-	tools/logging.cpp
-
 	pycontrol/sbpy.cpp
 	pycontrol/servermodule.cpp)
 
