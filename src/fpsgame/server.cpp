@@ -1117,53 +1117,6 @@ namespace server
         sendservmsg(s);
     }
 
-    struct votecount
-    {
-        char *map;
-        int mode, count;
-        votecount() {}
-        votecount(char *s, int n) : map(s), mode(n), count(0) {}
-    };
-
-    void checkvotes(bool force = false)
-    {
-        vector<votecount> votes;
-        int maxvotes = 0;
-        loopv(clients)
-        {
-            clientinfo *oi = clients[i];
-            if(oi->state.state==CS_SPECTATOR && !oi->privilege && !oi->local) continue;
-            if(oi->state.aitype!=AI_NONE) continue;
-            maxvotes++;
-            if(!oi->mapvote[0]) continue;
-            votecount *vc = NULL;
-            loopvj(votes) if(!strcmp(oi->mapvote, votes[j].map) && oi->modevote==votes[j].mode)
-            {
-                vc = &votes[j];
-                break;
-            }
-            if(!vc) vc = &votes.add(votecount(oi->mapvote, oi->modevote));
-            vc->count++;
-        }
-        votecount *best = NULL;
-        loopv(votes) if(!best || votes[i].count > best->count || (votes[i].count == best->count && rnd(2))) best = &votes[i];
-        if(force || (best && best->count > maxvotes/2))
-        {
-            if(demorecord) enddemorecord();
-            if(best && (best->count > (force ? 1 : maxvotes/2)))
-            {
-                sendservmsg(force ? "vote passed by default" : "vote passed by majority");
-                sendf(-1, 1, "risii", SV_MAPCHANGE, best->map, best->mode, 1);
-                changemap(best->map, best->mode);
-            }
-            else
-            {
-                mapreload = true;
-                if(clients.length()) sendf(-1, 1, "ri", SV_MAPRELOAD);
-            }
-        }
-    }
-
     void forcemap(const char *map, int mode)
     {
         stopdemo();
@@ -1174,37 +1127,6 @@ namespace server
         }
         sendf(-1, 1, "risii", SV_MAPCHANGE, map, mode, 1);
         changemap(map, mode);
-    }
-
-    void vote(char *map, int reqmode, int sender)
-    {
-        clientinfo *ci = getinfo(sender);
-        if(!ci || (ci->state.state==CS_SPECTATOR && !ci->privilege && !ci->local) || (!ci->local && !m_mp(reqmode))) return;
-        copystring(ci->mapvote, map);
-        if(!ci->privilege && !allow_modevote && reqmode != gamemode)
-        {
-            sendf(sender, 1, "ris", SV_SERVMSG, "You cannot vote for a new game mode.");
-            return;
-        }
-        ci->modevote = reqmode;
-        if(!ci->mapvote[0]) return;
-        if(ci->local || mapreload || (ci->privilege && mastermode>=MM_VETO))
-        {
-            if(demorecord) enddemorecord();
-            if((!ci->local || hasnonlocalclients()) && !mapreload)
-            {
-                defformatstring(msg)("%s forced %s on map %s", ci->privilege && mastermode>=MM_VETO ? privname(ci->privilege) : "local player", modename(ci->modevote), ci->mapvote);
-                sendservmsg(msg);
-            }
-            sendf(-1, 1, "risii", SV_MAPCHANGE, ci->mapvote, ci->modevote, 1);
-            changemap(ci->mapvote, ci->modevote);
-        }
-        else
-        {
-            defformatstring(msg)("%s suggests %s on map %s (select map to vote)", colorname(ci), modename(reqmode), map);
-            sendservmsg(msg);
-            checkvotes();
-        }
     }
 
     void setgamemins(int mins)
@@ -1484,7 +1406,6 @@ namespace server
         {
             if(demorecord) enddemorecord();
             interm = 0;
-            checkvotes(true);
         }
 
         SbPy::update();
