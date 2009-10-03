@@ -15,6 +15,9 @@ def onMapChanged(mapname, mapmode):
 	for player in players.values():
 		player.newGame();
 
+def all():
+	return players.values()
+
 def player(cn):
 	try:
 		return players[cn]

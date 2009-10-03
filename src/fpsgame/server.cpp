@@ -2094,7 +2094,7 @@ namespace server
                 filtertext(text, text);
                 int reqmode = getint(p);
                 if(type!=SV_MAPVOTE && !mapreload) break;
-                vote(text, reqmode, sender);
+		SbPy::triggerEventIntStringInt("player_map_request", sender, text, reqmode);
                 break;
             }
 
