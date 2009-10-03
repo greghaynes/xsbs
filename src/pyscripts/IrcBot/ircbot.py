@@ -5,6 +5,7 @@ from xsbs.events import registerServerEventHandler
 from xsbs.timers import addTimer
 from xsbs.colors import red, green
 import asyncore, socket
+import logging
 
 config = PluginConfig('ircbot')
 channel = config.getOption('Config', 'channel', '#xsbs-newserver')
@@ -39,14 +40,14 @@ class IrcBot(asyncore.dispatcher):
 	def quit(self):
 		self.send('QUIT :XSBS - eXtensible SauerBraten Server\r\n')
 	def handle_close(self):
-		print 'IRC Bot: connection closed.'
-		print 'IRC Bot: reconnecting in 5 seconds...'
+		logging.warning('Connection closed')
+		logging.warning('Reconnecting in 5 seconds')
 		self.connect_count += 1
 		if self.connect_count >= 5:
-			print 'IRC Bot: Connect failed 5 times.  Quitting.'
+			logging.warning('Connect failed 5 times.  Quitting.')
 		self.close()
 	def handle_connect(self):
-		print 'IRC Bot: conneced'
+		logging.info('Conneced')
 		self.connect_count = 0
 	def handle_write(self):
 		sent = self.send(self.writebuff)

@@ -1,6 +1,7 @@
 from ConfigParser import ConfigParser, NoOptionError
 import os, sys, __builtin__
 import sbserver, xsbs.events
+import xsbs.log
 
 plugins = {}
 paths = [os.curdir]
