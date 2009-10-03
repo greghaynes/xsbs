@@ -102,9 +102,9 @@ class IrcBot(asyncore.dispatcher):
 						text += t
 				self.handle_privmsg(user, text)
 			elif line[1] == '433':
-				print 'IRC Bot: Nickname is in use!'
+				logging.warning('IRC Bot: Nickname is in use!')
 				self.nickname = self.nickname + '1'
-				print 'IRC Bot: Using %s' % self.nickname
+				logging.warning('IRC Bot: Using %s' % self.nickname)
 				self.sendNick()
 
 bot = IrcBot(servername, nickname, port)

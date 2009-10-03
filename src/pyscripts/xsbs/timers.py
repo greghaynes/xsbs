@@ -1,4 +1,5 @@
 import sbserver
+import logging
 
 class Timer:
 	def __init__(self, currtime, delay, func, args=(), persistent=False):
@@ -36,7 +37,7 @@ class TimerManager:
 				try:
 					timer()
 				except:
-					print 'Fatal error occoured with timer method.'
+					logging.error('Uncaught exception oured within a timer method.')
 					del self.timers[i]
 					continue
 				if timer.persistent:
