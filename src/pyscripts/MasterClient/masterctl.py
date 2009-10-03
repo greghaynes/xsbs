@@ -4,6 +4,7 @@ from xsbs.ui import error, info, blue, orange
 import sbserver
 import asyncore
 import socket
+import logging
 
 claimstr = orange('%s') + ' has claimed master as ' + blue('%s')
 
@@ -25,7 +26,7 @@ class MasterClient(asyncore.dispatcher):
 		self.close()
 	def handle_connect(self):
 		self.is_connected = True
-		addTimer(3600000, self.update)
+		logging.info('Connected to master server')
 	def handle_write(self):
 		for out in self.out_buff:
 			self.send(out)
@@ -48,12 +49,12 @@ class MasterClient(asyncore.dispatcher):
 			key = args[0]
 			if key == 'failreg':
 				self.is_registered = False
-				print 'Failed to register with master server: %s' % line[8:]
+				logging.warning('Failed to register with master server: %s' % line[8:])
 				self.is_connected = False
 				self.close()
 			elif key == 'succreg':
 				self.is_registered = True
-				print 'Successfully registered with master server'
+				logging.info('Successfully registered with master server')
 				self.is_connected = False
 				self.close()
 			elif key == 'chalauth':
