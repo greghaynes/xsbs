@@ -42,7 +42,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/engine
 add_executable(xsbs
 	${xsbs_srcs})
 
-target_link_libraries(xsbs enet sauertools ${PYTHON_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(xsbs enet sauertools ${PYTHON_LIBRARIES} ${ZLIB_LIBRARIES} -lutil)
 
 install(TARGETS xsbs DESTINATION bin)
 
