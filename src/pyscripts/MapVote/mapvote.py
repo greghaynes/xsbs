@@ -63,7 +63,7 @@ def onMapRequest(cn, mapname, mapmode):
 	countVotes()
 
 def onIntermEnd():
-	mapreload[1] = True
+	mapreload[0] = True
 
 registerServerEventHandler('player_map_request', onMapRequest)
 registerServerEventHandler('intermission_ended', onIntermEnd)
