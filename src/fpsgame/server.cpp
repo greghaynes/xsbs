@@ -1406,6 +1406,8 @@ namespace server
         {
             if(demorecord) enddemorecord();
             interm = 0;
+	    mapreload = true;
+            if(clients.length()) sendf(-1, 1, "ri", SV_MAPRELOAD);
         }
 
         SbPy::update();
