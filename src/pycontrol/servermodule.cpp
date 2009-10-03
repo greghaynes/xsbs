@@ -556,6 +556,23 @@ static PyObject *authChal(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *setGameMins(PyObject *self, PyObject *args)
+{
+	int mm;
+	if(!PyArg_ParseTuple(args, "i", &mm))
+		return 0;
+	server::setgamemins(mm);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *endGame(PyObject *self, PyObject *args)
+{
+	server::endgame();
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -595,6 +612,8 @@ static PyMethodDef ModuleMethods[] = {
 	{"ip", ip, METH_VARARGS, "Current server ip."},
 	{"port", port, METH_VARARGS, "Current server port."},
 	{"authChallenge", authChal, METH_VARARGS, "Send auth challenge to client."},
+	{"setMinsRemaining", setGameMins, METH_VARARGS, "Set the minutes remanining in current game."},
+	{"endGame", endGame, METH_VARARGS, "End the current game."},
 	{NULL, NULL, 0, NULL}
 };
 

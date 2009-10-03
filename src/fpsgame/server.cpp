@@ -1207,6 +1207,20 @@ namespace server
         }
     }
 
+    void setgamemins(int mins)
+    {
+        gamelimit = gamemillis + (mins * 60000);
+        minremain = gamemillis>=gamelimit ? 0 : (gamelimit - gamemillis + 60000 - 1)/60000;
+        sendf(-1, 1, "ri2", SV_TIMEUP, minremain);
+    }
+
+    void endgame()
+    {
+	gamelimit = gamemillis;
+        minremain = gamemillis>=gamelimit ? 0 : (gamelimit - gamemillis + 60000 - 1)/60000;
+        sendf(-1, 1, "ri2", SV_TIMEUP, minremain);
+    }
+
     void checkintermission()
     {
         if(minremain>0)

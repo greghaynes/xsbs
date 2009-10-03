@@ -72,6 +72,14 @@ def onResize(cn, args):
 		size = int(args)
 		sbserver.setMaxClients(int(args))
 
+def onMinsLeft(cn, args):
+	if sbserver.playerPrivilege(cn) < 1:
+		insufficientPermissions(cn)
+	elif args == '':
+		sbserver.playerMessage(cn, error('Usage: #minsleft <int>'))
+	else:
+		sbserver.setMinsRemaining(int(args))
+
 registerCommandHandler('pause', onPauseCmd)
 registerCommandHandler('resume', onResumeCmd)
 registerCommandHandler('reload', onReloadCmd)
@@ -79,4 +87,5 @@ registerCommandHandler('info', onInfoCmd)
 registerCommandHandler('givemaster', onGiveMaster)
 registerCommandHandler('mastermask', onMasterMask)
 registerCommandHandler('resize', onResize)
+registerCommandHandler('minsleft', onMinsLeft)
 
