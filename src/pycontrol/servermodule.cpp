@@ -300,7 +300,7 @@ static PyObject *spectate(PyObject *self, PyObject *args)
 		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
 		return 0;
 	}
-	server::spectate(ci, spectator, true);
+	server::spectate(ci, true, spectator);
 	Py_INCREF(Py_None);
 	return Py_None;
 }
