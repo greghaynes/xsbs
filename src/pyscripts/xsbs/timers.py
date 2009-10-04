@@ -41,7 +41,7 @@ class TimerManager:
 					del self.timers[i]
 					continue
 				if timer.persistent:
-					timer.reload()
+					timer.reload(self.currtime)
 					self.timers.pop(i)
 					restarts.append(timer)
 				else:

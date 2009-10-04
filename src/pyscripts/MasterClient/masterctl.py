@@ -17,15 +17,19 @@ class MasterClient(asyncore.dispatcher):
 		self.out_buff = []
 		self.is_registered = False
 		self.is_connected = False
+		self.is_connecting = False
+		self.reg_in_progress = False
 		self.next_auth_id = 0
 		self.auth_map = {}
-		self.do_connect()
 		self.register()
 	def handle_close(self):
 		self.is_connected = False
+		self.is_connecting = False
 		self.close()
 	def handle_connect(self):
 		self.is_connected = True
+		self.is_connecting = False
+		logging.debug('Connected to master server')
 	def handle_write(self):
 		for out in self.out_buff:
 			self.send(out)
@@ -33,12 +37,12 @@ class MasterClient(asyncore.dispatcher):
 	def writable(self):
 		return len(self.out_buff) > 0
 	def do_connect(self):
-		if not self.is_connected:
+		if not self.is_connected and not self.is_connecting:
 			self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 			if sbserver.ip():
 				self.bind((sbserver.ip(), 0))
 			self.connect((self.hostname, self.port))
-			self.is_connected = True
+			self.is_connecting = True
 	def handle_read(self):
 		self.buff += self.recv(4096)
 		tmp_buff = self.buff.split('\n')
@@ -50,10 +54,14 @@ class MasterClient(asyncore.dispatcher):
 				self.is_registered = False
 				logging.warning('Failed to register with master server: %s' % line[8:])
 				self.is_connected = False
+				self.is_connecting = False
+				self.reg_in_progress = False
 				self.close()
 			elif key == 'succreg':
 				self.is_registered = True
 				logging.info('Successfully registered with master server')
+				self.reg_in_progress = False
+				self.is_connecting = False
 				self.is_connected = False
 				self.close()
 			elif key == 'chalauth':
@@ -75,9 +83,14 @@ class MasterClient(asyncore.dispatcher):
 				self.is_connected = False
 				self.close()
 	def register(self):
+		if self.reg_in_progress:
+			logging.debug('Registration already in progress')
+			return
 		self.do_connect()
+		logging.info('Attempting to register with master server')
 		self.out_buff.append('regserv %i\n' % sbserver.port())
-		addTimer(3600000, self.register)
+		self.reg_in_progress = True
+		addTimer(60*60*1000, self.register, (), True)
 	def update(self):
 		self.register()
 	def tryauth(self, cn, name):
