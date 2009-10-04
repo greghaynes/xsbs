@@ -1,3 +1,6 @@
+#ifndef IENGINE_H
+#define IENGINE_H
+
 // the interface the game uses to access the engine
 
 extern int curtime;                     // current frame time
@@ -410,4 +413,6 @@ extern bool g3d_movecursor(int dx, int dy);
 extern void g3d_cursorpos(float &x, float &y);
 extern void g3d_resetcursor();
 extern void g3d_limitscale(float scale);
+
+#endif
 

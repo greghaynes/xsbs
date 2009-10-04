@@ -1112,9 +1112,7 @@ namespace server
         {
             loopv(clients) allowedips.add(getclientip(clients[i]->clientnum));
         }
-        defformatstring(s)("mastermode is now %s (%d)", mastermodename(mastermode), mastermode);
         SbPy::triggerEventInt("server_mastermode_changed", mastermode);
-        sendservmsg(s);
     }
 
     void forcemap(const char *map, int mode)
@@ -2099,26 +2097,8 @@ namespace server
             case SV_MASTERMODE:
             {
                 int mm = getint(p);
-                if((ci->privilege || ci->local) && mm>=MM_OPEN && mm<=MM_PRIVATE)
-                {
-                    if((ci->privilege>=PRIV_MASTER || ci->local) || (mastermask&(1<<mm)))
-                    {
-                        mastermode = mm;
-                        allowedips.setsize(0);
-                        if(mm>=MM_PRIVATE)
-                        {
-                            loopv(clients) allowedips.add(getclientip(clients[i]->clientnum));
-                        }
-                        defformatstring(s)("mastermode is now %s (%d)", mastermodename(mastermode), mastermode);
-                        SbPy::triggerEventInt("server_mastermode_changed", mastermode);
-                        sendservmsg(s);
-                    }
-                    else
-                    {
-                        defformatstring(s)("mastermode %d is disabled on this server", mm);
-                        sendf(sender, 1, "ris", SV_SERVMSG, s);
-                    }
-                }
+		if(mm>=MM_OPEN && mm<=MM_PRIVATE)
+		    SbPy::triggerEventIntInt("player_set_mastermode", ci->clientnum, mm);
                 break;
             }
 
