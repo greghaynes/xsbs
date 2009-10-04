@@ -12,8 +12,12 @@ import string
 
 config = PluginConfig('masterclient')
 claimstr = config.getOption('Config', 'auth_message', '${green}${name}${white} has claimed master as ${magenta}${authname}')
+master_host = config.getOption('Config', 'master_host', 'sauerbraten.org')
+master_port = config.getOption('Config', 'master_port', '28787')
+allow_auth = config.getOption('Config', 'allow_auth', 'yes') == 'yes'
 del config
 claimstr = string.Template(claimstr)
+master_port = int(master_port)
 
 class MasterClient(asyncore.dispatcher):
 	def __init__(self, hostname='sauerbraten.org', port=28787):
@@ -111,6 +115,8 @@ class MasterClient(asyncore.dispatcher):
 	def update(self):
 		self.register()
 	def tryauth(self, cn, name):
+		if not allow_auth:
+			sbserver.playerMessage(cn, error('Auth keys are disabled on this server'))
 		self.do_connect()
 		self.auth_map[self.next_auth_id] = (cn, name)
 		self.out_buff.append('reqauth %i %s\n' % (self.next_auth_id, name))
@@ -119,7 +125,7 @@ class MasterClient(asyncore.dispatcher):
 		self.do_connect()
 		self.out_buff.append('confauth %i %s\n' % (id, val))
 
-mc = MasterClient()
+mc = MasterClient(master_host, master_port)
 registerServerEventHandler('auth_try', mc.tryauth)
 registerServerEventHandler('auth_ans', mc.anschal)
 
