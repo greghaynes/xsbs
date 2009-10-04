@@ -3,6 +3,7 @@ from xsbs.timers import addTimer
 from xsbs.colors import colordict
 from xsbs.ui import error, info
 from xsbs.settings import PluginConfig
+from xsbs.net import ipLongToString
 import sbserver
 import asyncore
 import socket
@@ -75,11 +76,20 @@ class MasterClient(asyncore.dispatcher):
 				chal = args[2]
 				sbserver.authChallenge(cn, int(args[1]), chal)
 			elif key == 'failauth':
+				a = self.auth_map[int(args[1])]
+				logging.info('%s (%s) failed to authenticate as %s' % (
+					sbserver.playerName(a[0]), 
+					ipLongToString(sbserver.playerIpLong(a[0])),
+					a[1]))
 				del self.auth_map[int(args[1])]
 				self.close()
 				self.is_connected = False
 			elif key == 'succauth':
 				authtup = self.auth_map[int(args[1])]
+				logging.info('%s (%s) authenticated as %s' % (
+					sbserver.playerName(authtup[0]), 
+					ipLongToString(sbserver.playerIpLong(authtup[0])),
+					authtup[1]))
 				cn = authtup[0]
 				nick = sbserver.playerName(cn)
 				authname = authtup[1]
