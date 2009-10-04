@@ -1,12 +1,18 @@
 from xsbs.events import registerServerEventHandler
 from xsbs.timers import addTimer
-from xsbs.ui import error, info, blue, orange
+from xsbs.colors import colordict
+from xsbs.ui import error, info
+from xsbs.settings import PluginConfig
 import sbserver
 import asyncore
 import socket
 import logging
+import string
 
-claimstr = orange('%s') + ' has claimed master as ' + blue('%s')
+config = PluginConfig('masterclient')
+claimstr = config.getOption('Config', 'auth_message', '${green}${name}${white} has claimed master as ${magenta}${authname}')
+del config
+claimstr = string.Template(claimstr)
 
 class MasterClient(asyncore.dispatcher):
 	def __init__(self, hostname='sauerbraten.org', port=28787):
@@ -78,7 +84,8 @@ class MasterClient(asyncore.dispatcher):
 				nick = sbserver.playerName(cn)
 				authname = authtup[1]
 				sbserver.setMaster(cn)
-				sbserver.message(info(claimstr % (nick, authname)))
+				msg = claimstr.substitute(colordict, name=nick, authname=authname)
+				sbserver.message(info(msg))
 				del self.auth_map[int(args[1])]
 				self.is_connected = False
 				self.close()
