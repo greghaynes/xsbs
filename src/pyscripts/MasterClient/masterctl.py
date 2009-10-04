@@ -32,6 +32,7 @@ class MasterClient(asyncore.dispatcher):
 		self.reg_in_progress = False
 		self.next_auth_id = 0
 		self.auth_map = {}
+		addTimer(60*60*1000, self.register, (), True)
 		self.register()
 	def handle_close(self):
 		self.is_connected = False
@@ -111,7 +112,6 @@ class MasterClient(asyncore.dispatcher):
 		logging.info('Attempting to register with master server')
 		self.out_buff.append('regserv %i\n' % sbserver.port())
 		self.reg_in_progress = True
-		addTimer(60*60*1000, self.register, (), True)
 	def update(self):
 		self.register()
 	def tryauth(self, cn, name):
