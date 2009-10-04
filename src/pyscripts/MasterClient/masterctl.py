@@ -26,7 +26,6 @@ class MasterClient(asyncore.dispatcher):
 		self.close()
 	def handle_connect(self):
 		self.is_connected = True
-		logging.info('Connected to master server')
 	def handle_write(self):
 		for out in self.out_buff:
 			self.send(out)
