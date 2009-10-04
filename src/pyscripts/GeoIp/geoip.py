@@ -7,7 +7,7 @@ from xsbs.net import ipLongToString
 import string
 import pygeoip
 
-db = pygeoip.Database('GeoIp/GeoIP.dat')
+db = pygeoip.GeoIP('GeoIp/GeoIP.dat')
 
 conf = PluginConfig('geoip')
 template = '${green}${user} ${white}has connected from ${orange}${country}'
@@ -15,11 +15,14 @@ template = conf.getOption('Config', 'template', template)
 del conf
 
 def getCountry(ip): 
-	 return db.lookup(ipLongToString(ip)).country
+	country = db.country_name_by_name(ipLongToString(ip))
+	if country == '':
+		country = 'Unknown'
+	return country
 
 def announce(cn):
 	msg = string.Template(template).substitute(colordict, user=sbserver.playerName(cn), country=getCountry(sbserver.playerIpLong(cn)))
 	sbserver.message(info(msg))
 
-registerServerEventHandler("player_connect_delayed", announce)
+registerServerEventHandler('player_connect_delayed', announce)
 
