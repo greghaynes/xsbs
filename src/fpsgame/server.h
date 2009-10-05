@@ -327,6 +327,7 @@ namespace server
 	extern int mastermask;
 	extern bool restart_py;
 	extern char smapname[260];
+	extern char *adminpass;
 	extern int gamemode;
 	extern bool allow_modevote;
 	extern int port;
@@ -345,6 +346,7 @@ namespace server
 	bool spectate(clientinfo *, bool, int);
 	void setgamemins(int mins);
 	void endgame();
+	void resetpriv(clientinfo *ci);
 }
 
 extern void server_sigint(int);

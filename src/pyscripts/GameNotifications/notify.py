@@ -24,7 +24,7 @@ def teamkill_broadcast(cn, tcn):
 	sbserver.message(info(tktemp.substitute(colordict, tker=sbserver.playerName(cn), victim=sbserver.playerName(tcn))))
 
 def getmap(cn):
-	info('Player %s is downloading map' % sbserver.playerName(cn))
+	sbserver.message(info('%s is downloading map' % sbserver.playerName(cn)))
 
 registerServerEventHandler('player_teamkill', teamkill_broadcast)
 registerServerEventHandler('get_map', getmap)

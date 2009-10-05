@@ -583,23 +583,33 @@ namespace server
     void setcimaster(clientinfo *ci)
     {
         string msg;
-        formatstring(msg)("%s claimed master", colorname(ci));
         loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
         ci->privilege = PRIV_MASTER;
 	currentmaster = ci->clientnum;
 	masterupdate = true;
-	sendservmsg(msg);
+	SbPy::triggerEventInt("player_claimed_master", ci->clientnum);
     }
 
     void setciadmin(clientinfo *ci)
     {
         string msg;
-        formatstring(msg)("%s claimed admin", colorname(ci));
         loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
         ci->privilege = PRIV_ADMIN;
 	currentmaster = ci->clientnum;
 	masterupdate = true;
-	sendservmsg(msg);
+	SbPy::triggerEventInt("player_claimed_admin", ci->clientnum);
+    }
+
+    void resetpriv(clientinfo *ci)
+    {
+        if(!ci || !ci->privilege) return;
+	if(ci->privilege == PRIV_MASTER)
+	    SbPy::triggerEventInt("player_released_master", ci->clientnum);
+	else
+	    SbPy::triggerEventInt("player_released_admin", ci->clientnum);
+        ci->privilege = PRIV_NONE;
+        masterupdate = true;
+        currentmaster = -1; 
     }
 
     void setmaster(clientinfo *ci, bool val, const char *pass = "", const char *authname = NULL)
@@ -2223,7 +2233,11 @@ namespace server
             {
                 int val = getint(p);
                 getstring(text, p);
-                setmaster(ci, val!=0, text);
+                if(val!=0)
+                    SbPy::triggerEventIntString("player_setmaster", ci->clientnum, text);
+                else
+                    SbPy::triggerEventInt("player_setmaster_off", ci->clientnum);
+                // setmaster(ci, val!=0, text);
                 // don't broadcast the master password
                 break;
             }

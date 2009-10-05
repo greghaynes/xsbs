@@ -128,5 +128,5 @@ Base.metadata.create_all(dbmanager.engine)
 registerCommandHandler('register', onRegisterCommand)
 registerCommandHandler('login', onLoginCommand)
 registerCommandHandler('linkname', onLinkName)
-registerPolicyEventHandler('player_setmaster', onSetMaster)
+registerServerEventHandler('player_setmaster', onSetMaster)
 

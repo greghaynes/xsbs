@@ -11,7 +11,7 @@ import logging
 import string
 
 config = PluginConfig('masterclient')
-claimstr = config.getOption('Config', 'auth_message', '${green}${name}${white} has claimed master as ${magenta}${authname}')
+claimstr = config.getOption('Config', 'auth_message', '${green}${name}${white} has authenticated as ${magenta}${authname}')
 master_host = config.getOption('Config', 'master_host', 'sauerbraten.org')
 master_port = config.getOption('Config', 'master_port', '28787')
 allow_auth = config.getOption('Config', 'allow_auth', 'yes') == 'yes'
@@ -98,9 +98,9 @@ class MasterClient(asyncore.dispatcher):
 				cn = authtup[0]
 				nick = sbserver.playerName(cn)
 				authname = authtup[1]
-				sbserver.setMaster(cn)
 				msg = claimstr.substitute(colordict, name=nick, authname=authname)
 				sbserver.message(info(msg))
+				sbserver.setMaster(cn)
 				del self.auth_map[int(args[1])]
 				self.is_connected = False
 				self.close()

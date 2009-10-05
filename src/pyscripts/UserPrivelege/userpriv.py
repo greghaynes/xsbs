@@ -8,12 +8,23 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
 
 from xsbs.commands import registerCommandHandler
-from xsbs.ui import error, insufficientPermissions
+from xsbs.events import registerServerEventHandler
+from xsbs.ui import error, info, insufficientPermissions
+from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
+import string
 
 config = PluginConfig('userprivilege')
 tablename = config.getOption('Config', 'tablename', 'userprivileges')
+gmtemp = config.getOption('Messages', 'gain_master', '${green}${name}${white} has claimed master')
+gatemp = config.getOption('Messages', 'gain_admin', '${green}${name}${white} has claimed admin')
+rmtemp = config.getOption('Messages', 'release_master', '${green}${name}${white} has relinquished master')
+ratemp = config.getOption('Messages', 'release_admin', '${green}${name}${white} has relinquished admin')
 del config
+gmtemp = string.Template(gmtemp)
+gatemp = string.Template(gatemp)
+rmtemp = string.Template(rmtemp)
+ratemp = string.Template(ratemp)
 
 Base = declarative_base()
 session = dbmanager.session()
@@ -51,8 +62,33 @@ def isPlayerMaster(cn):
 def masterCmd(cn, args):
 	return isPlayerMaster(cn)
 
+def onSetMaster(cn, hash):
+	if hash == sbserver.hashPassword(cn, sbserver.adminPassword()):
+		sbserver.setAdmin(cn)
+
+def onSetMasterOff(cn):
+	sbserver.resetPrivilege(cn)
+
+def onGainMaster(cn):
+	sbserver.message(info(gmtemp.substitute(colordict, name=sbserver.playerName(cn))))
+
+def onGainAdmin(cn):
+	sbserver.message(info(gatemp.substitute(colordict, name=sbserver.playerName(cn))))
+
+def onRelMaster(cn):
+	sbserver.message(info(rmtemp.substitute(colordict, name=sbserver.playerName(cn))))
+
+def onRelAdmin(cn):
+	sbserver.message(info(ratemp.substitute(colordict, name=sbserver.playerName(cn))))
+
 def init():
 	registerCommandHandler('master', masterCmd)
+	registerServerEventHandler('player_setmaster', onSetMaster)
+	registerServerEventHandler('player_setmaster_off', onSetMasterOff)
+	registerServerEventHandler('player_claimed_master', onGainMaster)
+	registerServerEventHandler('player_claimed_admin', onGainAdmin)
+	registerServerEventHandler('player_released_master', onRelMaster)
+	registerServerEventHandler('player_released_admin', onRelAdmin)
 	Base.metadata.create_all(dbmanager.engine)
 
 init()

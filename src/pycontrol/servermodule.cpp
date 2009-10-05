@@ -413,6 +413,23 @@ static PyObject *setAdmin(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *resetPrivilege(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "i", &cn))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	server::resetpriv(ci);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject *setPaused(PyObject *self, PyObject *args)
 {
 	bool val;
@@ -573,6 +590,12 @@ static PyObject *endGame(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *adminPass(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("s", server::adminpass);
+}
+
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -597,6 +620,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"hashPassword", hashPass, METH_VARARGS, "Return hash for user + password"},
 	{"setMaster", setMaster, METH_VARARGS, "Set cn to master."},
 	{"setAdmin", setAdmin, METH_VARARGS, "Set cn to admin."},
+	{"resetPrivilege", resetPrivilege, METH_VARARGS, "Set cn to non-privileged."},
 	{"setPaused", setPaused, METH_VARARGS, "Set game to be paused."},
 	{"setMap", setMap, METH_VARARGS, "Set to map and mode."},
 	{"setMasterMode", setMasterMode, METH_VARARGS, "Set server master mode."},
@@ -614,6 +638,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"authChallenge", authChal, METH_VARARGS, "Send auth challenge to client."},
 	{"setMinsRemaining", setGameMins, METH_VARARGS, "Set the minutes remanining in current game."},
 	{"endGame", endGame, METH_VARARGS, "End the current game."},
+	{"adminPassword", adminPass, METH_VARARGS, "Get the administrator password."},
 	{NULL, NULL, 0, NULL}
 };
 
