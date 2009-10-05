@@ -612,95 +612,6 @@ namespace server
         currentmaster = -1; 
     }
 
-    void setmaster(clientinfo *ci, bool val, const char *pass = "", const char *authname = NULL)
-    {
-        if(authname && !val) return;
-        const char *name = "";
-        if(val)
-        {
-            bool haspass = adminpass[0] && checkpassword(ci, adminpass, pass);
-            if(ci->privilege)
-            {
-                if(!adminpass[0] || haspass==(ci->privilege==PRIV_ADMIN)) return;
-            }
-            else if(ci->state.state==CS_SPECTATOR && !haspass && !authname && !ci->local)
-            {
-                SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass);
-	        return;
-            }
-	    if(authname && !SbPy::triggerPolicyEventIntString("allow_auth", ci->clientnum, authname)) return;
-            loopv(clients) if(ci!=clients[i] && clients[i]->privilege)
-            {
-                if(haspass) clients[i]->privilege = PRIV_NONE;
-            }
-            if(haspass)
-	    {
-		    ci->privilege = PRIV_ADMIN;
-		    SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass);
-	    }
-	    else if(!authname && SbPy::triggerPolicyEventIntString("player_setmaster", ci->clientnum, pass))
-            {
-                setcimaster(ci);
-            }
-            else if(!authname && !(mastermask&MM_AUTOAPPROVE) && !ci->privilege && !ci->local)
-            {
-                // sendf(ci->clientnum, 1, "ris", SV_SERVMSG, "This server requires you to use a valid \"/setmaster username/password\" or \"/auth\" command to gain master.");
-                return;
-            }
-            else
-            { 
-                if(authname)
-                {
-                    SbPy::triggerEventIntString("player_auth_master", ci->clientnum, authname);
-                    loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
-                }
-                ci->privilege = PRIV_MASTER;
-            }
-            name = privname(ci->privilege);
-        }
-        else
-        {
-            if(!ci->privilege) return;
-            name = privname(ci->privilege);
-            revokemaster(ci);
-        }
-        mastermode = MM_OPEN;
-        allowedips.setsize(0);
-        string msg;
-        if(val && authname)
-        {
-            formatstring(msg)("%s claimed %s as '\fs\f5%s\fr'", colorname(ci), name, authname);
-            SbPy::triggerEventInt("player_gained_master", ci->clientnum);
-        }
-        else 
-        {
-            formatstring(msg)("%s %s %s", colorname(ci), val ? "claimed" : "relinquished", name);
-	    if(val)
-	    {
-		    if(ci->privilege == PRIV_MASTER)
-		    	SbPy::triggerEventInt("player_gained_master", ci->clientnum);
-		    else
-                        SbPy::triggerEventInt("player_gained_admin", ci->clientnum);
-	    }
-	    else
-	    {
-		    if(ci->privilege == PRIV_MASTER)
-		    	SbPy::triggerEventInt("player_relinq_master", ci->clientnum);
-		    else
-                        SbPy::triggerEventInt("player_relinq_admin", ci->clientnum);
-	    }
-        }
-        sendservmsg(msg);
-        currentmaster = val ? ci->clientnum : -1;
-        masterupdate = true;
-        if(gamepaused)
-        {
-            int admins = 0;
-            loopv(clients) if(clients[i]->privilege >= PRIV_ADMIN || clients[i]->local) admins++;
-            if(!admins) pausegame(false);
-        }
-    }
-
     savedscore &findscore(clientinfo *ci, bool insert)
     {
         uint ip = getclientip(ci->clientnum);
@@ -1569,7 +1480,7 @@ namespace server
         clientinfo *ci = getinfo(n);
         if(ci->connected)
         {
-            if(ci->privilege) setmaster(ci, false);
+            if(ci->privilege) resetpriv(ci);
             if(smode) smode->leavegame(ci, true);
             ci->state.timeplayed += lastmillis - ci->state.lasttimeplayed;
             savescore(ci);
@@ -1610,21 +1521,6 @@ namespace server
     {
         loopv(clients) if(clients[i]->authreq == id) return clients[i];
         return NULL;
-    }
-
-    void authfailed(uint id)
-    {
-        clientinfo *ci = findauth(id);
-        if(!ci) return;
-        ci->authreq = 0;
-    }
-
-    void authsucceeded(uint id)
-    {
-        clientinfo *ci = findauth(id);
-        if(!ci) return;
-        ci->authreq = 0;
-        setmaster(ci, true, "", ci->authname);
     }
 
     void authchallenged(uint id, const char *val)
@@ -2237,7 +2133,6 @@ namespace server
                     SbPy::triggerEventIntString("player_setmaster", ci->clientnum, text);
                 else
                     SbPy::triggerEventInt("player_setmaster_off", ci->clientnum);
-                // setmaster(ci, val!=0, text);
                 // don't broadcast the master password
                 break;
             }
