@@ -42,13 +42,13 @@ mapreload = [False]
 def onMapSet(cn, mapname, mapmode):
 	if sbserver.mapName() == '':
 		sbserver.setMap(mapname, mapmode)
+	elif mapreload[0]:
+		sbserver.setMap(mapname, mapmode)
+		mapreload[0] = False
 	elif sbserver.playerPrivilege(cn) > 0 and sbserver.masterMode() > 0:
 		sbserver.setMap(mapname, mapmode)
 	elif mapmode != sbserver.gameMode() and not allow_modevote and sbserver.playerPrivilege(cn) == 0:
 		sbserver.playerMessage(cn, error('You cannot request a new game mode'))
-	elif mapreload[0]:
-		sbserver.setMap(mapname, mapmode)
-		mapreload[0] = False
 
 def onMapVote(cn, mapname, mapmode):
 	if sbserver.mapName() == '':
