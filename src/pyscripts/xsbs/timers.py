@@ -18,39 +18,43 @@ class Timer:
 class TimerManager:
 	def __init__(self):
 		self.timers = []
+		self.is_executing = False
+		self.add_queue = []
 		self.update()
 	def addTimer(self, delay, func, args=(), persistent=False):
 		timer = Timer(self.currtime, delay, func, args, persistent)
-		i = 0
-		for iter in self.timers:
-			if not iter.isTimedOut(timer.timeout):
-				self.timers.insert(i, timer)
-				return
-			i += 1
-		self.timers.append(timer)
+		if self.is_executing:
+			self.add_queue.append(timer)
+		else:
+			i = 0
+			for iter in self.timers:
+				if not iter.isTimedOut(timer.timeout):
+					self.timers.insert(i, timer)
+					return
+				i += 1
+			self.timers.append(timer)
 	def update(self):
+		self.is_executing = True
 		self.currtime = sbserver.uptime()
-		restarts = []
 		i = 0
-		for timer in self.timers:
-			if timer.isTimedOut(self.currtime):
-				try:
-					timer()
-				except:
-					logging.error('Uncaught exception oured within a timer method.')
-					del self.timers[i]
-					continue
-				if timer.persistent:
-					timer.reload(self.currtime)
-					self.timers.pop(i)
-					restarts.append(timer)
+		while True:
+			try:
+				if self.timers[0].isTimedOut(self.currtime):
+					timer = self.timers.pop(0)
+					try:
+						timer()
+					except:
+						logging.error('Uncaught exception while executing timer method.')
+					if timer.persistent:
+						self.addTimer(timer.delay, timer.func, timer.args, timer.persistent)
 				else:
-					del self.timers[i]
-			else:
+					break
+			except IndexError:
 				break
-		for timer in restarts:
-			addTimer(timer.delay, timer.func, timer.args, timer.persistent)
-			del timer
+		self.is_executing = False
+		for timer in self.add_queue:
+			self.addTimer(timer.delay, timer.func, timer.args, timer.persistent)
+		del self.add_queue[:]
 
 timermanager = TimerManager()
 
