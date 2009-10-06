@@ -18,7 +18,7 @@ getmaptemp = string.Template(getmaptemp)
 if tktemp == 'None':
 	tk_broadcast = 0
 elif tktemp == 'Master':
-	tk_broadgast = 1
+	tk_broadcast = 1
 else:
 	tk_broadcast = 2
 
