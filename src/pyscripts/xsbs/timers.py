@@ -22,10 +22,10 @@ class TimerManager:
 		self.add_queue = []
 		self.update()
 	def addTimer(self, delay, func, args=(), persistent=False):
-		timer = Timer(self.currtime, delay, func, args, persistent)
 		if self.is_executing:
-			self.add_queue.append(timer)
+			self.add_queue.append((delay, func, args, persistent))
 		else:
+			timer = Timer(self.currtime, delay, func, args, persistent)
 			i = 0
 			for iter in self.timers:
 				if not iter.isTimedOut(timer.timeout):
@@ -34,9 +34,11 @@ class TimerManager:
 				i += 1
 			self.timers.append(timer)
 	def update(self):
+		for timer in self.add_queue:
+			self.addTimer(*timer)
+		del self.add_queue[:]
 		self.is_executing = True
 		self.currtime = sbserver.uptime()
-		i = 0
 		while True:
 			try:
 				if self.timers[0].isTimedOut(self.currtime):
@@ -52,9 +54,6 @@ class TimerManager:
 			except IndexError:
 				break
 		self.is_executing = False
-		for timer in self.add_queue:
-			self.addTimer(timer.delay, timer.func, timer.args, timer.persistent)
-		del self.add_queue[:]
 
 timermanager = TimerManager()
 
