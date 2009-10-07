@@ -12,6 +12,7 @@ channel = config.getOption('Config', 'channel', '#xsbs-newserver')
 servername = config.getOption('Config', 'servername', 'irc.gamesurge.net')
 nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
 port = int(config.getOption('Config', 'port', '6667'))
+part_message = config.getOption('Config', 'part_message', 'QUIT :XSBS - eXtensible SauerBraten Server')
 try:
 	ipaddress = config.getOption('Config', 'ipaddress', None, False)
 except NoOptionError:
@@ -38,7 +39,7 @@ class IrcBot(asyncore.dispatcher):
 	def __del__(self):
 		self.close()
 	def quit(self):
-		self.send('QUIT :XSBS - eXtensible SauerBraten Server\r\n')
+		self.send(part_message + '\r\n')
 	def handle_close(self):
 		logging.warning('Connection closed')
 		logging.warning('Reconnecting in 5 seconds')
