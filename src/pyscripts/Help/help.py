@@ -94,6 +94,6 @@ if available_commands_connect:
 	registerServerEventHandler('player_connect_delayed', onPlayerActive)
 registerCommandHandler('help', onHelpCommand)
 registerCommandHandler('listcommands', onPlayerCommands)
-if len info_items > 0:
+if len(info_items) > 0:
 	registerCommandHandler('info', onInfoCommand)
 
