@@ -1,7 +1,7 @@
 import sbserver
 from xsbs.events import registerServerEventHandler
 from xsbs.commands import registerCommandHandler
-from xsbs.colors import blue, red, orange
+from xsbs.colors import blue, red, orange, colordict
 from xsbs.ui import error, info
 from xsbs.settings import PluginConfig
 
@@ -44,6 +44,7 @@ helptexts = {
 
 config = PluginConfig('help')
 available_commands_connect = config.getOption('Config', 'available_commands_on_connect', 'yes') == 'yes'
+info_items = config.getAllOptions('InfoMessages')
 del config
 
 available_commands_str = blue('Available commands: ')
@@ -85,8 +86,14 @@ def onPlayerCommands(cn, args):
 			msg += '#' + command + ' '
 		sbserver.playerMessage(cn, orange(msg))
 
+def onInfoCommand(cn, args):
+	for item in info_items:
+		sbserver.playerMessage(cn, info(item[1]))
+
 if available_commands_connect:
 	registerServerEventHandler('player_connect_delayed', onPlayerActive)
 registerCommandHandler('help', onHelpCommand)
 registerCommandHandler('listcommands', onPlayerCommands)
+if len info_items > 0:
+	registerCommandHandler('info', onInfoCommand)
 

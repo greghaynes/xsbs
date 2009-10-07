@@ -34,9 +34,6 @@ def onReloadCmd(cn, args):
 		else:
 			insufficientPermissions(cn)
 
-def onInfoCmd(cn, args):
-	sbserver.playerMessage(cn, motdstring)
-
 def onGiveMaster(cn, args):
 	if args == '':
 		sbserver.playerMessage(cn, error('Usage #givemaster <cn>'))
@@ -83,7 +80,6 @@ def onMinsLeft(cn, args):
 registerCommandHandler('pause', onPauseCmd)
 registerCommandHandler('resume', onResumeCmd)
 registerCommandHandler('reload', onReloadCmd)
-registerCommandHandler('info', onInfoCmd)
 registerCommandHandler('givemaster', onGiveMaster)
 registerCommandHandler('mastermask', onMasterMask)
 registerCommandHandler('resize', onResize)
