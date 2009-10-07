@@ -13,6 +13,7 @@ servername = config.getOption('Config', 'servername', 'irc.gamesurge.net')
 nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
 port = int(config.getOption('Config', 'port', '6667'))
 part_message = config.getOption('Config', 'part_message', 'QUIT :XSBS - eXtensible SauerBraten Server')
+msg_gw = config.getOption('Abilities', 'message_gateway', 'yes') == 'yes'
 try:
 	ipaddress = config.getOption('Config', 'ipaddress', None, False)
 except NoOptionError:
@@ -81,7 +82,7 @@ class IrcBot(asyncore.dispatcher):
 				self.msgcommands[message[1:]](sender, message)
 			except KeyError:
 				self.privMsg(channel, 'Invalid command')
-		else:
+		elif msg_gw:
 			sbserver.message((red('Remote User') + green(' %s') + ': %s') % (sender, message))
 	def handle_read(self):
 		self.buff += self.recv(4096)
