@@ -105,7 +105,7 @@ class MasterClient(asyncore.dispatcher):
 			self.authman.delAuth(auth.id)
 		elif key == 'failauth':
 			auth = self.authman.getAuth(int(args[1]))
-			sbserver.triggerServerEvent('player_auth_fail', (auth.cn, auth.name))
+			triggerServerEvent('player_auth_fail', (auth.cn, auth.name))
 			self.authman.delAuth(auth.id)
 		elif key == 'chalauth':
 			self.authman.challenge(int(args[1]), args[2])
