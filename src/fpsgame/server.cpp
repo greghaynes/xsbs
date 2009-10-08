@@ -1540,13 +1540,13 @@ namespace server
 
     void tryauth(clientinfo *ci, const char *user)
     {
-        SbPy::triggerEventIntString("auth_try", ci->clientnum, user);
+        SbPy::triggerEventIntString("player_auth_request", ci->clientnum, user);
         return;
     }
 
     void answerchallenge(clientinfo *ci, uint id, char *val)
     {
-        SbPy::triggerEventIntString("auth_ans", id, val);
+        SbPy::triggerEventIntIntString("player_auth_challenge_response", ci->clientnum, id, val);
         return;
     }
 

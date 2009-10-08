@@ -52,6 +52,8 @@ available_commands_str += orange()
 for command in helptexts.items():
 	if command[1][0]:
 		available_commands_str += '#' + command[0] + ' '
+for item in info_items:
+	item = string.Template(item).substitute(colordict)
 
 def onPlayerActive(cn):
 	sbserver.playerMessage(cn, available_commands_str)

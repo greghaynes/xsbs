@@ -1,4 +1,4 @@
-from xsbs.events import registerServerEventHandler
+from xsbs.events import registerServerEventHandler, triggerServerEvent
 from xsbs.timers import addTimer
 from xsbs.colors import colordict
 from xsbs.ui import error, info
@@ -15,117 +15,123 @@ claimstr = config.getOption('Config', 'auth_message', '${green}${name}${white} h
 master_host = config.getOption('Config', 'master_host', 'sauerbraten.org')
 master_port = config.getOption('Config', 'master_port', '28787')
 allow_auth = config.getOption('Config', 'allow_auth', 'yes') == 'yes'
+register_interval = config.getOption('Config', 'register_interval', '3600')
 del config
 claimstr = string.Template(claimstr)
 master_port = int(master_port)
+register_interval = int(register_interval)
+
+class Request:
+	def __init__(self, data):
+		self.data = data
+		self.is_running = False
+	def do(self, *args):
+		if not self.is_running:
+			args[0].send(self.data)
+			self.is_running = True
+
+class AuthRequest(Request):
+	def __init__(self, id, cn, name):
+		Request.__init__(self, 'reqauth %i %s\n' % (id, name))
+		self.id = id
+		self.cn = cn
+		self.name = name
+
+class AuthManager:
+	def __init__(self):
+		self.attempts = []
+		self.id = 0
+	def getAuth(self, id):
+		for auth in self.attempts:
+			if auth.id == id:
+				return auth
+		raise ValueError('Non existent auth request id')
+	def request(self, cn, name):
+		req = AuthRequest(self.id, cn, name)
+		self.attempts.append(req)
+		self.id += 1
+		return req
+	def challenge(self, id, chal):
+		auth = getAuth(id)
+		sbserver.authChallenge(auth.cn, auth.id, chal)
+	def challengeResponse(self, id, response):
+		auth = getAuth(id)
+		return Request('confauth %i %s\n' % (id, response))
+	def delAuth(self, id):
+		i = 0
+		for auth in self.attempts:
+			if auth.id == id:
+				del self.attempts[i]
+				return
+			i += 1
+		raise ValueError('Non existent auth reqest id')
 
 class MasterClient(asyncore.dispatcher):
 	def __init__(self, hostname='sauerbraten.org', port=28787):
 		asyncore.dispatcher.__init__(self)
 		self.hostname = hostname
 		self.port = port
-		self.buff = ''
-		self.out_buff = []
-		self.is_registered = False
-		self.is_connected = False
-		self.is_connecting = False
-		self.reg_in_progress = False
-		self.next_auth_id = 0
-		self.auth_map = {}
-		addTimer(60*60*1000, self.register, (), True)
+		self.request_queue = []
+		self.read_buff = ''
+		self.authman = AuthManager()
+		self.do_connect = False
 		self.register()
-	def handle_close(self):
-		self.is_connected = False
-		self.is_connecting = False
-		self.close()
+	def makeRequest(self, request):
+		if not self.do_connect:
+			self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+			self.connect((self.hostname, self.port))
+			self.do_connect = False
+		self.request_queue.append(request)
+	def try_auth(self, cn, name):
+		self.makeRequest(self.authman.request(cn, name))
+	def challenge_response(self, cn, id, response):
+		self.authman.challengeResponse(id, response)
+	def register(self):
+		addTimer(register_interval*1000, self.register)
+		self.makeRequest(Request('regserv %i\n' % sbserver.port()))
+	def handle_response(self, response):
+		args = response.split(' ')
+		key = args[0]
+		response_end = True
+		if key == 'succreg':
+			logging.info('Master server registration succeded')
+			triggerServerEvent('master_registration_succeeded', ())
+		elif key == 'failreg':
+			logging.warning('Master server registration failed')
+			triggerServerevent('master_registration_failed', ())
+		elif key == 'succauth':
+			auth = self.authman.getAuth(int(args[1]))
+			triggerServerEvent('player_auth_succeed', (auth.cn, auth.name))
+			self.authman.delAuth(auth.id)
+		elif key == 'failauth':
+			auth = self.authman.getAuth(int(args[1]))
+			sbserver.triggerServerEvent('player_auth_fail', (auth.cn, auth.name))
+			self.authman.delAuth(auth.id)
+		elif key == 'chalauth':
+			self.authman.challenge(int(args[1]), args[2])
+		del self.request_queue[0]
+		if len(self.request_queue) == 0:
+			self.close()
 	def handle_connect(self):
-		self.is_connected = True
-		self.is_connecting = False
 		logging.debug('Connected to master server')
 	def handle_write(self):
-		for out in self.out_buff:
-			self.send(out)
-		del self.out_buff[:]
-	def writable(self):
-		return len(self.out_buff) > 0
-	def do_connect(self):
-		if not self.is_connected and not self.is_connecting:
-			self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-			if sbserver.ip():
-				self.bind((sbserver.ip(), 0))
-			self.connect((self.hostname, self.port))
-			self.is_connecting = True
+		try:
+			self.request_queue[0].do(self)
+		except IndexError:
+			pass
 	def handle_read(self):
-		self.buff += self.recv(4096)
-		tmp_buff = self.buff.split('\n')
-		self.buff = tmp_buff.pop()
+		self.read_buff += self.recv(4096)
+		tmp_buff = self.read_buff.split('\n')
+		self.read_buff = tmp_buff.pop()
 		for line in tmp_buff:
-			args = line.strip().split()
-			key = args[0]
-			if key == 'failreg':
-				self.is_registered = False
-				logging.warning('Failed to register with master server: %s' % line[8:])
-				self.is_connected = False
-				self.is_connecting = False
-				self.reg_in_progress = False
-				self.close()
-			elif key == 'succreg':
-				self.is_registered = True
-				logging.info('Successfully registered with master server')
-				self.reg_in_progress = False
-				self.is_connecting = False
-				self.is_connected = False
-				self.close()
-			elif key == 'chalauth':
-				cn = self.auth_map[int(args[1])][0]
-				chal = args[2]
-				sbserver.authChallenge(cn, int(args[1]), chal)
-			elif key == 'failauth':
-				a = self.auth_map[int(args[1])]
-				logging.info('%s (%s) failed to authenticate as %s' % (
-					sbserver.playerName(a[0]), 
-					ipLongToString(sbserver.playerIpLong(a[0])),
-					a[1]))
-				del self.auth_map[int(args[1])]
-				self.close()
-				self.is_connected = False
-			elif key == 'succauth':
-				authtup = self.auth_map[int(args[1])]
-				logging.info('%s (%s) authenticated as %s' % (
-					sbserver.playerName(authtup[0]), 
-					ipLongToString(sbserver.playerIpLong(authtup[0])),
-					authtup[1]))
-				cn = authtup[0]
-				nick = sbserver.playerName(cn)
-				authname = authtup[1]
-				msg = claimstr.substitute(colordict, name=nick, authname=authname)
-				sbserver.message(info(msg))
-				sbserver.setMaster(cn)
-				del self.auth_map[int(args[1])]
-				self.is_connected = False
-				self.close()
-	def register(self):
-		if self.reg_in_progress:
-			logging.debug('Registration already in progress')
-			return
-		self.do_connect()
-		logging.info('Attempting to register with master server')
-		self.out_buff.append('regserv %i\n' % sbserver.port())
-		self.reg_in_progress = True
-	def update(self):
-		self.register()
-	def tryauth(self, cn, name):
-		if not allow_auth:
-			sbserver.playerMessage(cn, error('Auth keys are disabled on this server'))
-		self.do_connect()
-		self.auth_map[self.next_auth_id] = (cn, name)
-		self.out_buff.append('reqauth %i %s\n' % (self.next_auth_id, name))
-		self.next_auth_id += 1
-	def anschal(self, id, val):
-		self.do_connect()
-		self.out_buff.append('confauth %i %s\n' % (id, val))
+			self.handle_response(line)
+	def writable(self):
+		try:
+			return not self.request_queue[0].is_running
+		except IndexError:
+			return False
 
 mc = MasterClient(master_host, master_port)
-registerServerEventHandler('auth_try', mc.tryauth)
-registerServerEventHandler('auth_ans', mc.anschal)
+registerServerEventHandler('player_auth_request', mc.try_auth)
+registerServerEventHandler('player_auth_challenge_response', mc.challenge_response)
 
