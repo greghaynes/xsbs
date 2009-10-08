@@ -74,10 +74,10 @@ class MasterClient(asyncore.dispatcher):
 		self.request_queue = []
 		self.read_buff = ''
 		self.authman = AuthManager()
-		self.do_connect = False
+		self.do_connect = True
 		self.register()
 	def makeRequest(self, request):
-		if not self.do_connect:
+		if self.do_connect:
 			self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 			self.connect((self.hostname, self.port))
 			self.do_connect = False
@@ -85,7 +85,7 @@ class MasterClient(asyncore.dispatcher):
 	def try_auth(self, cn, name):
 		self.makeRequest(self.authman.request(cn, name))
 	def challenge_response(self, cn, id, response):
-		self.authman.challengeResponse(id, response)
+		self.makeRequest(self.authman.challengeResponse(id, response))
 	def register(self):
 		addTimer(register_interval*1000, self.register)
 		self.makeRequest(Request('regserv %i\n' % sbserver.port()))
@@ -98,7 +98,7 @@ class MasterClient(asyncore.dispatcher):
 			triggerServerEvent('master_registration_succeeded', ())
 		elif key == 'failreg':
 			logging.warning('Master server registration failed')
-			triggerServerevent('master_registration_failed', ())
+			triggerServerEvent('master_registration_failed', ())
 		elif key == 'succauth':
 			auth = self.authman.getAuth(int(args[1]))
 			triggerServerEvent('player_auth_succeed', (auth.cn, auth.name))
@@ -108,17 +108,18 @@ class MasterClient(asyncore.dispatcher):
 			sbserver.triggerServerEvent('player_auth_fail', (auth.cn, auth.name))
 			self.authman.delAuth(auth.id)
 		elif key == 'chalauth':
+			response_end = False
 			self.authman.challenge(int(args[1]), args[2])
-		del self.request_queue[0]
+		if response_end:
+			del self.request_queue[0]
 		if len(self.request_queue) == 0:
 			self.close()
+			self.do_connect = True
 	def handle_connect(self):
 		logging.debug('Connected to master server')
 	def handle_write(self):
-		try:
-			self.request_queue[0].do(self)
-		except IndexError:
-			pass
+		for item in self.request_queue:
+			item.do(self)
 	def handle_read(self):
 		self.read_buff += self.recv(4096)
 		tmp_buff = self.read_buff.split('\n')
@@ -126,10 +127,10 @@ class MasterClient(asyncore.dispatcher):
 		for line in tmp_buff:
 			self.handle_response(line)
 	def writable(self):
-		try:
-			return not self.request_queue[0].is_running
-		except IndexError:
-			return False
+		for item in self.request_queue:
+			if not item.is_running:
+				return True
+		return False
 
 mc = MasterClient(master_host, master_port)
 registerServerEventHandler('player_auth_request', mc.try_auth)
