@@ -112,14 +112,14 @@ class MasterClient(asyncore.dispatcher):
 			self.authman.delAuth(auth.id)
 		elif key == 'chalauth':
 			self.authman.challenge(int(args[1]), args[2])
+		if self.responses_needed == 0:
+			logging.error('Got response when none needed')
+		else:
+			self.responses_needed -= 1
 		if response_end:
 			if self.responses_needed == 0:
-				logging.error('Got response when none needed')
-			else:
-				self.responses_needed -= 0
-		if len(self.request_queue) == 0:
-			self.close()
-			self.do_connect = True
+				self.close()
+				self.do_connect = True
 	def handle_connect(self):
 		logging.debug('Connected to master server')
 	def handle_write(self):
