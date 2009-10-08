@@ -111,6 +111,7 @@ class MasterClient(asyncore.dispatcher):
 			triggerServerEvent('player_auth_fail', (auth.cn, auth.name))
 			self.authman.delAuth(auth.id)
 		elif key == 'chalauth':
+			self.response_end = False
 			self.authman.challenge(int(args[1]), args[2])
 		if self.responses_needed == 0:
 			logging.error('Got response when none needed')
