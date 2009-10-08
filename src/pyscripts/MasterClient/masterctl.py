@@ -120,6 +120,8 @@ class MasterClient(asyncore.dispatcher):
 	def handle_write(self):
 		for item in self.request_queue:
 			item.do(self)
+	def handle_close(self):
+		self.do_connect = True
 	def handle_read(self):
 		self.read_buff += self.recv(4096)
 		tmp_buff = self.read_buff.split('\n')
