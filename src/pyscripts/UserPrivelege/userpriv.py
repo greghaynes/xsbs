@@ -16,11 +16,13 @@ import string
 
 config = PluginConfig('userprivilege')
 tablename = config.getOption('Config', 'tablename', 'userprivileges')
+authtemp = config.getOption('Messages', 'authenticated', '${green}${name}${white} has authenticated as ${orange}${authname}')
 gmtemp = config.getOption('Messages', 'gain_master', '${green}${name}${white} has claimed master')
 gatemp = config.getOption('Messages', 'gain_admin', '${green}${name}${white} has claimed admin')
 rmtemp = config.getOption('Messages', 'release_master', '${green}${name}${white} has relinquished master')
 ratemp = config.getOption('Messages', 'release_admin', '${green}${name}${white} has relinquished admin')
 del config
+authtemp = string.Template(authtemp)
 gmtemp = string.Template(gmtemp)
 gatemp = string.Template(gatemp)
 rmtemp = string.Template(rmtemp)
@@ -66,6 +68,9 @@ def onSetMaster(cn, hash):
 	if hash == sbserver.hashPassword(cn, sbserver.adminPassword()):
 		sbserver.setAdmin(cn)
 
+def onAuthSuccess(cn, name):
+	sbserver.message(info(authtemp.substitute(colordict, name=sbserver.playerName(cn), authname=name)))
+
 def onSetMasterOff(cn):
 	sbserver.resetPrivilege(cn)
 
@@ -89,6 +94,7 @@ def init():
 	registerServerEventHandler('player_claimed_admin', onGainAdmin)
 	registerServerEventHandler('player_released_master', onRelMaster)
 	registerServerEventHandler('player_released_admin', onRelAdmin)
+	registerServerEventHandler('player_auth_succeed', onAuthSuccess)
 	Base.metadata.create_all(dbmanager.engine)
 
 init()
