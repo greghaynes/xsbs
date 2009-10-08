@@ -79,6 +79,8 @@ class MasterClient(asyncore.dispatcher):
 	def makeRequest(self, request):
 		if self.do_connect:
 			self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
+			if sbserver.ip():
+				self.bind((sbserver.ip(), 0))
 			self.connect((self.hostname, self.port))
 			self.do_connect = False
 		self.request_queue.append(request)
