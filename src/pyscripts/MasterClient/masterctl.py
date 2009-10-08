@@ -72,6 +72,7 @@ class MasterClient(asyncore.dispatcher):
 		self.hostname = hostname
 		self.port = port
 		self.request_queue = []
+		self.responses_needed = 0
 		self.read_buff = ''
 		self.authman = AuthManager()
 		self.do_connect = True
@@ -112,7 +113,10 @@ class MasterClient(asyncore.dispatcher):
 		elif key == 'chalauth':
 			self.authman.challenge(int(args[1]), args[2])
 		if response_end:
-			del self.request_queue[0]
+			if self.responses_needed == 0:
+				logging.error('Got response when none needed')
+			else:
+				self.responses_needed -= 0
 		if len(self.request_queue) == 0:
 			self.close()
 			self.do_connect = True
@@ -120,7 +124,10 @@ class MasterClient(asyncore.dispatcher):
 		logging.debug('Connected to master server')
 	def handle_write(self):
 		for item in self.request_queue:
-			item.do(self)
+			if not item.is_running:
+				self.responses_needed += 1
+				item.do(self)
+		del self.request_queue[:]
 	def handle_close(self):
 		self.do_connect = True
 	def handle_read(self):
