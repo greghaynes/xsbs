@@ -70,6 +70,7 @@ def onSetMaster(cn, hash):
 
 def onAuthSuccess(cn, name):
 	sbserver.message(info(authtemp.substitute(colordict, name=sbserver.playerName(cn), authname=name)))
+	sbserver.setMaster(cn)
 
 def onSetMasterOff(cn):
 	sbserver.resetPrivilege(cn)
