@@ -52,10 +52,10 @@ class AuthManager:
 		self.id += 1
 		return req
 	def challenge(self, id, chal):
-		auth = getAuth(id)
+		auth = self.getAuth(id)
 		sbserver.authChallenge(auth.cn, auth.id, chal)
 	def challengeResponse(self, id, response):
-		auth = getAuth(id)
+		auth = self.getAuth(id)
 		return Request('confauth %i %s\n' % (id, response))
 	def delAuth(self, id):
 		i = 0
