@@ -352,6 +352,7 @@ namespace server
 
 extern void server_sigint(int);
 extern int serverport;
+extern int totalmillis;
 extern char *serverip;
 
 #endif

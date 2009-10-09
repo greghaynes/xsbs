@@ -533,7 +533,7 @@ static PyObject *restartPy(PyObject *self, PyObject *args)
 
 static PyObject *uptime(PyObject *self, PyObject *args)
 {
-	return Py_BuildValue("i", server::gamemillis);
+	return Py_BuildValue("i", totalmillis);
 }
 
 static PyObject *ip(PyObject *self, PyObject *args)
