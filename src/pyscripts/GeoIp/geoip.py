@@ -10,7 +10,7 @@ import pygeoip
 db = pygeoip.GeoIP('GeoIp/GeoIP.dat')
 
 conf = PluginConfig('geoip')
-template = '${green}${user} ${white}has connected from ${orange}${country}'
+template = '${green}${user} ${white} connected from ${orange}${country}'
 template = conf.getOption('Config', 'template', template)
 del conf
 
