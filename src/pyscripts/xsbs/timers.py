@@ -28,7 +28,7 @@ class TimerManager:
 			timer = Timer(self.currtime, delay, func, args, persistent)
 			i = 0
 			for iter in self.timers:
-				if not iter.isTimedOut(timer.timeout):
+				if iter.timeout > timer.timeout:
 					self.timers.insert(i, timer)
 					return
 				i += 1
