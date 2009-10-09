@@ -14,5 +14,10 @@ def setMM(cn, mm):
 	else:
 		sbserver.playerMessage(cn, error('You cannot set the master mode.'))
 
+def onNoClients():
+	if sbserver.masterMode() > 1:
+		sbserver.setMasterMode(1)
+
 registerServerEventHandler('player_set_mastermode', setMM)
+registerServerEventHandler('no_clients', onNoClients)
 

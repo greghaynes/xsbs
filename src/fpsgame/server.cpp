@@ -1442,6 +1442,7 @@ namespace server
     void noclients()
     {
         aiman::clearai();
+        SbPy::triggerEvent("no_clients", 0);
     }
 
     void localconnect(int n)
