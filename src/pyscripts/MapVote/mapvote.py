@@ -75,5 +75,5 @@ def onIntermEnd():
 
 registerServerEventHandler('player_map_set', onMapSet)
 registerServerEventHandler('player_map_vote', onMapVote)
-registerServerEventHandler('intermission_ended', onIntermEnd)
+registerServerEventHandler('reload_map_selection', onIntermEnd)
 

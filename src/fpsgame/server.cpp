@@ -1326,7 +1326,7 @@ namespace server
             if(demorecord) enddemorecord();
             interm = 0;
             SbPy::triggerEvent("intermission_ended", 0);
-            if(clients.length()) sendf(-1, 1, "ri", SV_MAPRELOAD);
+            //if(clients.length()) sendf(-1, 1, "ri", SV_MAPRELOAD);
         }
 
         SbPy::update();
@@ -1338,6 +1338,11 @@ namespace server
 		signal(SIGINT, server_sigint);
 		sendservmsg("Reloading completed.");
 	}
+    }
+
+    void sendmapreload()
+    {
+        if(clients.length()) sendf(-1, 1, "ri", SV_MAPRELOAD);
     }
 
     struct crcinfo

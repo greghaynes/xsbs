@@ -347,6 +347,7 @@ namespace server
 	void setgamemins(int mins);
 	void endgame();
 	void resetpriv(clientinfo *ci);
+	void sendmapreload();
 }
 
 extern void server_sigint(int);
