@@ -87,7 +87,7 @@ namespace server
         virtual void initclient(clientinfo *ci, packetbuf &p, bool connecting) {}
         virtual void update() {}
         virtual void reset(bool empty) {}
-        virtual void intermission() {}
+        virtual void intermission() {  }
         virtual bool hidefrags() { return false; }
         virtual int getteamscore(const char *team) { return 0; }
         virtual void getteamscores(vector<teamscore> &scores) {}
@@ -1070,7 +1070,11 @@ namespace server
             sendf(-1, 1, "ri2", SV_TIMEUP, minremain);
             if(!minremain && smode) smode->intermission();
         }
-        if(!interm && minremain<=0) interm = gamemillis+10000;
+        if(!interm && minremain<=0)
+        {
+            SbPy::triggerEvent("intermission_begin", 0);
+            interm = gamemillis+10000;
+        }
     }
 
     void startintermission() { gamelimit = min(gamelimit, gamemillis); checkintermission(); }
