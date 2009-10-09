@@ -324,14 +324,16 @@ const char *disc_reasons[] = { "normal", "end of packet", "client num", "kicked/
 void disconnect_client(int n, int reason)
 {
     if(clients[n]->type!=ST_TCPIP) return;
+    SbPy::triggerEventInt("player_disconnect", n);
+    SbPy::triggerEventInt("player_disconnect_post", n);
     enet_peer_disconnect(clients[n]->peer, reason);
     server::clientdisconnect(n);
     clients[n]->type = ST_EMPTY;
     clients[n]->peer->data = NULL;
     server::deleteclientinfo(clients[n]->info);
     clients[n]->info = NULL;
-    defformatstring(s)("client (%s) disconnected because: %s", clients[n]->hostname, disc_reasons[reason]);
-    server::sendservmsg(s);
+//    defformatstring(s)("client (%s) disconnected because: %s", clients[n]->hostname, disc_reasons[reason]);
+//    server::sendservmsg(s);
 }
 
 void kicknonlocalclients(int reason)
@@ -622,8 +624,6 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
             {
                 client *c = (client *)event.peer->data;
                 if(!c) break;
-                SbPy::triggerEventInt("player_disconnect", c->num);
-                SbPy::triggerEventInt("player_disconnect_post", c->num);
                 server::clientdisconnect(c->num);
                 nonlocalclients--;
                 c->type = ST_EMPTY;

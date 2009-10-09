@@ -7,23 +7,13 @@ from xsbs.settings import PluginConfig
 import string
 
 config = PluginConfig('gamenotifications')
-tktemp = config.getOption('Config', 'teamkill', '${green}${tker}${white} has team killed ${orange}${victim}')
-uptemp = config.getOption('Config', 'map_uploaded', '${green}${name} has uploaded a map. /getmap to receive it')
+tktemp = config.getOption('Config', 'teamkill', '${green}${tker}${white} team killed ${orange}${victim}')
+uptemp = config.getOption('Config', 'map_uploaded', '${green}${name} uploaded a map. /getmap to receive it')
 getmaptemp = config.getOption('Config', 'get_map', '${green}${name} is downloading map')
 del config
 
 uptemp = string.Template(tktemp)
 getmaptemp = string.Template(getmaptemp)
-
-if tktemp == 'None':
-	tk_broadcast = 0
-elif tktemp == 'Master':
-	tk_broadcast = 1
-else:
-	tk_broadcast = 2
-
-if tk_broadcast > 0:
-	tktemp = string.Template(tktemp)
 
 def teamkill_broadcast(cn, tcn):
 	sbserver.message(info(tktemp.substitute(colordict, tker=sbserver.playerName(cn), victim=sbserver.playerName(tcn))))
