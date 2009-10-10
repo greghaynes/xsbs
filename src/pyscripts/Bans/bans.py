@@ -112,7 +112,7 @@ def onRecentBans(cn, args):
 		for ban in recent:
 			sbserver.playerMessage(cn, info('Nick: %s' % ban.nick))
 
-def allowClient(cn):
+def allowClient(cn, pwd):
 	ip = sbserver.playerIpLong(cn)
 	return not isCurrentlyBanned(ip)
 
@@ -120,7 +120,7 @@ def onKick(tcn, cn):
 	ban(tcn, 14500, 'Unspecified reason', cn)
 
 def init():
-	registerPolicyEventHandler("allow_connect", allowClient)
+	registerPolicyEventHandler("connect_kick", allowClient)
 	registerCommandHandler('ban', onBanCmd)
 	registerCommandHandler('recentbans', onRecentBans)
 	registerServerEventHandler('player_ban', ban)

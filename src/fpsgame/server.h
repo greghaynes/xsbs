@@ -328,6 +328,7 @@ namespace server
 	extern bool restart_py;
 	extern char smapname[260];
 	extern char *adminpass;
+	extern char *serverpass;
 	extern int gamemode;
 	extern bool allow_modevote;
 	extern int port;
