@@ -45,16 +45,20 @@ def clientReloadRotate():
 	sbserver.sendMapReload()
 
 def presetRotate():
-	try:
-		map = getSuccessor(sbserver.gameMode(), sbserver.mapName())
-	except KeyError:
-		logging.warning('No map list specified for current mode.  Defaulting to user-specified rotation.')
-		clientReloadRotate()
-	except ValueError:
-		logging.info('Maps list for current mode is empty.  Defaulting to user-specified rotation.')
-		clientReloadRotate()
+	if sbserver.numClients() == 0:
+		rotate_on_join[0] = True
 	else:
-		sbserver.setMap(map, sbserver.gameMode())
+		rotate_on_join[0] = False
+		try:
+			map = getSuccessor(sbserver.gameMode(), sbserver.mapName())
+		except KeyError:
+			logging.warning('No map list specified for current mode.  Defaulting to user-specified rotation.')
+			clientReloadRotate()
+		except ValueError:
+			logging.info('Maps list for current mode is empty.  Defaulting to user-specified rotation.')
+			clientReloadRotate()
+		else:
+			sbserver.setMap(map, sbserver.gameMode())
 
 def onNextMapCmd(cn, args):
 	if args != '':
@@ -65,15 +69,19 @@ def onNextMapCmd(cn, args):
 		except (KeyError, ValueError):
 			sbserver.playerMessage(cn, error('Could not determine next map'))
 
+def onConnect(cn):
+	if rotate_on_join[0]:
+		presetRotate()
+
 if preset_rotation:
 	modeMapLists = {}
 	for mode in map_modes:
 		modeMapLists[mode[0]] = mode[1].replace(' ', '').split(',')
+	rotate_on_join = [False]
 	presetRotate()
-
-if preset_rotation:
 	registerServerEventHandler('intermission_ended', presetRotate)
 	registerCommandHandler('nextmap', onNextMapCmd)
+	registerServerEventHandler('player_connect', onConnect)
 else:
 	registerServerEventHandler('intermission_ended', onIntermEnd)
 
