@@ -7,7 +7,7 @@ import sbserver
 config = PluginConfig('maprotation')
 preset_rotation = config.getOption('Config', 'use_preset_rotation', 'yes') == 'yes'
 start_mode = config.getOption('Config', 'start_mode', 'ffa')
-modes = config.getAllOptions('Maps')
+map_modes = config.getAllOptions('Maps')
 del config
 
 class Map:
@@ -17,7 +17,7 @@ class Map:
 
 def getSuccessor(mode_num, map):
 	try:
-		maps = modeMapLists[mode_num]
+		maps = modeMapLists[modes[mode_num]]
 		if map == '':
 			return maps[0]
 		else:
@@ -41,7 +41,7 @@ def clientReloadRotate():
 def presetRotate(mode=False):
 	try:
 		if mode:
-			map = getSuccessor(mode, sbserver.mapName)
+			map = getSuccessor(modes.index(mode), sbserver.mapName)
 		else:
 			map = getSuccessor(sbserver.gameMode(), sbserver.mapName())
 	except KeyError:
@@ -51,12 +51,12 @@ def presetRotate(mode=False):
 		logging.info('Maps list for current mode is empty.  Defaulting to user-specified rotation.')
 		clientReloadRotate()
 	else:
-		sbserver.setMap(sbserver.gameMode(), map)
+		sbserver.setMap(map, sbserver.gameMode())
 
 if preset_rotation:
 	modeMapLists = {}
-	for mode in modes:
-		modeMapLists[mode[0]] = mode[1].replate(' ', '').split(',')
+	for mode in map_modes:
+		modeMapLists[mode[0]] = mode[1].replace(' ', '').split(',')
 	presetRotate(start_mode)
 
 if preset_rotation:
