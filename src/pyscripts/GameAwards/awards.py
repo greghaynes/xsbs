@@ -29,8 +29,10 @@ def onIntermission():
 	msg = ''
 	if most_frags > 0:
 		msg += mftemp.substitute(colordict, name=sbserver.playerName(most_frags_cn), count=most_frags)
+		msg += ' '
 	if most_tks > 0:
-		msg += mftemp.substitute(colordict, name=sbserver.playerName(most_tks_cn), count=most_tks)
+		msg += mtktemp.substitute(colordict, name=sbserver.playerName(most_tks_cn), count=most_tks)
+		msg += ' '
 	if msg != '':
 		msg = awards_prefix + msg
 		sbserver.message(msg)
