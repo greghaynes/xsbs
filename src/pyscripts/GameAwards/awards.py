@@ -37,5 +37,5 @@ def onIntermission():
 		msg = awards_prefix + msg
 		sbserver.message(msg)
 
-registerServerEventHandler('intermission_begin', onIntermission)
+#registerServerEventHandler('intermission_begin', onIntermission)
 
