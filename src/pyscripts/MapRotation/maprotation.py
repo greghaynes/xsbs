@@ -1,14 +1,20 @@
 from xsbs.events import registerServerEventHandler, triggerServerEvent
 from xsbs.settings import PluginConfig
 from xsbs.game import modes
+from xsbs.ui import error, info
+from xsbs.colors import colordict
+from xsbs.commands import registerCommandHandler
 import logging
 import sbserver
+import string
 
 config = PluginConfig('maprotation')
 preset_rotation = config.getOption('Config', 'use_preset_rotation', 'yes') == 'yes'
 start_mode = config.getOption('Config', 'start_mode', 'ffa')
+nextmap_response = config.getOption('Config', 'nextmap_response', 'The next map is ${blue}${mapname}')
 map_modes = config.getAllOptions('Maps')
 del config
+nextmap_response = string.Template(nextmap_response)
 
 class Map:
 	def __init__(self, name, mode):
@@ -50,6 +56,15 @@ def presetRotate():
 	else:
 		sbserver.setMap(map, sbserver.gameMode())
 
+def onNextMapCmd(cn, args):
+	if args != '':
+		sbserver.playerMessage(cn, error('Usage: #nextmap'))
+	else:
+		try:
+			sbserver.playerMessage(cn, info(nextmap_response.substitute(colordict, mapname=getSuccessor(sbserver.gameMode(), sbserver.mapName()))))
+		except (KeyError, ValueError):
+			sbserver.playerMessage(cn, error('Could not determine next map'))
+
 if preset_rotation:
 	modeMapLists = {}
 	for mode in map_modes:
@@ -58,6 +73,7 @@ if preset_rotation:
 
 if preset_rotation:
 	registerServerEventHandler('intermission_ended', presetRotate)
+	registerCommandHandler('nextmap', onNextMapCmd)
 else:
 	registerServerEventHandler('intermission_ended', onIntermEnd)
 
