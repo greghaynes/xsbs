@@ -38,12 +38,9 @@ def clientReloadRotate():
 	triggerServerEvent('reload_map_selection', ())
 	sbserver.sendMapReload()
 
-def presetRotate(mode=False):
+def presetRotate():
 	try:
-		if mode:
-			map = getSuccessor(modes.index(mode), sbserver.mapName)
-		else:
-			map = getSuccessor(sbserver.gameMode(), sbserver.mapName())
+		map = getSuccessor(sbserver.gameMode(), sbserver.mapName())
 	except KeyError:
 		logging.warning('No map list specified for current mode.  Defaulting to user-specified rotation.')
 		clientReloadRotate()
@@ -57,7 +54,7 @@ if preset_rotation:
 	modeMapLists = {}
 	for mode in map_modes:
 		modeMapLists[mode[0]] = mode[1].replace(' ', '').split(',')
-	presetRotate(start_mode)
+	presetRotate()
 
 if preset_rotation:
 	registerServerEventHandler('intermission_ended', presetRotate)
