@@ -1,5 +1,6 @@
 import timers
 import asyncore
+import logging
 
 class EventManager:
 	def __init__(self):
@@ -13,7 +14,10 @@ class EventManager:
 	def trigger(self, eventname, args=()):
 		try:
 			for event in self.events[eventname]:
-				event(*args)
+				try:
+					event(*args)
+				except:
+					logging.warn('Uncaught exception occured in event handler.')
 		except KeyError:
 			pass
 
@@ -23,8 +27,11 @@ class PolicyEventManager(EventManager):
 	def trigger(self, event, args=()):
 		try:
 			for event in self.events[event]:
-				if not event(*args):
+				try:
+					if not event(*args):
 					return False
+				except:
+					logging.warn('Uncaught exception occoured in policy event handler.')	
 		except KeyError:
 			return True
 		return True
