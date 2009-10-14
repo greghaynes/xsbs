@@ -1,7 +1,7 @@
 import sbserver
 from xsbs.colors import red, orange, white
 from xsbs.events import registerPolicyEventHandler, registerServerEventHandler
-from xsbs.commands import registerCommandHandler
+from xsbs.commands import registerCommandHandler, masterRequired
 
 muted_players = []
 
@@ -11,11 +11,9 @@ def allowMsg(cn, text):
 		return False
 	return True
 
+@masterRequired
 def onMuteCommand(cn, args):
 	try:
-		if sbserver.playerPrivilege(cn) == 0:
-			sbserver.playerMessage(cn, red('Insufficient privileges'))
-			return
 		args = args.split(' ')
 		tcn = int(args[0])
 		if len(args) > 1:
@@ -31,11 +29,9 @@ def onMuteCommand(cn, args):
 	except ValueError:
 		sbserver.playerMessage(cn, red('Invalid player cn'))
 
+@masterRequired
 def onUnmuteCommand(cn, args):
 	try:
-		if sbserver.playerPrivilege(cn) == 0:
-			sbserver.playerMessage(cn, red('Insufficient privileges'))
-			return
 		args = args.split(' ')
 		tcn = int(args[0])
 		if len(args) > 1:

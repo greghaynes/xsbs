@@ -19,6 +19,8 @@ def checkModified(cn):
 			sbserver.spectate(cn, cn)
 	except KeyError:
 		pass
+	except ValueError:
+	 	pass
 
 registerServerEventHandler('player_modified_map', onMapModified)
 registerServerEventHandler('player_active', checkModified)

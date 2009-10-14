@@ -1,5 +1,6 @@
 from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info
+from xsbs.commands import masterRequired
 import sbserver
 
 MMNAMES = ['open',
@@ -7,12 +8,10 @@ MMNAMES = ['open',
 	'locked',
 	'private']
 
+@masterRequired
 def setMM(cn, mm):
-	if sbserver.playerPrivilege(cn) > 0:
-		sbserver.message(info('%s set master mode to %s' % (sbserver.playerName(cn), MMNAMES[mm])))
-		sbserver.setMasterMode(mm)
-	else:
-		sbserver.playerMessage(cn, error('You cannot set the master mode.'))
+	sbserver.message(info('%s set master mode to %s' % (sbserver.playerName(cn), MMNAMES[mm])))
+	sbserver.setMasterMode(mm)
 
 def onNoClients():
 	if sbserver.masterMode() > 1:

@@ -1,7 +1,7 @@
 import sbserver
 from events import registerServerEventHandler, registerPolicyEventHandler
 from colors import red
-from xsbs.ui import error
+from xsbs.ui import error, insufficientPermissions
 
 class CommandManager:
 	def __init__(self):
@@ -24,6 +24,24 @@ class CommandManager:
 			self.trigger(cn, cmd, text[len(cmd)+2:])
 			return False
 		return True
+
+class masterRequired(object):
+	def __init__(self, func):
+		self.func = func
+	def __call__(self, *args):
+		if sbserver.playerPrivilege(args[0]) == 0:
+			insufficientPermissions(args[0])
+		else:
+			self.func(*args)
+
+class adminRequired(object):
+	def __init__(self, func):
+		self.func = func
+	def __call__(self, *args):
+		if sbserver.playerPrivilege(args[0]) <= 1:
+			insufficientPermissions(args[0])
+		else:
+			self.func(*args)
 
 commandmanager = CommandManager()
 
