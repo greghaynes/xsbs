@@ -3,7 +3,7 @@ from xsbs.settings import PluginConfig
 from xsbs.colors import red, colordict
 from xsbs.ui import insufficientPermissions, error, info
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, execLater
-from xsbs.commands import registerCommandHandler
+from xsbs.commands import registerCommandHandler, masterRequired
 from xsbs.net import ipLongToString
 from DB.db import dbmanager
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
@@ -76,12 +76,10 @@ ban_message = string.Template(ban_message)
 default_reason = config.getOption('Config', 'default_reason', 'unspecified reason')
 del config
 
+@masterRequired
 def onBanCmd(cn, text):
 	sp = text.split(' ')
 	try:
-		if sbserver.playerPrivilege(cn) == 0:
-			insufficientPermissions(cn)
-			return
 		tcn = int(sp[0])
 		try:
 			ip = sbserver.playerIpLong(tcn)
