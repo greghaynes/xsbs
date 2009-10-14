@@ -29,7 +29,7 @@ class PolicyEventManager(EventManager):
 			for event in self.events[event]:
 				try:
 					if not event(*args):
-					return False
+						return False
 				except:
 					logging.warn('Uncaught exception occoured in policy event handler.')	
 		except KeyError:
