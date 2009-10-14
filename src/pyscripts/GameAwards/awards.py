@@ -16,16 +16,21 @@ mftemp = string.Template(mftemp)
 def onIntermission():
 	players = allPlayers()
 	most_frags = 0
-	most_frags_cn = -1
+	most_frags_cn = 0
 	most_tks = 0
 	most_tks_cn = -1
 	for player in players:
-		if sbserver.playerFrags(player.cn) > most_frags or most_frags_cn == -1:
-			most_frags = sbserver.playerFrags(player.cn)
-			most_frags_cn = player.cn
-		if sbserver.playerTeamkills(player.cn) > most_tks or most_tks_cn == -1:
-			most_tks = sbserver.playerTeamkills(player.cn)
-			most_tks_cn = player.cn
+		try:
+			frags = sbserver.playerFrags(player.cn)
+			teamkills = sbserver.playerTeamkills(player.cn)
+			if frags > most_frags or most_frags_cn == -1:
+				most_frags = sbserver.playerFrags(player.cn)
+				most_frags_cn = player.cn
+			if teamkills > most_tks or most_tks_cn == -1:
+				most_tks = sbserver.playerTeamkills(player.cn)
+				most_tks_cn = player.cn
+		except ValueError:
+			continue
 	msg = ''
 	if most_frags > 0:
 		msg += mftemp.substitute(colordict, name=sbserver.playerName(most_frags_cn), count=most_frags)
@@ -37,5 +42,5 @@ def onIntermission():
 		msg = awards_prefix + msg
 		sbserver.message(msg)
 
-#registerServerEventHandler('intermission_begin', onIntermission)
+registerServerEventHandler('intermission_begin', onIntermission)
 
