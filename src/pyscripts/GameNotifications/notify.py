@@ -12,7 +12,8 @@ uptemp = config.getOption('Config', 'map_uploaded', '${green}${name} uploaded a 
 getmaptemp = config.getOption('Config', 'get_map', '${green}${name} is downloading map')
 del config
 
-uptemp = string.Template(tktemp)
+tktemp = string.Template(tktemp)
+uptemp = string.Template(uptemp)
 getmaptemp = string.Template(getmaptemp)
 
 def teamkill_broadcast(cn, tcn):
