@@ -573,11 +573,13 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
     flushmasteroutput();
     checkserversockets();
 
+/*
     if(totalmillis-lastupdatemaster>60*60*1000)       // send alive signal to masterserver every hour of uptime
     {
         updatemasterserver();
         lastupdatemaster = totalmillis;
     }
+*/
     
 /*
     if(totalmillis-laststatus>60*1000)   // display bandwidth stats, useful for server ops
