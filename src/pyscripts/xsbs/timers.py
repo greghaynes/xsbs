@@ -1,3 +1,4 @@
+import collections
 import sbserver
 import logging
 
@@ -19,7 +20,7 @@ class TimerManager:
 	def __init__(self):
 		self.timers = []
 		self.is_executing = False
-		self.add_queue = []
+		self.add_queue = collections.deque()
 		self.update()
 	def addTimer(self, delay, func, args=(), persistent=False):
 		if self.is_executing:
@@ -36,7 +37,7 @@ class TimerManager:
 	def update(self):
 		for timer in self.add_queue:
 			self.addTimer(*timer)
-		del self.add_queue[:]
+		self.add_queue.clear()
 		self.is_executing = True
 		self.currtime = sbserver.uptime()
 		while True:
