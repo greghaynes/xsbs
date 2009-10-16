@@ -12,6 +12,16 @@ from sqlalchemy.orm.exc import NoResultFound
 import time, string
 import logging
 
+config = PluginConfig('bans')
+ban_command = config.getOption('Config', 'ban_command', 'ban')
+default_ban_length = config.getOption('Config', 'default_ban_time', 3600)
+ban_message = config.getOption('Config', 'message', 'Banning $name for $seconds seconds for ${red}${reason}')
+default_reason = config.getOption('Config', 'default_reason', 'unspecified reason')
+kick_message = config.getOption('Config', 'kick_message', '${green}${name}${white} was ${red}kicked${white} from server')
+del config
+ban_message = string.Template(ban_message)
+kick_message = string.Template(kick_message)
+
 Base = declarative_base()
 session = dbmanager.session()
 
@@ -67,14 +77,7 @@ def ban(cn, seconds, reason, banner_cn):
 		reason,
 		banner_nick,
 		ipLongToString(banner_ip))
-
-config = PluginConfig('bans')
-ban_command = config.getOption('Config', 'ban_command', 'ban')
-default_ban_length = config.getOption('Config', 'default_ban_time', 3600)
-ban_message = config.getOption('Config', 'message', 'Banning $name for $seconds seconds for ${red}${reason}')
-ban_message = string.Template(ban_message)
-default_reason = config.getOption('Config', 'default_reason', 'unspecified reason')
-del config
+	sbserver.message(info(ban_message.substitute(colordict, name=nick, seconds=seconds, reason=reason)))
 
 @masterRequired
 def onBanCmd(cn, text):
@@ -119,10 +122,17 @@ def onKick(cn, tcn):
 	ban(tcn, 14500, 'Unspecified reason', cn)
 	sbserver.playerKick(tcn)
 
+@masterRequired
+def onKickCommand(cn, args):
+	tcn = int(args)
+	sbserver.message(info(kick_message.substitute(colordict, name=sbserver.playerName(tcn))))
+	sbserver.playerKick(tcn)
+
 def init():
 	registerPolicyEventHandler("connect_kick", allowClient)
 	registerCommandHandler('ban', onBanCmd)
 	registerCommandHandler('recentbans', onRecentBans)
+	registerCommandHandler('kick', onKickCommand)
 	registerServerEventHandler('player_ban', ban)
 	registerServerEventHandler('player_kick', onKick)
 	Base.metadata.create_all(dbmanager.engine)
