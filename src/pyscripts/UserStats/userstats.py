@@ -30,16 +30,21 @@ class UserSessionStats(Base):
 	frags = Column(Integer)
 	deaths = Column(Integer)
 	teamkills = Column(Integer)
-	def __init__(self, user_id, end_time, frags, deaths, teamkills):
+	damage_delt = Column(Integer)
+	damage_recieved = Column(Integer)
+	def __init__(self, user_id, end_time, frags, deaths, teamkills, damage_delt, damage_recieved):
 		self.user_id = user_id
 		self.end_time = end_time
 		self.frags = frags
 		self.deaths = deaths
 		self.teamkills = teamkills
+		self.damage_delt = damage_delt
+		self.damage_recieved = damage_recieved
 
 def flushPlayerSession(cn):
 	user = loggedInAs(cn)
-	UserSessionStats(cn)
+	p = player(cn)
+	stats = UserSessionStats(cn.id, time.time(), p.stats_frags, p.stats_deaths, p.stats_teamkills, sbserver.playerDamageDelt(cn), sbserver.playerDamageRecieved(cn))
 
 def onConnect(cn):
 	player(cn).stats_frags = 0
@@ -57,7 +62,7 @@ def onFrag(cn, tcn):
 		player(cn).stats_frags = val
 
 def onTeamKill(cn, tcn):
-	print 'teamkill'
+	pass
 
 registerServerEventHandler('player_frag', onFrag)
 registerServerEventHandler('player_teamkill', onTeamKill)

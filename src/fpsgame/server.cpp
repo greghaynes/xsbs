@@ -1084,6 +1084,7 @@ namespace server
         gamestate &ts = target->state;
         ts.dodamage(damage);
         actor->state.damage += damage;
+	target->state.damage_rec += damage;
         sendf(-1, 1, "ri6", SV_DAMAGE, target->clientnum, actor->clientnum, damage, ts.armour, ts.health);
         if(target!=actor && !hitpush.iszero())
         {

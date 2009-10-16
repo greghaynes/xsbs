@@ -338,6 +338,36 @@ static PyObject *playerPing(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ci->ping);
 }
 
+static PyObject *playerDamageDelt(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "i", &cn))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	return Py_BuildValue("i", ci->state.damage);
+}
+
+static PyObject *playerDamageRecieved(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "i", &cn))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	return Py_BuildValue("i", ci->state.damage_rec);
+}
+
 // TODO: This should except on isufficient permissions
 static PyObject *setBotLimit(PyObject *self, PyObject *args)
 {
@@ -630,6 +660,8 @@ static PyMethodDef ModuleMethods[] = {
 	{"playerShots", playerShots, METH_VARARGS, "Shots by player in current match."},
 	{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
 	{"playerPing", playerPing, METH_VARARGS, "Current ping of player."},
+	{"playerDamageDelt", playerDamageDelt, METH_VARARGS, "Damage delt by player in current game."},
+	{"playerDamageRecieved", playerDamageRecieved, METH_VARARGS, "Damage recieved by player in current game."},
 	{"spectate", spectate, METH_VARARGS, "Spectate player."},
 	{"setPlayerTeam", setPlayerTeam, METH_VARARGS, "Set team of player."},
 	{"setBotLimit", setBotLimit, METH_VARARGS, "Set server bot limit."},

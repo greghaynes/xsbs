@@ -117,7 +117,7 @@ namespace server
         int lastdeath, lastspawn, lifesequence;
         int lastshot;
         projectilestate<8> rockets, grenades;
-        int frags, flags, deaths, teamkills, shotdamage, damage;
+        int frags, flags, deaths, teamkills, shotdamage, damage, damage_rec;
         int lasttimeplayed, timeplayed;
         int shots, hits;
         float effectiveness;
