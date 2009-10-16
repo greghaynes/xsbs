@@ -78,7 +78,8 @@ if preset_rotation:
 	for mode in map_modes:
 		modeMapLists[mode[0]] = mode[1].replace(' ', '').split(',')
 	rotate_on_join = [False]
-	presetRotate()
+	mn = modes.index(start_mode)
+	sbserver.setMap(modeMapLists[start_mode][0], mn)
 	registerServerEventHandler('intermission_ended', presetRotate)
 	registerCommandHandler('nextmap', onNextMapCmd)
 	registerServerEventHandler('player_connect', onConnect)
