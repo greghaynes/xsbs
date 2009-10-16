@@ -409,83 +409,6 @@ int masteroutpos = 0, masterinpos = 0;
 VARN(updatemaster, allowupdatemaster, 0, 1, 1);
 SVAR(mastername, server::defaultmaster());
 
-void disconnectmaster()
-{
-    if(mastersock == ENET_SOCKET_NULL) return;
-
-    enet_socket_destroy(mastersock);
-    mastersock = ENET_SOCKET_NULL;
-
-    masterout.setsizenodelete(0);
-    masterin.setsizenodelete(0);
-    masteroutpos = masterinpos = 0;
-}
-
-ENetSocket connectmaster()
-{
-    if(!mastername[0]) return ENET_SOCKET_NULL;
-
-    if(masteraddress.host == ENET_HOST_ANY)
-    {
-        masteraddress.port = server::masterport();
-        if(!resolverwait(mastername, &masteraddress)) return ENET_SOCKET_NULL;
-    }
-    ENetSocket sock = enet_socket_create(ENET_SOCKET_TYPE_STREAM);
-    if(sock != ENET_SOCKET_NULL && serveraddress.host != ENET_HOST_ANY && enet_socket_bind(sock, &serveraddress) < 0)
-    {
-        enet_socket_destroy(sock);
-        sock = ENET_SOCKET_NULL;
-    }
-	if(sock != ENET_SOCKET_NULL)
-	{
-		puts("Connecting asynchronously to master..");
-    	enet_socket_set_option(sock, ENET_SOCKOPT_NONBLOCK, 1);
-		connectasync(sock, mastername, masteraddress);
-		mastersock_connecting = true;
-	}
-    if(sock == ENET_SOCKET_NULL) 
-    {
-#ifdef STANDALONE
-        printf(sock==ENET_SOCKET_NULL ? "could not open socket\n" : "could not connect\n"); 
-#endif
-        return ENET_SOCKET_NULL;
-    }
-    
-    return sock;
-}
-
-bool requestmaster(const char *req)
-{
-    SbPy::triggerEventStr("master_request", req);
-    return true;
-}
-
-bool requestmasterf(const char *fmt, ...)
-{
-    defvformatstring(req, fmt, fmt);
-    return requestmaster(req);
-}
-
-void flushmasteroutput()
-{
-    if(masterout.empty()) return;
-
-    ENetBuffer buf;
-    buf.data = &masterout[masteroutpos];
-    buf.dataLength = masterout.length() - masteroutpos;
-    int sent = enet_socket_send(mastersock, NULL, &buf, 1);
-    if(sent >= 0)
-    {
-        masteroutpos += sent;
-        if(masteroutpos >= masterout.length())
-        {
-            masterout.setsizenodelete(0);
-            masteroutpos = 0;
-        }
-    }
-    else disconnectmaster();
-}
-
 static ENetAddress pongaddr;
 
 void sendserverinforeply(ucharbuf &p)
@@ -537,13 +460,6 @@ VARF(serverport, 0, server::serverport(), 0xFFFF, { if(!serverport) serverport =
 int curtime = 0, lastmillis = 0, totalmillis = 0;
 #endif
 
-void updatemasterserver()
-{
-    if(!mastername[0] || !allowupdatemaster) return;
-
-    requestmasterf("regserv %d\n", serverport);
-}
-
 void serverslice(bool dedicated, uint timeout)   // main server update, called from main loop in sp, or from below in dedicated server
 {
     localclients = nonlocalclients = 0;
@@ -570,7 +486,7 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
     }
     server::serverupdate();
 
-    flushmasteroutput();
+    //flushmasteroutput();
     checkserversockets();
 
 /*
