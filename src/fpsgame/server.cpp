@@ -2027,10 +2027,10 @@ namespace server
             case SV_KICK:
             {
                 int victim = getint(p);
-                if((ci->privilege || ci->local) && ci->clientnum!=victim && getclientinfo(victim)) // no bots
+                if(getclientinfo(victim)) // no bots
                 {
-                    SbPy::triggerEventIntInt("player_kicked", victim, ci->clientnum);
-                    disconnect_client(victim, DISC_KICK);
+                    SbPy::triggerEventIntInt("player_kick", ci->clientnum, victim);
+                    //disconnect_client(victim, DISC_KICK);
                 }
                 break;
             }

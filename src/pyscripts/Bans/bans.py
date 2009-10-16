@@ -114,15 +114,17 @@ def allowClient(cn, pwd):
 	ip = sbserver.playerIpLong(cn)
 	return not isCurrentlyBanned(ip)
 
-def onKick(tcn, cn):
+@masterRequired
+def onKick(cn, tcn):
 	ban(tcn, 14500, 'Unspecified reason', cn)
+	sbserver.playerKick(tcn)
 
 def init():
 	registerPolicyEventHandler("connect_kick", allowClient)
 	registerCommandHandler('ban', onBanCmd)
 	registerCommandHandler('recentbans', onRecentBans)
 	registerServerEventHandler('player_ban', ban)
-	registerServerEventHandler('player_kicked', onKick)
+	registerServerEventHandler('player_kick', onKick)
 	Base.metadata.create_all(dbmanager.engine)
 
 init()
