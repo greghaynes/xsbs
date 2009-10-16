@@ -7,6 +7,7 @@ import sbserver
 
 config = PluginConfig('mapvote')
 allow_modevote = config.getOption('Config', 'allow_mode_vote', 'no') == 'yes'
+lock_mode = config.getOption('Config', 'lock_game_mode', 'no') == 'yes'
 del config
 
 def vote(candidates, vote):
@@ -48,7 +49,7 @@ def onMapSet(cn, mapname, mapmode):
 		mapreload[0] = False
 	elif (sbserver.playerPrivilege(cn) > 0 or isPlayerMaster(cn)) and sbserver.masterMode() > 0:
 		sbserver.setMap(mapname, mapmode)
-	elif mapmode != sbserver.gameMode() and not allow_modevote and sbserver.playerPrivilege(cn) == 0:
+	elif mapmode != sbserver.gameMode() and (lock_mode or (not allow_modevote and sbserver.playerPrivilege(cn) == 0)):
 		sbserver.playerMessage(cn, error('You cannot request a new game mode'))
 
 def onMapVote(cn, mapname, mapmode):
@@ -56,7 +57,7 @@ def onMapVote(cn, mapname, mapmode):
 		sbserver.setMap(mapname, mapmode)
 	elif (sbserver.playerPrivilege(cn) > 0 or isPlayerMaster(cn)) and sbserver.masterMode() > 0:
 		sbserver.setMap(mapname, mapmode)
-	elif mapmode != sbserver.gameMode() and not allow_modevote and sbserver.playerPrivilege(cn) == 0:
+	elif mapmode != sbserver.gameMode() and (lock_mode or (not allow_modevote and sbserver.playerPrivilege(cn) == 0)):
 		sbserver.playerMessage(cn, error('You cannot request a new game mode'))
 	else:
 		try:
