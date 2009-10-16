@@ -8,8 +8,8 @@ import string
 
 config = PluginConfig('gamenotifications')
 tktemp = config.getOption('Config', 'teamkill', '${green}${tker}${white} team killed ${orange}${victim}')
-uptemp = config.getOption('Config', 'map_uploaded', '${green}${name} uploaded a map. /getmap to receive it')
-getmaptemp = config.getOption('Config', 'get_map', '${green}${name} is downloading map')
+uptemp = config.getOption('Config', 'map_uploaded', '${green}${name}${white} uploaded a map. /getmap to receive it')
+getmaptemp = config.getOption('Config', 'get_map', '${green}${name}${white} is downloading map')
 del config
 
 tktemp = string.Template(tktemp)
