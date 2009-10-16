@@ -2,6 +2,7 @@ from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info
 from xsbs.players import player, all as allPlayers
 from xsbs.settings import PluginConfig
+from UserPrivelege.userpriv import isPlayerMaster
 import sbserver
 
 config = PluginConfig('mapvote')
@@ -45,7 +46,7 @@ def onMapSet(cn, mapname, mapmode):
 	elif mapreload[0]:
 		sbserver.setMap(mapname, mapmode)
 		mapreload[0] = False
-	elif sbserver.playerPrivilege(cn) > 0 and sbserver.masterMode() > 0:
+	elif (sbserver.playerPrivilege(cn) > 0 or isPlayerMaster(cn)) and sbserver.masterMode() > 0:
 		sbserver.setMap(mapname, mapmode)
 	elif mapmode != sbserver.gameMode() and not allow_modevote and sbserver.playerPrivilege(cn) == 0:
 		sbserver.playerMessage(cn, error('You cannot request a new game mode'))
@@ -53,7 +54,7 @@ def onMapSet(cn, mapname, mapmode):
 def onMapVote(cn, mapname, mapmode):
 	if sbserver.mapName() == '':
 		sbserver.setMap(mapname, mapmode)
-	elif sbserver.playerPrivilege(cn) > 0 and sbserver.masterMode() > 0:
+	elif (sbserver.playerPrivilege(cn) > 0 or isPlayerMaster(cn)) and sbserver.masterMode() > 0:
 		sbserver.setMap(mapname, mapmode)
 	elif mapmode != sbserver.gameMode() and not allow_modevote and sbserver.playerPrivilege(cn) == 0:
 		sbserver.playerMessage(cn, error('You cannot request a new game mode'))
