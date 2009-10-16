@@ -31,7 +31,8 @@ class PolicyEventManager(EventManager):
 					if not event(*args):
 						return False
 				except:
-					logging.warn('Uncaught exception occoured in policy event handler.')	
+					logging.warn('Uncaught exception occured in event handler.')
+
 		except KeyError:
 			return True
 		return True

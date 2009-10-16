@@ -1,7 +1,7 @@
 import sbserver
 from xsbs.colors import red, orange, white
 from xsbs.events import registerPolicyEventHandler, registerServerEventHandler
-from xsbs.commands import registerCommandHandler, masterRequired
+from UserPrivelege.userpriv import registerCommandHandler, masterRequired
 
 muted_players = []
 

@@ -55,14 +55,35 @@ def isPlayerMaster(cn):
 	try:
 		user = loggedInAs(cn)
 		if isMaster(user.id):
-			sbserver.setMaster(cn)
+			return True
 		else:
-			insufficientPermissions(cn)
+			return False
 	except AttributeError:
-		sbserver.playerMessage(cn, error('You need to verify using /setmaster before using #master'))
+		return False
+
+class masterRequired(object):
+	def __init__(self, func):
+		self.func = func
+	def __call__(self, *args):
+		if sbserver.playerPrivilege(args[0]) == 0 and not isPlayerMaster(args[0]):
+			insufficientPermissions(args[0])
+		else:
+			self.func(*args)
+
+class adminRequired(object):
+	def __init__(self, func):
+		self.func = func
+	def __call__(self, *args):
+		if sbserver.playerPrivilege(args[0]) <= 1:
+			insufficientPermissions(args[0])
+		else:
+			self.func(*args)
 
 def masterCmd(cn, args):
-	return isPlayerMaster(cn)
+	if isPlayerMaster(cn):
+		sbserver.setMaster(cn)
+	else:
+		insufficientPermissions(cn)
 
 def onSetMaster(cn, hash):
 	if hash == sbserver.hashPassword(cn, sbserver.adminPassword()):

@@ -25,24 +25,6 @@ class CommandManager:
 			return False
 		return True
 
-class masterRequired(object):
-	def __init__(self, func):
-		self.func = func
-	def __call__(self, *args):
-		if sbserver.playerPrivilege(args[0]) == 0:
-			insufficientPermissions(args[0])
-		else:
-			self.func(*args)
-
-class adminRequired(object):
-	def __init__(self, func):
-		self.func = func
-	def __call__(self, *args):
-		if sbserver.playerPrivilege(args[0]) <= 1:
-			insufficientPermissions(args[0])
-		else:
-			self.func(*args)
-
 commandmanager = CommandManager()
 
 def registerCommandHandler(command, func):
