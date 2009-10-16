@@ -607,6 +607,11 @@ static PyObject *serverPassword(PyObject *self, PyObject *args)
 	return Py_BuildValue("s", server::serverpass);
 }
 
+static PyObject *minRemain(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("i", server::minremain);
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -652,6 +657,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"adminPassword", adminPass, METH_VARARGS, "Get the administrator password."},
 	{"sendMapReload", sendMapReload, METH_VARARGS, "Causes all users to send vote on next map."},
 	{"serverPassword", serverPassword, METH_VARARGS, "Password for entry to the server."},
+	{"minutesRemaining", minRemain, METH_VARARGS, "Minutes remaining in current match."},
 	{NULL, NULL, 0, NULL}
 };
 
