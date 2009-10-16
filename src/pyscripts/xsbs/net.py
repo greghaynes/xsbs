@@ -6,10 +6,15 @@ def ipLongToString(num):
 
 def ipStringToLong(st):
 	st = st.split('.')
-	i = 0
-	for item in st:
-		n = int(item)
-		i = i | n
-		i << 4
+	if len(st) != 4:
+		raise ValueError('Not a valid ipv4 address')
+
+	i = int(st[3])
+	i = i << 8
+	i = i | int(st[2])
+	i = i << 8
+	i = i | int(st[1])
+	i = i << 8
+	i = i | int(st[0])
 	return i
 

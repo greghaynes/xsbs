@@ -4,7 +4,7 @@ from xsbs.colors import red, colordict
 from xsbs.ui import insufficientPermissions, error, info
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, execLater
 from UserPrivelege.userpriv import registerCommandHandler, masterRequired
-from xsbs.net import ipLongToString
+from xsbs.net import ipLongToString, ipStringToLong
 from DB.db import dbmanager
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
@@ -120,7 +120,6 @@ def allowClient(cn, pwd):
 @masterRequired
 def onKick(cn, tcn):
 	ban(tcn, 14500, 'Unspecified reason', cn)
-	sbserver.playerKick(tcn)
 
 @masterRequired
 def onKickCommand(cn, args):
@@ -128,11 +127,29 @@ def onKickCommand(cn, args):
 	sbserver.message(info(kick_message.substitute(colordict, name=sbserver.playerName(tcn))))
 	sbserver.playerKick(tcn)
 
+@masterRequired
+def onInsertBan(cn, args):
+	args = args.split(' ')
+	if len(args) < 2:
+		sbserver.playerMessage(cn, error('Usage: #insertban <ip> <length> (reason)'))
+	else:
+		ip = ipStringToLong(args[0])
+		length = int(args[1])
+		try:
+			reason = args[2]
+		except IndexError:
+		 	reason = 'Unspecified reason'
+		expiration = time.time() + length
+		newban = Ban(ip, expiration, reason, 'Unnamed', 0, 'Unnamed', time.time())
+		session.add(newban)
+		session.commit()
+		sbserver.playerMessage(cn, info('Inserted ban for %s for %i seconds for %s.' % (ipLongToString(ip), length, reason)))
 def init():
 	registerPolicyEventHandler("connect_kick", allowClient)
 	registerCommandHandler('ban', onBanCmd)
 	registerCommandHandler('recentbans', onRecentBans)
 	registerCommandHandler('kick', onKickCommand)
+	registerCommandHandler('insertban', onInsertBan)
 	registerServerEventHandler('player_ban', ban)
 	registerServerEventHandler('player_kick', onKick)
 	Base.metadata.create_all(dbmanager.engine)

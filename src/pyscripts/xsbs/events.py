@@ -27,11 +27,8 @@ class PolicyEventManager(EventManager):
 	def trigger(self, event, args=()):
 		try:
 			for event in self.events[event]:
-				try:
 					if not event(*args):
 						return False
-				except:
-					logging.warn('Uncaught exception occured in event handler.')
 
 		except KeyError:
 			return True
