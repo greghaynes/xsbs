@@ -16,11 +16,11 @@ import string
 
 config = PluginConfig('userprivilege')
 tablename = config.getOption('Config', 'tablename', 'userprivileges')
-authtemp = config.getOption('Messages', 'authenticated', '${green}${name}${white} has authenticated as ${orange}${authname}')
-gmtemp = config.getOption('Messages', 'gain_master', '${green}${name}${white} has claimed master')
-gatemp = config.getOption('Messages', 'gain_admin', '${green}${name}${white} has claimed admin')
-rmtemp = config.getOption('Messages', 'release_master', '${green}${name}${white} has relinquished master')
-ratemp = config.getOption('Messages', 'release_admin', '${green}${name}${white} has relinquished admin')
+authtemp = config.getOption('Messages', 'authenticated', '${green}${name}${white} authenticated as ${magenta}${authname}')
+gmtemp = config.getOption('Messages', 'gain_master', '${green}${name}${white} claimed ${red}master')
+gatemp = config.getOption('Messages', 'gain_admin', '${green}${name}${white} claimed ${red}admin')
+rmtemp = config.getOption('Messages', 'release_master', '${green}${name}${white} relinquished ${red}master')
+ratemp = config.getOption('Messages', 'release_admin', '${green}${name}${white} relinquished ${red}admin')
 del config
 authtemp = string.Template(authtemp)
 gmtemp = string.Template(gmtemp)
