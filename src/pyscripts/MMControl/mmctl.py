@@ -1,6 +1,6 @@
 from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info
-from xsbs.colors import orange, blue
+from xsbs.colors import green, blue
 from UserPrivelege.userpriv import masterRequired
 import sbserver
 
@@ -11,7 +11,7 @@ MMNAMES = ['open',
 
 @masterRequired
 def setMM(cn, mm):
-	sbserver.message((info(green('%s') + ' set master mode to ' + blue('s')) % (sbserver.playerName(cn), MMNAMES[mm])))
+	sbserver.message((info(green('%s') + ' set master mode to ' + blue('%s')) % (sbserver.playerName(cn), MMNAMES[mm])))
 	sbserver.setMasterMode(mm)
 
 def onNoClients():
