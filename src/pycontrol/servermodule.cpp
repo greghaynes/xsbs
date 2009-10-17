@@ -305,6 +305,24 @@ static PyObject *spectate(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *unspectate(PyObject *self, PyObject *args)
+{
+	int cn;
+	int spectator;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "ii", &cn, &spectator))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	server::spectate(ci, false, spectator);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject *setPlayerTeam(PyObject *self, PyObject *args)
 {
 	int cn;
@@ -663,6 +681,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"playerDamageDelt", playerDamageDelt, METH_VARARGS, "Damage delt by player in current game."},
 	{"playerDamageRecieved", playerDamageRecieved, METH_VARARGS, "Damage recieved by player in current game."},
 	{"spectate", spectate, METH_VARARGS, "Spectate player."},
+	{"unspectate", unspectate, METH_VARARGS, "Set player to unspectated."},
 	{"setPlayerTeam", setPlayerTeam, METH_VARARGS, "Set team of player."},
 	{"setBotLimit", setBotLimit, METH_VARARGS, "Set server bot limit."},
 	{"hashPassword", hashPass, METH_VARARGS, "Return hash for user + password"},

@@ -2039,11 +2039,14 @@ namespace server
             case SV_SPECTATOR:
             {
                 int spectator = getint(p), val = getint(p);
-                if(!ci->privilege && !ci->local && (spectator!=sender || (ci->state.state==CS_SPECTATOR && mastermode>=MM_LOCKED))) break;
+               // if(!ci->privilege && !ci->local && (spectator!=sender || (ci->state.state==CS_SPECTATOR && mastermode>=MM_LOCKED))) break;
                 clientinfo *spinfo = (clientinfo *)getclientinfo(spectator); // no bots
                 if(!spinfo || (spinfo->state.state==CS_SPECTATOR ? val : !val)) break;
-
-		spectate(spinfo, val, spectator);
+                if(val)
+                    SbPy::triggerEventIntInt("player_request_spectate", ci->clientnum, spectator);
+                else
+                    SbPy::triggerEventIntInt("player_request_unspectate", ci->clientnum, spectator);
+		//spectate(spinfo, val, spectator);
                 break;
             }
 
