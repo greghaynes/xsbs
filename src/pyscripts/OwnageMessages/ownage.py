@@ -1,5 +1,6 @@
 import sbserver
 from xsbs.colors import green, orange
+from xsbs.ui import info
 from xsbs.events import registerServerEventHandler
 from xsbs.players import player
 import string
@@ -24,12 +25,12 @@ def onPlayerFrag(cn, tcn):
 			p.killspree = 1
 		try:
 			if t.killspree >= 5:
-				sbserver.message(endmsg.substitute(name=sbserver.playerName(tcn), endername=sbserver.playerName(cn)))
+				sbserver.message(info(endmsg.substitute(name=sbserver.playerName(tcn), endername=sbserver.playerName(cn))))
 			t.killspree = 0
 		except AttributeError:
 			t.killspree = 0
 		try:
-			sbserver.message(messages[p.killspree].substitute(name=sbserver.playerName(cn)))
+			sbserver.message(info(messages[p.killspree].substitute(name=sbserver.playerName(cn))))
 		except KeyError:
 			pass
 
