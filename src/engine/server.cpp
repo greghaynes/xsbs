@@ -12,7 +12,6 @@
 #include "server.h"
 
 #include <signal.h>
-//#include <sys/socket.h>
 
 #ifdef STANDALONE
 void fatal(const char *s, ...) 
@@ -332,8 +331,6 @@ void disconnect_client(int n, int reason)
     clients[n]->peer->data = NULL;
     server::deleteclientinfo(clients[n]->info);
     clients[n]->info = NULL;
-//    defformatstring(s)("client (%s) disconnected because: %s", clients[n]->hostname, disc_reasons[reason]);
-//    server::sendservmsg(s);
 }
 
 void kicknonlocalclients(int reason)
@@ -389,18 +386,6 @@ int connectwithtimeout(ENetSocket sock, const char *hostname, const ENetAddress 
 
 bool mastersock_connecting = false;
 
-/*
-int connectasync(ENetSocket sock, const char *hostname, const ENetAddress &remoteaddress)
-{
-	int result = enet_socket_connect(sock, &remoteaddress);
-	if(false && result<0 && errno != EINPROGRESS)
-	{
-		puts("Destroyed thine socket.\n");
-		enet_socket_destroy(sock);
-	}
-	return result;
-}
-*/
 #endif
 
 ENetSocket mastersock = ENET_SOCKET_NULL;
