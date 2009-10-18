@@ -124,11 +124,8 @@ class MasterClient(asyncore.dispatcher):
 	def handle_connect(self):
 		logging.debug('Connected to master server')
 	def handle_write(self):
-		for item in self.request_queue:
-			if not item.is_running:
-				self.responses_needed += 1
-				item.do(self)
-		del self.request_queue[:]
+		item = self.request_queue.pop(0)
+		self.send(item.data)
 	def handle_close(self):
 		self.do_connect = True
 	def handle_read(self):
@@ -138,10 +135,7 @@ class MasterClient(asyncore.dispatcher):
 		for line in tmp_buff:
 			self.handle_response(line)
 	def writable(self):
-		for item in self.request_queue:
-			if not item.is_running:
-				return True
-		return False
+		return len(self.request_queue) > 0
 
 mc = MasterClient(master_host, master_port)
 registerServerEventHandler('player_auth_request', mc.try_auth)
