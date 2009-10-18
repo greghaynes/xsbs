@@ -289,12 +289,11 @@ static PyObject *playerHits(PyObject *self, PyObject *args)
 
 static PyObject *spectate(PyObject *self, PyObject *args)
 {
-	int cn;
 	int spectator;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "ii", &cn, &spectator))
+	if(!PyArg_ParseTuple(args, "i", &spectator))
 		return 0;
-	ci = server::getinfo(cn);
+	ci = server::getinfo(spectator);
 	if(!ci)
 	{
 		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
@@ -307,12 +306,11 @@ static PyObject *spectate(PyObject *self, PyObject *args)
 
 static PyObject *unspectate(PyObject *self, PyObject *args)
 {
-	int cn;
 	int spectator;
 	server::clientinfo *ci;
-	if(!PyArg_ParseTuple(args, "ii", &cn, &spectator))
+	if(!PyArg_ParseTuple(args, "i", &spectator))
 		return 0;
-	ci = server::getinfo(cn);
+	ci = server::getinfo(spectator);
 	if(!ci)
 	{
 		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");

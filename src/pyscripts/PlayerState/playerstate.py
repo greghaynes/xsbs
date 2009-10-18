@@ -6,23 +6,23 @@ import sbserver
 def onReqSpectate(cn, tcn):
 	if tcn != cn:
 		if isPlayerMaster(cn) or sbserver.playerPrivilege(cn) > 0:
-			sbserver.spectate(cn, tcn)
+			sbserver.spectate(tcn)
 		else:
 			insufficientPermissions(cn)
 	else:
-		sbserver.spectate(cn, tcn)
+		sbserver.spectate(tcn)
 
 def onReqUnspectate(cn, tcn):
 	if tcn != cn:
 		if isPlayerMaster(cn) or sbserver.playerPrivilege(cn) > 0:
-			sbserver.spectate(cn, tcn)
+			sbserver.unspectate(tcn)
 		else:
 			insufficientPermissions(cn)
 	else:
 		if sbserver.masterMode() > 1 and not (isPlayerMaster(cn) or sbserver.playerPrivilege(cn) > 0):
 			sbserver.playerMessage(cn, error('Master mode is locked.  You cannot unspectate.'))
 		else:
-			sbserver.unspectate(cn, tcn)
+			sbserver.unspectate(tcn)
 
 registerServerEventHandler('player_request_spectate', onReqSpectate)
 registerServerEventHandler('player_request_unspectate', onReqUnspectate)
