@@ -658,6 +658,24 @@ static PyObject *minRemain(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", server::minremain);
 }
 
+static PyObject *setTeam(PyObject *self, PyObject *args)
+{
+	int cn;
+	char *team;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "is", &cn, &team))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	server::setteam(ci, team);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -707,6 +725,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"sendMapReload", sendMapReload, METH_VARARGS, "Causes all users to send vote on next map."},
 	{"serverPassword", serverPassword, METH_VARARGS, "Password for entry to the server."},
 	{"minutesRemaining", minRemain, METH_VARARGS, "Minutes remaining in current match."},
+	{"setTeam", setTeam, METH_VARARGS, "Set team of player."},
 	{NULL, NULL, 0, NULL}
 };
 

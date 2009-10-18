@@ -280,6 +280,22 @@ namespace server
         return true;
     }
 
+    void switchteam(clientinfo *ci, char *team, int sender)
+    {
+        if(ci && strcmp(ci->team, team))
+        {
+            if(m_teammode && smode && !smode->canchangeteam(ci, ci->team, team))
+                sendf(sender, 1, "riis", SV_SETTEAM, sender, ci->team);
+            else
+            {
+                if(smode && ci->state.state==CS_ALIVE)
+                    smode->changeteam(ci, ci->team, team);
+                copystring(ci->team, team);
+                aiman::changeteam(ci);
+                sendf(-1, 1, "riis", SV_SETTEAM, sender, ci->team);
+            }
+        }
+    }
 
     void autoteam()
     {
@@ -1910,7 +1926,8 @@ namespace server
             {
                 getstring(text, p);
                 filtertext(text, text, false, MAXTEAMLEN);
-		SbPy::triggerEventIntString("player_switch_team", ci->clientnum, text);
+		SbPy::triggerEventIntString("player_switch_team", sender, text);
+		/*
                 if(strcmp(ci->team, text) && SbPy::triggerPolicyEventIntString("allow_switch_team", ci->clientnum, ci->team))
                 {
                     if(m_teammode && smode && !smode->canchangeteam(ci, ci->team, text))
@@ -1924,6 +1941,7 @@ namespace server
                     }
                     SbPy::triggerEventInt("player_team_changed", ci->clientnum);
                 }
+		*/
                 break;
             }
 
@@ -2059,17 +2077,20 @@ namespace server
                 int who = getint(p);
                 getstring(text, p);
                 filtertext(text, text, false, MAXTEAMLEN);
-                if(!ci->privilege && !ci->local) break;
+                //if(!ci->privilege && !ci->local) break;
                 clientinfo *wi = getinfo(who);
                 if(!wi || !strcmp(wi->team, text)) break;
                 if(!smode || smode->canchangeteam(wi, wi->team, text))
                 {
+                    SbPy::triggerEventIntIntString("player_set_team", ci->clientnum, who, text);
+                    /*
                     if(smode && wi->state.state==CS_ALIVE)
                         smode->changeteam(wi, wi->team, text);
                     copystring(wi->team, text, MAXTEAMLEN+1);
+                    */
                 }
-                aiman::changeteam(wi);
-                sendf(-1, 1, "riis", SV_SETTEAM, who, wi->team);
+                //aiman::changeteam(wi);
+                //sendf(-1, 1, "riis", SV_SETTEAM, who, wi->team);
                 break;
             }
 
