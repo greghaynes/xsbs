@@ -5,6 +5,7 @@ from xsbs.events import registerServerEventHandler
 from xsbs.timers import addTimer
 from xsbs.colors import red, green
 import asyncore, socket
+import asynirc
 import logging
 
 config = PluginConfig('ircbot')
@@ -19,137 +20,54 @@ try:
 except NoOptionError:
 	ipaddress = None
 
-class IrcBot(asyncore.dispatcher):
-	def __init__(self, servername, nickname, port=6667):
-		asyncore.dispatcher.__init__(self)
-		self.servername = servername
-		self.nickname = nickname
-		self.port = port
-		self.isConnected = False
-		self.channels = []
-		self.buff = ''
-		self.msgcommands = {
-				'status': self.sendStatus
-		}
-		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-		if ipaddress != None:
-			self.bind((ipaddress, 0))
-		self.connect((self.servername, self.port))
-		self.connect_count = 1
-		self.sendNick()
-	def __del__(self):
-		self.close()
-	def quit(self):
-		self.send(part_message + '\r\n')
-	def handle_close(self):
-		logging.warning('Connection closed')
-		logging.warning('Reconnecting in 5 seconds')
-		self.connect_count += 1
-		if self.connect_count >= 5:
-			logging.warning('Connect failed 5 times.  Quitting.')
-		self.close()
-	def handle_connect(self):
-		logging.info('Conneced')
-		self.connect_count = 0
-	def handle_write(self):
-		sent = self.send(self.writebuff)
-		self.writebuff = self.writebuff[sent:]
-	def writeable(self):
-		return len(self.writebuff) > 0
-	def sendNick(self):
-		self.writebuff = 'NICK %s\r\n' % self.nickname
-		self.writebuff += 'USER %s %s %s :%s\r\n' % (self.nickname, self.nickname, self.nickname, self.nickname)
-	def onWelcome(self):
-		self.isConnected = True
-		for channel in self.channels:
-			self.join(channel)
-		del self.channels[:]
-	def join(self, channel):
-		if self.isConnected:
-			self.writebuff += 'JOIN %s\r\n' % channel
-		else:
-			self.channels.append(channel)
-	def privMsg(self, user, message):
-		self.writebuff += 'PRIVMSG %s :%s\r\n' % (user, message)
-	def sendStatus(self, sender, message):
-		clients = sbserver.clients()
-		players = sbserver.players()
-		msg = '%i clients: %i players, %i spectators Playing %s on %s' % (len(clients), len(players), len(clients) - len(players), sbserver.modeName(sbserver.gameMode()), sbserver.mapName())
-		self.privMsg(channel, msg)
-	def handle_privmsg(self, sender, message):
-		if message[0] == '!':
-			try:
-				self.msgcommands[message[1:]](sender, message)
-			except KeyError:
-				self.privMsg(channel, 'Invalid command')
-		elif msg_gw:
-			sbserver.message((red('Remote User') + green(' %s') + ': %s') % (sender, message))
-	def handle_read(self):
-		self.buff += self.recv(4096)
-		tmp_buff = self.buff.split('\n')
-		self.buff = tmp_buff.pop()
-		for line in tmp_buff:
-			line = line.strip().split()
-			if line[0] == 'PING':
-				self.writebuff += 'PONG %s\r\n' % line[1]
-			elif line[1] == 'MODE':
-				if not self.isConnected and line[3] == ':+iw':
-					self.onWelcome()
-			elif line[1] == 'PRIVMSG':
-				user = line[0].split('!')[0][1:]
-				text = line[3][1:]
-				if len(line) >= 4:
-					for t in line[4:]:
-						text += ' '
-						text += t
-				self.handle_privmsg(user, text)
-			elif line[1] == '433':
-				logging.warning('IRC Bot: Nickname is in use!')
-				self.nickname = self.nickname + '1'
-				logging.warning('IRC Bot: Using %s' % self.nickname)
-				self.sendNick()
+class ServerBot(asynirc.IrcClient):
+	def __init__(self, serverinfo, clientinfo):
+		asynirc.IrcClient.__init__(self, serverinfo, clientinfo)
 
-bot = IrcBot(servername, nickname, port)
+bot = ServerBot(
+	(servername, 6667),
+	(nickname, nickname.lower(), 'localhost', 'localhost', nickname))
 bot.join(channel)
+bot.doConnect()
 
 def onPlayerConnect(cn):
-	bot.privMsg(channel, '\x032CONNECT         \x03Player %s (%i) has joined' % (sbserver.playerName(cn), cn))
+	bot.message('\x032CONNECT         \x03Player %s (%i) has joined' % (sbserver.playerName(cn), cn), channel)
 
 def onPlayerDisconnect(cn):
-	bot.privMsg(channel, '\x032DISCONNECT      \x03Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn))
+	bot.message('\x032DISCONNECT      \x03Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn), channel)
 
 def onMsg(cn, text):
-	bot.privMsg(channel, '\x033MESSAGE         \x03%s (%i): %s' % (sbserver.playerName(cn), cn, text))
+	bot.message('\x033MESSAGE         \x03%s (%i): %s' % (sbserver.playerName(cn), cn, text), channel)
 
 def onTeamMsg(cn, text):
-	bot.privMsg(channel, '\x033MESSAGE (TEAM)  \x03%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text))
+	bot.message('\x033MESSAGE (TEAM)  \x03%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text), channel)
 
 def onMapChange(map, mode):
-	bot.privMsg(channel, '\x035MAP CHANGE      \x03%s (%s)' % (map, sbserver.modeName(mode)))
+	bot.message('\x035MAP CHANGE      \x03%s (%s)' % (map, sbserver.modeName(mode)), channel)
 
 def onGainMaster(cn):
-	bot.privMsg(channel, '\x037MASTER          \x03%s gained master' % sbserver.playerName(cn))
+	bot.message('\x037MASTER          \x03%s gained master' % sbserver.playerName(cn), channel)
 
 def onGainAdmin(cn):
-	bot.privMsg(channel, '\x037ADMIN           \x03%s gained admin' % sbserver.playerName(cn))
+	bot.message('\x037ADMIN           \x03%s gained admin' % sbserver.playerName(cn), channel)
 
 def onAuth(cn, authname):
-	bot.privMsg(channel, '\x037AUTH            \x03%s has authenticated as %s' % (sbserver.playerName(cn), authname))
+	bot.message('\x037AUTH            \x03%s has authenticated as %s' % (sbserver.playerName(cn), authname), channel)
 
 def onReleaseAdmin(cn):
-	bot.privMsg(channel, '\x037ADMIN RELINQ    \x03%s released admin' % sbserver.playerName(cn))
+	bot.message('\x037ADMIN RELINQ    \x03%s released admin' % sbserver.playerName(cn), channel)
 
 def onReleaseMaster(cn):
-	bot.privMsg(channel, '\x037MASTER RELINQ   \x03%s released master' % sbserver.playerName(cn))
+	bot.message('\x037MASTER RELINQ   \x03%s released master' % sbserver.playerName(cn), channel)
 
 def onBan(cn, seconds, reason):
-	bot.privMsg(channel, '\x0313BAN             \x03%s banned for %i for %s' % (sbserver.playerName(cn), seconds, reason))
+	bot.message('\x0313BAN             \x03%s banned for %i for %s' % (sbserver.playerName(cn), seconds, reason), channel)
 
 def onSpectated(cn):
-	bot.privMsg(channel, '\x0314SPECTATED       \x03%s became a spectator' % sbserver.playerName(cn))
+	bot.message('\x0314SPECTATED       \x03%s became a spectator' % sbserver.playerName(cn), channel)
 
 def onUnSpectated(cn):
-	bot.privMsg(channel, '\x0314UNSPECTATED     \x03%s unspectated' % sbserver.playerName(cn))
+	bot.message('\x0314UNSPECTATED     \x03%s unspectated' % sbserver.playerName(cn), channel)
 
 def onReload():
 	bot.quit()

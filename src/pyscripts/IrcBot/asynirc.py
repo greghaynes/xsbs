@@ -14,7 +14,6 @@ class EventDispatcher(object):
 			self.handlers[event] = collections.deque()
 			self.connect(event, handler)
 	def trigger(self, event, *args):
-		print 'triggering ', event, args
 		try:
 			for handler in self.handlers[event]:
 				try:
@@ -63,7 +62,6 @@ class IrcClient(asyncore.dispatcher):
 		self.work_queue.append('NICK :%s\r\n' % self.nick)
 		self.work_queue.append('USER %s %s %s :%s\r\n' % (self.username, self.hostname, self.servername, self.realname))
 	def handle_close(self):
-		print 'disconnected'
 		self.close()
 	def handle_read(self):
 		self.read_buffer = self.read_buffer.join(self.recv(4096))
@@ -82,14 +80,16 @@ class IrcClient(asyncore.dispatcher):
 				self.events.trigger(event, args)
 	def handle_write(self):
 		data = self.work_queue.popleft()
-		print 'sending ', data
 		self.send(data)
 	def writable(self):
 		if time.time() >= self.throttle_timeout:
 			self.throttle_timeout = time.time() + self.trottle_time
 			self.throttle_used = 0
-		if len(self.work_queue[0]) >= self.throttle_size:
-			self.work_queue[0] = self.work_queue[0][:self.throttle_size]
+		try:
+			if len(self.work_queue[0]) >= self.throttle_size:
+				self.work_queue[0] = self.work_queue[0][:self.throttle_size]
+		except IndexError:
+			pass
 		return len(self.work_queue) > 0 and len(self.work_queue[0]) + self.throttle_used < self.throttle_size
 	def handle_pong(self, event, args):
 		self.work_queue.append('PONG :%s\r\n' % args)
@@ -103,6 +103,8 @@ class IrcClient(asyncore.dispatcher):
 			self.work_queue.append('JOIN :%s\r\n' % channel)
 		else:
 			self.channel_list.append(channel)
+	def message(self, message, to):
+		self.work_queue.append('PRIVMSG %s :%s\r\n' % (to, message))
 
 def run(host, port, chan, nick):
 	bot = IrcClient(
