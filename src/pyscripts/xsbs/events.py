@@ -14,10 +14,10 @@ class EventManager:
 	def trigger(self, eventname, args=()):
 		try:
 			for event in self.events[eventname]:
-				try:
+#				try:
 					event(*args)
-				except:
-					logging.warn('Uncaught exception occured in event handler.')
+#				except:
+#					logging.warn('Uncaught exception occured in event handler.')
 		except KeyError:
 			pass
 

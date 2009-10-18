@@ -1426,27 +1426,30 @@ namespace server
 	bool spectated = false, unspectated = false;
         if(spinfo->state.state!=CS_SPECTATOR && val)
         {
-            if(spinfo->state.state==CS_ALIVE) suicide(spinfo);
-            if(smode) smode->leavegame(spinfo);
-            spinfo->state.state = CS_SPECTATOR;
-            spinfo->state.timeplayed += lastmillis - spinfo->state.lasttimeplayed;
-            if(!spinfo->local && !spinfo->privilege) aiman::removeai(spinfo);
-	    spectated = true;
+             if(spinfo->state.state==CS_ALIVE) suicide(spinfo);
+             if(smode) smode->leavegame(spinfo);
+             spinfo->state.state = CS_SPECTATOR;
+             spinfo->state.timeplayed += lastmillis - spinfo->state.lasttimeplayed;
+             if(!spinfo->local && !spinfo->privilege) aiman::removeai(spinfo);
+	     spectated = true;
         }
         else if(spinfo->state.state==CS_SPECTATOR && !val)
         {
-            spinfo->state.state = CS_DEAD;
-            spinfo->state.respawn();
-            spinfo->state.lasttimeplayed = lastmillis;
-            aiman::addclient(spinfo);
-            if(spinfo->clientmap[0] || spinfo->mapcrc) checkmaps();
-	    unspectated = true;
+             spinfo->state.state = CS_DEAD;
+             spinfo->state.respawn();
+             spinfo->state.lasttimeplayed = lastmillis;
+             aiman::addclient(spinfo);
+             if(spinfo->clientmap[0] || spinfo->mapcrc) checkmaps();
+	     unspectated = true;
          }
+          else
+             return false;
          sendf(-1, 1, "ri3", SV_SPECTATOR, spectator, val);
 	 if(spectated)
             SbPy::triggerEventInt("player_spectated", spinfo->clientnum);
 	 else if(unspectated)
             SbPy::triggerEventInt("player_unspectated", spinfo->clientnum);
+	 return true;
     }
 
     void noclients()
@@ -1907,6 +1910,7 @@ namespace server
             {
                 getstring(text, p);
                 filtertext(text, text, false, MAXTEAMLEN);
+		SbPy::triggerEventIntString("player_switch_team", ci->clientnum, text);
                 if(strcmp(ci->team, text) && SbPy::triggerPolicyEventIntString("allow_switch_team", ci->clientnum, ci->team))
                 {
                     if(m_teammode && smode && !smode->canchangeteam(ci, ci->team, text))
