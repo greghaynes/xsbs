@@ -2,6 +2,7 @@ import asyncore
 import socket
 import logging
 import collections
+import time
 
 class EventDispatcher(object):
 	def __init__(self):
@@ -41,6 +42,8 @@ class IrcClient(asyncore.dispatcher):
 		self.events = EventDispatcher()
 		self.is_connected = False
 		self.channel_list = []
+		self.throttle_size = 1024
+		self.trottle_time = 5
 	def logInfo(self, string):
 		if(self.use_logging):
 			logging.info(string)
@@ -52,6 +55,8 @@ class IrcClient(asyncore.dispatcher):
 		self.connect((self.server_hostname, self.server_port))
 		self.read_buffer = ''
 		self.work_queue = collections.deque()
+		self.throttle_timeout = time.time() + self.throttle_size
+		self.throttle_used = 0
 	def handle_connect(self):
 		self.events.connect('PING', self.handle_pong)
 		self.events.connect('MODE', self.handle_mode)
@@ -80,7 +85,12 @@ class IrcClient(asyncore.dispatcher):
 		print 'sending ', data
 		self.send(data)
 	def writable(self):
-		return len(self.work_queue) > 0
+		if time.time() >= self.throttle_timeout:
+			self.throttle_timeout = time.time() + self.trottle_time
+			self.throttle_used = 0
+		if len(self.work_queue[0]) >= self.throttle_size:
+			self.work_queue[0] = self.work_queue[0][:self.throttle_size]
+		return len(self.work_queue) > 0 and len(self.work_queue[0]) + self.throttle_used < self.throttle_size
 	def handle_pong(self, event, args):
 		self.work_queue.append('PONG :%s\r\n' % args)
 	def handle_mode(self, event, who, args):
@@ -106,4 +116,4 @@ if __name__ == '__main__':
 	server = "irc.gamesurge.net"
 	nick = "asyncirc"
 	password = "default"
-	run(server, 6667, "#julie", nick)
+	run(server, 6667, "#xsbs", nick)
