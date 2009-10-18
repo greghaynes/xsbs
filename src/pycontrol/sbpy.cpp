@@ -22,6 +22,10 @@
 #include <string>
 #include <iostream>
 
+#ifdef WIN32
+#include <direct.h> // for _chdir()
+#endif
+
 extern int totalmillis;
 
 namespace SbPy
@@ -55,7 +59,9 @@ void initEnv()
 		newpath.append(":");
 		newpath.append(pyscripts_path);
 	}
+#ifndef WIN32
 	setenv("PYTHONPATH", newpath.c_str(), 1);
+#endif
 }
 
 #define SBPY_ERR(x) \
@@ -156,7 +162,11 @@ bool init(const char *prog_name, const char *arg_pyscripts_path, const char *mod
 		return false;
 	}
 	initEnv();
+#ifndef WIN32
 	if(-1 == chdir(pyscripts_path))
+#else
+	if(-1 == _chdir(pyscripts_path))
+#endif
 	{
 		perror("Could not chdir into pyscripts path.\n");
 		return false;

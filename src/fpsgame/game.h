@@ -19,6 +19,10 @@ enum
 #define DNF 100.0f              // for normalized vectors
 #define DVELF 1.0f              // for playerspeed based velocity vectors
 
+#ifdef PLATFORM
+#undef PLATFORM
+#endif
+
 enum                            // static entity types
 {
     NOTUSED = ET_EMPTY,         // entity slot not in use in map
