@@ -1,6 +1,8 @@
 import timers
 import asyncore
 import logging
+import sys
+import traceback
 
 class EventManager:
 	def __init__(self):
@@ -14,10 +16,12 @@ class EventManager:
 	def trigger(self, eventname, args=()):
 		try:
 			for event in self.events[eventname]:
-#				try:
+				try:
 					event(*args)
-#				except:
-#					logging.warn('Uncaught exception occured in event handler.')
+				except:
+					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
+					logging.warn('Uncaught exception occured in event handler.')
+					logging.warn(traceback.extract_tb(exceptionTraceback))
 		except KeyError:
 			pass
 
