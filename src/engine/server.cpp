@@ -389,6 +389,7 @@ int connectwithtimeout(ENetSocket sock, const char *hostname, const ENetAddress 
 
 bool mastersock_connecting = false;
 
+/*
 int connectasync(ENetSocket sock, const char *hostname, const ENetAddress &remoteaddress)
 {
 	int result = enet_socket_connect(sock, &remoteaddress);
@@ -399,6 +400,7 @@ int connectasync(ENetSocket sock, const char *hostname, const ENetAddress &remot
 	}
 	return result;
 }
+*/
 #endif
 
 ENetSocket mastersock = ENET_SOCKET_NULL;
