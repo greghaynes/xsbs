@@ -25,9 +25,9 @@ def countVotes():
 	bestmode = 0
 	bestcount = 0
 	candidates = []
-	for player in allPlayers():
+	for p in allPlayers():
 		try:
-			pv = player.gamevars['mapvote']
+			pv = p.gamevars['mapvote']
 			count = vote(candidates, pv)
 			if count > bestcount:
 				bestmap = pv[0]
