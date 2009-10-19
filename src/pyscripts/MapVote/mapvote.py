@@ -33,7 +33,7 @@ def countVotes():
 				bestmap = pv[0]
 				bestmode = pv[1]
 				bestcount = count
-		except AttributeError, KeyError:
+		except (AttributeError, KeyError):
 			pass
 	if bestcount > votes_needed:
 		sbserver.message(info('Vote passed.'))
