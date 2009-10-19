@@ -128,7 +128,7 @@ def userPrivAddCmd(cn, tcn, args):
 def userPrivDelCmd(cn, tcn, args):
 	sbserver.playerMessage(cn, error('Not yet implemented.'))
 
-@masterRequired
+@adminRequired
 def onUserPrivCmd(cn, args):
 	sp = args.split(' ')
 	tcn = int(sp[0])
