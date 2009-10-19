@@ -27,6 +27,8 @@ class ServerBot(asynirc.IrcClient):
 bot = ServerBot(
 	(servername, 6667),
 	(nickname, nickname.lower(), 'localhost', 'localhost', nickname))
+if(ipaddress):
+	bot.ip_address = ipaddress
 bot.join(channel)
 bot.doConnect()
 

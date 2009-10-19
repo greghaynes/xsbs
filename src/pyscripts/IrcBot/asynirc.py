@@ -50,6 +50,10 @@ class IrcClient(asyncore.dispatcher):
 		self.logInfo('Connecting to %s:%i' % (
 				self.server_hostname,
 				self.server_port))
+		try:
+			self.bind((self.ip_address, 0))
+		except AttributeError:
+			pass
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.connect((self.server_hostname, self.server_port))
 		self.read_buffer = ''
@@ -64,7 +68,7 @@ class IrcClient(asyncore.dispatcher):
 	def handle_close(self):
 		self.close()
 	def handle_read(self):
-		self.read_buffer = self.read_buffer.join(self.recv(4096))
+		self.read_buffer += self.recv(4096)
 		tmp_buff = self.read_buffer.split('\r\n')
 		self.read_buffer = tmp_buff.pop()
 		for line in tmp_buff:
