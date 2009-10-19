@@ -50,11 +50,11 @@ class IrcClient(asyncore.dispatcher):
 		self.logInfo('Connecting to %s:%i' % (
 				self.server_hostname,
 				self.server_port))
+		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 		try:
 			self.bind((self.ip_address, 0))
 		except AttributeError:
 			pass
-		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.connect((self.server_hostname, self.server_port))
 		self.read_buffer = ''
 		self.work_queue = collections.deque()
