@@ -126,6 +126,7 @@ class MasterClient(asyncore.dispatcher):
 	def handle_write(self):
 		item = self.request_queue.pop(0)
 		self.send(item.data)
+		self.responses_needed += 1
 	def handle_close(self):
 		self.do_connect = True
 	def handle_read(self):
