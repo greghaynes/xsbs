@@ -108,8 +108,42 @@ def onRelMaster(cn):
 def onRelAdmin(cn):
 	sbserver.message(info(ratemp.substitute(colordict, name=sbserver.playerName(cn))))
 
+def userPrivAddCmd(cn, tcn, args):
+	if args == 'master':
+		if isPlayerMaster(tcn):
+			sbserver.playerMessage(cn, error('%s already has master permissions.' % sbserver.playerName(tcn)))
+		else:
+			try:
+				user = loggedInAs(tcn)
+			except AttributeError:
+				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
+			else:
+				priv = UserPrivilege(1, user.id)
+				session.add(priv)
+				session.commit()
+				sbserver.playerMessage(cn, info('Master privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
+	else:
+		sbserver.playerMessage(cn, error('Privilege level must be \'master\''))
+
+def userPrivDelCmd(cn, tcn, args):
+	sbserver.playerMessage(cn, error('Not yet implemented.'))
+
+@masterRequired
+def onUserPrivCmd(cn, args):
+	sp = args.split(' ')
+	tcn = int(sp[0])
+	subcmd = sp[1]
+	args = args[len(sp[0])+len(sp[1])+2:]
+	if subcmd == 'add':
+		userPrivAddCmd(cn, tcn, args)
+	elif subcmd == 'del':
+		userPrivDelCmd(cn, tcn, args)
+	else:
+		sbserver.playerMessage(cn, error('Usage: #userpriv <cn> <action> <level>'))
+
 def init():
 	registerCommandHandler('master', masterCmd)
+	registerCommandHandler('userpriv', onUserPrivCmd)
 	registerServerEventHandler('player_setmaster', onSetMaster)
 	registerServerEventHandler('player_setmaster_off', onSetMasterOff)
 	registerServerEventHandler('player_claimed_master', onGainMaster)
