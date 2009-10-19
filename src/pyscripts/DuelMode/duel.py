@@ -28,7 +28,7 @@ def onMapChange(mapname, mode):
 		endDuel()
 
 def onPlayerDisconnect(cn):
-	if currently_dueling[0] and (duelers[0] == cn or duelers[1) == cn]:
+	if currently_dueling[0] and (duelers[0] == cn or duelers[1] == cn):
 		cancelDuel()
 
 def duelCountdown(count, map, mode):
