@@ -2,8 +2,8 @@ from xsbs.events import registerServerEventHandler
 from UserPrivelege.userpriv import masterRequired
 import sbserver
 
-def onSwitchTeam(sender, cn, team):
-	sbserver.setsetTTeam(cn, team)
+def onSwitchTeam(cn, team):
+	sbserver.setTeam(cn, team)
 
 @masterRequired
 def onSetTeam(cn, who, team):
