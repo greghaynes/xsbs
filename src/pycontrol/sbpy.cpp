@@ -136,6 +136,10 @@ void deinitPy()
 bool restartPy()
 {
 	triggerEvent("restart_begin", 0);
+	Py_DECREF(triggerEventFunc);
+	Py_DECREF(triggerPolicyEventFunc);
+	Py_DECREF(updateFunc);
+	Py_DECREF(eventsModule);
 	deinitPy();
 	Py_Initialize();
 	initModule("sbserver");
