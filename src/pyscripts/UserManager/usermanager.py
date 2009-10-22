@@ -22,8 +22,8 @@ session = dbmanager.session()
 class User(Base):
 	__tablename__ = usertable
 	id = Column(Integer, primary_key=True)
-	email = Column(String)
-	password = Column(String)
+	email = Column(String, index=True)
+	password = Column(String, index=True)
 	def __init__(self, email, password):
 		self.email = email
 		self.password = password
@@ -31,7 +31,7 @@ class User(Base):
 class NickAccount(Base):
 	__tablename__ = nicktable
 	id = Column(Integer, primary_key=True)
-	nick = Column(String)
+	nick = Column(String, index=True)
 	user_id = Column(Integer, ForeignKey('usermanager_users.id'))
 	user = relation(User, primaryjoin=user_id==User.id)
 	def __init__(self, nick, user_id):

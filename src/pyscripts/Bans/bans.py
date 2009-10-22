@@ -28,7 +28,7 @@ session = dbmanager.session()
 class Ban(Base):
 	__tablename__='bans'
 	id = Column(Integer, primary_key=True)
-	ip = Column(Integer)
+	ip = Column(Integer, index=True)
 	expiration = Column(Integer) # Epoch seconds
 	reason = Column(String)
 	nick = Column(String)
