@@ -65,14 +65,7 @@ def onUnmuteCommand(cn, args):
 	except ValueError:
 		sbserver.playerMessage(cn, error('Invalid player cn'))
 
-def onDisconnect(cn):
-	try:
-		muted_players.remove(cn)
-	except ValueError:
-		pass
-
 registerPolicyEventHandler('allow_message', allowMsg)
 registerCommandHandler('mute', onMuteCommand)
 registerCommandHandler('unmute', onUnmuteCommand)
-registerServerEventHandler('player_disconnect', onDisconnect)
 
