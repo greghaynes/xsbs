@@ -15,7 +15,7 @@ import logging
 config = PluginConfig('bans')
 ban_command = config.getOption('Config', 'ban_command', 'ban')
 default_ban_length = config.getOption('Config', 'default_ban_time', 3600)
-ban_message = config.getOption('Config', 'message', 'Banning $name for $seconds seconds for ${red}${reason}')
+ban_message = config.getOption('Config', 'message', 'Banning ${orange}${name}${white} for $seconds seconds for ${red}${reason}')
 default_reason = config.getOption('Config', 'default_reason', 'unspecified reason')
 kick_message = config.getOption('Config', 'kick_message', '${green}${name}${white} was ${red}kicked${white} from server')
 del config
