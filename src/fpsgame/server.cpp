@@ -1510,6 +1510,8 @@ namespace server
         clientinfo *ci = getinfo(n);
         if(ci->connected)
         {
+	    SbPy::triggerEventInt("player_disconnect", n);
+	    SbPy::triggerEventInt("player_disconnect_post", n);
             if(ci->privilege) resetpriv(ci);
             if(smode) smode->leavegame(ci, true);
             ci->state.timeplayed += lastmillis - ci->state.lasttimeplayed;

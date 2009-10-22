@@ -323,8 +323,8 @@ const char *disc_reasons[] = { "normal", "end of packet", "client num", "kicked/
 void disconnect_client(int n, int reason)
 {
     if(clients[n]->type!=ST_TCPIP) return;
-    SbPy::triggerEventInt("player_disconnect", n);
-    SbPy::triggerEventInt("player_disconnect_post", n);
+    //SbPy::triggerEventInt("player_disconnect", n);
+    //SbPy::triggerEventInt("player_disconnect_post", n);
     enet_peer_disconnect(clients[n]->peer, reason);
     server::clientdisconnect(n);
     clients[n]->type = ST_EMPTY;
