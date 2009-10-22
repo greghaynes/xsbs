@@ -10,7 +10,7 @@ del config
 
 def onTeamkill(cn, tcn):
 	if sbserver.playerTeamkills(cn) >= limit:
-		ban(cn, duration, 'killing teammates')
+		ban(cn, duration, 'killing teammates', -1)
 
 registerServerEventHandler('player_teamkill', onTeamkill)
 
