@@ -17,7 +17,7 @@ session = dbmanager.session()
 class IpToNick(Base):
 	__tablename__=tablename
 	id = Column(Integer, primary_key=True)
-	ip = Column(Integer)
+	ip = Column(Integer, index=True)
 	nick = Column(String)
 	def __init__(self, ip, nick):
 		self.ip = ip
