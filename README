@@ -12,5 +12,5 @@ RUN XSBS
 cd into xsbs
 ./bin/start_server.py
 
-For more detailed information, see the project wiki: http://wiki.github.com/greghaynes/xsbs
+If you experienced an error, or for more detailed information, see the project wiki: http://wiki.github.com/greghaynes/xsbs
 
