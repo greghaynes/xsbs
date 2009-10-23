@@ -50,6 +50,9 @@ def namesCmd(cn, args):
 	except NoResultFound:
 		sbserver.playerMessage(cn, error('No names found'))
 		return
+	except ValueError:
+		sbserver.playerMessage(cn, error('Invalid cn'))
+		return
 	namestr = 'Other known names: '
 	for name in names:
 		namestr += name.nick + ' '
