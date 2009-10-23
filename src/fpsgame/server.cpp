@@ -2085,11 +2085,11 @@ namespace server
                 if(!smode || smode->canchangeteam(wi, wi->team, text))
                 {
                     SbPy::triggerEventIntIntString("player_set_team", ci->clientnum, who, text);
-                    /*
+		/*
                     if(smode && wi->state.state==CS_ALIVE)
                         smode->changeteam(wi, wi->team, text);
                     copystring(wi->team, text, MAXTEAMLEN+1);
-                    */
+		*/
                 }
                 //aiman::changeteam(wi);
                 //sendf(-1, 1, "riis", SV_SETTEAM, who, wi->team);
