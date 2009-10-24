@@ -1,5 +1,5 @@
 from xsbs.events import registerServerEventHandler
-from UserPrivelege.userpriv import masterRequired
+from UserPrivilege.userpriv import masterRequired
 from xsbs.ui import error
 import sbserver
 

@@ -1,7 +1,7 @@
 import sbserver
 from xsbs.events import triggerServerEvent
 from xsbs.commands import registerCommandHandler
-from UserPrivelege.userpriv import masterRequired, adminRequired
+from UserPrivilege.userpriv import masterRequired, adminRequired
 from xsbs.colors import red, yellow, blue, green
 from xsbs.plugins import reload as pluginReload
 from xsbs.ui import error, info, insufficientPermissions

@@ -4,7 +4,7 @@ from xsbs.ui import info, notice, error
 from xsbs.events import registerPolicyEventHandler, registerServerEventHandler
 from xsbs.players import player
 from xsbs.settings import PluginConfig
-from UserPrivelege.userpriv import registerCommandHandler, masterRequired
+from UserPrivilege.userpriv import registerCommandHandler, masterRequired
 import string
 
 config = PluginConfig('mute')

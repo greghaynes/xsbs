@@ -2,7 +2,7 @@ from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info
 from xsbs.players import player, all as allPlayers
 from xsbs.settings import PluginConfig
-from UserPrivelege.userpriv import isPlayerMaster
+from UserPrivilege.userpriv import isPlayerMaster
 import sbserver
 
 config = PluginConfig('mapvote')

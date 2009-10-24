@@ -1,5 +1,5 @@
 from xsbs.events import registerServerEventHandler
-from UserPrivelege.userpriv import isPlayerMaster
+from UserPrivilege.userpriv import isPlayerMaster
 from xsbs.ui import insufficientPermissions, error
 import sbserver
 
