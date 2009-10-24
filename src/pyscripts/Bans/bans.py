@@ -3,7 +3,7 @@ from xsbs.settings import PluginConfig
 from xsbs.colors import red, colordict
 from xsbs.ui import insufficientPermissions, error, info
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, execLater
-from UserPrivelege.userpriv import registerCommandHandler, masterRequired
+from UserPrivilege.userpriv import registerCommandHandler, masterRequired
 from xsbs.net import ipLongToString, ipStringToLong
 from DB.db import dbmanager
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey

@@ -1,7 +1,7 @@
 from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info
 from xsbs.colors import green, blue
-from UserPrivelege.userpriv import masterRequired
+from UserPrivilege.userpriv import masterRequired
 import sbserver
 
 MMNAMES = ['open',
