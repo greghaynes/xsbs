@@ -16,7 +16,6 @@ setteam_modes = [
 
 def onSwitchTeam(cn, team):
 	mode =  sbserver.gameMode()
-	print 'switch team %i %s (%i)' % (cn, team, mode)
 	if mode in setteam_modes:
 		sbserver.setTeam(cn, team)
 	elif mode in switchteam_modes:
@@ -29,7 +28,6 @@ def onSwitchTeam(cn, team):
 
 @masterRequired
 def onSetTeam(cn, who, team):
-	print 'set team'
 	mode =  sbserver.gameMode()
 	if mode not in setteam_modes:
 		sbserver.playerMessage(cn, error('You can not set team in this game mode.'))
