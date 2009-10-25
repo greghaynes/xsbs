@@ -101,7 +101,7 @@ def onLinkName(cn, args):
 	except NoResultFound:
 		pass
 	else:
-		sbserver.playerMessage(cn, error('Your name is already licked to an account.'))
+		sbserver.playerMessage(cn, error('Your name is already linked to an account.'))
 		return
 	user = loggedInAs(cn)
 	nickacct = NickAccount(sbserver.playerName(cn), user.id)
