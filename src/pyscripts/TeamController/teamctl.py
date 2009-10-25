@@ -29,7 +29,7 @@ def onSwitchTeam(cn, team):
 @masterRequired
 def onSetTeam(cn, who, team):
 	mode =  sbserver.gameMode()
-	if mode not in setteam_modes:
+	if mode not in setteam_modes and team != 'evil' and team != 'good':
 		sbserver.playerMessage(cn, error('You can not set team in this game mode.'))
 	else:
 		sbserver.setTeam(who, team)

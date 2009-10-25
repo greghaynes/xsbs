@@ -12,6 +12,7 @@ mtktemp = config.getOption('Config', 'most_teamkills', 'Most TeamKills: ${orange
 del config
 awards_prefix = string.Template(awards_prefix).substitute(colordict)
 mftemp = string.Template(mftemp)
+mtktemp = string.Template(mtktemp)
 
 def onIntermission():
 	players = allPlayers()
