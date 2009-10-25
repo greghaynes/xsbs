@@ -3,24 +3,30 @@ import string, math
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
+from xsbs.ui import insufficientPermissions, error
+from UserPrivilege.userpriv import isPlayerMaster
 
 config = PluginConfig('stats')
 template = config.getOption('Config', 'template', '${white}Stats for ${orange}${name}\n${white}Frags: ${green}${frags} ${white}Deaths: ${red}${deaths} ${white}Teamkills: ${magenta}${teamkills} ${white}Accuracy: ${yellow}${accuracy}% ${white}KpD: ${orange}${ktd}')
-template = string.Template(template)
+require_master = config.getOption('Config', 'require_master', 'no') == 'yes'
 del config
+template = string.Template(template)
 
 def onCommand(cn, command):
+	if require_master and not isPlayerMaster(cn):
+		insufficientPermissions(cn)
+		return
 	if command != '':
 		try:
 			tcn = int(command)
 		except ValueError:
-			sbserver.playerMessage(cn, sbtools.red('Usage: #stats (cn)'))
+			sbserver.playerMessage(cn, error('Usage: #stats (cn)'))
 			return
 	else:
 		tcn = cn
 	name = sbserver.playerName(tcn)
 	if not name:
-		sbserver.playerMessage(cn, sbtools.red('You must use a valid cn'))
+		sbserver.playerMessage(cn, error('You must use a valid cn'))
 		return
 	frags = sbserver.playerFrags(tcn)
 	deaths = sbserver.playerDeaths(tcn)
