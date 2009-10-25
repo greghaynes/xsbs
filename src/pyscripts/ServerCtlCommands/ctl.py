@@ -66,6 +66,22 @@ def onMinsLeft(cn, args):
 	else:
 		sbserver.setMinsRemaining(int(args))
 
+@masterRequired
+def specAll(cn, args):
+	if args != '':
+		sbserver.playerMessage(cn, error('Usage: #specall'))
+	else:
+		for s in sbserver.players():
+			sbserver.spectate(s)
+
+@masterRequired
+def unspecAll(cn, args):
+	if args != '':
+		sbserver.playerMessage(cn, error('Usage: #unspecall'))
+	else:
+		for s in sbserver.spectators():
+			sbserver.unspectate(s)
+
 registerCommandHandler('pause', onPauseCmd)
 registerCommandHandler('resume', onResumeCmd)
 registerCommandHandler('reload', onReloadCmd)
@@ -73,4 +89,6 @@ registerCommandHandler('givemaster', onGiveMaster)
 registerCommandHandler('mastermask', onMasterMask)
 registerCommandHandler('resize', onResize)
 registerCommandHandler('minsleft', onMinsLeft)
+registerCommandHandler('specall', specAll)
+registerCommandHandler('unspecall', unspecAll)
 
