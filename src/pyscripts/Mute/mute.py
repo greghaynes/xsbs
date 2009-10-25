@@ -19,7 +19,7 @@ def allowMsg(cn, text):
 		if player(cn).is_muted:
 			sbserver.playerMessage(cn, notice('You are currently muted.  No one will recieve your messages.'))
 			return False
-	except AttributeError:
+	except (AttributeError, ValueError):
 		pass
 	return True
 
