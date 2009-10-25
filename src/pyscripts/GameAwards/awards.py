@@ -7,8 +7,8 @@ import string
 
 config = PluginConfig('gameawards')
 awards_prefix = config.getOption('Config', 'awards_prefix', '${blue}Awards: ${white}')
-mftemp = config.getOption('Config', 'most_frags', 'Most Frags: ${orange}${name} (${green}${count}${white})')
-mtktemp = config.getOption('Config', 'most_teamkills', 'Most TeamKills: ${orange}${name} (${green}${count}${white})')
+mftemp = config.getOption('Config', 'most_frags', 'Most Frags: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
+mtktemp = config.getOption('Config', 'most_teamkills', 'Most TeamKills: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
 del config
 awards_prefix = string.Template(awards_prefix).substitute(colordict)
 mftemp = string.Template(mftemp)
