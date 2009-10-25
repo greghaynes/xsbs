@@ -7,13 +7,6 @@ def ipLongToString(num):
 		(num >> 24) & 0xff)
 
 def ipStringToLong(st):
-	decs = st.split('.')
-	hexn = ''
-	for i in range(4):
-		hexn = hexn.join('%02X' % long(decs[3-i]))
-	return int(hexn, 16)
-	hexn = ''.join(["%02X" % long(i) for i in st.split('.')])
-	return int(hexn, 16)
 	st = st.split('.')
 	if len(st) != 4:
 		raise ValueError('Not a valid ipv4 address')
