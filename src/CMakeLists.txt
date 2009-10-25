@@ -13,6 +13,14 @@ set(xsbs_srcs
 	pycontrol/sbpy.cpp
 	pycontrol/servermodule.cpp)
 
+set(XSBS_LIBS
+	enet
+	sauertools
+	${PYTHON_LIBRARIES}
+	${ZLIB_LIBRARIES}
+	${CMAKE_THREAD_LIBS_INIT}
+	-lutil)
+
 include(CheckFunctionExists)
 include(CheckSymbolExists)
 
@@ -42,7 +50,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/engine
 add_executable(xsbs
 	${xsbs_srcs})
 
-target_link_libraries(xsbs enet sauertools ${PYTHON_LIBRARIES} ${ZLIB_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} -lutil)
+target_link_libraries(xsbs ${XSBS_LIBS})
 
 install(TARGETS xsbs DESTINATION bin)
 
