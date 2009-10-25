@@ -4,12 +4,15 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
 from xsbs.settings import PluginConfig
 from xsbs.events import registerServerEventHandler
-from xsbs.ui import error, info
+from xsbs.ui import error, info, insufficientPermissions
 from xsbs.commands import registerCommandHandler
+from UserPrivilege.userpriv import isPlayerMaster
 import sbserver
 
 config = PluginConfig('namesdb')
 tablename = config.getOption('Config', 'tablename', 'ip_name')
+master_required = config.getOption('Config', 'master_required', 'no') == 'yes'
+del config
 
 Base = declarative_base()
 session = dbmanager.session()
@@ -38,6 +41,9 @@ def onNameChange(cn, newname):
 	onConnect(cn)
 
 def namesCmd(cn, args):
+	if master_required and not isPlayerMaster(cn):
+		insufficientPermissions(cn)
+		return
 	if args == '':
 		sbserver.playerMessage(cn, error('Usage: #names <cn>'))
 		return
