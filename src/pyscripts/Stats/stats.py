@@ -13,10 +13,10 @@ del config
 template = string.Template(template)
 
 def onCommand(cn, command):
-	if require_master and not isPlayerMaster(cn):
-		insufficientPermissions(cn)
-		return
 	if command != '':
+		if require_master and not isPlayerMaster(cn):
+			insufficientPermissions(cn)
+		return
 		try:
 			tcn = int(command)
 		except ValueError:
