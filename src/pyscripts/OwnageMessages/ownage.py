@@ -31,11 +31,14 @@ def onPlayerFrag(cn, tcn):
 			t.killspree = 0
 		try:
 			sbserver.message(info(messages[p.killspree].substitute(name=sbserver.playerName(cn))))
-		except KeyError:
+		except (KeyError, ValueError):
 			pass
 
 def onPlayerTeamKill(cn, tcn):
-	player(cn).killspree = 0
+	try:
+		player(cn).killspree = 0
+	except ValueError:
+		pass
 
 registerServerEventHandler('player_frag', onPlayerFrag)
 registerServerEventHandler('player_teamkill', onPlayerTeamKill)
