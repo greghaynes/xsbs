@@ -47,8 +47,8 @@ def namesCmd(cn, args):
 	if args == '':
 		sbserver.playerMessage(cn, error('Usage: #names <cn>'))
 		return
-	tcn = int(args)
 	try:
+		tcn = int(args)
 		names = session.query(IpToNick).filter(IpToNick.ip==sbserver.playerIpLong(tcn)).all()
 		if len(names) == 0:
 			sbserver.playerMessage(cn, error('No names found'))
