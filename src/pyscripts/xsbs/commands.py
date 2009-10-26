@@ -2,6 +2,8 @@ import sbserver
 from events import registerServerEventHandler, registerPolicyEventHandler
 from colors import red
 from xsbs.ui import error, insufficientPermissions
+import logging
+import sys, traceback
 
 class CommandManager:
 	def __init__(self):
@@ -15,7 +17,13 @@ class CommandManager:
 	def trigger(self, cn, command, text):
 		if self.command_handlers.has_key(command):
 			for func in self.command_handlers[command]:
-				func(cn, text)
+				try:
+					func(cn, text)
+				except:
+					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
+					logging.warn('Uncaught exception occured in command handler.')
+					logging.warn(traceback.format_exc())
+					logging.warn(traceback.extract_tb(exceptionTraceback))
 		else:
 			sbserver.playerMessage(cn, error('Command not found'))
 	def onMsg(self, cn, text):
