@@ -105,7 +105,7 @@ def onBanCmd(cn, text):
 
 @masterRequired
 def onRecentBans(cn, args):
-	elif args != '':
+	if args != '':
 		sbserver.playerMessage(cn, error('Usage: #recentbans'))
 	else:
 		recent = session.query(Ban).order_by(Ban.time.desc())[:5]
