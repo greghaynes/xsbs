@@ -1,6 +1,6 @@
 from DB.db import dbmanager
 from sqlalchemy.orm.exc import NoResultFound
-from UserManager.usermanager import session, NickAccount, isLoggedIn, loggedInAs
+from UserManager.usermanager import NickAccount, isLoggedIn, loggedInAs
 from Bans.bans import ban
 import sbserver
 from xsbs.events import registerServerEventHandler
@@ -33,7 +33,10 @@ def warnNickReserved(cn, count, sessid):
 	addTimer(5000, warnNickReserved, (cn, count+1, sessid))
 
 def nickReserver(nick):
-	return session.query(NickAccount).filter(NickAccount.nick==nick).one()
+	session = dbmanager.session()
+	r = session.query(NickAccount).filter(NickAccount.nick==nick).one()
+	session.close()
+	return r
 
 def onPlayerActive(cn):
 	nick = sbserver.playerName(cn)
@@ -61,7 +64,10 @@ def onReserveCommand(cn, args):
 		sbserver.playerMessage(red('Name is already reserved.'))
 		return
 	rn = ReservedNick(nick, user.id)
+	session = dbmanager.session()
 	session.add(rn)
+	session.commit()
+	session.close()
 	sbserver.playerMessage(cn, green('Your account has been created.'))
 
 registerServerEventHandler('player_connect_delayed', onPlayerActive)

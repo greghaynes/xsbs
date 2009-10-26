@@ -15,7 +15,6 @@ master_required = config.getOption('Config', 'master_required', 'no') == 'yes'
 del config
 
 Base = declarative_base()
-session = dbmanager.session()
 
 class IpToNick(Base):
 	__tablename__=tablename
@@ -28,14 +27,18 @@ class IpToNick(Base):
 
 def onConnect(cn):
 	try:
+		session = dbmanager.session()
 		same = session.query(IpToNick).filter(IpToNick.ip==sbserver.playerIpLong(cn)).filter(IpToNick.nick==sbserver.playerName(cn)).all()
+		session.close()
 		if len(same) > 0:
 			return
 	except NoResultFound:
 		pass
 	ent = IpToNick(sbserver.playerIpLong(cn), sbserver.playerName(cn))
+	session = dbmanager.session()
 	session.add(ent)
 	session.commit()
+	session.close()
 
 def onNameChange(cn, newname):
 	onConnect(cn)
@@ -49,7 +52,9 @@ def namesCmd(cn, args):
 		return
 	try:
 		tcn = int(args)
+		session = dbmanager.session()
 		names = session.query(IpToNick).filter(IpToNick.ip==sbserver.playerIpLong(tcn)).all()
+		session.close()
 		if len(names) == 0:
 			sbserver.playerMessage(cn, error('No names found'))
 			return

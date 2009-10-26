@@ -23,7 +23,6 @@ ban_message = string.Template(ban_message)
 kick_message = string.Template(kick_message)
 
 Base = declarative_base()
-session = dbmanager.session()
 
 class Ban(Base):
 	__tablename__='bans'
@@ -56,10 +55,16 @@ class BanNick(Base):
 		self.reason = reason
 
 def getCurrentBanByIp(ipaddress):
-	return session.query(Ban).filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
+	session = dbmanager.session()
+	b = session.query(Ban).filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
+	session.close()
+	return b
 
 def getCurrentBanByNick(nick):
-	return session.query(BanNick).filter(BanNick.nick==nick).one()
+	session = dbmanager.session()
+	b = session.query(BanNick).filter(BanNick.nick==nick).one()
+	session.close()
+	return b
 
 def isIpBanned(ipaddress):
 	try:
@@ -86,8 +91,10 @@ def ban(cn, seconds, reason, banner_cn):
 		banner_ip = 0
 		banner_nick = ''
 	newban = Ban(ip, expiration, reason, nick, banner_ip, banner_nick, time.time())
+	session = dbmanager.session()
 	session.add(newban)
 	session.commit()
+	session.close()
 	execLater(sbserver.playerKick, (cn,))
 	logging.info('Player %s (%s) banned for %s by %s (%s)',
 		nick,
@@ -126,7 +133,9 @@ def onRecentBans(cn, args):
 	if args != '':
 		sbserver.playerMessage(cn, error('Usage: #recentbans'))
 	else:
+		session = dbmanager.session()
 		recent = session.query(Ban).order_by(Ban.time.desc())[:5]
+		session.close()
 		for ban in recent:
 			sbserver.playerMessage(cn, info('Nick: %s' % ban.nick))
 
@@ -158,8 +167,10 @@ def onInsertBan(cn, args):
 		 	reason = 'Unspecified reason'
 		expiration = time.time() + length
 		newban = Ban(ip, expiration, reason, 'Unnamed', 0, 'Unnamed', time.time())
+		session = dbmanager.session()
 		session.add(newban)
 		session.commit()
+		session.close()
 		sbserver.playerMessage(cn, info('Inserted ban for %s for %i seconds for %s.' % (ipLongToString(ip), length, reason)))
 
 @masterRequired
@@ -172,8 +183,10 @@ def onBanNick(cn, args):
 		nick = reason.pop(0)
 		reason = args[len(nick)+1:]
 	b = BanNick(nick, reason)
+	session = dbmanager.session()
 	session.add(b)
 	session.commit()
+	session.close()
 	sbserver.playerMessage(cn, info('Inserted nick ban of %s for %s' % (nick, reason)))
 
 def init():
