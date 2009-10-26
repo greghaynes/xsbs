@@ -103,9 +103,8 @@ def onBanCmd(cn, text):
 	except (ValueError, KeyError):
 		sbserver.playerMessage(cn, error('Usage: #ban <cn> (duration) (reason)'))
 
+@masterRequired
 def onRecentBans(cn, args):
-	if sbserver.playerPrivilege(cn) == 0:
-		insufficientPermissions(cn)
 	elif args != '':
 		sbserver.playerMessage(cn, error('Usage: #recentbans'))
 	else:
