@@ -1458,7 +1458,7 @@ namespace server
              if(spinfo->clientmap[0] || spinfo->mapcrc) checkmaps();
 	     unspectated = true;
          }
-          else
+         else
              return false;
          sendf(-1, 1, "ri3", SV_SPECTATOR, spectator, val);
 	 if(spectated)
