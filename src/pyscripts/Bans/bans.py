@@ -29,7 +29,7 @@ class Ban(Base):
 	__tablename__='bans'
 	id = Column(Integer, primary_key=True)
 	ip = Column(Integer, index=True)
-	expiration = Column(Integer) # Epoch seconds
+	expiration = Column(Integer, index=True) # Epoch seconds
 	reason = Column(String)
 	nick = Column(String)
 	banner_ip = Column(Integer)
@@ -46,13 +46,31 @@ class Ban(Base):
 	def isExpired(self):
 		return self.expiration <= time.time()
 
+class BanNick(Base):
+	__tablename__='banned_nicks'
+	id = Column(Integer, primary_key=True)
+	nick = Column(String, index=True)
+	reason = Column(String)
+	def __init__(self, nick, reason):
+		self.nick = nick
+		self.reason = reason
 
 def getCurrentBanByIp(ipaddress):
 	return session.query(Ban).filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
 
-def isCurrentlyBanned(ipaddress):
+def getCurrentBanByNick(nick):
+	return session.query(BanNick).filter(BanNick.nick==nick).one()
+
+def isIpBanned(ipaddress):
 	try:
 		b = getCurrentBanByIp(ipaddress)
+		return True
+	except NoResultFound:
+		return False
+
+def isNickBanned(nick):
+	try:
+		b = getCurrentBanByNick(nick)
 		return True
 	except NoResultFound:
 		return False
@@ -114,7 +132,7 @@ def onRecentBans(cn, args):
 
 def allowClient(cn, pwd):
 	ip = sbserver.playerIpLong(cn)
-	return not isCurrentlyBanned(ip)
+	return not isIpBanned(ip) and not isNickBanned(sbserver.playerName(cn))
 
 @masterRequired
 def onKick(cn, tcn):
@@ -143,9 +161,25 @@ def onInsertBan(cn, args):
 		session.add(newban)
 		session.commit()
 		sbserver.playerMessage(cn, info('Inserted ban for %s for %i seconds for %s.' % (ipLongToString(ip), length, reason)))
+
+@masterRequired
+def onBanNick(cn, args):
+	reason = args.split(' ')
+	if len(reason) == 1:
+		nick = reason[0]
+		reason = 'Unspecified reason'
+	else:
+		nick = reason.pop(0)
+		reason = args[len(nick)+1:]
+	b = BanNick(nick, reason)
+	session.add(b)
+	session.commit()
+	sbserver.playerMessage(cn, info('Inserted nick ban of %s for %s' % (nick, reason)))
+
 def init():
 	registerPolicyEventHandler("connect_kick", allowClient)
 	registerCommandHandler('ban', onBanCmd)
+	registerCommandHandler('bannick', onBanNick)
 	registerCommandHandler('recentbans', onRecentBans)
 	registerCommandHandler('kick', onKickCommand)
 	registerCommandHandler('insertban', onInsertBan)
