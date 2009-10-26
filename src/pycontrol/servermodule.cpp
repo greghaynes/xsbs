@@ -83,7 +83,7 @@ static PyObject *spectators(PyObject *self, PyObject *args)
 	loopv(server::clients)
 	{
 		ci = server::getinfo(i);
-		if(ci->state.state == CS_SPECTATOR)
+		if(ci && ci->state.state == CS_SPECTATOR)
 		{
 			spects.push_back(i);
 		}
