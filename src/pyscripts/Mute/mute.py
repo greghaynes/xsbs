@@ -55,11 +55,14 @@ def onUnmuteCommand(cn, args):
 		tcn = int(args[0])
 		if len(args) > 1:
 			raise KeyError
-		if player(tcn).is_muted:
-			player(tcn).is_muted = False
-			sbserver.message(info(unmuted_temp.substitute(colordict, muted_name=sbserver.playerName(tcn))))
-		else:
-			sbserver.playerMessage(cn, error('Player is not crrently muted'))
+		try:
+			if player(tcn).is_muted:
+				player(tcn).is_muted = False
+				sbserver.message(info(unmuted_temp.substitute(colordict, muted_name=sbserver.playerName(tcn))))
+			else:
+				sbserver.playerMessage(cn, error('Specifiedlayer is not crrently muted'))
+		except AttributeError:
+			sbserver.playerMessage(cn, error('Specified player is not currently muted.'))
 	except KeyError:
 		sbserver.playerMessage(cn, error('Usage: #unmute <cn>'))
 	except ValueError:
