@@ -19,7 +19,7 @@ class CommandManager:
 		else:
 			sbserver.playerMessage(cn, error('Command not found'))
 	def onMsg(self, cn, text):
-		if self.prefixes.find(text[0]) != -1:
+		if len(text) > 0 and self.prefixes.find(text[0]) != -1:
 			cmd = text[1:].split(' ')[0]
 			self.trigger(cn, cmd, text[len(cmd)+2:])
 			return False
