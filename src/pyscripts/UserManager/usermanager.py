@@ -17,6 +17,7 @@ nicktable = config.getOption('Config', 'linkednames_table', 'usermanager_nickacc
 del config
 
 Base = declarative_base()
+session = dbmanager.session()
 
 class User(Base):
 	__tablename__ = usertable
@@ -57,9 +58,7 @@ def login(cn, user):
 
 def userAuth(email, password):
 	try:
-		session= dbmanager.session()
 		user = session.query(User).filter(User.email==email).filter(User.password==password).one()
-		session.close()
 	except NoResultFound:
 		return False
 	return user
@@ -68,18 +67,16 @@ def onRegisterCommand(cn, args):
 	args = args.split(' ')
 	if len(args) != 2:
 		sbserver.playerMessage(cn, info('Usage: #register <email> <password>'))
-	else:
-		session = dbmanager.session()
-		try:
-			session.query(User).filter(User.email==args[0]).one()
-		except NoResultFound:
-			user = User(args[0], args[1])
-			session.add(user)
-			session.commit()
-			sbserver.playerMessage(cn, green('Account created'))
-		else:
-			sbserver.playerMessage(cn, error('An account with that email address already exists.'))
-		session.close()
+		return
+	try:
+		session.query(User).filter(User.email==args[0]).one()
+	except NoResultFound:
+		user = User(args[0], args[1])
+		session.add(user)
+		session.commit()
+		sbserver.playerMessage(cn, green('Account created'))
+		return
+	sbserver.playerMessage(cn, error('An account with that email address already exists.'))
 
 def onLoginCommand(cn, args):
 	args = args.split(' ')
@@ -100,9 +97,7 @@ def onLinkName(cn, args):
 		sbserver.playerMessage(cn, error('You must be logged in to link a name to your account.'))
 		return
 	try:
-		session = dbmanager.session()
 		session.query(NickAccount).filter(NickAccount.nick==sbserver.playerName(cn)).one()
-		session.close()
 	except NoResultFound:
 		pass
 	else:
@@ -110,18 +105,14 @@ def onLinkName(cn, args):
 		return
 	user = loggedInAs(cn)
 	nickacct = NickAccount(sbserver.playerName(cn), user.id)
-	session = dbmanager.session()
 	session.add(nickacct)
 	session.commit()
-	session.close()
 	sbserver.playerMessage(cn, info('Your name is now linked to your account.'))
 
 def onSetMaster(cn, givenhash):
 	nick = sbserver.playerName(cn)
 	try:
-		session = dbmanager.session()
 		na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
-		session.close()
 	except NoResultFound:
 		if sbserver.playerPrivilege(cn) <= 1:
 			sbserver.playerMessage(cn, error('Your name is not assigned to any accounts.'))
