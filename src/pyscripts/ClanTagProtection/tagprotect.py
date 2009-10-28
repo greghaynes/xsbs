@@ -120,5 +120,6 @@ def onNameChange(cn, name):
 Base.metadata.create_all(dbmanager.engine)
 
 registerServerEventHandler('player_connect_delayed', onConnect)
+registerServerEventHandler('player_name_changed', onConnect)
 registerServerEventHandler('player_name_changed', onNameChange)
 
