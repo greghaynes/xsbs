@@ -66,7 +66,7 @@ def setUsedTags(cn):
 				p.registered_tags.append(id)
 			except NoResultFound:
 				pass
-			except AttibuteError:
+			except AttributeError:
 				p.registered_tags = [potential]
 
 def userBelongsTo(user, tag_id):
@@ -78,9 +78,10 @@ def userBelongsTo(user, tag_id):
 def onLogin(cn):
 	try:
 		p = player(cn)
-		u = player.user
+		u = p.user
 	except AttributeError:
 		logging.error('Got login event but no user object for player.')
+		return
 	try:
 		for tag in p.registered_tags:
 			t = p.registered_tags.pop(0)
@@ -102,7 +103,8 @@ def initCheck(cn):
 
 def onConnect(cn):
 	setUsedTags(cn)
-	sbserver.execLater(initCheck, (cn,))
+	execLater(initCheck, (cn,))
+	p = player(cn)
 	try:
 		if len(p.registered_tags) > 0:
 			registerServerEventHandler('player_logged_in', onLogin)

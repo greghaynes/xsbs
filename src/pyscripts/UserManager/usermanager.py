@@ -53,7 +53,7 @@ def login(cn, user):
 		return
 	player(cn).user = user
 	player(cn).logged_in = True
-	triggerServerEvent('player_logged_in', cn)
+	triggerServerEvent('player_logged_in', (cn,))
 	sbserver.message(info(green(sbserver.playerName(cn)) + ' is verified'))
 
 def userAuth(email, password):
