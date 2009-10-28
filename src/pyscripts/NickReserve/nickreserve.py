@@ -39,6 +39,7 @@ def nickReserver(nick):
 
 def onPlayerActive(cn):
 	nick = sbserver.playerName(cn)
+	p = player(cn)
 	try:
 		nickacct = nickReserver(sbserver.playerName(cn))
 	except NoResultFound:
