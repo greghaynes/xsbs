@@ -2,6 +2,7 @@ from xsbs.events import registerServerEventHandler, execLater
 from xsbs.players import player
 from xsbs.ui import warning
 from xsbs.colors import red
+from xsbs.timers import timers
 from Bans.bans import ban
 from UserManager.usermanager import User
 from NickReserve.nickreserve import nickReserver
