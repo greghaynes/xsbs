@@ -101,7 +101,8 @@ def initCheck(cn):
 			return
 	except AttributeError:
 		pass
-	warnTagReserved(cn, 0, sbserver.playerSessionId(cn))
+	else:
+		warnTagReserved(cn, 0, sbserver.playerSessionId(cn))
 
 def onConnect(cn):
 	setUsedTags(cn)
