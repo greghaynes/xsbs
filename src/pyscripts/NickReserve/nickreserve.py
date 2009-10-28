@@ -14,19 +14,21 @@ def warnNickReserved(cn, count, sessid):
 	try:
 		p = player(cn)
 		nickacct = p.warn_nickacct
-		if nickacct.nick != sbserver.playerName(cn):
-			return
-		if sessid != sbserver.playerSessionId(cn):
+		if nickacct.nick != sbserver.playerName(cn) or sessid != sbserver.playerSessionId(cn):
+			p.warning_for_login = False
 			return
 	except (AttributeError, ValueError):
+		p.warning_for_login = False
 		return
 	if isLoggedIn(cn):
 		user = loggedInAs(cn)
 		if nickacct.user_id != user.id:
 			ban(cn, 0, 'Use of reserved name')
+		p.warning_for_login = False
 		return
 	if count > 4:
 		ban(cn, 0, 'Use of reserved name', -1)
+		p.warning_for_login = False
 		return
 	remaining = 25-(count*5)
 	sbserver.playerMessage(cn, warning('Your name is reserved. You have ' + red('%i') + ' seconds to login or be kicked.') % remaining)
@@ -40,8 +42,10 @@ def onPlayerActive(cn):
 	try:
 		nickacct = nickReserver(sbserver.playerName(cn))
 	except NoResultFound:
+		p.warning_for_login = False
 		return
 	p = player(cn)
+	p.warning_for_login = True
 	p.warn_nickacct = nickacct
 	warnNickReserved(cn, 0, sbserver.playerSessionId(cn))
 
