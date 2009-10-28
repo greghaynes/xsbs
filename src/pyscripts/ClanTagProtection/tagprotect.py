@@ -101,7 +101,7 @@ def initCheck(cn):
 	warnTagReserved(cn, 0, sbserver.playerSessionId(cn))
 
 def onConnect(cn):
-	setUsedTags(sbserver.playerName(cn))
+	setUsedTags(cn)
 	sbserver.execLater(initCheck, (cn,))
 	try:
 		if len(p.registered_tags) > 0:
