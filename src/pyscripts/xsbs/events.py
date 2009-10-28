@@ -63,7 +63,9 @@ def triggerExecQueue():
 		try:
 			event[0](*event[1])
 		except:
-			print 'Error executing execLater op.'
+			logging.warn('Uncaught exception execLater queue.')
+			logging.warn(traceback.format_exc())
+			logging.warn(traceback.extract_tb(exceptionTraceback))
 	del exec_queue[:]
 
 def update():
