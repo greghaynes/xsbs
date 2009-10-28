@@ -63,6 +63,7 @@ def triggerExecQueue():
 		try:
 			event[0](*event[1])
 		except:
+			exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
 			logging.warn('Uncaught exception execLater queue.')
 			logging.warn(traceback.format_exc())
 			logging.warn(traceback.extract_tb(exceptionTraceback))
