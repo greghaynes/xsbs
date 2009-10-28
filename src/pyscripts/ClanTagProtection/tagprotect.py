@@ -49,7 +49,7 @@ def warnTagReserved(cn, count, sessid):
 		return
 	remaining = 25-(count*5)
 	sbserver.playerMessage(cn, warning('Your are using a reserved clan tag. You have ' + red('%i') + ' seconds to login or be kicked.') % remaining)
-	addTimer(5000, warnNickReserved, (cn, count+1, sessid))
+	addTimer(5000, warnTagReserved, (cn, count+1, sessid))
 
 def tagId(tag):
 	return session.query(ClanTag).filter(ClanTag.tag==tag).one().id
