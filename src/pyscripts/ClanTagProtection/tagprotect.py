@@ -106,10 +106,10 @@ def initCheck(cn):
 
 def onConnect(cn):
 	setUsedTags(cn)
-	execLater(initCheck, (cn,))
 	p = player(cn)
 	try:
 		if len(p.registered_tags) > 0:
+			execLater(initCheck, (cn,))
 			registerServerEventHandler('player_logged_in', onLogin)
 	except AttributeError:
 		pass
