@@ -22,17 +22,15 @@ session = dbmanager.session()
 class ClanTag(Base):
 	__tablename__ = 'clantags'
 	id = Column(Integer, primary_key=True)
-	tag = Column(String)
+	tag = Column(String, index=True)
 	def __init__(self, tag):
 		self.tag = tag
 
 class ClanMember(Base):
 	__tablename__ = 'clanmember'
 	id = Column(Integer, primary_key=True)
-	tag_id = Column(Integer)
-	user_id = Column(Integer)
-	tag = relation(ClanTag, primaryjoin=tag_id=ClanTag.id)
-	user = relation(User, primaryjoin=user_id=User.id)
+	tag_id = Column(Integer, index=True)
+	user_id = Column(Integer, index=True)
 	def __init__(self, tag_id, user_id):
 		self.tag_id = tag_id
 		self.user_id = user_id
@@ -52,6 +50,9 @@ def warnTagReserved(cn, count, sessid):
 	sbserver.playerMessage(cn, warning('Your are using a reserved clan tag. You have ' + red('%i') + ' seconds to login or be kicked.') % remaining)
 	addTimer(5000, warnNickReserved, (cn, count+1, sessid))
 
+def tagId(tag):
+	return session.query(ClanTag).filter(ClanTag.tag==tag).one().id
+
 def setUsedTags(cn):
 	nick = sbserver.playerName(cn)
 	p = player(cn)
@@ -60,11 +61,19 @@ def setUsedTags(cn):
 	for match in matches:
 		potentials.append(match)
 	for potential in potentials:
-		if isTag(potential):
 			try:
-				p.registered_tags.append(potential)
+				id = tagId(potential)
+				p.registered_tags.append(id)
+			except NoResultFound:
+				pass
 			except AttibuteError:
 				p.registered_tags = [potential]
+
+def userBelongsTo(user, tag_id):
+	try:
+		session.query(ClanMember).filter(ClanMember.tag_id==tag_id).filter(ClanMember.user_id==user.id).one()
+	except NoResultFound:
+		return False
 
 def onLogin(cn):
 	try:
@@ -74,8 +83,9 @@ def onLogin(cn):
 		logging.error('Got login event but no user object for player.')
 	try:
 		for tag in p.registered_tags:
-			if userBelongsTo(tag):
-				p.registered_tags.pop(0)
+			t = p.registered_tags.pop(0)
+			if userBelongsTo(u, t):
+				return
 			else:
 				ban(cn, 0, 'Use of reserved clan tag', -1)
 	except AttributeError:
@@ -101,6 +111,8 @@ def onConnect(cn):
 
 def onNameChange(cn, name):
 	onConnect(cn)
+
+Base.metadata.create_all(dbmanager.engine)
 
 registerServerEventHandler('player_connect_delayed', onConnect)
 registerServerEventHandler('player_name_changed', onNameChange)
