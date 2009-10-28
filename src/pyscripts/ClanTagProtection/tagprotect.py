@@ -2,6 +2,7 @@ from xsbs.events import registerServerEventHandler, execLater
 from xsbs.players import player
 from xsbs.ui import warning
 from xsbs.colors import red
+from Bans.bans import ban
 from UserManager.usermanager import User
 from NickReserve.nickreserve import nickReserver
 import sbserver
@@ -72,6 +73,7 @@ def setUsedTags(cn):
 def userBelongsTo(user, tag_id):
 	try:
 		session.query(ClanMember).filter(ClanMember.tag_id==tag_id).filter(ClanMember.user_id==user.id).one()
+		return True
 	except NoResultFound:
 		return False
 
