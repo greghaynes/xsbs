@@ -6,10 +6,12 @@ from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
 from Bans.bans import ban
 import sbserver
+import string
 
 config = PluginConfig('votekick')
 vktemp = config.getOption('Config', 'vote_message', '${green}${voter}${white} voted to ${red}kick ${orange}${victim}')
 del config
+vktemp = string.Template(vktemp)
 
 def checkVotes(cn):
 	players = allPlayers()
