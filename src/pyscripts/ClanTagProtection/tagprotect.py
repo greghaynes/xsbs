@@ -4,7 +4,7 @@ from xsbs.ui import warning
 from xsbs.colors import red
 from xsbs.timers import addTimer
 from Bans.bans import ban
-from UserManager.usermanager import User
+from UserManager.usermanager import User, isLoggedIn
 from NickReserve.nickreserve import nickReserver
 import sbserver
 from DB.db import dbmanager
@@ -62,14 +62,13 @@ def setUsedTags(cn):
 	matches = regex.findall(nick)
 	for match in matches:
 		potentials.append(match)
+	p.registered_tags = []
 	for potential in potentials:
 			try:
 				id = tagId(potential)
 				p.registered_tags.append(id)
 			except NoResultFound:
 				pass
-			except AttributeError:
-				p.registered_tags = [id]
 
 def userBelongsTo(user, tag_id):
 	try:
@@ -96,6 +95,9 @@ def onLogin(cn):
 		return
 
 def initCheck(cn):
+	if isLoggedIn(cn):
+		onLogin(cn)
+		return
 	p = player(cn)
 	try:
 		if p.warning_for_login:
