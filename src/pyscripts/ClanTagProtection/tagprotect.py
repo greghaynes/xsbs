@@ -67,7 +67,7 @@ def setUsedTags(cn):
 			except NoResultFound:
 				pass
 			except AttributeError:
-				p.registered_tags = [potential]
+				p.registered_tags = [id]
 
 def userBelongsTo(user, tag_id):
 	try:
