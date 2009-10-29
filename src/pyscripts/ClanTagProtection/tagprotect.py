@@ -42,7 +42,7 @@ def warnTagReserved(cn, count, sessid, nick):
 		p = player(cn)
 	except ValueError:
 		return
-	if p.tag_warn_nick != nick or sessid != sbserver.playerSessionId(cn):
+	if sbserver.playerName(cn) != nick or sessid != sbserver.playerSessionId(cn):
 		return
 	if len(p.registered_tags) == 0:
 		return
@@ -125,6 +125,5 @@ def onNameChange(cn, name):
 Base.metadata.create_all(dbmanager.engine)
 
 registerServerEventHandler('player_connect_delayed', onConnect)
-registerServerEventHandler('player_name_changed', onNameChange)
 registerServerEventHandler('player_name_changed', onNameChange)
 
