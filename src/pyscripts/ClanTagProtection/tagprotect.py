@@ -37,12 +37,12 @@ class ClanMember(Base):
 		self.tag_id = tag_id
 		self.user_id = user_id
 
-def warnTagReserved(cn, count, sessid):
+def warnTagReserved(cn, count, sessid, nick):
 	try:
 		p = player(cn)
 	except ValueError:
 		return
-	if p.tag_warn_nick != sbserver.playerName(cn) or sessid != sbserver.playerSessionId(cn):
+	if p.tag_warn_nick != nick or sessid != sbserver.playerSessionId(cn):
 		return
 	if len(p.registered_tags) == 0:
 		return
@@ -52,7 +52,7 @@ def warnTagReserved(cn, count, sessid):
 		return
 	remaining = 25-(count*5)
 	sbserver.playerMessage(cn, warning('Your are using a reserved clan tag. You have ' + red('%i') + ' seconds to login or be kicked.') % remaining)
-	addTimer(5000, warnTagReserved, (cn, count+1, sessid))
+	addTimer(5000, warnTagReserved, (cn, count+1, sessid, nick))
 
 def tagId(tag):
 	return session.query(ClanTag).filter(ClanTag.tag==tag).one().id
@@ -107,8 +107,7 @@ def initCheck(cn):
 	except AttributeError:
 		pass
 	else:
-		p.tag_warn_nick = sbserver.playerName(cn)
-		warnTagReserved(cn, 0, sbserver.playerSessionId(cn))
+		warnTagReserved(cn, 0, sbserver.playerSessionId(cn), sbserver.playerName(cn))
 
 def onConnect(cn):
 	setUsedTags(cn)
@@ -126,6 +125,6 @@ def onNameChange(cn, name):
 Base.metadata.create_all(dbmanager.engine)
 
 registerServerEventHandler('player_connect_delayed', onConnect)
-registerServerEventHandler('player_name_changed', onConnect)
+registerServerEventHandler('player_name_changed', onNameChange)
 registerServerEventHandler('player_name_changed', onNameChange)
 
