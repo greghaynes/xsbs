@@ -42,6 +42,8 @@ def warnTagReserved(cn, count, sessid):
 		p = player(cn)
 	except ValueError:
 		return
+	if p.tag_warn_nick != sbserver.playerName(cn) or sessid != sbserver.playerSessionId(cn):
+		return
 	if len(p.registered_tags) == 0:
 		return
 	if count > 4:
@@ -105,6 +107,7 @@ def initCheck(cn):
 	except AttributeError:
 		pass
 	else:
+		p.tag_warn_nick = sbserver.playerName(cn)
 		warnTagReserved(cn, 0, sbserver.playerSessionId(cn))
 
 def onConnect(cn):
