@@ -1,6 +1,7 @@
 from xsbs.events import registerServerEventHandler, triggerServerEvent
 from xsbs.timers import addTimer
 import sbserver
+import logging
 
 class Player:
 	def __init__(self, cn):
@@ -50,7 +51,7 @@ def playerDisconnect(cn):
 	try:
 		del players[cn]
 	except KeyError:
-		print 'Player disconnected but does not have player class instance!'
+		logging.error('Player disconnected but does not have player class instance!')
 
 def playerConnect(cn):
 	try:
