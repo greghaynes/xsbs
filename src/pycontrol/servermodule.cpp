@@ -32,14 +32,18 @@ static PyObject *numClients(PyObject *self, PyObject *args)
 
 static PyObject *clients(PyObject *self, PyObject *args)
 {
+	server::clientinfo *ci;
 	PyObject *pTuple = PyTuple_New(server::numclients());
 	PyObject *pInt;
 	int y = 0;
 	loopv(server::clients)
 	{
-
-		pInt = PyInt_FromLong(i);
-		PyTuple_SetItem(pTuple, i, pInt);
+		ci = server::getinfo(i);
+		if(ci)
+		{
+			pInt = PyInt_FromLong(i);
+			PyTuple_SetItem(pTuple, i, pInt);
+		}
 		y++;
 	}
 	return pTuple;
