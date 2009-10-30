@@ -67,6 +67,6 @@ def reload():
 
 registerServerEventHandler('player_connect_pre', playerConnect)
 registerServerEventHandler('player_disconnect_post', playerDisconnect)
-registerServerEventHandler('reload_complete', reload)
+registerServerEventHandler('restart_complete', reload)
 registerServerEventHandler('map_changed', onMapChanged)
 
