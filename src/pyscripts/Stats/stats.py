@@ -16,7 +16,7 @@ def onCommand(cn, command):
 	if command != '':
 		if require_master and not isPlayerMaster(cn):
 			insufficientPermissions(cn)
-		return
+			return
 		try:
 			tcn = int(command)
 		except ValueError:
