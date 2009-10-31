@@ -53,12 +53,15 @@ def isMaster(user_id):
 
 def isPlayerMaster(cn):
 	try:
+		p = player(cn)
+		if p.privilege() > 0:
+			return True
 		user = loggedInAs(cn)
 		if isMaster(user.id):
 			return True
 		else:
 			return False
-	except AttributeError:
+	except (AttributeError, KeyError):
 		return False
 
 class masterRequired(object):
