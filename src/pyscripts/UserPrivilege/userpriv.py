@@ -12,6 +12,7 @@ from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
+from xsbs.players import player
 import string
 
 config = PluginConfig('userprivilege')

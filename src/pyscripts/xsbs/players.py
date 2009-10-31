@@ -9,27 +9,27 @@ class Player:
 		self.gamevars = {}
 	def newGame(self):
 		self.gamevars.clear()
-	def sessionId():
+	def sessionId(self):
 		return sbserver.playerSessionId(self.cn)
-	def name():
+	def name(self):
 		return sbserver.playerName(self.cn)
-	def ipLong():
+	def ipLong(self):
 		return sbserver.playerIpLong(self.cn)
-	def privilege():
+	def privilege(self):
 		return sbserver.playerPrivilege(self.cn)
-	def frags():
+	def frags(self):
 		return sbserver.playerFrags(self.cn)
-	def teamkills():
+	def teamkills(self):
 		return sbserver.playerTeamkills(self.cn)
-	def deaths():
+	def deaths(self):
 		return sbserver.playerDeaths(self.cn)
-	def message(msg):
+	def message(self, msg):
 		sbserver.playerMessage(self.cn, msg)
-	def kick():
+	def kick(self):
 		sbserver.playerKick(self.cn)
-	def spectate():
+	def spectate(self):
 		sbserver.spectate(self.cn)
-	def unspectate():
+	def unspectate(self):
 		sbserver.unspectate(self.cn)
 
 players = {}
