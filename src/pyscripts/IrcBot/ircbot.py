@@ -39,13 +39,16 @@ def onPlayerDisconnect(cn):
 	bot.message('\x032DISCONNECT      \x03Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn), channel)
 
 def onMsg(cn, text):
-	bot.message('\x033MESSAGE         \x03%s (%i): %s' % (sbserver.playerName(cn), cn, text), channel)
+	bot.message('\x033MESSAGE\x03         %s (%i): %s' % (sbserver.playerName(cn), cn, text), channel)
 
 def onTeamMsg(cn, text):
-	bot.message('\x033MESSAGE (TEAM)  \x03%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text), channel)
+	bot.message('\x033MESSAGE (TEAM)\x03  %s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text), channel)
 
 def onMapChange(map, mode):
-	bot.message('\x035MAP CHANGE      \x03%s (%s)' % (map, sbserver.modeName(mode)), channel)
+	bot.message('\x035MAP CHANGE\x03      %s (%s)' % (map, sbserver.modeName(mode)), channel)
+
+def onAuthSucceed(cn, name):
+	bot.message('\x03AUTH\x03             %s authenticated as %s' % (sbserver.playerName(cn), name))
 
 def onGainMaster(cn):
 	bot.message('\x037MASTER          \x03%s gained master' % sbserver.playerName(cn), channel)
@@ -83,6 +86,7 @@ event_abilities = {
 	'message': ('player_message', onMsg),
 	'message_team': ('player_message_team', onTeamMsg),
 	'map_change': ('map_changed', onMapChange),
+	'auth_success': ('player_auth_succeed', onAuthSucceed),
 	'gain_admin': ('player_gained_admin', onGainAdmin),
 	'gain_master': ('player_gained_master', onGainMaster),
 	'auth': ('player_auth_master', onAuth),
