@@ -16,7 +16,7 @@ def vote(candidates, vote):
 		if cand[0] == vote[0] and cand[1] == vote[1]:
 			cand[2] += 1
 			return cand[2]
-	candidates.append((vote[0], vote[1], 1))
+	candidates.append([vote[0], vote[1], 1])
 	return 1
 
 def countVotes():
