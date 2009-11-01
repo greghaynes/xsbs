@@ -598,12 +598,18 @@ namespace server
 
     void setcimaster(clientinfo *ci)
     {
-        string msg;
         loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
-        ci->privilege = PRIV_MASTER;
-	currentmaster = ci->clientnum;
-	masterupdate = true;
-	SbPy::triggerEventInt("player_claimed_master", ci->clientnum);
+		if(ci)
+		{
+            ci->privilege = PRIV_MASTER;
+	        currentmaster = ci->clientnum;
+	        SbPy::triggerEventInt("player_claimed_master", ci->clientnum);
+		}
+		else
+		{
+			currentmaster = 0;
+		}
+		masterupdate = true;
     }
 
     void setciadmin(clientinfo *ci)
@@ -611,9 +617,9 @@ namespace server
         string msg;
         loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
         ci->privilege = PRIV_ADMIN;
-	currentmaster = ci->clientnum;
-	masterupdate = true;
-	SbPy::triggerEventInt("player_claimed_admin", ci->clientnum);
+        currentmaster = ci->clientnum;
+        masterupdate = true;
+        SbPy::triggerEventInt("player_claimed_admin", ci->clientnum);
     }
 
     void resetpriv(clientinfo *ci)

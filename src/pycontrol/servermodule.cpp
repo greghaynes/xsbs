@@ -435,8 +435,9 @@ static PyObject *setMaster(PyObject *self, PyObject *args)
 	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
-	ci = server::getinfo(cn);
-	if(!ci)
+	if(cn != -1)
+		ci = server::getinfo(cn);
+	if(cn != -1 && !ci)
 	{
 		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
 		return 0;

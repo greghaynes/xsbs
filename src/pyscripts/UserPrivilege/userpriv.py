@@ -83,11 +83,9 @@ class adminRequired(object):
 		else:
 			self.func(*args)
 
+@masterRequired
 def masterCmd(cn, args):
-	if isPlayerMaster(cn):
-		sbserver.setMaster(cn)
-	else:
-		insufficientPermissions(cn)
+	sbserver.setMaster(cn)
 
 def onSetMaster(cn, hash):
 	if hash == sbserver.hashPassword(cn, sbserver.adminPassword()):
@@ -148,6 +146,7 @@ def onUserPrivCmd(cn, args):
 def init():
 	registerCommandHandler('master', masterCmd)
 	registerCommandHandler('userpriv', onUserPrivCmd)
+	registerCommandHandler('unsetmaster', unsetMaster)
 	registerServerEventHandler('player_setmaster', onSetMaster)
 	registerServerEventHandler('player_setmaster_off', onSetMasterOff)
 	registerServerEventHandler('player_claimed_master', onGainMaster)
