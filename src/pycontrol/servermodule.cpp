@@ -437,6 +437,8 @@ static PyObject *setMaster(PyObject *self, PyObject *args)
 		return 0;
 	if(cn != -1)
 		ci = server::getinfo(cn);
+	else
+		ci = 0;
 	if(cn != -1 && !ci)
 	{
 		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");

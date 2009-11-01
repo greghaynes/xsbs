@@ -87,6 +87,13 @@ class adminRequired(object):
 def masterCmd(cn, args):
 	sbserver.setMaster(cn)
 
+@masterRequired
+def unsetMaster(cn, args):
+	if args != '':
+		sbserver.playerMessage(cn, error('Usage: #unsetmaster'))
+	else:
+		sbserver.setMaster(-1)
+
 def onSetMaster(cn, hash):
 	if hash == sbserver.hashPassword(cn, sbserver.adminPassword()):
 		sbserver.setAdmin(cn)

@@ -607,7 +607,7 @@ namespace server
 		}
 		else
 		{
-			currentmaster = 0;
+			currentmaster = -1;
 		}
 		masterupdate = true;
     }
