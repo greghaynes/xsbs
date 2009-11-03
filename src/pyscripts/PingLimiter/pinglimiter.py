@@ -21,13 +21,13 @@ class PingLimiter:
 		i = 0
 		for lagger in laggers:
 			if lagger in self.warned_cns:
-				ban(cn, 0, 'lagging')
+				ban(cn, 0, 'lagging', -1)
 				del laggers[i]
 			else:
 				sbserver.playerMessage(cn, warning('Your ping is too high.  You will be kicked if it is not lowered.'))
 				self.warned_cns.append(lagger)
 				i += 1
-		addTimer(5000, limiter.checkPlayers, ())
+		addTimer(5000, self.checkPlayers, ())
 
 limiter = PingLimiter(max_ping)
 addTimer(5000, limiter.checkPlayers, ())

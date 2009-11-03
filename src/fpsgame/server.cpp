@@ -273,10 +273,10 @@ namespace server
     bool setteam(clientinfo *ci, char *team)
     {
         if(!ci || !strcmp(ci->team, team)) return false;
-	if(smode && ci->state.state==CS_ALIVE) smode->changeteam(ci, ci->team, team);
-	copystring(ci->team, team);
-	aiman::changeteam(ci);
-	sendf(-1, 1, "riis", SV_SETTEAM, ci->clientnum, ci->team);
+        if(smode && ci->state.state==CS_ALIVE) smode->changeteam(ci, ci->team, team);
+        copystring(ci->team, team);
+        aiman::changeteam(ci);
+        sendf(-1, 1, "riis", SV_SETTEAM, ci->clientnum, ci->team);
         return true;
     }
 

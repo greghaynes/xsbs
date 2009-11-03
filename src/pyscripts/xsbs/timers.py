@@ -1,5 +1,7 @@
 import collections
 import sbserver
+import sys
+import traceback
 import logging
 
 class Timer:
@@ -47,7 +49,10 @@ class TimerManager:
 					try:
 						timer()
 					except:
+						exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
 						logging.error('Uncaught exception while executing timer method.')
+						logging.warn(traceback.format_exc())
+						logging.warn(traceback.extract_tb(exceptionTraceback))
 					if timer.persistent:
 						self.addTimer(timer.delay, timer.func, timer.args, timer.persistent)
 				else:
