@@ -37,7 +37,10 @@ def getSuccessor(mode_num, map):
 	try:
 	 	return maps[ndx+1]
 	except IndexError:
-		return maps[0]
+	  	if len(maps) > 0:
+			return maps[0]
+		else:
+		 	return sbserver.mapName()
 
 
 def clientReloadRotate():
@@ -66,7 +69,7 @@ def onNextMapCmd(cn, args):
 	else:
 		try:
 			sbserver.playerMessage(cn, info(nextmap_response.substitute(colordict, mapname=getSuccessor(sbserver.gameMode(), sbserver.mapName()))))
-		except (KeyError, ValueError):
+		except (KeyError, ValueError, IndexError):
 			sbserver.playerMessage(cn, error('Could not determine next map'))
 
 def onConnect(cn):
