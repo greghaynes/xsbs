@@ -10,6 +10,8 @@ from xsbs.colors import red, blue
 from xsbs.ui import warning
 from xsbs.players import player
 
+blocked_nicks = ['unnamed']
+
 def warnNickReserved(cn, count, sessid):
 	try:
 		p = player(cn)

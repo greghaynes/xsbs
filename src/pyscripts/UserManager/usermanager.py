@@ -14,7 +14,10 @@ from xsbs.settings import PluginConfig
 config = PluginConfig('usermanager')
 usertable = config.getOption('Config', 'users_tablename', 'usermanager_users')
 nicktable = config.getOption('Config', 'linkednames_table', 'usermanager_nickaccounts')
+blocked_names = config.getOption('Config', 'blocked_names', 'unnamed, admin')
 del config
+
+blocked_names = blocked_names.strip(' ').split(',')
 
 Base = declarative_base()
 session = dbmanager.session()
@@ -95,6 +98,9 @@ def onLinkName(cn, args):
 		return
 	if not isLoggedIn(cn):
 		sbserver.playerMessage(cn, error('You must be logged in to link a name to your account.'))
+		return
+	if sbserver.playerName(cn) in blocked_names:
+		sbserver.playerMessage(cn, error('You cannot reserve your current name.'))
 		return
 	try:
 		session.query(NickAccount).filter(NickAccount.nick==sbserver.playerName(cn)).one()
