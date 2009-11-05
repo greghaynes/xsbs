@@ -1,15 +1,19 @@
 from xsbs.events import registerServerEventHandler
+from xsbs.colors import colordict
 from xsbs.ui import error, info
 from xsbs.players import player, all as allPlayers
 from xsbs.settings import PluginConfig
 from UserPrivilege.userpriv import isPlayerMaster
 import sbserver
 import logging
+import string
 
 config = PluginConfig('mapvote')
 allow_modevote = config.getOption('Config', 'allow_mode_vote', 'no') == 'yes'
 lock_mode = config.getOption('Config', 'lock_game_mode', 'no') == 'yes'
+request_temp = config.getOption('Config', 'request_string', '${green}${user}${white} requested ${modename} on ${mapname}')
 del config
+request_temp = string.Template(request_temp)
 
 def vote(candidates, vote):
 	for cand in candidates:
@@ -67,7 +71,10 @@ def onMapVote(cn, mapname, mapmode):
 		except KeyError:
 			allow_vote = True
 		if allow_vote:
-			sbserver.message(info('%s requested %s on %s' % (sbserver.playerName(cn), sbserver.modeName(mapmode), mapname)))
+			sbserver.message(info(request_temp.substitute(colordict,
+				user=sbserver.playerName(cn),
+				modename=sbserver.modeName(mapmode),
+				mapname=mapname)))
 			player(cn).gamevars['mapvote'] = (mapname, mapmode)
 		else:
 			sbserver.playerMessage(cn, error('You have already requested this map.'))
