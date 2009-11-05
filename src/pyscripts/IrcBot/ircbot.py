@@ -3,9 +3,10 @@ from ConfigParser import NoOptionError
 from xsbs.settings import PluginConfig
 from xsbs.events import registerServerEventHandler
 from xsbs.timers import addTimer
-from xsbs.colors import red, green
+from xsbs.colors import red, green, colordict
 import asyncore, socket
 import asynirc
+import string
 import logging
 
 config = PluginConfig('ircbot')
@@ -15,18 +16,26 @@ nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
 port = int(config.getOption('Config', 'port', '6667'))
 part_message = config.getOption('Config', 'part_message', 'QUIT :XSBS - eXtensible SauerBraten Server')
 msg_gw = config.getOption('Abilities', 'message_gateway', 'yes') == 'yes'
+irc_msg_temp = config.getOption('Templates', 'irc_message', '${white}(${blue}IRC${white}) ${red}${name}${white}: ${message}')
+irc_msg_temp = string.Template(irc_msg_temp)
 try:
 	ipaddress = config.getOption('Config', 'ipaddress', None, False)
 except NoOptionError:
 	ipaddress = None
 
 class ServerBot(asynirc.IrcClient):
-	def __init__(self, serverinfo, clientinfo):
+	def __init__(self, serverinfo, clientinfo, msg_gw):
 		asynirc.IrcClient.__init__(self, serverinfo, clientinfo)
+		self.msg_gw = msg_gw
+	def handle_privmsg(self, who, to, message):
+		if self.msg_gw and to[0] == '#':
+			name = who.split('!', 1)[0]
+			sbserver.message(irc_msg_temp.substitute(colordict, name=name, message=message, channel=to))
 
 bot = ServerBot(
 	(servername, 6667),
-	(nickname, nickname.lower(), 'localhost', 'localhost', nickname))
+	(nickname, nickname.lower(), 'localhost', 'localhost', nickname),
+	msg_gw)
 if(ipaddress):
 	bot.ip_address = ipaddress
 bot.join(channel)

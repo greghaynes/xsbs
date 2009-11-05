@@ -63,6 +63,7 @@ class IrcClient(asyncore.dispatcher):
 	def handle_connect(self):
 		self.events.connect('PING', self.handle_pong)
 		self.events.connect('MODE', self.handle_mode)
+		self.events.connect('PRIVMSG', self.handle_raw_privmsg)
 		self.work_queue.append('NICK :%s\r\n' % self.nick)
 		self.work_queue.append('USER %s %s %s :%s\r\n' % (self.username, self.hostname, self.servername, self.realname))
 	def handle_close(self):
@@ -102,6 +103,14 @@ class IrcClient(asyncore.dispatcher):
 			self.is_connected = True
 			for channel in self.channel_list:
 				self.join(channel)
+	def handle_ctcp(self, who_from, who_to, msg):
+		pass
+	def handle_privmsg(self, who_from, who_to, msg):
+		pass
+	def handle_raw_privmsg(self, event, who, args):
+		to = args.split(' ', 1)[0]
+		args = args[len(to)+2:]
+		self.handle_privmsg(who, to, args)
 	def join(self, channel):
 		if self.is_connected:
 			self.work_queue.append('JOIN :%s\r\n' % channel)
