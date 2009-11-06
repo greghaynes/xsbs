@@ -67,6 +67,9 @@ def userAuth(email, password):
 	return user
 
 def onRegisterCommand(cn, args):
+	'''@description Register account with server
+	   @usage <email> <password>
+	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
 		sbserver.playerMessage(cn, info('Usage: #register <email> <password>'))
@@ -82,6 +85,9 @@ def onRegisterCommand(cn, args):
 	sbserver.playerMessage(cn, error('An account with that email address already exists.'))
 
 def onLoginCommand(cn, args):
+	'''@description Login to server account
+	   @usage <email> <password>
+	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
 		sbserver.playerMessage(cn, info('Usage: #login <email> <password>'))
@@ -93,6 +99,9 @@ def onLoginCommand(cn, args):
 		sbserver.playerMessage(cn, error('Invalid login.'))
 
 def onLinkName(cn, args):
+	'''@description Link name to server account, and reserve name.
+	   @usage
+	   @public'''
 	if args != '':
 		sbserver.playerMessage(cn, error('Usage: #linkname'))
 		return

@@ -79,6 +79,8 @@ class masterRequired(object):
 class adminRequired(object):
 	def __init__(self, func):
 		self.func = func
+		self.__doc__ = func.__doc__
+		self.__name__ = func.__name__
 	def __call__(self, *args):
 		if sbserver.playerPrivilege(args[0]) <= 1:
 			insufficientPermissions(args[0])
@@ -87,10 +89,14 @@ class adminRequired(object):
 
 @masterRequired
 def masterCmd(cn, args):
+	'''@description Claim master
+	   @usage'''
 	sbserver.setMaster(cn)
 
 @masterRequired
 def unsetMaster(cn, args):
+	'''@description Force release master from current master
+	   @usage'''
 	if args != '':
 		sbserver.playerMessage(cn, error('Usage: #unsetmaster'))
 	else:
@@ -141,6 +147,8 @@ def userPrivDelCmd(cn, tcn, args):
 
 @adminRequired
 def onUserPrivCmd(cn, args):
+	'''@description Set privileges for server account
+	   @usage <cn> <action> <level>'''
 	sp = args.split(' ')
 	tcn = int(sp[0])
 	subcmd = sp[1]
