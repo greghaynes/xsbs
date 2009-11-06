@@ -2049,10 +2049,7 @@ namespace server
 
             case SV_CLEARBANS:
             {
-                if(ci->privilege || ci->local)
-                {
-                    SbPy::triggerEventInt("server_clear_bans", ci->clientnum);
-                }
+                SbPy::triggerEventInt("server_clear_bans", ci->clientnum);
                 break;
             }
 

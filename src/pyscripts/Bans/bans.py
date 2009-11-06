@@ -179,6 +179,22 @@ def onBanName(cn, args):
 	session.commit()
 	sbserver.playerMessage(cn, info('Inserted nick ban of %s for %s' % (nick, reason)))
 
+def clearBans():
+	bans = session.query(Ban).filter('expiration>'+str(time.time())).all()
+	for b in bans:
+		session.delete(b)
+	session.commit()
+
+@masterRequired
+def reqClearBans(cn):
+	clearBans()
+	sbserver.message(info('Bans cleared'))
+
+@masterRequired
+def onClearBansCmd(cn, args):
+	clearBans()
+	sbserver.message(info('Bans cleared'))
+
 def init():
 	registerPolicyEventHandler("connect_kick", allowClient)
 	registerCommandHandler('ban', onBanCmd)
@@ -186,8 +202,10 @@ def init():
 	registerCommandHandler('recentbans', onRecentBans)
 	registerCommandHandler('kick', onKickCommand)
 	registerCommandHandler('insertban', onInsertBan)
+	registerCommandHandler('clearbans', onClearBansCmd)
 	registerServerEventHandler('player_ban', ban)
 	registerServerEventHandler('player_kick', onKick)
+	registerServerEventHandler('server_clear_bans', reqClearBans)
 	Base.metadata.create_all(dbmanager.engine)
 
 init()
