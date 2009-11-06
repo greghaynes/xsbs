@@ -4,6 +4,7 @@ from colors import red
 from xsbs.ui import error, insufficientPermissions
 import logging
 import sys, traceback
+import xsbs.help
 
 class CommandManager:
 	def __init__(self):
@@ -36,9 +37,12 @@ class CommandManager:
 commandmanager = CommandManager()
 
 def registerCommandHandler(command, func):
+	xsbs.help.loadCommandInfo(command, func)
 	commandmanager.register(command, func)
 
 def allowTeamSwitch(cn, team):
 	sbserver.playerMessage(cn, 'You cannot switch to team %s' % team)
 	return False
+
+registerCommandHandler('help', xsbs.help.onHelpCommand)
 

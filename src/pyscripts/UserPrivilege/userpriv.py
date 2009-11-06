@@ -68,6 +68,8 @@ def isPlayerMaster(cn):
 class masterRequired(object):
 	def __init__(self, func):
 		self.func = func
+		self.__doc__ = func.__doc__
+		self.__name__ = func.__name__
 	def __call__(self, *args):
 		if sbserver.playerPrivilege(args[0]) == 0 and not isPlayerMaster(args[0]):
 			insufficientPermissions(args[0])

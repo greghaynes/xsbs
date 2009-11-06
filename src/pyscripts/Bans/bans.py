@@ -99,6 +99,8 @@ def ban(cn, seconds, reason, banner_cn):
 
 @masterRequired
 def onBanCmd(cn, text):
+	'''@description Ban user from server
+	   @usage <seconds> (reason)'''
 	sp = text.split(' ')
 	try:
 		tcn = int(sp[0])
@@ -163,7 +165,8 @@ def onInsertBan(cn, args):
 		sbserver.playerMessage(cn, info('Inserted ban for %s for %i seconds for %s.' % (ipLongToString(ip), length, reason)))
 
 @masterRequired
-def onBanNick(cn, args):
+def onBanName(cn, args):
+	'''@description Ban name from the server'''
 	reason = args.split(' ')
 	if len(reason) == 1:
 		nick = reason[0]
@@ -179,7 +182,7 @@ def onBanNick(cn, args):
 def init():
 	registerPolicyEventHandler("connect_kick", allowClient)
 	registerCommandHandler('ban', onBanCmd)
-	registerCommandHandler('bannick', onBanNick)
+	registerCommandHandler('banname', onBanName)
 	registerCommandHandler('recentbans', onRecentBans)
 	registerCommandHandler('kick', onKickCommand)
 	registerCommandHandler('insertban', onInsertBan)
