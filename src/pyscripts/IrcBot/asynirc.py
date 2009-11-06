@@ -43,6 +43,7 @@ class IrcClient(asyncore.dispatcher):
 		self.channel_list = []
 		self.throttle_size = 1024
 		self.trottle_time = 5
+		self.part_message = 'PyAsyncirc Bot'
 	def logInfo(self, string):
 		if(self.use_logging):
 			logging.info(string)
@@ -118,6 +119,8 @@ class IrcClient(asyncore.dispatcher):
 			self.channel_list.append(channel)
 	def message(self, message, to):
 		self.work_queue.append('PRIVMSG %s :%s\r\n' % (to, message))
+	def quit(self):
+		pass
 
 def run(host, port, chan, nick):
 	bot = IrcClient(
