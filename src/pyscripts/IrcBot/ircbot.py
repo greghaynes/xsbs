@@ -63,37 +63,40 @@ def onPlayerDisconnect(cn):
 	bot.message('\x032DISCONNECT      \x03Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn), channel)
 
 def onMsg(cn, text):
-	bot.message('\x033MESSAGE         \x03%s (%i): %s' % (sbserver.playerName(cn), cn, text), channel)
+	bot.message('\x033MESSAGE\x03         %s (%i): %s' % (sbserver.playerName(cn), cn, text), channel)
 
 def onTeamMsg(cn, text):
-	bot.message('\x033MESSAGE (TEAM)  \x03%s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text), channel)
+	bot.message('\x033MESSAGE (TEAM)\x03  %s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text), channel)
 
 def onMapChange(map, mode):
-	bot.message('\x035MAP CHANGE      \x03%s (%s)' % (map, sbserver.modeName(mode)), channel)
+	bot.message('\x035MAP CHANGE\x03      %s (%s)' % (map, sbserver.modeName(mode)), channel)
 
 def onGainMaster(cn):
-	bot.message('\x037MASTER          \x03%s gained master' % sbserver.playerName(cn), channel)
+	bot.message('\x037MASTER\x03          %s gained master' % sbserver.playerName(cn), channel)
 
 def onGainAdmin(cn):
-	bot.message('\x037ADMIN           \x03%s gained admin' % sbserver.playerName(cn), channel)
+	bot.message('\x037ADMIN\x03           %s gained admin' % sbserver.playerName(cn), channel)
 
 def onAuth(cn, authname):
-	bot.message('\x037AUTH            \x03%s has authenticated as %s' % (sbserver.playerName(cn), authname), channel)
+	bot.message('\x037AUTH\x03            %s has authenticated as %s' % (sbserver.playerName(cn), authname), channel)
 
 def onReleaseAdmin(cn):
-	bot.message('\x037ADMIN RELINQ    \x03%s released admin' % sbserver.playerName(cn), channel)
+	bot.message('\x037ADMIN RELINQ\x03    %s released admin' % sbserver.playerName(cn), channel)
 
 def onReleaseMaster(cn):
-	bot.message('\x037MASTER RELINQ   \x03%s released master' % sbserver.playerName(cn), channel)
+	bot.message('\x037MASTER RELINQ\x03   %s released master' % sbserver.playerName(cn), channel)
 
 def onBan(cn, seconds, reason):
-	bot.message('\x0313BAN             \x03%s banned for %i for %s' % (sbserver.playerName(cn), seconds, reason), channel)
+	bot.message('\x0313BAN\x03            %s banned for %i for %s' % (sbserver.playerName(cn), seconds, reason), channel)
 
 def onSpectated(cn):
-	bot.message('\x0314SPECTATED       \x03%s became a spectator' % sbserver.playerName(cn), channel)
+	bot.message('\x0314SPECTATED\x03      %s became a spectator' % sbserver.playerName(cn), channel)
 
 def onUnSpectated(cn):
-	bot.message('\x0314UNSPECTATED     \x03%s unspectated' % sbserver.playerName(cn), channel)
+	bot.message('\x0314UNSPECTATED\x03    %s unspectated' % sbserver.playerName(cn), channel)
+
+def onNameChanged(cn, new_name):
+	bot.message('\x0314NAME CHANGE\x03    %s (%i) changed name' % (new_name, cn), channel)
 
 def onReload():
 	bot.quit()
@@ -115,6 +118,7 @@ event_abilities = {
 	'ban': ('player_banned', onBan),
 	'spectate': ('player_spectated', onSpectated),
 	'unspectate': ('player_unspectated', onUnSpectated),
+	'name_change': ('player_name_changed', onNameChanged),
 }
 
 for key in event_abilities.keys():
