@@ -69,6 +69,7 @@ class IrcClient(asyncore.dispatcher):
 		self.work_queue.append('USER %s %s %s :%s\r\n' % (self.username, self.hostname, self.servername, self.realname))
 	def handle_close(self):
 		self.close()
+		self.is_connected = False
 	def handle_read(self):
 		self.read_buffer += self.recv(4096)
 		tmp_buff = self.read_buffer.split('\r\n')
