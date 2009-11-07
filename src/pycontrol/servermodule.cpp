@@ -408,6 +408,21 @@ static PyObject *playerTeam(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ci->state.damage_rec);
 }
 
+static PyObject *playerIsSpectator(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "i", &cn))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	return Py_BuildValue("b", ci->state.state == CS_SPECTATOR);
+}
+
 // TODO: This should except on isufficient permissions
 static PyObject *setBotLimit(PyObject *self, PyObject *args)
 {
@@ -724,6 +739,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"playerDamageDelt", playerDamageDelt, METH_VARARGS, "Damage delt by player in current game."},
 	{"playerDamageRecieved", playerDamageRecieved, METH_VARARGS, "Damage recieved by player in current game."},
 	{"playerTeam", playerTeam, METH_VARARGS, "Team player is member of."},
+	{"playerIsSpectator", playerIsSpectator, METH_VARARGS, "Player is a spectator"},
 	{"spectate", spectate, METH_VARARGS, "Spectate player."},
 	{"unspectate", unspectate, METH_VARARGS, "Set player to unspectated."},
 	{"setPlayerTeam", setPlayerTeam, METH_VARARGS, "Set team of player."},
