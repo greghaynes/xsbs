@@ -25,6 +25,10 @@ class Player:
 		return sbserver.playerDeaths(self.cn)
 	def ping(self):
 		return sbserver.playerPing(self.cn)
+	def team(self):
+		return sbserver.playerTeam(self.cn)
+	def isSpectator(self):
+		return sbserver.playerIsSpectator(self.cn)
 	def message(self, msg):
 		sbserver.playerMessage(self.cn, msg)
 	def kick(self):
