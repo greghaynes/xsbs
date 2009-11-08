@@ -1,4 +1,5 @@
 import sbserver
+from UserPrivilege.userpriv import masterRequired
 from xsbs.events import registerServerEventHandler
 from xsbs.players import player
 from xsbs.ui import warning, error, info
@@ -23,6 +24,7 @@ def checkModified(cn):
 	except ValueError:
 	 	pass
 
+@masterRequired
 def mapModifiedSpecCmd(cn, args):
 	if args == 'disable':
 		spectate_map_modified = False
