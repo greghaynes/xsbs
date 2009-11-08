@@ -243,7 +243,7 @@ static PyObject *playerTeamkills(PyObject *self, PyObject *args)
 		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
 		return 0;
 	}
-	return Py_BuildValue("s", ci->team);
+	return Py_BuildValue("i", ci->state.teamkills);
 }
 
 static PyObject *playerDeaths(PyObject *self, PyObject *args)
@@ -405,7 +405,7 @@ static PyObject *playerTeam(PyObject *self, PyObject *args)
 		PyErr_SetString(PyExc_ValueError, "Player is a spectator");
 		return 0;
 	}
-	return Py_BuildValue("i", ci->state.damage_rec);
+	return Py_BuildValue("s", ci->team);
 }
 
 static PyObject *playerIsSpectator(PyObject *self, PyObject *args)
