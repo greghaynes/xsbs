@@ -1,7 +1,7 @@
 import sbserver
 from xsbs.events import registerServerEventHandler
 from xsbs.players import player
-from xsbs.ui import warning
+from xsbs.ui import warning, error, info
 from xsbs.settings import PluginConfig
 from xsbs.commands import registerCommandHandler
 
