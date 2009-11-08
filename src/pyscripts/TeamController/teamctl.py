@@ -30,10 +30,10 @@ def onSwitchTeam(cn, team):
 @masterRequired
 def onSetTeam(cn, who, team):
 	mode =  sbserver.gameMode()
-	if mode in setteam_modes or (team == 'evil' or team == 'good'):
-		sbserver.playerMessage(cn, error('You can not set team in this game mode.'))
-	else:
+	if mode in setteam_modes or team == 'evil' or team == 'good':
 		sbserver.setTeam(who, team)
+	else:
+		sbserver.playerMessage(cn, error('You can not set team in this game mode.'))
 
 registerServerEventHandler('player_switch_team', onSwitchTeam)
 registerServerEventHandler('player_set_team', onSetTeam)
