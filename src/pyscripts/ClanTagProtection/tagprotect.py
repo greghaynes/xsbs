@@ -3,11 +3,11 @@ from xsbs.players import player
 from xsbs.ui import warning
 from xsbs.colors import red
 from xsbs.timers import addTimer
+from xsbs.db import dbmanager
 from Bans.bans import ban
 from UserManager.usermanager import User, isLoggedIn
 from NickReserve.nickreserve import nickReserver
 import sbserver
-from DB.db import dbmanager
 from sqlalchemy.orm import relation
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base

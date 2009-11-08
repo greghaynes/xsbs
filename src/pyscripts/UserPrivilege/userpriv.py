@@ -1,5 +1,4 @@
 import sbserver
-from DB.db import dbmanager
 from UserManager.usermanager import User, loggedInAs
 
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
@@ -13,6 +12,7 @@ from xsbs.ui import error, info, insufficientPermissions
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
 from xsbs.players import player
+from xsbs.db import dbmanager
 import string
 
 config = PluginConfig('userprivilege')

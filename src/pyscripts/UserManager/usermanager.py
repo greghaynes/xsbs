@@ -1,9 +1,9 @@
-from DB.db import dbmanager
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relation
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
 import sbserver
+from xsbs.db import dbmanager
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import red, green, orange

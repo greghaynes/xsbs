@@ -1,4 +1,3 @@
-from DB.db import dbmanager
 from sqlalchemy.orm.exc import NoResultFound
 from UserManager.usermanager import session, NickAccount, isLoggedIn, loggedInAs
 from Bans.bans import ban
@@ -9,6 +8,7 @@ from xsbs.timers import addTimer
 from xsbs.colors import red, blue
 from xsbs.ui import warning
 from xsbs.players import player
+from xsbs.db import dbmanager
 
 blocked_nicks = ['unnamed']
 

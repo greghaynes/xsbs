@@ -1,4 +1,3 @@
-from DB.db import dbmanager
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
@@ -6,6 +5,7 @@ from xsbs.settings import PluginConfig
 from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.commands import registerCommandHandler
+from xsbs.db import dbmanager
 from UserPrivilege.userpriv import isPlayerMaster
 import sbserver
 
