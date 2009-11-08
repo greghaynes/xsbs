@@ -10,6 +10,7 @@ from xsbs.colors import red, green, orange
 from xsbs.ui import info, error
 from xsbs.players import player
 from xsbs.settings import PluginConfig
+import re
 
 config = PluginConfig('usermanager')
 usertable = config.getOption('Config', 'users_tablename', 'usermanager_users')
@@ -65,6 +66,12 @@ def userAuth(email, password):
 	except NoResultFound:
 		return False
 	return user
+
+def isValidEmail(email):
+	if len(email) > 7:
+		if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email) != None:
+			return 1
+	return 0
 
 def onRegisterCommand(cn, args):
 	'''@description Register account with server
