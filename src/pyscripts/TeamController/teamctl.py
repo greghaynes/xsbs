@@ -17,7 +17,6 @@ setteam_modes = [
 
 def onSwitchTeam(cn, team):
 	mode =  sbserver.gameMode()
-	print mode
 	if mode in setteam_modes:
 		sbserver.setTeam(cn, team)
 	elif mode in switchteam_modes:
