@@ -3,6 +3,7 @@ from xsbs.events import registerServerEventHandler
 from xsbs.players import player
 from xsbs.ui import warning
 from xsbs.settings import PluginConfig
+from xsbs.commands import registerCommandHandler
 
 config = PluginConfig('cheatdetection')
 spectate_map_modified = (config.getOption('Config', 'spectate_map_modified', 'yes') == 'yes')
@@ -22,7 +23,18 @@ def checkModified(cn):
 	except ValueError:
 	 	pass
 
+def mapModifiedSpecCmd(cn, args):
+	if args == 'disable':
+		spectate_map_modified = False
+		sbserver.playerMessage(info('Spectate modified mapes disabled'))
+	elif args == 'enable':
+		spectate_map_modified = True
+		sbserver.playerMessage(info('Spectate modified mapes enabled'))
+	else:
+		sbserver.playerMessage(cn, error('Usage: #mapmodifiedspec (enable/disable)'))
+
 registerServerEventHandler('player_modified_map', onMapModified)
 registerServerEventHandler('player_active', checkModified)
 registerServerEventHandler('player_unspectated', checkModified)
+registerCommandHandler('mapmodifiedspec', mapModifiedSpecCmd)
 
