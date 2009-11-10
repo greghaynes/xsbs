@@ -13,15 +13,41 @@ unmuted_temp = config.getOption('Messages', 'unmuted_message', '${green}${muted_
 del config
 muted_temp = string.Template(muted_temp)
 unmuted_temp = string.Template(unmuted_temp)
+mute_spectators = [False]
 
 def allowMsg(cn, text):
 	try:
+		if mute_spectators[0] == True and player(cn).isSpectator():
+			sbserver.playerMessage(cn, notice('Spectators are currently muted.  No one will recieve your message'))
+			return False
 		if player(cn).is_muted:
-			sbserver.playerMessage(cn, notice('You are currently muted.  No one will recieve your messages.'))
+			sbserver.playerMessage(cn, notice('You are currently muted.  No one will recieve your message'))
 			return False
 	except (AttributeError, ValueError):
 		pass
 	return True
+
+@masterRequired
+def onMuteSpectatorsCmd(cn, args):
+	if args == '':
+		if mute_spectators[0] == True:
+			player(cn).message(error('Spectators are arleady muted'))
+		else:
+			mute_spectators[0] = True
+			sbserver.message(notice('Spectators are now muted'))
+	else:
+		player(cn).message(error('Usage: #mutespectators'))
+
+@masterRequired
+def onUnMuteSpectatorsCmd(cn, args):
+	if args == '':
+		if mute_spectators[0] == False:
+			player(cn).message(error('Spectators are not currently muted'))
+		else:
+			mute_spectators[0] = False
+			sbserver.message(notice('Spectators are no longer muted'))
+	else:
+		player(cn).message(error('Usage: #unmutespectators'))
 
 @masterRequired
 def onMuteCommand(cn, args):
@@ -69,6 +95,8 @@ def onUnmuteCommand(cn, args):
 		sbserver.playerMessage(cn, error('Invalid player cn'))
 
 registerPolicyEventHandler('allow_message', allowMsg)
+registerCommandHandler('mutespectators', onMuteSpectatorsCmd)
+registerCommandHandler('unmutespectators', onUnMuteSpectatorsCmd)
 registerCommandHandler('mute', onMuteCommand)
 registerCommandHandler('unmute', onUnmuteCommand)
 
