@@ -24,7 +24,7 @@ class PingLimiter:
 			laggers = []
 			for player in players.all():
 				try:
-					if player.avg_ping > self.max_ping:
+					if not player.isSpectator() and player.avg_ping > self.max_ping:
 						laggers.append(player.cn)
 				except AttributeError:
 					player.avg_ping = 0
