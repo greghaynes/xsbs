@@ -17,11 +17,12 @@ mute_spectators = [False]
 
 def allowMsg(cn, text):
 	try:
-		if mute_spectators[0] == True and player(cn).isSpectator():
-			sbserver.playerMessage(cn, notice('Spectators are currently muted.  No one will recieve your message'))
+		p = player(cn)
+		if mute_spectators[0] == True and p.isSpectator():
+			p.message(notice('Spectators are currently muted.  No one will recieve your message'))
 			return False
-		if player(cn).is_muted:
-			sbserver.playerMessage(cn, notice('You are currently muted.  No one will recieve your message'))
+		if p.is_muted:
+			p.message(notice('You are currently muted.  No one will recieve your message'))
 			return False
 	except (AttributeError, ValueError):
 		pass
