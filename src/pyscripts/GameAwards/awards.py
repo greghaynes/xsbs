@@ -48,7 +48,7 @@ def onIntermission():
 		msg += mtktemp.substitute(colordict, name=playerName(most_tks_cn).name(), count=most_tks)
 		msg += ' '
 	if most_deaths > 0:
-		msg += mdtemp.substitute(colordict, name=player(most_tks_cn).name(), count=most_deaths)
+		msg += mdtemp.substitute(colordict, name=player(most_deaths_cn).name(), count=most_deaths)
 	if msg != '':
 		msg = awards_prefix + msg
 		sbserver.message(msg)
