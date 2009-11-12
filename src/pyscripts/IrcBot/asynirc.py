@@ -41,8 +41,8 @@ class IrcClient(asyncore.dispatcher):
 		self.events = EventDispatcher()
 		self.is_connected = False
 		self.channel_list = []
-		self.throttle_size = 1024
-		self.trottle_time = 5
+		self.throttle_size = 512
+		self.trottle_time = 1
 		self.part_message = 'PyAsyncirc Bot'
 	def logInfo(self, string):
 		if(self.use_logging):
