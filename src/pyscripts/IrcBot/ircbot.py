@@ -10,6 +10,7 @@ import string
 import logging
 
 config = PluginConfig('ircbot')
+enable = config.getOption('Config', 'enable', 'yes') == 'yes'
 channel = config.getOption('Config', 'channel', '#xsbs-newserver')
 servername = config.getOption('Config', 'servername', 'irc.gamesurge.net')
 nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
@@ -54,7 +55,9 @@ bot = ServerBot(
 if(ipaddress):
 	bot.ip_address = ipaddress
 bot.join(channel)
-bot.doConnect()
+
+if enable:
+	bot.doConnect()
 
 def onPlayerConnect(cn):
 	bot.message('\x032CONNECT         \x03Player %s (%i) has joined' % (sbserver.playerName(cn), cn), channel)
