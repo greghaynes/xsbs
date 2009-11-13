@@ -40,9 +40,19 @@ def registerCommandHandler(command, func):
 	xsbs.help.loadCommandInfo(command, func)
 	commandmanager.register(command, func)
 
+class command(object):
+	def __init__(self, func, command):
+		self.func = func
+		self.__doc__ = func.__doc__
+		self.__name__ = func.__name__
+		registerCommandHandler(command, func)
+	def __call__(self, *args):
+		self.func(*args)
+
 def allowTeamSwitch(cn, team):
 	sbserver.playerMessage(cn, 'You cannot switch to team %s' % team)
 	return False
+
 
 registerCommandHandler('help', xsbs.help.onHelpCommand)
 
