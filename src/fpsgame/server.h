@@ -310,6 +310,7 @@ namespace server
 #define MM_PUBSERV ((1<<MM_OPEN) | (1<<MM_VETO))
 #define MM_COOPSERV (MM_AUTOAPPROVE | MM_PUBSERV | (1<<MM_LOCKED))
 
+
 }
 
 /*
@@ -331,7 +332,38 @@ namespace server
 	extern char *serverpass;
 	extern int gamemode;
 	extern bool allow_modevote;
+	extern int minremain;
 	extern int port;
+
+	struct servmode
+	{
+		virtual ~servmode() {}
+
+		virtual void entergame(clientinfo *ci) {}
+		virtual void leavegame(clientinfo *ci, bool disconnecting = false) {}
+
+		virtual void moved(clientinfo *ci, const vec &oldpos, bool oldclip, const vec &newpos, bool newclip) {}
+		virtual bool canspawn(clientinfo *ci, bool connecting = false) { return true; }
+		virtual void spawned(clientinfo *ci) {}
+		virtual int fragvalue(clientinfo *victim, clientinfo *actor)
+		{
+			if(victim==actor || isteam(victim->team, actor->team)) return -1;
+			return 1;
+		}
+		virtual void died(clientinfo *victim, clientinfo *actor) {}
+		virtual bool canchangeteam(clientinfo *ci, const char *oldteam, const char *newteam) { return true; }
+		virtual void changeteam(clientinfo *ci, const char *oldteam, const char *newteam) {}
+		virtual void initclient(clientinfo *ci, packetbuf &p, bool connecting) {}
+		virtual void update() {}
+		virtual void reset(bool empty) {}
+		virtual void intermission() {  }
+		virtual bool hidefrags() { return false; }
+		virtual int getteamscore(const char *team) { return 0; }
+		virtual void getteamscores(vector<teamscore> &scores) {}
+		virtual bool extinfoteam(const char *team, ucharbuf &p) { return false; }
+	};
+
+	extern servmode *smode;
 
 	int numclients(int exclude = -1, bool nospec = true, bool noai = true);
 	void sendservmsg(const char *s);
@@ -349,7 +381,6 @@ namespace server
 	void endgame();
 	void resetpriv(clientinfo *ci);
 	void sendmapreload();
-	extern int minremain;
 }
 
 extern void server_sigint(int);

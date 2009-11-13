@@ -718,6 +718,14 @@ static PyObject *setTeam(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *teamScore(PyObject *self, PyObject *args)
+{
+	char *team;
+	if(!PyArg_ParseTuple(args, "s", &team))
+		return 0;
+	return Py_BuildValue("i", server::smode->getteamscore(team));
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -770,6 +778,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"serverPassword", serverPassword, METH_VARARGS, "Password for entry to the server."},
 	{"minutesRemaining", minRemain, METH_VARARGS, "Minutes remaining in current match."},
 	{"setTeam", setTeam, METH_VARARGS, "Set team of player."},
+	{"teamScore", teamScore, METH_VARARGS, "Score of team."},
 	{NULL, NULL, 0, NULL}
 };
 
