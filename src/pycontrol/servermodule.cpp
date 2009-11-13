@@ -718,6 +718,24 @@ static PyObject *setTeam(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *pregameSetTeam(PyObject *self, PyObject *args)
+{
+	int cn;
+	char *team;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "is", &cn, &team))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	server::pregame_setteam(ci, team);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyObject *teamScore(PyObject *self, PyObject *args)
 {
 	char *team;
@@ -778,6 +796,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"serverPassword", serverPassword, METH_VARARGS, "Password for entry to the server."},
 	{"minutesRemaining", minRemain, METH_VARARGS, "Minutes remaining in current match."},
 	{"setTeam", setTeam, METH_VARARGS, "Set team of player."},
+	{"pregameSetTeam", pregameSetTeam, METH_VARARGS, "Set team of player as a result of autoteam event."},
 	{"teamScore", teamScore, METH_VARARGS, "Score of team."},
 	{NULL, NULL, 0, NULL}
 };

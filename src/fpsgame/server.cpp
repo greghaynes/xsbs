@@ -270,12 +270,34 @@ namespace server
         }
     }
 
+    /* This is a special purpose function for setting teams pre-game
+       which wont be effected by the autoteam function. */
+    bool pregame_setteam(clientinfo *ci, char *team)
+    {
+        if(!ci || !strcmp(ci->team, team)) return false;
+        ci->state.timeplayed = -1;
+        if(!strcmp(ci->team, team)) return true;
+        copystring(ci->team, team, MAXTEAMLEN+1);
+        sendf(-1, 1, "riis", SV_SETTEAM, ci->clientnum, team);
+    }
+
     void autoteam()
     {
         static const char *teamnames[2] = {"good", "evil"};
         vector<clientinfo *> team[2];
         float teamrank[2] = {0, 0};
-        for(int round = 0, remaining = clients.length(); remaining>=0; round++)
+        int remaining = clients.length();
+        SbPy::triggerEvent("autoteam", 0);
+        // We arent going to set clients already assigned a team
+        clientinfo *ci;
+        loopv(clients)
+        {
+            ci = clients[i];
+            if(ci->state.timeplayed<0)
+                remaining--;
+        }
+        // Do autoteam
+        for(int round = 0; remaining>=0; round++)
         {
             int first = round&1, second = (round+1)&1, selected = 0;
             while(teamrank[first] <= teamrank[second])
