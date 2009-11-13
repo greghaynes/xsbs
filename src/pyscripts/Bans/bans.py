@@ -3,8 +3,9 @@ from xsbs.settings import PluginConfig
 from xsbs.colors import red, colordict
 from xsbs.ui import insufficientPermissions, error, info
 from xsbs.db import dbmanager
+from xsbs.commands import command
 from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, execLater
-from UserPrivilege.userpriv import registerCommandHandler, masterRequired
+from UserPrivilege.userpriv import masterRequired
 from xsbs.net import ipLongToString, ipStringToLong
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
@@ -123,6 +124,7 @@ def onBanCmd(cn, text):
 	except (ValueError, KeyError):
 		sbserver.playerMessage(cn, error('Usage: #ban <cn> (duration) (reason)'))
 
+@command('recentbans')
 @masterRequired
 def onRecentBans(cn, args):
 	if args != '':
@@ -140,12 +142,14 @@ def allowClient(cn, pwd):
 def onKick(cn, tcn):
 	ban(tcn, 14500, 'Unspecified reason', cn)
 
+@command('kick')
 @masterRequired
 def onKickCommand(cn, args):
 	tcn = int(args)
 	sbserver.message(info(kick_message.substitute(colordict, name=sbserver.playerName(tcn))))
 	sbserver.playerKick(tcn)
 
+@command('insertban')
 @masterRequired
 def onInsertBan(cn, args):
 	args = args.split(' ')
@@ -164,6 +168,7 @@ def onInsertBan(cn, args):
 		session.commit()
 		sbserver.playerMessage(cn, info('Inserted ban for %s for %i seconds for %s.' % (ipLongToString(ip), length, reason)))
 
+@command('banname')
 @masterRequired
 def onBanName(cn, args):
 	'''@description Ban name from the server'''
@@ -190,6 +195,7 @@ def reqClearBans(cn):
 	clearBans()
 	sbserver.message(info('Bans cleared'))
 
+@command('clearbans')
 @masterRequired
 def onClearBansCmd(cn, args):
 	clearBans()
@@ -197,12 +203,6 @@ def onClearBansCmd(cn, args):
 
 def init():
 	registerPolicyEventHandler("connect_kick", allowClient)
-	registerCommandHandler('ban', onBanCmd)
-	registerCommandHandler('banname', onBanName)
-	registerCommandHandler('recentbans', onRecentBans)
-	registerCommandHandler('kick', onKickCommand)
-	registerCommandHandler('insertban', onInsertBan)
-	registerCommandHandler('clearbans', onClearBansCmd)
 	registerServerEventHandler('player_ban', ban)
 	registerServerEventHandler('player_kick', onKick)
 	registerServerEventHandler('server_clear_bans', reqClearBans)
