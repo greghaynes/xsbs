@@ -41,13 +41,14 @@ def registerCommandHandler(command, func):
 	commandmanager.register(command, func)
 
 class command(object):
-	def __init__(self, func, command):
-		self.func = func
-		self.__doc__ = func.__doc__
-		self.__name__ = func.__name__
-		registerCommandHandler(command, func)
-	def __call__(self, *args):
-		self.func(*args)
+	def __init__(self, name):
+		self.command_name = name
+		pass
+	def __call__(self, f):
+		self.__doc__ = f.__doc__
+		self.__name__ = f.__name__
+		registerCommandHandler(self.command_name, f)
+		return f
 
 def allowTeamSwitch(cn, team):
 	sbserver.playerMessage(cn, 'You cannot switch to team %s' % team)
