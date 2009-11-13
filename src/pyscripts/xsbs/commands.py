@@ -43,7 +43,6 @@ def registerCommandHandler(command, func):
 class command(object):
 	def __init__(self, name):
 		self.command_name = name
-		pass
 	def __call__(self, f):
 		self.__doc__ = f.__doc__
 		self.__name__ = f.__name__
