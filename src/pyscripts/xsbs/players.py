@@ -37,6 +37,8 @@ class Player:
 		sbserver.spectate(self.cn)
 	def unspectate(self):
 		sbserver.unspectate(self.cn)
+	def setTeam(self, team):
+		sbserver.setTeam(self.cn, team)
 
 players = {}
 
