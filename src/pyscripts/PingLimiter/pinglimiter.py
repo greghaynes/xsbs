@@ -6,6 +6,7 @@ from xsbs.ui import warning
 from xsbs import players
 
 config = PluginConfig('pinglimiter')
+enable = config.getOption('Config', 'enable', 'yes') == 'yes'
 max_ping = config.getOption('Config', 'max_ping', '500')
 action_interval = config.getOption('Config', 'action_interval', '5')
 del config
@@ -55,5 +56,7 @@ class PingLimiter:
 		else:
 			self.counter = self.action_interval
 
-limiter = PingLimiter(max_ping, action_interval)
-addTimer(5000, limiter.checkPlayers, ())
+if enable:
+	limiter = PingLimiter(max_ping, action_interval)
+	addTimer(5000, limiter.checkPlayers, ())
+
