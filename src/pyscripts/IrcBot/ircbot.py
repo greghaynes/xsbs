@@ -34,7 +34,7 @@ class ServerBot(asynirc.IrcClient):
 		self.do_reconnect = True
 		self.reconnect_count = 0
 	def reconnect(self):
-		if self.reconnect_count >= 5:
+		if self.reconnect_count >= 30:
 			logging.error('Max recconect failures (5) occoured.')
 		else:
 			self.reconnect_count += 1
