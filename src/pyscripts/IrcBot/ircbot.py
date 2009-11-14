@@ -50,6 +50,9 @@ class ServerBot(asynirc.IrcClient):
 		if self.msg_gw and to[0] == '#':
 			name = who.split('!', 1)[0]
 			sbserver.message(irc_msg_temp.substitute(colordict, name=name, message=message, channel=to))
+	def quit():
+		self.do_reconnect = False
+		self.close()
 
 bot = ServerBot(
 	(servername, 6667),
@@ -66,11 +69,11 @@ if enable:
 @masterRequired
 def ircbotCmd(cn, args):
 	if args == 'off':
-		bot.close()
-		sbserver.playerMessage(cn, info('Irc bot enabled'))
+		bot.quit()
+		sbserver.playerMessage(cn, info('Irc bot disabled'))
 	elif args == 'on':
 		bot.doConnect()
-		sbserver.playerMessage(cn, info('Irc bot disabled'))
+		sbserver.playerMessage(cn, info('Irc bot enabled'))
 	else:
 		sbserver.playerMessage(cn, error('Usage: #ircbot off/on'))
 
