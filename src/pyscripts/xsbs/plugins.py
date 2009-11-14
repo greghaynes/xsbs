@@ -2,6 +2,7 @@ from ConfigParser import ConfigParser, NoOptionError
 import os, sys, __builtin__
 import sbserver, xsbs.events
 import xsbs.log
+import xsbs.persistteam
 import logging
 
 plugins = {}
