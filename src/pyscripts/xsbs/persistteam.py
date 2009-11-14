@@ -18,11 +18,11 @@ def persistentTeams(cn, args):
 	if args == 'on':
 		del player_pteams[:]
 		for p in allPlayers():
-			if p.team() != '':
-				try:
-					player_pteams.append((p.cn, p.team()))
-				except ValueError:
-					pass
+			try:
+				if p.team() != '':
+						player_pteams.append((p.cn, p.team()))
+			except ValueError:
+				pass
 		sbserver.message(notice('Persistent teams enabled'))
 	elif args == 'off':
 		del player_pteams[:]
