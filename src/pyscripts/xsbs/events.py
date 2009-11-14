@@ -61,6 +61,15 @@ def triggerServerEvent(event, args):
 def registerPolicyEventHandler(event, func):
 	policy_events.connect(event, func)
 
+class policyHandler(object):
+	def __init__(self, name):
+		self.name = name
+	def __call__(self, f):
+		self.__doc__ = f.__doc__
+		self.__name__ = f.__name__
+		registerPolicyEventHandler(self.name, f)
+		return f
+
 def triggerPolicyEvent(event, args):
 	return policy_events.trigger(event, args)
 

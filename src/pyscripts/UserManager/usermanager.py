@@ -7,9 +7,11 @@ from xsbs.db import dbmanager
 from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import red, green, orange
-from xsbs.ui import info, error
+from xsbs.ui import info, error, warning
 from xsbs.players import player
 from xsbs.settings import PluginConfig
+from xsbs.ban import ban
+from xsbs.timers import addTimer
 import re
 
 config = PluginConfig('usermanager')
@@ -148,6 +150,9 @@ def onSetMaster(cn, givenhash):
 def warnNickReserved(cn, count, sessid):
 	try:
 		p = player(cn)
+	except ValueError:
+		return
+	try:
 		nickacct = p.warn_nickacct
 		if nickacct.nick != sbserver.playerName(cn) or sessid != sbserver.playerSessionId(cn):
 			p.warning_for_login = False
