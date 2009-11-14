@@ -10,7 +10,10 @@ player_pteams = []
 @eventHandler('autoteam')
 def onAutoteam():
 	for p in player_pteams:
-		sbserver.pregameSetTeam(p[0], p[1])
+		try:
+			sbserver.pregameSetTeam(p[0], p[1])
+		except ValueError:
+			pass
 
 @eventHandler('player_disconnect')
 def onDisconnect(cn):
