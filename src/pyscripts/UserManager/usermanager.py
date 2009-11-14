@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
 import sbserver
 from xsbs.db import dbmanager
-from xsbs.events import triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
+from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import registerCommandHandler
 from xsbs.colors import red, green, orange
 from xsbs.ui import info, error
@@ -144,6 +144,51 @@ def onSetMaster(cn, givenhash):
 		login(cn, na.user)
 	else:
 		sbserver.playerMessage(cn, error('Invalid password'))
+
+def warnNickReserved(cn, count, sessid):
+	try:
+		p = player(cn)
+		nickacct = p.warn_nickacct
+		if nickacct.nick != sbserver.playerName(cn) or sessid != sbserver.playerSessionId(cn):
+			p.warning_for_login = False
+			return
+	except (AttributeError, ValueError):
+		p.warning_for_login = False
+		return
+	if isLoggedIn(cn):
+		user = loggedInAs(cn)
+		if nickacct.user_id != user.id:
+			ban(cn, 0, 'Use of reserved name')
+		p.warning_for_login = False
+		return
+	if count > 4:
+		ban(cn, 0, 'Use of reserved name', -1)
+		p.warning_for_login = False
+		return
+	remaining = 25-(count*5)
+	sbserver.playerMessage(cn, warning('Your name is reserved. You have ' + red('%i') + ' seconds to login or be kicked.') % remaining)
+	addTimer(5000, warnNickReserved, (cn, count+1, sessid))
+
+def nickReserver(nick):
+	return session.query(NickAccount).filter(NickAccount.nick==nick).one()
+
+@eventHandler('player_connect')
+def onPlayerActive(cn):
+	nick = sbserver.playerName(cn)
+	p = player(cn)
+	try:
+		nickacct = nickReserver(sbserver.playerName(cn))
+	except NoResultFound:
+		p.warning_for_login = False
+		return
+	p = player(cn)
+	p.warning_for_login = True
+	p.warn_nickacct = nickacct
+	warnNickReserved(cn, 0, sbserver.playerSessionId(cn))
+
+@eventHandler('player_name_changed')
+def onPlayerNameChanged(cn, new_name):
+	onPlayerActive(cn)
 
 Base.metadata.create_all(dbmanager.engine)
 
