@@ -46,6 +46,15 @@ exec_queue = []
 def registerServerEventHandler(event, func):
 	server_events.connect(event, func)
 
+class eventHandler(object):
+	def __init__(self, name):
+		self.name = name
+	def __call__(self, f):
+		self.__doc__ = f.__doc__
+		self.__name__ = f.__name__
+		registerServerEventHandler(self.name, f)
+		return f
+
 def triggerServerEvent(event, args):
 	server_events.trigger(event, args)
 
