@@ -12,6 +12,15 @@ def onAutoteam():
 	for p in player_pteams:
 		sbserver.pregameSetTeam(p[0], p[1])
 
+@eventHandler('player_disconnect')
+def onDisconnect(cn):
+	i = 0
+	for p in player_pteams:
+		if p[i] == cn:
+			del p[i]
+			return
+		i += 1
+
 @commandHandler('persistteam')
 @masterRequired
 def persistentTeams(cn, args):
