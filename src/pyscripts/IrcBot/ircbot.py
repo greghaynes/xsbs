@@ -4,6 +4,9 @@ from xsbs.settings import PluginConfig
 from xsbs.events import registerServerEventHandler
 from xsbs.timers import addTimer
 from xsbs.colors import red, green, colordict
+from xsbs.ui import info, error
+from xsbs.commands import commandHandler
+from UserPrivilege.userpriv import masterRequired
 import asyncore, socket
 import asynirc
 import string
@@ -58,6 +61,18 @@ bot.join(channel)
 
 if enable:
 	bot.doConnect()
+
+@commandHandler('ircbot')
+@masterRequired
+def ircbotCmd(cn, args):
+	if args == 'off':
+		bot.close()
+		sbserver.playerMessage(cn, info('Irc bot enabled'))
+	elif args == 'on':
+		bot.doConnect()
+		sbserver.playerMessage(cn, info('Irc bot disabled'))
+	else:
+		sbserver.playerMessage(cn, error('Usage: #ircbot off/on'))
 
 def onPlayerConnect(cn):
 	bot.message('\x032CONNECT         \x03Player %s (%i) has joined' % (sbserver.playerName(cn), cn), channel)
