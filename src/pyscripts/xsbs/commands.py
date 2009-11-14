@@ -40,7 +40,7 @@ def registerCommandHandler(command, func):
 	xsbs.help.loadCommandInfo(command, func)
 	commandmanager.register(command, func)
 
-class command(object):
+class commandHandler(object):
 	def __init__(self, name):
 		self.command_name = name
 	def __call__(self, f):

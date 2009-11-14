@@ -4,7 +4,7 @@ from xsbs.ui import info, notice, error
 from xsbs.events import registerPolicyEventHandler, registerServerEventHandler
 from xsbs.players import player
 from xsbs.settings import PluginConfig
-from xsbs.commands import command
+from xsbs.commands import commandHandler
 from UserPrivilege.userpriv import masterRequired
 import string
 
@@ -29,7 +29,7 @@ def allowMsg(cn, text):
 		pass
 	return True
 
-@command('mutespectators')
+@commandHandler('mutespectators')
 @masterRequired
 def onMuteSpectatorsCmd(cn, args):
 	if args == '':
@@ -41,7 +41,7 @@ def onMuteSpectatorsCmd(cn, args):
 	else:
 		player(cn).message(error('Usage: #mutespectators'))
 
-@command('unmutespectators')
+@commandHandler('unmutespectators')
 @masterRequired
 def onUnMuteSpectatorsCmd(cn, args):
 	if args == '':
@@ -53,7 +53,7 @@ def onUnMuteSpectatorsCmd(cn, args):
 	else:
 		player(cn).message(error('Usage: #unmutespectators'))
 
-@command('mute')
+@commandHandler('mute')
 @masterRequired
 def onMuteCommand(cn, args):
 	try:
@@ -79,7 +79,7 @@ def onMuteCommand(cn, args):
 	except KeyError:
 		sbserver.playerMessage(cn, error('Usage: #mute <cn>'))
 			
-@command('unmute')
+@commandHandler('unmute')
 @masterRequired
 def onUnmuteCommand(cn, args):
 	try:
