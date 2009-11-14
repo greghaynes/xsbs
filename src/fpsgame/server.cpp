@@ -274,7 +274,7 @@ namespace server
        which wont be effected by the autoteam function. */
     bool pregame_setteam(clientinfo *ci, char *team)
     {
-        if(!ci || !strcmp(ci->team, team)) return false;
+        if(!ci) return false;
         ci->state.timeplayed = -1;
         if(!strcmp(ci->team, team)) return true;
         copystring(ci->team, team, MAXTEAMLEN+1);

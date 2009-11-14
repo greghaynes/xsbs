@@ -1,12 +1,13 @@
 from xsbs.events import eventHandler
 from xsbs.commands import commandHandler
-from xsbs.players import all as allPlayers
+from xsbs.players import player, all as allPlayers
 from xsbs.ui import error, notice
 from UserPrivilege.userpriv import masterRequired
 import sbserver
 
 player_pteams = []
 
+@eventHandler('autoteam')
 def onAutoteam():
 	for p in player_pteams:
 		sbserver.pregameSetTeam(p[0], p[1])
