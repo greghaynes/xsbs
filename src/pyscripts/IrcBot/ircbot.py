@@ -50,7 +50,7 @@ class ServerBot(asynirc.IrcClient):
 		if self.msg_gw and to[0] == '#':
 			name = who.split('!', 1)[0]
 			sbserver.message(irc_msg_temp.substitute(colordict, name=name, message=message, channel=to))
-	def quit():
+	def quit(self):
 		self.do_reconnect = False
 		self.close()
 
