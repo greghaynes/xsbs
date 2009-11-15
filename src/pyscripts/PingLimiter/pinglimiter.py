@@ -1,6 +1,6 @@
 import sbserver
 from xsbs.timers import addTimer
-from Bans.bans import ban
+from xsbs.ban import ban
 from xsbs.settings import PluginConfig
 from xsbs.ui import warning
 from xsbs import players
