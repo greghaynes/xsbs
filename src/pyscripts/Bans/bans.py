@@ -49,6 +49,8 @@ def onBanCmd(cn, text):
 @commandHandler('recentbans')
 @masterRequired
 def onRecentBans(cn, args):
+	'''@description Recently added bans
+	   @usage'''
 	if args != '':
 		sbserver.playerMessage(cn, error('Usage: #recentbans'))
 	else:
@@ -69,6 +71,8 @@ def onKick(cn, tcn):
 @commandHandler('kick')
 @masterRequired
 def onKickCommand(cn, args):
+	'''@description Kick player from the server without ban time
+	   @usage <cn>'''
 	tcn = int(args)
 	sbserver.message(info(kick_message.substitute(colordict, name=sbserver.playerName(tcn))))
 	sbserver.playerKick(tcn)
@@ -76,6 +80,8 @@ def onKickCommand(cn, args):
 @commandHandler('insertban')
 @masterRequired
 def onInsertBan(cn, args):
+	'''@description Intert ban for ip address
+	   @usage <ip> <seconds> (reason)'''
 	args = args.split(' ')
 	if len(args) < 2:
 		sbserver.playerMessage(cn, error('Usage: #insertban <ip> <length> (reason)'))
@@ -95,7 +101,8 @@ def onInsertBan(cn, args):
 @commandHandler('banname')
 @masterRequired
 def onBanName(cn, args):
-	'''@description Ban name from the server'''
+	'''@description Ban name from the server
+	   @usage <name>'''
 	reason = args.split(' ')
 	if len(reason) == 1:
 		nick = reason[0]
@@ -123,6 +130,8 @@ def reqClearBans(cn):
 @commandHandler('clearbans')
 @masterRequired
 def onClearBansCmd(cn, args):
+	'''@description Remove active bans
+	   @usage'''
 	clearBans()
 	sbserver.message(info('Bans cleared'))
 

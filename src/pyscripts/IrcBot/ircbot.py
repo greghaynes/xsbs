@@ -68,6 +68,8 @@ if enable:
 @commandHandler('ircbot')
 @masterRequired
 def ircbotCmd(cn, args):
+	'''@description Enable or disable the irc bot
+	   @usage <on/off>'''
 	if args == 'off':
 		bot.quit()
 		sbserver.playerMessage(cn, info('Irc bot disabled'))

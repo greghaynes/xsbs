@@ -1,5 +1,5 @@
 from xsbs.events import registerServerEventHandler
-from xsbs.commands import registerCommandHandler
+from xsbs.commands import commandHandler
 from xsbs.players import player, all as allPlayers
 from xsbs.ui import error, info
 from xsbs.colors import colordict
@@ -28,7 +28,10 @@ def checkVotes(cn):
 	if votes >= needed:
 		ban(cn, 3600, 'Vote', -1)
 
+@commandHandler('votekick')
 def onVoteKick(cn, args):
+	'''@description Vote to kick a player from server
+	   @usage <cn>'''
 	if args == '':
 		sbserver.playerMessage(cn, error('Usage #votekick <cn>'))
 	else:
@@ -45,6 +48,4 @@ def onVoteKick(cn, args):
 			sbserver.message(info(vktemp.substitute(colordict, voter=sbserver.playerName(cn), victim=sbserver.playerName(tcn))))
 			player(cn).votekick = int(args)
 			checkVotes(int(args))
-
-registerCommandHandler('votekick', onVoteKick)
 
