@@ -36,7 +36,7 @@ def loadCommandInfo(command, handler):
 					info.description = line[len(tag)+1:]
 					valid  = True
 				elif tag == '@public':
-					info.public == True
+					info.public = True
 					valid = True
 		if valid:
 			command_info[command] = info
@@ -78,4 +78,11 @@ def onPlayerCommands(cn, args):
 		for command in helptexts.keys():
 			msg += '#' + command + ' '
 		sbserver.playerMessage(cn, orange(msg))
+
+def listPublicCommands(cn, args):
+	str = 'Public commands: '
+	for cmd in command_info.items():
+		if cmd[1].public:
+			str += cmd[1].command + ' '
+	sbserver.playerMessage(cn, info(str))
 

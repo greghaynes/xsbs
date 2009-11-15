@@ -55,4 +55,5 @@ def allowTeamSwitch(cn, team):
 
 
 registerCommandHandler('help', xsbs.help.onHelpCommand)
+registerCommandHandler('listcommands', xsbs.help.listPublicCommands)
 
