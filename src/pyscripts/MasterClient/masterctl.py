@@ -131,7 +131,11 @@ class MasterClient(asyncore.dispatcher):
 		self.do_connect = True
 		self.close()
 	def handle_read(self):
-		self.read_buff += self.recv(4096)
+		try:
+			self.read_buff += self.recv(4096)
+		except socket.error:
+			logging.error('Could not read from socket')
+			return
 		tmp_buff = self.read_buff.split('\n')
 		self.read_buff = tmp_buff.pop()
 		for line in tmp_buff:
