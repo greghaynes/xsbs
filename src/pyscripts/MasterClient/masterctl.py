@@ -129,6 +129,7 @@ class MasterClient(asyncore.dispatcher):
 		self.responses_needed += 1
 	def handle_close(self):
 		self.do_connect = True
+		self.close()
 	def handle_read(self):
 		self.read_buff += self.recv(4096)
 		tmp_buff = self.read_buff.split('\n')
