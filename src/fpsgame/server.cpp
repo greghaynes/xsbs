@@ -1114,8 +1114,8 @@ namespace server
             if(isteam(actor->team, target->team))
             {
                 actor->state.teamkills++;
-				if(actor->clientnum != target->clientnum)
-                	SbPy::triggerEventIntInt("player_teamkill", actor->clientnum, target->clientnum);
+                if(actor->clientnum != target->clientnum)
+                    SbPy::triggerEventIntInt("player_teamkill", actor->clientnum, target->clientnum);
             }
             int fragvalue = smode ? smode->fragvalue(target, actor) : (target==actor || isteam(target->team, actor->team) ? -1 : 1);
             actor->state.frags += fragvalue;
