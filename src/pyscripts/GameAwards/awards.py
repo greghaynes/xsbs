@@ -45,7 +45,7 @@ def onIntermission():
 		msg += mftemp.substitute(colordict, name=player(most_frags_cn).name(), count=most_frags)
 		msg += ' '
 	if most_tks > 0:
-		msg += mtktemp.substitute(colordict, name=playerName(most_tks_cn).name(), count=most_tks)
+		msg += mtktemp.substitute(colordict, name=player(most_tks_cn).name(), count=most_tks)
 		msg += ' '
 	if most_deaths > 0:
 		msg += mdtemp.substitute(colordict, name=player(most_deaths_cn).name(), count=most_deaths)
