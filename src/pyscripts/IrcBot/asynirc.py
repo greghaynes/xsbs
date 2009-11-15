@@ -44,6 +44,9 @@ class IrcClient(asyncore.dispatcher):
 		self.throttle_size = 512
 		self.trottle_time = 1
 		self.part_message = 'PyAsyncirc Bot'
+		self.events.connect('PING', self.handle_pong)
+		self.events.connect('MODE', self.handle_mode)
+		self.events.connect('PRIVMSG', self.handle_raw_privmsg)
 	def logInfo(self, string):
 		if(self.use_logging):
 			logging.info(string)
@@ -62,9 +65,6 @@ class IrcClient(asyncore.dispatcher):
 		self.throttle_timeout = time.time() + self.throttle_size
 		self.throttle_used = 0
 	def handle_connect(self):
-		self.events.connect('PING', self.handle_pong)
-		self.events.connect('MODE', self.handle_mode)
-		self.events.connect('PRIVMSG', self.handle_raw_privmsg)
 		self.work_queue.append('NICK :%s\r\n' % self.nick)
 		self.work_queue.append('USER %s %s %s :%s\r\n' % (self.username, self.hostname, self.servername, self.realname))
 	def handle_close(self):
