@@ -41,7 +41,7 @@ def warnTagReserved(cn, count, sessid, nick):
 		p = player(cn)
 	except ValueError:
 		return
-	if sbserver.playerName(cn) != nick or sessid != sbserver.playerSessionId(cn):
+	if p.name() != nick or sessid != p.sessionId():
 		return
 	if len(p.registered_tags) == 0:
 		return
@@ -50,15 +50,15 @@ def warnTagReserved(cn, count, sessid, nick):
 		p.warning_for_login = False
 		return
 	remaining = 25-(count*5)
-	sbserver.playerMessage(cn, warning('Your are using a reserved clan tag. You have ' + red('%i') + ' seconds to login or be kicked.') % remaining)
+	p.message(warning('Your are using a reserved clan tag. You have ' + red('%i') + ' seconds to login or be kicked.') % remaining)
 	addTimer(5000, warnTagReserved, (cn, count+1, sessid, nick))
 
 def tagId(tag):
 	return session.query(ClanTag).filter(ClanTag.tag==tag).one().id
 
 def setUsedTags(cn):
-	nick = sbserver.playerName(cn)
 	p = player(cn)
+	nick = p.name()
 	potentials = []
 	matches = regex.findall(nick)
 	for match in matches:
@@ -106,7 +106,7 @@ def initCheck(cn):
 	except AttributeError:
 		pass
 	else:
-		warnTagReserved(cn, 0, sbserver.playerSessionId(cn), sbserver.playerName(cn))
+		warnTagReserved(cn, 0, p.sessionId(), p.name())
 
 @eventHandler('player_connect_delayed')
 def onConnect(cn):
