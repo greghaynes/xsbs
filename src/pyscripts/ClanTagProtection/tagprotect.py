@@ -1,10 +1,10 @@
-from xsbs.events import registerServerEventHandler, execLater
+from xsbs.events import eventHandler, execLater
 from xsbs.players import player
 from xsbs.ui import warning
 from xsbs.colors import red
 from xsbs.timers import addTimer
 from xsbs.db import dbmanager
-from Bans.bans import ban
+from xsbs.ban import ban
 from UserManager.usermanager import User, isLoggedIn
 import sbserver
 from sqlalchemy.orm import relation
@@ -108,6 +108,7 @@ def initCheck(cn):
 	else:
 		warnTagReserved(cn, 0, sbserver.playerSessionId(cn), sbserver.playerName(cn))
 
+@eventHandler('player_connect_delayed')
 def onConnect(cn):
 	setUsedTags(cn)
 	p = player(cn)
@@ -118,11 +119,9 @@ def onConnect(cn):
 	except AttributeError:
 		pass
 
+@eventHandler('player_name_changed')
 def onNameChange(cn, name):
 	onConnect(cn)
 
 Base.metadata.create_all(dbmanager.engine)
-
-registerServerEventHandler('player_connect_delayed', onConnect)
-registerServerEventHandler('player_name_changed', onNameChange)
 
