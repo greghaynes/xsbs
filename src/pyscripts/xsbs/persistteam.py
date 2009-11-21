@@ -1,5 +1,5 @@
 from xsbs.events import eventHandler
-from xsbs.commands import commandHandler
+from xsbs.commands import commandHandler, UsageError
 from xsbs.players import player, all as allPlayers
 from xsbs.ui import error, notice
 from UserPrivilege.userpriv import masterRequired
@@ -24,10 +24,8 @@ def onDisconnect(cn):
 			return
 		i += 1
 
-@commandHandler('persistteam')
-@masterRequired
-def persistentTeams(cn, args):
-	if args == 'on':
+def persistentTeams(enabled):
+	if enabled == True:
 		del player_pteams[:]
 		for p in allPlayers():
 			try:
@@ -35,10 +33,20 @@ def persistentTeams(cn, args):
 						player_pteams.append((p.cn, p.team()))
 			except ValueError:
 				pass
+	elif enabled == False:
+		del player_pteams[:]
+	else:
+		raise ValueError('Enabled must be boolean value')
+
+@commandHandler('persistteam')
+@masterRequired
+def persistentTeamsCmd(cn, args):
+	if args == 'on':
+		persistentTeams(True)
 		sbserver.message(notice('Persistent teams enabled'))
 	elif args == 'off':
-		del player_pteams[:]
+		persistentTeams(False)
 		sbserver.message(notice('Persistent teams disabled'))
 	else:
-		player(cn).message(error('Usage: #persistentteams on/off'))
+		raise UsageError('on/off')
 

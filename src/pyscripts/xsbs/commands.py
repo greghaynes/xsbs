@@ -10,7 +10,7 @@ class UsageError(Exception):
 	def __init__(self, value):
 		self.value = value
 	def __str__(self):
-		return repr(self.value)
+		return str(self.value)
 
 class CommandManager:
 	def __init__(self):
@@ -27,7 +27,7 @@ class CommandManager:
 				try:
 					func(cn, text)
 				except UsageError as e:
-					sbserver.playerMessage(cn, error('Usage: ' + repr(e)))
+					sbserver.playerMessage(cn, error('Usage: #' + command + ' ' + str(e)))
 				except:
 					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
 					logging.warn('Uncaught exception occured in command handler.')
