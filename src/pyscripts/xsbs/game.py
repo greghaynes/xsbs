@@ -16,3 +16,11 @@ modes = [
 	'instaprotect'
 ]
 
+def modeNumber(modename):
+	i = 0
+	for mode in modes:
+		if modename == mode:
+			return i
+		i += 1
+	raise ValueError('Invalid mode')
+
