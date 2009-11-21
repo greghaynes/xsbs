@@ -5,7 +5,7 @@ from xsbs.ui import insufficientPermissions, error, info
 from xsbs.db import dbmanager
 from xsbs.commands import commandHandler
 from xsbs.events import triggerServerEvent, eventHandler, policyHandler, execLater
-from xsbs.ban import ban, isIpBanned, isNickBanned
+from xsbs.ban import ban, isIpBanned, isNickBanned, Ban
 from xsbs.net import ipLongToString, ipStringToLong
 from UserPrivilege.userpriv import masterRequired
 import time, string
