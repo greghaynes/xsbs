@@ -63,8 +63,8 @@ def allowClient(cn, pwd):
 	ip = sbserver.playerIpLong(cn)
 	return not isIpBanned(ip) and not isNickBanned(sbserver.playerName(cn))
 
-@masterRequired
 @eventHandler('player_kick')
+@masterRequired
 def onKick(cn, tcn):
 	ban(tcn, 14500, 'Unspecified reason', cn)
 
