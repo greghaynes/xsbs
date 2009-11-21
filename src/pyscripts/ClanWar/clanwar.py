@@ -34,7 +34,7 @@ def clanWar(cn, args):
 			except ValueError:
 				sender.message(error('Invalid game mode'))
 				return
-		persistentTeams(cn, 'on')
+		persistentTeams(True)
 		sbserver.setMap(map, mode)
 		sbserver.setMasterMode(2)
 		sbserver.setPaused(True)
