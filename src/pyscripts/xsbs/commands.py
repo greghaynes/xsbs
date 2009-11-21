@@ -2,9 +2,15 @@ import sbserver
 from events import registerServerEventHandler, registerPolicyEventHandler
 from colors import red
 from xsbs.ui import error, insufficientPermissions
+import xsbs.help
 import logging
 import sys, traceback
-import xsbs.help
+
+class UsageError(Exception):
+	def __init__(self, value):
+		self.value = value
+	def __str__(self):
+		return repr(self.value)
 
 class CommandManager:
 	def __init__(self):
@@ -20,6 +26,8 @@ class CommandManager:
 			for func in self.command_handlers[command]:
 				try:
 					func(cn, text)
+				except UsageError as e:
+					sbserver.playerMessage(cn, error('Usage: ' + repr(e)))
 				except:
 					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
 					logging.warn('Uncaught exception occured in command handler.')
@@ -48,11 +56,6 @@ class commandHandler(object):
 		self.__name__ = f.__name__
 		registerCommandHandler(self.command_name, f)
 		return f
-
-def allowTeamSwitch(cn, team):
-	sbserver.playerMessage(cn, 'You cannot switch to team %s' % team)
-	return False
-
 
 registerCommandHandler('help', xsbs.help.onHelpCommand)
 registerCommandHandler('listcommands', xsbs.help.listPublicCommands)
