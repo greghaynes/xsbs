@@ -126,7 +126,6 @@ bool initPy()
 
 void deinitPy()
 {
-	std::cout << "Cleaning up\n";
 	Py_XDECREF(triggerEventFunc);
 	Py_XDECREF(triggerPolicyEventFunc);
 	Py_XDECREF(updateFunc);
