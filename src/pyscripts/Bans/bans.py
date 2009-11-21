@@ -3,7 +3,7 @@ from xsbs.settings import PluginConfig
 from xsbs.colors import red, colordict
 from xsbs.ui import insufficientPermissions, error, info
 from xsbs.db import dbmanager
-from xsbs.commands import commandHandler
+from xsbs.commands import commandHandler, UsageError
 from xsbs.events import triggerServerEvent, eventHandler, policyHandler, execLater
 from xsbs.ban import ban, isIpBanned, isNickBanned, Ban
 from xsbs.net import ipLongToString, ipStringToLong
@@ -46,7 +46,7 @@ def onBanCmd(cn, text):
 			length = int(default_ban_length)
 		ban(tcn, length, reason, cn)
 	except (ValueError, KeyError):
-		sbserver.playerMessage(cn, error('Usage: #ban <cn> (duration) (reason)'))
+		raise UsageError('cn (duration) (reason)')
 
 @commandHandler('recentbans')
 @masterRequired
@@ -86,7 +86,7 @@ def onInsertBan(cn, args):
 	   @usage <ip> <seconds> (reason)'''
 	args = args.split(' ')
 	if len(args) < 2:
-		sbserver.playerMessage(cn, error('Usage: #insertban <ip> <length> (reason)'))
+		raise UsageError('ip length (reason)')
 	else:
 		ip = ipStringToLong(args[0])
 		length = int(args[1])
