@@ -1,6 +1,6 @@
 import sbserver
 from xsbs.events import triggerServerEvent
-from xsbs.commands import registerCommandHandler
+from xsbs.commands import commandHandler, UsageError
 from xsbs.settings import PluginConfig
 from UserPrivilege.userpriv import masterRequired, adminRequired
 from xsbs.colors import red, yellow, blue, green, colordict
@@ -14,97 +14,86 @@ servermsg_template = config.getOption('Templates', 'servermsg', '${orange}${send
 del config
 servermsg_template = string.Template(servermsg_template)
 
+@commandHandler('pause')
 @masterRequired
 def onPauseCmd(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, error('Usage: #pause'))
+		raise UsageError('')
 		return
 	sbserver.setPaused(True)
 
+@commandHandler('resume')
 @masterRequired
 def onResumeCmd(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, error('Usage: #resume'))
+		raise UsageError('')
 		return
 	sbserver.setPaused(False)
 
+@commandHandler('reload')
 @adminRequired
 def onReloadCmd(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, error('Usage: #reload'))
+		raise UsageError('')
 	else:
 		sbserver.playerMessage(cn, yellow('NOTICE: ') + blue('Reloading server plugins.  Fasten your seatbelts...'))
 		pluginReload()
 
+@commandHandler('givemaster')
 @masterRequired
 def onGiveMaster(cn, args):
 	if args == '':
-		sbserver.playerMessage(cn, error('Usage #givemaster <cn>'))
+		raise UsageError('cn')
 		return
 	try:
 		tcn = int(args)
 	except TypeError:
-		sbserver.playerMessage(cn, error('Usage #givemaster <cn>'))
+		raise UsageError('cn')
 		return
 	sbserver.playerMessage(cn, info('You have given master to %s') % sbserver.playerName(tcn))
 	sbserver.setMaster(tcn)
 
-@adminRequired
-def onMasterMask(cn, args):
-	if args == '':
-		sbserver.playerMessage(cn, error('Usage: #mastermask <int>'))
-		return
-	args = args.split(' ')
-	sbserver.setMasterMask(int(args[0]))
-	sbserver.message(info('Master mask is now %s') % args[0])
-
+@commandHandler('resize')
 @adminRequired
 def onResize(cn, args):
 	if args == '':
-		sbserver.playerMessage(cn, error('Usage: #resize <int>'))
+		raise UsageError('maxclients')
 	else:
 		size = int(args)
 		sbserver.setMaxClients(int(args))
 
+@commandHandler('minsleft')
 @masterRequired
 def onMinsLeft(cn, args):
 	if args == '':
-		sbserver.playerMessage(cn, error('Usage: #minsleft <int>'))
+		raise UsageError('minutes')
 	else:
 		sbserver.setMinsRemaining(int(args))
 
+@commandHandler('specall')
 @masterRequired
 def specAll(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, error('Usage: #specall'))
+		raise UsageError('')
 	else:
 		for s in sbserver.players():
 			sbserver.spectate(s)
 
+@commandHandler('unspecall')
 @masterRequired
 def unspecAll(cn, args):
 	if args != '':
-		sbserver.playerMessage(cn, error('Usage: #unspecall'))
+		raise UsageError('')
 	else:
 		for s in sbserver.spectators():
 			sbserver.unspectate(s)
 
+@commandHandler('servermsg')
 @masterRequired
 def serverMessage(cn, args):
 	if args == '':
-		sbserver.playerMessage(cn, error('Usage: #servermsg <message>'))
+		raise UsageError('message')
 	else:
 		msg = servermsg_template.substitute(colordict, sender=sbserver.playerName(cn), message=args)
 		sbserver.message(msg)
-
-registerCommandHandler('pause', onPauseCmd)
-registerCommandHandler('resume', onResumeCmd)
-registerCommandHandler('reload', onReloadCmd)
-registerCommandHandler('givemaster', onGiveMaster)
-registerCommandHandler('mastermask', onMasterMask)
-registerCommandHandler('resize', onResize)
-registerCommandHandler('minsleft', onMinsLeft)
-registerCommandHandler('specall', specAll)
-registerCommandHandler('unspecall', unspecAll)
-registerCommandHandler('servermsg', serverMessage)
 
