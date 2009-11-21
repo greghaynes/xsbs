@@ -4,7 +4,7 @@ from xsbs.ui import info, notice, error
 from xsbs.events import registerPolicyEventHandler, registerServerEventHandler
 from xsbs.players import player
 from xsbs.settings import PluginConfig
-from xsbs.commands import commandHandler
+from xsbs.commands import commandHandler, UsageError
 from UserPrivilege.userpriv import masterRequired
 import string
 
@@ -39,7 +39,7 @@ def onMuteSpectatorsCmd(cn, args):
 			mute_spectators[0] = True
 			sbserver.message(notice('Spectators are now muted'))
 	else:
-		player(cn).message(error('Usage: #mutespectators'))
+		raise UsageError('')
 
 @commandHandler('unmutespectators')
 @masterRequired
@@ -51,7 +51,7 @@ def onUnMuteSpectatorsCmd(cn, args):
 			mute_spectators[0] = False
 			sbserver.message(notice('Spectators are no longer muted'))
 	else:
-		player(cn).message(error('Usage: #unmutespectators'))
+		raise UsageError('')
 
 @commandHandler('mute')
 @masterRequired
@@ -77,7 +77,7 @@ def onMuteCommand(cn, args):
 				name = sbserver.playerName(tcn)
 				sbserver.message(info(muted_temp.substitute(colordict, muted_name=name)))
 	except KeyError:
-		sbserver.playerMessage(cn, error('Usage: #mute <cn>'))
+		raise UsageError('cn')
 			
 @commandHandler('unmute')
 @masterRequired
@@ -96,7 +96,7 @@ def onUnmuteCommand(cn, args):
 		except AttributeError:
 			sbserver.playerMessage(cn, error('Specified player is not currently muted.'))
 	except KeyError:
-		sbserver.playerMessage(cn, error('Usage: #unmute <cn>'))
+		raise UsageError('cn')
 	except ValueError:
 		sbserver.playerMessage(cn, error('Invalid player cn'))
 
