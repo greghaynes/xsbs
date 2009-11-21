@@ -19,6 +19,8 @@ kick_message = config.getOption('Config', 'kick_message', '${green}${name}${whit
 del config
 kick_message = string.Template(kick_message)
 
+session = dbmanager.session()
+
 @commandHandler('ban')
 @masterRequired
 def onBanCmd(cn, text):
