@@ -4,6 +4,7 @@ from xsbs.colors import green
 from xsbs.timers import addTimer
 from xsbs.game import modeNumber
 from xsbs.players import player
+from xsbs.persistteam import persistentTeams
 from UserPrivilege.userpriv import masterRequired
 import sbserver
 
@@ -16,6 +17,7 @@ def clanWarTimer(count):
 		sbserver.setPaused(False)
 
 @commandHandler('clanwar')
+@masterRequired
 def clanWar(cn, args):
 	sender = player(cn)
 	if args == '':
@@ -32,6 +34,7 @@ def clanWar(cn, args):
 			except ValueError:
 				sender.message(error('Invalid game mode'))
 				return
+		persistentTeams(cn, 'on')
 		sbserver.setMap(map, mode)
 		sbserver.setMasterMode(2)
 		sbserver.setPaused(True)
