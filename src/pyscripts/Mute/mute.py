@@ -32,6 +32,8 @@ def allowMsg(cn, text):
 @commandHandler('mutespectators')
 @masterRequired
 def onMuteSpectatorsCmd(cn, args):
+	'''@description Mute all spectators
+	   @usage'''
 	if args == '':
 		if mute_spectators[0] == True:
 			player(cn).message(error('Spectators are arleady muted'))
@@ -44,6 +46,8 @@ def onMuteSpectatorsCmd(cn, args):
 @commandHandler('unmutespectators')
 @masterRequired
 def onUnMuteSpectatorsCmd(cn, args):
+	'''@description Unmute spectators
+	   @usage'''
 	if args == '':
 		if mute_spectators[0] == False:
 			player(cn).message(error('Spectators are not currently muted'))
@@ -56,6 +60,8 @@ def onUnMuteSpectatorsCmd(cn, args):
 @commandHandler('mute')
 @masterRequired
 def onMuteCommand(cn, args):
+	'''@description Mute a player
+	   @usage cn'''
 	try:
 		args = args.split(' ')
 		tcn = int(args[0])
