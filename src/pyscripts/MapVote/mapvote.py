@@ -1,4 +1,4 @@
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 from xsbs.colors import colordict
 from xsbs.ui import error, info
 from xsbs.players import player, all as allPlayers
@@ -46,6 +46,7 @@ def countVotes():
 
 mapreload = [False]
 
+@eventHandler('player_map_set')
 def onMapSet(cn, mapname, mapmode):
 	if sbserver.mapName() == '':
 		sbserver.setMap(mapname, mapmode)
@@ -57,6 +58,7 @@ def onMapSet(cn, mapname, mapmode):
 	elif mapmode != sbserver.gameMode() and (lock_mode or not allow_modevote):
 		sbserver.playerMessage(cn, error('You cannot request a new game mode'))
 
+@eventHandler('player_map_vote')
 def onMapVote(cn, mapname, mapmode):
 	if sbserver.mapName() == '':
 		sbserver.setMap(mapname, mapmode)
@@ -80,10 +82,7 @@ def onMapVote(cn, mapname, mapmode):
 			sbserver.playerMessage(cn, error('You have already requested this map.'))
 	countVotes()
 
+@eventHandler('reload_map_selection')
 def onIntermEnd():
 	mapreload[0] = True
-
-registerServerEventHandler('player_map_set', onMapSet)
-registerServerEventHandler('player_map_vote', onMapVote)
-registerServerEventHandler('reload_map_selection', onIntermEnd)
 
