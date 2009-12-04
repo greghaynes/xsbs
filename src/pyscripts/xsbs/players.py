@@ -1,5 +1,6 @@
 from xsbs.events import registerServerEventHandler, triggerServerEvent
 from xsbs.timers import addTimer
+from xsbs.net import ipLongToString
 import sbserver
 import logging
 
@@ -15,6 +16,8 @@ class Player:
 		return sbserver.playerName(self.cn)
 	def ipLong(self):
 		return sbserver.playerIpLong(self.cn)
+	def ipString(self):
+		return ipLongToString(self.ipLong())
 	def privilege(self):
 		return sbserver.playerPrivilege(self.cn)
 	def frags(self):

@@ -2,11 +2,12 @@ import sbserver
 from xsbs.events import triggerServerEvent
 from xsbs.commands import commandHandler, UsageError
 from xsbs.settings import PluginConfig
-from UserPrivilege.userpriv import masterRequired, adminRequired
 from xsbs.colors import red, yellow, blue, green, colordict
 from xsbs.plugins import reload as pluginReload
 from xsbs.ui import error, info, insufficientPermissions
+from xsbs.net import ipLongToString
 from Motd.motd import motdstring
+from UserPrivilege.userpriv import masterRequired, adminRequired
 import string
 
 config = PluginConfig('servercommands')
@@ -96,4 +97,12 @@ def serverMessage(cn, args):
 	else:
 		msg = servermsg_template.substitute(colordict, sender=sbserver.playerName(cn), message=args)
 		sbserver.message(msg)
+
+@commandHandler('ip')
+@masterRequired
+def playerIp(cn, args):
+	if args == '':
+		raise UsageError('cn')
+	else:
+		sbserver.message(info(player(int(args)).ipString()))
 
