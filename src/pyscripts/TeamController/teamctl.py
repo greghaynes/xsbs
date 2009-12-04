@@ -1,4 +1,4 @@
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 from UserPrivilege.userpriv import masterRequired
 from xsbs.ui import error
 import sbserver
@@ -15,6 +15,7 @@ setteam_modes = [
 	2,
 	4]
 
+@eventHandler('player_switch_team')
 def onSwitchTeam(cn, team):
 	mode =  sbserver.gameMode()
 	if mode in setteam_modes:
@@ -27,6 +28,7 @@ def onSwitchTeam(cn, team):
 	else:
 		sbserver.playerMessage(cn, error('You can not set team in this game mode.'))
 
+@eventHandler('player_set_team')
 @masterRequired
 def onSetTeam(cn, who, team):
 	mode =  sbserver.gameMode()
@@ -34,7 +36,4 @@ def onSetTeam(cn, who, team):
 		sbserver.setTeam(who, team)
 	else:
 		sbserver.playerMessage(cn, error('You can not set team in this game mode.'))
-
-registerServerEventHandler('player_switch_team', onSwitchTeam)
-registerServerEventHandler('player_set_team', onSetTeam)
 
