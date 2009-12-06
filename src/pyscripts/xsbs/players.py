@@ -59,6 +59,12 @@ def player(cn):
 	except KeyError:
 		raise ValueError('Player does not exist')
 
+def playerByName(name):
+	for p in all():
+		if p.name() == name:
+			return p
+	raise ValueError('No player by specified name')
+
 @eventHandler('player_disconnect_post')
 def playerDisconnect(cn):
 	try:
