@@ -1,4 +1,4 @@
-from xsbs.events import registerServerEventHandler, triggerServerEvent
+from xsbs.events import eventHandler, triggerServerEvent
 from xsbs.timers import addTimer
 import sbserver
 import logging
@@ -42,6 +42,7 @@ class Player:
 
 players = {}
 
+@eventHandler('map_changed')
 def onMapChanged(mapname, mapmode):
 	for player in players.values():
 		player.newGame();
@@ -55,12 +56,14 @@ def player(cn):
 	except KeyError:
 		raise ValueError('Player does not exist')
 
+@eventHandler('player_disconnect_post')
 def playerDisconnect(cn):
 	try:
 		del players[cn]
 	except KeyError:
 		logging.error('Player disconnected but does not have player class instance!')
 
+@eventHandler('player_connect_pre')
 def playerConnect(cn):
 	try:
 		del players[cn]
@@ -69,12 +72,8 @@ def playerConnect(cn):
 	players[cn] = Player(cn)
 	addTimer(1000, triggerServerEvent, ('player_connect_delayed', (cn,)))
 
+@eventHandler('restart_complete')
 def reload():
 	for cn in sbserver.clients():
 		playerConnect(cn)
-
-registerServerEventHandler('player_connect_pre', playerConnect)
-registerServerEventHandler('player_disconnect_post', playerDisconnect)
-registerServerEventHandler('restart_complete', reload)
-registerServerEventHandler('map_changed', onMapChanged)
 
