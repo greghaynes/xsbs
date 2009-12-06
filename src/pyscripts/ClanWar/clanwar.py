@@ -1,4 +1,4 @@
-from xsbs.commands import commandHandler
+from xsbs.commands import commandHandler, UsageError
 from xsbs.ui import error, notice
 from xsbs.colors import green
 from xsbs.timers import addTimer
@@ -19,9 +19,11 @@ def clanWarTimer(count):
 @commandHandler('clanwar')
 @masterRequired
 def clanWar(cn, args):
+	'''@description Start a clan war with currint teams
+	   @usage map (mode)'''
 	sender = player(cn)
 	if args == '':
-		sender.message(error('Usage: #clanwar <map> (mode)'))
+		raise UsageError('<map> (mode)')
 	else:
 		args = args.split(' ')
 		if len(args) == 1:
