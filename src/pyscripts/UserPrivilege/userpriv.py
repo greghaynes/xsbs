@@ -127,7 +127,7 @@ def onRelAdmin(cn):
 
 def userPrivAddCmd(cn, tcn, args):
 	if args == 'master':
-		if isPlayerMaster(tcn):
+		if isMaster(tcn):
 			sbserver.playerMessage(cn, error('%s already has master permissions.' % sbserver.playerName(tcn)))
 		else:
 			try:
