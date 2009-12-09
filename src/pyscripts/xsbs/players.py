@@ -53,12 +53,26 @@ def onMapChanged(mapname, mapmode):
 def all():
 	return players.values()
 
-def spectators():
-	cns = sbserver.spectators()
+def cnsToPlayers(cns):
 	ps = []
 	for cn in cns:
 		ps.append(player(cn))
 	return ps
+
+def clientCount():
+	return len(sbserver.clients())
+
+def spectatorCount():
+	return len(sbserver.spectators())
+
+def playerCount():
+	return len(sbserver.player())
+
+def spectators():
+	return cnsToPlayers(sbserver.spectators())
+
+def players():
+	return cnsToPlayers(sbserver.players())
 
 def player(cn):
 	try:
