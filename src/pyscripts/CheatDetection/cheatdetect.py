@@ -16,7 +16,8 @@ def onMapModified(cn):
 
 def checkModified(cn):
 	try:
-		if player(cn).gamevars['modified_map'] and spectate_map_modified:
+		p = player(cn)
+		if p.gamevars['modified_map'] and spectate_map_modified:
 			sbserver.playerMessage(cn, warning('You cannot play with a modified map.'))
 			sbserver.spectate(cn)
 	except KeyError:

@@ -66,12 +66,12 @@ def spectatorCount():
 	return len(sbserver.spectators())
 
 def playerCount():
-	return len(sbserver.player())
+	return len(sbserver.players())
 
 def spectators():
 	return cnsToPlayers(sbserver.spectators())
 
-def players():
+def activePlayers():
 	return cnsToPlayers(sbserver.players())
 
 def player(cn):
