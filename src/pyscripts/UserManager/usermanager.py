@@ -135,17 +135,19 @@ def onLinkName(cn, args):
 
 def onSetMaster(cn, givenhash):
 	nick = sbserver.playerName(cn)
+	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
 	try:
 		na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
 	except NoResultFound:
-		if sbserver.playerPrivilege(cn) <= 1:
+		if givenhash != adminhash:
 			sbserver.playerMessage(cn, error('Your name is not assigned to any accounts.'))
 		return
 	nickhash = sbserver.hashPassword(cn, na.user.password)
 	if givenhash == nickhash:
 		login(cn, na.user)
 	else:
-		sbserver.playerMessage(cn, error('Invalid password'))
+		if givenhash != adminhash:
+			sbserver.playerMessage(cn, error('Invalid password'))
 
 def warnNickReserved(cn, count, sessid):
 	try:

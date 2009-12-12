@@ -10,7 +10,7 @@ root_found = False
 
 if xsbs_root_path == '':
 	for dir in cwddirs:
-		if dir == 'xsbs':
+		if dir.find('xsbs') > -1:
 			root_found = True
 		xsbs_root_path += dir + '/'
 else:

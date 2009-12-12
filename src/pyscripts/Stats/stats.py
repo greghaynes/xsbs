@@ -1,6 +1,6 @@
 import sbserver
 import string, math
-from xsbs.commands import registerCommandHandler
+from xsbs.commands import commandHandler
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
 from xsbs.ui import insufficientPermissions, error
@@ -12,7 +12,11 @@ require_master = config.getOption('Config', 'require_master', 'no') == 'yes'
 del config
 template = string.Template(template)
 
+@commandHandler('stats')
 def onCommand(cn, command):
+	'''@description Stats for the current match
+	   @usage (cn)
+	   @public'''
 	if command != '':
 		if require_master and not isPlayerMaster(cn):
 			insufficientPermissions(cn)
@@ -46,6 +50,4 @@ def onCommand(cn, command):
 		ktd = ktd / 100
 	msg = template.substitute(colordict, name=name, frags=frags, deaths=deaths, teamkills=teamkills, shots=shots, hits=hits, accuracy=accuracy, ktd=ktd)
 	sbserver.playerMessage(cn, msg)
-
-registerCommandHandler('stats', onCommand)
 

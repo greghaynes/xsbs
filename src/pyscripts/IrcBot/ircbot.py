@@ -6,7 +6,7 @@ from xsbs.timers import addTimer
 from xsbs.colors import red, green, colordict
 from xsbs.ui import info, error
 from xsbs.commands import commandHandler, UsageError
-from UserPrivilege.userpriv import masterRequired
+from UserPrivilege.userpriv import masterRequired, adminRequired
 import asyncore, socket
 import asynirc
 import string
@@ -66,7 +66,7 @@ if enable:
 	bot.doConnect()
 
 @commandHandler('ircbot')
-@masterRequired
+@adminRequired
 def ircbotCmd(cn, args):
 	'''@description Enable or disable the irc bot
 	   @usage <on/off>'''

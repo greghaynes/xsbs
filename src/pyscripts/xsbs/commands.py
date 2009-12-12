@@ -2,6 +2,7 @@ import sbserver
 from events import registerServerEventHandler, registerPolicyEventHandler
 from colors import red
 from xsbs.ui import error, insufficientPermissions
+from xsbs.players import playerByName
 import xsbs.help
 import logging
 import sys, traceback
@@ -56,6 +57,23 @@ class commandHandler(object):
 		self.__name__ = f.__name__
 		registerCommandHandler(self.command_name, f)
 		return f
+
+class cnArg(object):
+	def __init__(self, argnum=0):
+		self.argnum = argnum
+	def __call__(self, f):
+		self.func = f
+		self.__doc__ = f.__doc__
+		self.__name__ = f.__name__
+		return self.handle
+	def handle(cn, args):
+		arg = args[self.argnum]
+		try:
+			cn = int(arg)
+		except TypeError:
+			cn = playerByName(arg).crn
+		args[self.argnum] = cn
+		return self.func(cn, args)
 
 registerCommandHandler('help', xsbs.help.onHelpCommand)
 registerCommandHandler('listcommands', xsbs.help.listPublicCommands)
