@@ -15,15 +15,29 @@ except TypeError:
 	logging.error('Non int value for spectator addclient rate.  Setting to 0')
 	spectatorsAddClient = 0
 
+adjsize = [0]
+
 @eventHandler('player_spectated')
-@eventHandler('player_unspectated')
+@eventHandler('player_connect')
 def onSpectate(cn):
 	if spectatorsAddClient == 0:
 		return
-	pcount = playerCount()
-	speccount = spectatorCount()
-	adjpcount = pcount + (speccount / spectatorsAddClient)
-	if adjpcount != maxClients():
-		logging.info('Adjusting server size by %i due to spectators', adjpcount)
-		setMaxClients(adjpcount)
+	newadj = spectatorCount() / spectatorsAddClient
+	if adjsize[0] != newadj:
+		newsize = maxClients() + 1
+		logging.info('Adjusting server size to %i due to new spectator', newsize)
+		adjsize[0] = newadj
+		setMaxClients(newsize)
+
+@eventHandler('player_unspectated')
+@eventHandler('player_disconnect')
+def onUnspectate(cn):
+	if spectatorsAddClient == 0:
+		return
+	newadj = spectatorCount() / spectatorsAddClient
+	if adjsize[0] != newadj:
+		newsize = maxClients() - 1
+		logging.info('Adjusting server size to %i due to loss of spectator', newsize)
+		adjsize[0] = newadj
+		setMaxClients(newsize)
 
