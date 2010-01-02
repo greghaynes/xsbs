@@ -5,6 +5,7 @@ from sbserver import maxClients, setMaxClients
 import logging
 
 config = PluginConfig('DynamicResize')
+# For every n spectators add one to maxclients
 spectatorsAddClient = config.getOption('Config', 'spectators_addclient_rate', '2')
 del config
 
@@ -23,5 +24,6 @@ def onSpectate(cn):
 	speccount = spectatorCount()
 	adjpcount = pcount + (speccount / spectatorsAddClient)
 	if adjpcount != maxClients():
+		logging.info('Adjusting server size by %i due to spectators', adjpcount)
 		setMaxClients(adjpcount)
 

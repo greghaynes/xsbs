@@ -79,7 +79,6 @@ class IrcClient(asyncore.dispatcher):
 		tmp_buff = self.read_buffer.split('\r\n')
 		self.read_buffer = tmp_buff.pop()
 		for line in tmp_buff:
-			print line
 			if line[0] == ':':
 				args = line.split(' ')
 				who = args[0][1:]
