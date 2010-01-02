@@ -9,8 +9,8 @@ from UserPrivilege.userpriv import masterRequired
 import string
 
 config = PluginConfig('mute')
-muted_temp = config.getOption('Messages', 'muted_message', '${green}${muted_name}${white} has been ${red}muted')
-unmuted_temp = config.getOption('Messages', 'unmuted_message', '${green}${muted_name}${white} has been ${red}unmuted')
+muted_temp = config.getOption('Messages', 'muted_message', '${green}${muted_name}${white} has been ${red}muted ${white}(by ${blue}${muter}${white})')
+unmuted_temp = config.getOption('Messages', 'unmuted_message', '${green}${muted_name}${white} has been ${red}unmuted ${white}(by ${blue}${muter}${white})')
 del config
 muted_temp = string.Template(muted_temp)
 unmuted_temp = string.Template(unmuted_temp)
@@ -70,7 +70,7 @@ def onMuteCommand(cn, args):
 		try:	
 			p = player(tcn)
 		except ValueError:
-			sbserver.playerMessage(cn, errer('Invalid player cn'))
+			sbserver.playerMessage(cn, error('Invalid player cn'))
 		else:
 			try:
 				muted = p.is_muted
@@ -80,8 +80,9 @@ def onMuteCommand(cn, args):
 				sbserver.playerMessage(cn, error('Player is already muted.'))
 			else:
 				p.is_muted = True
-				name = sbserver.playerName(tcn)
-				sbserver.message(info(muted_temp.substitute(colordict, muted_name=name)))
+				name = p.name()
+				muter = player(cn).name()
+				sbserver.message(info(muted_temp.substitute(colordict, muted_name=name, muter=muter)))
 	except KeyError:
 		raise UsageError('cn')
 			
@@ -94,11 +95,13 @@ def onUnmuteCommand(cn, args):
 		if len(args) > 1:
 			raise KeyError
 		try:
-			if player(tcn).is_muted:
-				player(tcn).is_muted = False
-				sbserver.message(info(unmuted_temp.substitute(colordict, muted_name=sbserver.playerName(tcn))))
+			p = player(tcn)
+			if p.is_muted:
+				p.is_muted = False
+				muter = player(cn).name()
+				sbserver.message(info(unmuted_temp.substitute(colordict, muted_name=p.name(), muter=muter)))
 			else:
-				sbserver.playerMessage(cn, error('Specifiedlayer is not crrently muted'))
+				sbserver.playerMessage(cn, error('Specified player is not crrently muted'))
 		except AttributeError:
 			sbserver.playerMessage(cn, error('Specified player is not currently muted.'))
 	except KeyError:
