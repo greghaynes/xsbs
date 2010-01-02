@@ -64,6 +64,10 @@ class IrcClient(asyncore.dispatcher):
 		self.work_queue = collections.deque()
 		self.throttle_timeout = time.time() + self.throttle_size
 		self.throttle_used = 0
+	def quit(self):
+		self.send('QUIT :Bye\r\n')
+		self.close()
+		self.is_connected = False
 	def handle_connect(self):
 		self.work_queue.append('NICK :%s\r\n' % self.nick)
 		self.work_queue.append('USER %s %s %s :%s\r\n' % (self.username, self.hostname, self.servername, self.realname))
@@ -75,6 +79,7 @@ class IrcClient(asyncore.dispatcher):
 		tmp_buff = self.read_buffer.split('\r\n')
 		self.read_buffer = tmp_buff.pop()
 		for line in tmp_buff:
+			print line
 			if line[0] == ':':
 				args = line.split(' ')
 				who = args[0][1:]
@@ -120,8 +125,6 @@ class IrcClient(asyncore.dispatcher):
 			self.channel_list.append(channel)
 	def message(self, message, to):
 		self.work_queue.append('PRIVMSG %s :%s\r\n' % (to, message))
-	def quit(self):
-		pass
 
 def run(host, port, chan, nick):
 	bot = IrcClient(

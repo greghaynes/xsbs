@@ -34,7 +34,9 @@ class ServerBot(asynirc.IrcClient):
 		self.do_reconnect = True
 		self.reconnect_count = 0
 	def reconnect(self):
-		if self.reconnect_count >= 30:
+		if self.is_connected == True:
+			return
+		if self.reconnect_count >= 5:
 			logging.error('Max recconect failures (5) occoured.')
 		else:
 			self.reconnect_count += 1
@@ -45,14 +47,11 @@ class ServerBot(asynirc.IrcClient):
 	def handle_close(self):
 		asynirc.IrcClient.handle_close(self)
 		if self.do_reconnect:
-			addTimer(5000, self.reconnect)
+			addTimer(20000, self.reconnect)
 	def handle_privmsg(self, who, to, message):
 		if self.msg_gw and to[0] == '#':
 			name = who.split('!', 1)[0]
 			sbserver.message(irc_msg_temp.substitute(colordict, name=name, message=message, channel=to))
-	def quit(self):
-		self.do_reconnect = False
-		self.close()
 
 bot = ServerBot(
 	(servername, 6667),
