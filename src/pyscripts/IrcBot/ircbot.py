@@ -18,7 +18,7 @@ channel = config.getOption('Config', 'channel', '#xsbs-newserver')
 servername = config.getOption('Config', 'servername', 'irc.gamesurge.net')
 nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
 port = int(config.getOption('Config', 'port', '6667'))
-part_message = config.getOption('Config', 'part_message', 'QUIT :XSBS - eXtensible SauerBraten Server')
+part_message = config.getOption('Config', 'part_message', 'XSBS - eXtensible SauerBraten Server')
 msg_gw = config.getOption('Abilities', 'message_gateway', 'yes') == 'yes'
 irc_msg_temp = config.getOption('Templates', 'irc_message', '${white}(${blue}IRC${white}) ${red}${name}${white}: ${message}')
 irc_msg_temp = string.Template(irc_msg_temp)
@@ -33,6 +33,7 @@ class ServerBot(asynirc.IrcClient):
 		self.msg_gw = msg_gw
 		self.do_reconnect = True
 		self.reconnect_count = 0
+		self.part_message = part_message
 	def reconnect(self):
 		if self.is_connected == True:
 			return

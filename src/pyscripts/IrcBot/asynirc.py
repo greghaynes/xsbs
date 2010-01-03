@@ -69,7 +69,7 @@ class IrcClient(asyncore.dispatcher):
 		self.throttle_timeout = time.time() + self.throttle_size
 		self.throttle_used = 0
 	def quit(self):
-		self.send('QUIT :Bye\r\n')
+		self.send('QUIT :%s\r\n' % self.part_message)
 		self.close()
 		self.is_connected = False
 	def handle_connect(self):
