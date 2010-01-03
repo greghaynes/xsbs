@@ -30,20 +30,4 @@ colordict = { 'green': green(),
 	'white': white() }
 
 def colorstring(str, text):
-	if str == 'green':
-		return green(text)
-	if str == 'blue':
-		return blue(text)
-	if str == 'yellow':
-		return yellow(text)
-	if str == 'red':
-		return red(text)
-	if str == 'grey':
-                return grey(text)
-	if str == 'magenta':
-		return magenta(text)
-	if str == 'orange':
-		return orange(text)
-	if str == 'white':
-		return white(text)
-
+	textcolor(colordic[str],text)
