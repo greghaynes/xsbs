@@ -3,6 +3,8 @@ import socket
 import logging
 import collections
 import time
+import sys
+import traceback
 
 class EventDispatcher(object):
 	def __init__(self):
@@ -19,7 +21,9 @@ class EventDispatcher(object):
 				try:
 					handler(event, *args)
 				except:
+					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
 					logging.error('Unhandled exception in event handler for %s', event)
+					logging.error(traceback.format_exc())
 		except KeyError:
 			pass
 
