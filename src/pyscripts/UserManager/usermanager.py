@@ -5,7 +5,7 @@ from sqlalchemy.orm.exc import NoResultFound
 import sbserver
 from xsbs.db import dbmanager
 from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
-from xsbs.commands import registerCommandHandler
+from xsbs.commands import commandHandler
 from xsbs.colors import red, green, orange
 from xsbs.ui import info, error, warning
 from xsbs.players import player
@@ -75,6 +75,7 @@ def isValidEmail(email):
 			return 1
 	return 0
 
+@commandHandler('register')
 def onRegisterCommand(cn, args):
 	'''@description Register account with server
 	   @usage <email> <password>
@@ -93,6 +94,7 @@ def onRegisterCommand(cn, args):
 		return
 	sbserver.playerMessage(cn, error('An account with that email address already exists.'))
 
+@commandHandler('login')
 def onLoginCommand(cn, args):
 	'''@description Login to server account
 	   @usage <email> <password>
@@ -107,6 +109,7 @@ def onLoginCommand(cn, args):
 	else:
 		sbserver.playerMessage(cn, error('Invalid login.'))
 
+@commandHandler('linkname')
 def onLinkName(cn, args):
 	'''@description Link name to server account, and reserve name.
 	   @usage
@@ -133,6 +136,7 @@ def onLinkName(cn, args):
 	session.commit()
 	sbserver.playerMessage(cn, info('Your name is now linked to your account.'))
 
+@eventHandler('player_setmaster')
 def onSetMaster(cn, givenhash):
 	nick = sbserver.playerName(cn)
 	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
@@ -198,9 +202,4 @@ def onPlayerNameChanged(cn, new_name):
 	onPlayerActive(cn)
 
 Base.metadata.create_all(dbmanager.engine)
-
-registerCommandHandler('register', onRegisterCommand)
-registerCommandHandler('login', onLoginCommand)
-registerCommandHandler('linkname', onLinkName)
-registerServerEventHandler('player_setmaster', onSetMaster)
 

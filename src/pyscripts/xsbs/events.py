@@ -20,9 +20,8 @@ class EventManager:
 					event(*args)
 				except:
 					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
-					logging.warn('Uncaught exception occured in event handler.')
-					logging.warn(traceback.format_exc())
-					logging.warn(traceback.extract_tb(exceptionTraceback))
+					logging.error('Uncaught exception occured in event handler.')
+					logging.error(traceback.format_exc())
 		except KeyError:
 			pass
 
