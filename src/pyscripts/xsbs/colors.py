@@ -24,7 +24,7 @@ colordict = { 'green': green(),
 	'blue' : blue(),
 	'yellow' : yellow(),
 	'red' : red(),
-        'grey' : grey(),
+	'grey' : grey(),
 	'magenta': magenta(),
 	'orange': orange(),
 	'white': white() }
