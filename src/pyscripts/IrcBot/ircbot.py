@@ -49,9 +49,15 @@ class ServerBot(asynirc.IrcClient):
 		if self.do_reconnect:
 			addTimer(20000, self.reconnect)
 	def handle_privmsg(self, who, to, message):
-		if self.msg_gw and to[0] == '#':
+		if message[0] in '.!@#':
+			command = message.split(' ')[0].strip()[1:]
+			message = message[len(command)+1:].strip()
+			self.handle_msg_command(who, to, command, message)
+		elif self.msg_gw and to[0] == channel:
 			name = who.split('!', 1)[0]
 			sbserver.message(irc_msg_temp.substitute(colordict, name=name, message=message, channel=to))
+	def handle_msg_command(self, who, to, command, message):
+		pass
 
 bot = ServerBot(
 	(servername, 6667),
