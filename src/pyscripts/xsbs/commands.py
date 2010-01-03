@@ -29,11 +29,15 @@ class CommandManager:
 					func(cn, text)
 				except UsageError as e:
 					sbserver.playerMessage(cn, error('Usage: #' + command + ' ' + str(e)))
+				except ValueError:
+					sbserver.playerMessage(cn, error('Value Error: Did you specify a valid cn?'))
+					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
+					logging.warn('Uncaught ValueError raised in command handler.')
+					logging.warn(traceback.format_exc())
 				except:
 					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
 					logging.warn('Uncaught exception occured in command handler.')
 					logging.warn(traceback.format_exc())
-					logging.warn(traceback.extract_tb(exceptionTraceback))
 		else:
 			sbserver.playerMessage(cn, error('Command not found'))
 	def onMsg(self, cn, text):
