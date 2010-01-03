@@ -39,7 +39,7 @@ def colorstring(str, text):
 	if str == 'red':
 		return red(text)
 	if str == 'grey':
-		return grey(text)
+                return grey(text)
 	if str == 'magenta':
 		return magenta(text)
 	if str == 'orange':
