@@ -154,7 +154,10 @@ def onUserPrivCmd(cn, args):
 	'''@description Set privileges for server account
 	   @usage <cn> <action> <level>'''
 	sp = args.split(' ')
-	tcn = int(sp[0])
+	try:
+		tcn = int(sp[0])
+	except ValueError:
+		raise UsageError('<cn> <action> <level>')
 	subcmd = sp[1]
 	args = args[len(sp[0])+len(sp[1])+2:]
 	if subcmd == 'add':
