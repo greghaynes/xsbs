@@ -84,8 +84,8 @@ namespace server
         {
              case 0: default: mastermask = MM_PRIVSERV; break;
              case 1: mastermask = MM_PUBSERV; break;
-	     case 2: mastermask = MM_COOPSERV; break;
-	}
+             case 2: mastermask = MM_COOPSERV; break;
+        }
     });
     SVAR(servermotd, "");
 
@@ -160,7 +160,7 @@ namespace server
     {
         smapname[0] = '\0';
         resetitems();
-	
+
         // Initialize python modules
         if(!SbPy::init("sauer_server", pyscriptspath, "sbserver"))
             return false;
@@ -594,17 +594,17 @@ namespace server
     void setcimaster(clientinfo *ci)
     {
         loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
-		if(ci)
-		{
+        if(ci)
+        {
             ci->privilege = PRIV_MASTER;
-	        currentmaster = ci->clientnum;
-	        SbPy::triggerEventInt("player_claimed_master", ci->clientnum);
-		}
-		else
-		{
-			currentmaster = -1;
-		}
-		masterupdate = true;
+            currentmaster = ci->clientnum;
+            SbPy::triggerEventInt("player_claimed_master", ci->clientnum);
+        }
+        else
+        {
+            currentmaster = -1;
+        }
+        masterupdate = true;
     }
 
     void setciadmin(clientinfo *ci)
@@ -620,10 +620,10 @@ namespace server
     void resetpriv(clientinfo *ci)
     {
         if(!ci || !ci->privilege) return;
-	if(ci->privilege == PRIV_MASTER)
-	    SbPy::triggerEventInt("player_released_master", ci->clientnum);
-	else
-	    SbPy::triggerEventInt("player_released_admin", ci->clientnum);
+        if(ci->privilege == PRIV_MASTER)
+            SbPy::triggerEventInt("player_released_master", ci->clientnum);
+        else
+            SbPy::triggerEventInt("player_released_admin", ci->clientnum);
         ci->privilege = PRIV_NONE;
         masterupdate = true;
         currentmaster = -1; 
@@ -1033,13 +1033,13 @@ namespace server
             demonextmatch = false;
             setupdemorecord();
         }
-	SbPy::triggerEventStrInt("map_changed", smapname, mode);
+        SbPy::triggerEventStrInt("map_changed", smapname, mode);
     }
 
     void setmap(const char *s, int mode)
     {
         sendf(-1, 1, "risii", SV_MAPCHANGE, s, mode, 1);
-	changemap(s, mode);
+        changemap(s, mode);
     }
 
     void setmastermode(int mm)
@@ -1074,7 +1074,7 @@ namespace server
 
     void endgame()
     {
-	gamelimit = gamemillis;
+        gamelimit = gamemillis;
         minremain = gamemillis>=gamelimit ? 0 : (gamelimit - gamemillis + 60000 - 1)/60000;
         sendf(-1, 1, "ri2", SV_TIMEUP, minremain);
     }
@@ -1101,7 +1101,7 @@ namespace server
         gamestate &ts = target->state;
         ts.dodamage(damage);
         actor->state.damage += damage;
-	target->state.damage_rec += damage;
+        target->state.damage_rec += damage;
         sendf(-1, 1, "ri6", SV_DAMAGE, target->clientnum, actor->clientnum, damage, ts.armour, ts.health);
         if(target!=actor && !hitpush.iszero())
         {
@@ -1354,13 +1354,13 @@ namespace server
 
         SbPy::update();
 
-	if(restart_py)
-	{
-		SbPy::restartPy();
-		restart_py = false;
-		signal(SIGINT, server_sigint);
-		sendservmsg("Reloading completed.");
-	}
+        if(restart_py)
+        {
+            SbPy::restartPy();
+            restart_py = false;
+            signal(SIGINT, server_sigint);
+            sendservmsg("Reloading completed.");
+        }
     }
 
     void sendmapreload()
@@ -1512,8 +1512,8 @@ namespace server
         clientinfo *ci = getinfo(n);
         if(ci->connected)
         {
-	    SbPy::triggerEventInt("player_disconnect", n);
-	    SbPy::triggerEventInt("player_disconnect_post", n);
+            SbPy::triggerEventInt("player_disconnect", n);
+            SbPy::triggerEventInt("player_disconnect_post", n);
             if(ci->privilege) resetpriv(ci);
             if(smode) smode->leavegame(ci, true);
             ci->state.timeplayed += lastmillis - ci->state.lasttimeplayed;
@@ -1540,7 +1540,7 @@ namespace server
         if(numclients(-1, false, true)>=maxclients) return DISC_MAXCLIENTS;
         uint ip = getclientip(ci->clientnum);
         if(mastermode>=MM_PRIVATE && allowedips.find(ip)<0) return DISC_PRIVATE;
-	if(!SbPy::triggerPolicyEventIntString("connect_private", ci->clientnum, pwd)) return DISC_PRIVATE;
+        if(!SbPy::triggerPolicyEventIntString("connect_private", ci->clientnum, pwd)) return DISC_PRIVATE;
         if(!SbPy::triggerPolicyEventIntString("connect_kick", ci->clientnum, pwd)) return DISC_KICK;
         return DISC_NONE;
     }
@@ -1594,7 +1594,7 @@ namespace server
         mapdata = opentempfile("mapdata", "w+b");
         if(!mapdata) { sendf(sender, 1, "ris", SV_SERVMSG, "failed to open temporary file for map"); return; }
         mapdata->write(data, len);
-	SbPy::triggerEventInt("player_uploaded_map", sender);
+        SbPy::triggerEventInt("player_uploaded_map", sender);
     }
 
     void parsepacket(int sender, int chan, packetbuf &p)     // has to parse exactly each byte of the packet
@@ -1645,7 +1645,7 @@ namespace server
 
                 if(m_demo) setupdemoplayback();
 
-		SbPy::triggerEventInt("player_connect_pre", ci->clientnum);
+                SbPy::triggerEventInt("player_connect_pre", ci->clientnum);
                 SbPy::triggerEventInt("player_connect", ci->clientnum);
             }
         }
@@ -1695,11 +1695,11 @@ namespace server
                     }
                     if(cp->state.state == CS_ALIVE)
                     {
-		        if(!cp->active)
-		        {
+                        if(!cp->active)
+                        {
                             cp->active = true;
                             SbPy::triggerEventInt("player_active", cp->clientnum);
-		        }
+                        }
                         if(smode) smode->moved(cp, cp->state.o, cp->gameclip, pos, (physstate&0x80)!=0);
                     }
                     cp->state.o = pos;
@@ -1930,7 +1930,7 @@ namespace server
             {
                 getstring(text, p);
                 filtertext(text, text, false, MAXTEAMLEN);
-		SbPy::triggerEventIntString("player_switch_team", sender, text);
+                SbPy::triggerEventIntString("player_switch_team", sender, text);
 		/*
                 if(strcmp(ci->team, text) && SbPy::triggerPolicyEventIntString("allow_switch_team", ci->clientnum, ci->team))
                 {
@@ -1955,10 +1955,10 @@ namespace server
                 getstring(text, p);
                 filtertext(text, text);
                 int reqmode = getint(p);
-		if(type==SV_MAPVOTE)
-			SbPy::triggerEventIntStringInt("player_map_vote", sender, text, reqmode);
-		else
-			SbPy::triggerEventIntStringInt("player_map_set", sender, text, reqmode);
+                if(type==SV_MAPVOTE)
+                    SbPy::triggerEventIntStringInt("player_map_vote", sender, text, reqmode);
+                else
+                    SbPy::triggerEventIntStringInt("player_map_set", sender, text, reqmode);
                 break;
             }
 
@@ -2037,8 +2037,8 @@ namespace server
             case SV_MASTERMODE:
             {
                 int mm = getint(p);
-		if(mm>=MM_OPEN && mm<=MM_PRIVATE)
-		    SbPy::triggerEventIntInt("player_set_mastermode", ci->clientnum, mm);
+                if(mm>=MM_OPEN && mm<=MM_PRIVATE)
+                    SbPy::triggerEventIntInt("player_set_mastermode", ci->clientnum, mm);
                 break;
             }
 
@@ -2141,7 +2141,7 @@ namespace server
                 if(mapdata)
                 {
                     sendfile(sender, 2, mapdata, "ri", SV_SENDMAP);
-		    SbPy::triggerEventInt("player_get_map", ci->clientnum);
+                    SbPy::triggerEventInt("player_get_map", ci->clientnum);
                 }
                 else sendf(sender, 1, "ris", SV_SERVMSG, "no map to send");
                 break;
