@@ -11,6 +11,8 @@ def yellow(text=None):
 	return textcolor(2, text)
 def red(text=None):
 	return textcolor(3, text)
+def grey(text=None):
+	return textcolor(4, text)
 def magenta(text=None):
 	return textcolor(5, text)
 def orange(text=None):
@@ -22,6 +24,7 @@ colordict = { 'green': green(),
 	'blue' : blue(),
 	'yellow' : yellow(),
 	'red' : red(),
+        'grey' : grey(),
 	'magenta': magenta(),
 	'orange': orange(),
 	'white': white() }
@@ -35,6 +38,8 @@ def colorstring(str, text):
 		return yellow(text)
 	if str == 'red':
 		return red(text)
+	if str == 'grey':
+		return grey(text)
 	if str == 'magenta':
 		return magenta(text)
 	if str == 'orange':
