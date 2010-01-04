@@ -19,25 +19,21 @@ adjsize = [0]
 
 @eventHandler('player_spectated')
 @eventHandler('player_connect')
-def onSpectate(cn):
-	if spectatorsAddClient == 0:
-		return
-	newadj = spectatorCount() / spectatorsAddClient
-	if adjsize[0] != newadj:
-		newsize = maxClients() + 1
-		logging.info('Adjusting server size to %i due to new spectator', newsize)
-		adjsize[0] = newadj
-		setMaxClients(newsize)
-
-@eventHandler('player_unspectated')
 @eventHandler('player_disconnect')
-def onUnspectate(cn):
+@eventHandler('player_unspectated')
+def checkSize(cn):
 	if spectatorsAddClient == 0:
 		return
 	newadj = spectatorCount() / spectatorsAddClient
-	if adjsize[0] != newadj:
-		newsize = maxClients() - 1
-		logging.info('Adjusting server size to %i due to loss of spectator', newsize)
+	newsize = 0
+	if adjsize[0] == newadj:
+		return
+	elif adjsize[0] > newadj:
+		newsize = maxClients() - (adjsize[0] - newadj)
 		adjsize[0] = newadj
-		setMaxClients(newsize)
+	else:
+		newsize = maxClients() + (newadj - adjsize[0])
+		adjsize[0] = newadj
+	logging.info('Adjusting server size to %i due to new spectator', newsize)
+	setMaxClients(newsize)
 
