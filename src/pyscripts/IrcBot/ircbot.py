@@ -6,6 +6,7 @@ from xsbs.timers import addTimer
 from xsbs.colors import red, green, colordict
 from xsbs.ui import info, error
 from xsbs.commands import commandHandler, UsageError
+from xsbs.players import clientCount
 from UserPrivilege.userpriv import masterRequired, adminRequired
 import asyncore, socket
 import asynirc
@@ -58,7 +59,9 @@ class ServerBot(asynirc.IrcClient):
 			name = who.split('!', 1)[0]
 			sbserver.message(irc_msg_temp.substitute(colordict, name=name, message=message, channel=to))
 	def handle_msg_command(self, who, to, command, message):
-		pass
+		if command == 'status':
+			message = '%i clients on %s' % (clientCount(), sbserver.mapName())
+			self.message(message, channel)
 
 bot = ServerBot(
 	(servername, 6667),
