@@ -3,6 +3,7 @@ from UserPrivilege.userpriv import masterRequired
 from xsbs.ui import error
 import sbserver
 
+#modes where clients can swtich team
 switchteam_modes = [
 	4,
 	6,
@@ -11,6 +12,7 @@ switchteam_modes = [
 	11,
 	12]
 
+# modes where clients can set team name
 setteam_modes = [
 	2,
 	4]
@@ -32,7 +34,7 @@ def onSwitchTeam(cn, team):
 @masterRequired
 def onSetTeam(cn, who, team):
 	mode =  sbserver.gameMode()
-	if mode in setteam_modes or team == 'evil' or team == 'good':
+	if mode in setteam_modes or ((team == 'evil' or team == 'good') and mode in switchteam_modes):
 		sbserver.setTeam(who, team)
 	else:
 		sbserver.playerMessage(cn, error('You can not set team in this game mode.'))
