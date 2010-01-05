@@ -46,7 +46,7 @@ class IrcClient(asyncore.dispatcher):
 		self.is_connected = False
 		self.channel_list = []
 		self.throttle_size = 512
-		self.trottle_time = 1
+		self.trottle_time = 2
 		self.part_message = 'PyAsyncirc Bot'
 		self.events.connect('PING', self.handle_pong)
 		self.events.connect('MODE', self.handle_mode)
