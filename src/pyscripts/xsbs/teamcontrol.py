@@ -10,7 +10,8 @@ switchteam_modes = [
 	8,
 	10,
 	11,
-	12]
+	12,
+    14]
 
 # modes where clients can set team name
 setteam_modes = [
