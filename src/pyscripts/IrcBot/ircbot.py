@@ -65,6 +65,9 @@ class ServerBot(asynirc.IrcClient):
 		if command == 'status':
 			message = status_message.substitute(num_clients=clientCount(), map_name=sbserver.mapName())
 			self.message(message, channel)
+	def quit(self):
+		self.do_reconnect = False
+		asynirc.IrcClient.quit(self)
 
 bot = ServerBot(
 	(servername, 6667),
