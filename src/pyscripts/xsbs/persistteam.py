@@ -19,9 +19,12 @@ def onAutoteam():
 def onDisconnect(cn):
 	i = 0
 	for p in player_pteams:
-		if p[i] == cn:
-			del p[i]
-			return
+		try:
+			if p[i] == cn:
+				del p[i]
+				return
+		except IndexError:
+			pass
 		i += 1
 
 def persistentTeams(enabled):

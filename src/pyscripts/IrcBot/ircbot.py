@@ -6,6 +6,7 @@ from xsbs.timers import addTimer
 from xsbs.colors import red, green, colordict
 from xsbs.ui import info, error
 from xsbs.commands import commandHandler, UsageError
+from xsbs.players import clientCount
 from UserPrivilege.userpriv import masterRequired, adminRequired
 import asyncore, socket
 import asynirc
@@ -21,11 +22,14 @@ port = int(config.getOption('Config', 'port', '6667'))
 part_message = config.getOption('Config', 'part_message', 'XSBS - eXtensible SauerBraten Server')
 msg_gw = config.getOption('Abilities', 'message_gateway', 'yes') == 'yes'
 irc_msg_temp = config.getOption('Templates', 'irc_message', '${white}(${blue}IRC${white}) ${red}${name}${white}: ${message}')
-irc_msg_temp = string.Template(irc_msg_temp)
+status_message = config.getOption('Templates', 'status_message', '${num_clients} clients on map ${map_name}')
 try:
 	ipaddress = config.getOption('Config', 'ipaddress', None, False)
 except NoOptionError:
 	ipaddress = None
+
+irc_msg_temp = string.Template(irc_msg_temp)
+status_message = string.Template(status_message)
 
 class ServerBot(asynirc.IrcClient):
 	def __init__(self, serverinfo, clientinfo, msg_gw):
@@ -58,7 +62,12 @@ class ServerBot(asynirc.IrcClient):
 			name = who.split('!', 1)[0]
 			sbserver.message(irc_msg_temp.substitute(colordict, name=name, message=message, channel=to))
 	def handle_msg_command(self, who, to, command, message):
-		pass
+		if command == 'status':
+			message = status_message.substitute(num_clients=clientCount(), map_name=sbserver.mapName())
+			self.message(message, channel)
+	def quit(self):
+		self.do_reconnect = False
+		asynirc.IrcClient.quit(self)
 
 bot = ServerBot(
 	(servername, 6667),
