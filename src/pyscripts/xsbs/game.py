@@ -1,3 +1,5 @@
+import sbserver
+
 modes = [
 	'ffa',
 	'coop',
@@ -17,13 +19,27 @@ modes = [
 ]
 
 def modeName(modenum):
+	'''String representing game mode number'''
 	return modes[modenum]
 
 def modeNumber(modename):
+	'''Number representing game mode string'''
 	i = 0
 	for mode in modes:
 		if modename == mode:
 			return i
 		i += 1
 	raise ValueError('Invalid mode')
+
+def currentMap():
+	'''Name of current map'''
+	return sbserver.mapName()
+
+def currentMode():
+	'''Integer value of current game mode'''
+	return sbserver.gameMode()
+
+def setPaused(val):
+	'''Pause or unpause the server'''
+	sbserver.setPaused(val)
 
