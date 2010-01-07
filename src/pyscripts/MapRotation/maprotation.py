@@ -70,6 +70,7 @@ def onNextMapCmd(cn, args):
 
 def onConnect(cn):
 	if rotate_on_join[0]:
+		rotate_on_join[0] = False
 		sbserver.setPaused(False)
 
 if preset_rotation:
