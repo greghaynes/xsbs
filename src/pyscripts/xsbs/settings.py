@@ -9,7 +9,9 @@ configuration_extension = '.conf'
 ##### DONT MODIFY BELOW HERE ######
 
 class PluginConfig:
+	'''Allows easy reading of configuration options from configuration files'''
 	def __init__(self, plugin_name):
+		'''Creates config reader for file plugin_name.conf'''
 		self.is_modified = False
 		self.parser = ConfigParser()
 		self.plugin_name = plugin_name
