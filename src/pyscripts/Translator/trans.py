@@ -2,7 +2,6 @@ import sbserver
 from xsbs.commands import registerCommandHandler
 from xsbs.settings import PluginConfig
 from xsbs.colors import red, green, white
-from xsbs.ui import info
 import socket, re, asyncore
 
 cmd_name = 'translate'
