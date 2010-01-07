@@ -16,6 +16,9 @@ modes = [
 	'instaprotect'
 ]
 
+def modeName(modunum):
+	return modes[modenum]
+
 def modeNumber(modename):
 	i = 0
 	for mode in modes:
