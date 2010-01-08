@@ -34,7 +34,7 @@ def onSwitchTeam(cn, team):
 @eventHandler('player_set_team')
 def onSetTeam(tcn, cn, team):
 	if cn != tcn and isPlayerMaster(cn):
-		insufficientPermissions(cn)
+		insufficientPermissions(tcn)
 		return
 	mode =  sbserver.gameMode()
 	if mode in setteam_modes:
