@@ -1,4 +1,4 @@
-from xsbs.events import eventHandler, execLater
+from xsbs.events import eventHandler, execLater, registerServerEventHandler
 from xsbs.players import player
 from xsbs.ui import warning
 from xsbs.colors import red
