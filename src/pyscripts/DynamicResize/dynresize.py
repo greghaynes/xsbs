@@ -34,6 +34,6 @@ def checkSize(cn):
 	else:
 		newsize = maxClients() + (newadj - adjsize[0])
 		adjsize[0] = newadj
-	logging.info('Adjusting server size to %i due to new spectator', newsize)
+	logging.debug('Adjusting server size to %i due to new spectator', newsize)
 	setMaxClients(newsize)
 
