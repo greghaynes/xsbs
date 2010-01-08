@@ -41,6 +41,9 @@ def onNameChange(cn, newname):
 	onConnect(cn)
 
 def namesCmd(cn, args):
+	'''@description Display names used by client
+	   @usage cn
+	   @public'''
 	if master_required and not isPlayerMaster(cn):
 		insufficientPermissions(cn)
 		return
