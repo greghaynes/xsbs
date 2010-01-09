@@ -70,8 +70,8 @@ class IrcClient(asyncore.dispatcher):
 		self.throttle_used = 0
 	def quit(self):
 		self.send('QUIT :%s\r\n' % self.part_message)
-		self.close()
 		self.is_connected = False
+		self.close()
 	def handle_connect(self):
 		self.work_queue.append('NICK :%s\r\n' % self.nick)
 		self.work_queue.append('USER %s %s %s :%s\r\n' % (self.username, self.hostname, self.servername, self.realname))
@@ -95,7 +95,11 @@ class IrcClient(asyncore.dispatcher):
 				self.events.trigger(event, args)
 	def handle_write(self):
 		data = self.work_queue.popleft()
-		self.send(data)
+		try:
+			self.send(data)
+		except socket.error:
+			self.is_connected = False
+			self.close()
 	def writable(self):
 		if time.time() >= self.throttle_timeout:
 			self.throttle_timeout = time.time() + self.trottle_time
