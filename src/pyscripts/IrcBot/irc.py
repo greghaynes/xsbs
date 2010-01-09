@@ -5,10 +5,13 @@ Copyright 2008, Sean B. Palmer, inamidst.com
 Licensed under the Eiffel Forum License 2.
 
 http://inamidst.com/phenny/
+
+Modifications have been made to the original Phenny source.
 """
 
 import sys, re, time, traceback
 import socket, asyncore, asynchat
+import logging
 
 class Origin(object): 
    source = re.compile(r'([^!]*)!?([^@]*)@?(.*)')
@@ -69,19 +72,19 @@ class Bot(asynchat.async_chat):
    def initiate_connect(self, host, port): 
       if self.verbose: 
          message = 'Connecting to %s:%s...' % (host, port)
-         print >> sys.stderr, message,
+         logging.info(message)
       self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
       self.connect((host, port))
 
    def handle_connect(self): 
       if self.verbose: 
-         print >> sys.stderr, 'connected!'
+         logging.info('Connected')
       self.write(('NICK', self.nick))
       self.write(('USER', self.user, '+iw', self.nick), self.name)
 
    def handle_close(self): 
       self.close()
-      print >> sys.stderr, 'Closed!'
+      logging.info('Closed')
 
    def collect_incoming_data(self, data): 
       self.buffer += data
