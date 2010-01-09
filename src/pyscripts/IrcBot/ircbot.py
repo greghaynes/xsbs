@@ -39,19 +39,29 @@ def decode(bytes):
 class Bot(irc.Bot):
 	def __init__(self, nick, name, channel):
 		irc.Bot.__init__(self, nick, name, (channel,))
-		self.event_handlers = { '251': self.handle_mode }
+		self.event_handlers = { '251': self.handle_mode,
+			'PRIVMSG': self.handle_privmsg }
 		self.connect_complete = False
 	def dispatch(self, origin, args):
 		bytes, event, args = args[0], args[1], args[2:]
 		text = decode(bytes)
 		try:
-			self.event_handlers[event](event, args)
+			self.event_handlers[event](origin, event, args, bytes)
 		except KeyError:
 			pass
-	def handle_mode(self, event, args):
+	def handle_mode(self, origin, event, args, bytes):
 		if not self.connect_complete:
 			self.connect_complete = True
 			self.handle_complete_connect()
+	def handle_privmsg(self, origin, event, args, bytes):
+		if args[0] in self.channels:
+			if bytes[0] in '.!#@':
+				cmd_args = bytes.split(' ', 1)
+				self.handle_command(args, origin, cmd_args[0][1:], cmd_args[1])
+			else:
+				sbserver.message(irc_msg_temp.substitute(colordict, name=origin.nick, message=bytes))
+	def handle_command(self, origin, command, bytes):
+		pass
 	def handle_complete_connect(self):
 		for chan in self.channels:
 			self.write(('JOIN', chan))
