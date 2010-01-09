@@ -20,8 +20,8 @@ def onDisconnect(cn):
 	i = 0
 	for p in player_pteams:
 		try:
-			if p[i] == cn:
-				del p[i]
+			if p[0] == cn:
+				del player_pteams[i]
 				return
 		except IndexError:
 			pass
