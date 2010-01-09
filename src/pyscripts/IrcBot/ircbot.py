@@ -40,7 +40,8 @@ class Bot(irc.Bot):
 	def __init__(self, nick, name, channel):
 		irc.Bot.__init__(self, nick, name, (channel,))
 		self.event_handlers = { '251': self.handle_mode,
-			'PRIVMSG': self.handle_privmsg }
+			'PRIVMSG': self.handle_privmsg,
+			'433': self.handle_nick_in_use }
 		self.connect_complete = False
 	def dispatch(self, origin, args):
 		bytes, event, args = args[0], args[1], args[2:]
@@ -60,12 +61,16 @@ class Bot(irc.Bot):
 				self.handle_command(args, origin, cmd_args[0][1:], cmd_args[1])
 			else:
 				sbserver.message(irc_msg_temp.substitute(colordict, name=origin.nick, message=bytes))
+	def handle_nick_in_use(self, origin, event, args, bytes):
+		logging.error('Nickname already in use')
 	def handle_command(self, origin, command, bytes):
 		pass
 	def handle_complete_connect(self):
 		for chan in self.channels:
 			self.write(('JOIN', chan))
 	def broadcast(self, message):
+		if not self.connect_complete:
+			return
 		for chan in self.channels:
 			self.msg(chan, message)
 
