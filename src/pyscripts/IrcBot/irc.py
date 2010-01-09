@@ -41,9 +41,6 @@ class Bot(asynchat.async_chat):
       self.channels = channels or []
       self.stack = []
 
-      import threading
-      self.sending = threading.RLock()
-
    def __write(self, args, text=None): 
       # print '%r %r %r' % (self, args, text)
       try: 
@@ -115,8 +112,6 @@ class Bot(asynchat.async_chat):
       pass
 
    def msg(self, recipient, text): 
-      self.sending.acquire()
-
       # Cf. http://swhack.com/logs/2006-03-01#T19-43-25
       if isinstance(text, unicode): 
          try: text = text.encode('utf-8')
@@ -142,7 +137,6 @@ class Bot(asynchat.async_chat):
       if messages.count(text) >= 5: 
          text = '...'
          if messages.count('...') >= 3: 
-            self.sending.release()
             return
 
       self.__write(('PRIVMSG', recipient), text)
