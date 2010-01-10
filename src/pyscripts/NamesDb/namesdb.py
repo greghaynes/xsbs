@@ -37,7 +37,7 @@ def onConnect(cn):
 	session.add(ent)
 	session.commit()
 
-def onNameChange(cn, newname):
+def onNameChange(cn, oldname, newname):
 	onConnect(cn)
 
 def namesCmd(cn, args):

@@ -1912,9 +1912,12 @@ namespace server
             {
                 QUEUE_MSG;
                 getstring(text, p);
+                char *oldname = (char*)malloc(strlen(ci->name)+1);
+                strcpy(oldname, ci->name);
                 filtertext(ci->name, text, false, MAXNAMELEN);
                 if(!ci->name[0]) copystring(ci->name, "unnamed");
-                SbPy::triggerEventIntString("player_name_changed", ci->clientnum, ci->name);
+                SbPy::triggerEventIntStringString("player_name_changed", ci->clientnum, oldname, ci->name);
+                free(oldname);
                 QUEUE_STR(ci->name);
                 break;
             }

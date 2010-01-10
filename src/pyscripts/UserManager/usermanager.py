@@ -198,7 +198,7 @@ def onPlayerActive(cn):
 	warnNickReserved(cn, 0, sbserver.playerSessionId(cn))
 
 @eventHandler('player_name_changed')
-def onPlayerNameChanged(cn, new_name):
+def onPlayerNameChanged(cn, old_name, new_name):
 	onPlayerActive(cn)
 
 Base.metadata.create_all(dbmanager.engine)
