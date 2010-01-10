@@ -7,9 +7,9 @@ from xsbs.colors import red, green, colordict
 from xsbs.ui import info, error
 from xsbs.commands import commandHandler, UsageError
 from xsbs.players import clientCount
+from xsbs.game import currentMap
 from UserPrivilege.userpriv import masterRequired, adminRequired
-import asyncore, socket
-import asynirc
+import irc
 import string
 import logging
 
@@ -28,135 +28,88 @@ try:
 except NoOptionError:
 	ipaddress = None
 
+# This decode is borrowed from Phenny, under same license as irc.py
+def decode(bytes): 
+	try: text = bytes.decode('utf-8')
+	except UnicodeDecodeError: 
+		try: text = bytes.decode('iso-8859-1')
+		except UnicodeDecodeError: 
+			text = bytes.decode('cp1252')
+	return text
+
+class Bot(irc.Bot):
+	def __init__(self, nick, name, channel):
+		irc.Bot.__init__(self, nick, name, (channel,))
+		self.event_handlers = { '251': self.handle_mode,
+			'PRIVMSG': self.handle_privmsg,
+			'433': self.handle_nick_in_use }
+		self.command_handlers = { 'status': self.cmd_status }
+		self.connect_complete = False
+	def dispatch(self, origin, args):
+		bytes, event, args = args[0], args[1], args[2:]
+		text = decode(bytes)
+		try:
+			self.event_handlers[event](origin, event, args, bytes)
+		except KeyError:
+			pass
+	def handle_mode(self, origin, event, args, bytes):
+		if not self.connect_complete:
+			self.connect_complete = True
+			self.handle_complete_connect()
+	def handle_privmsg(self, origin, event, args, bytes):
+		if args[0] in self.channels:
+			if bytes[0] in '.!#@':
+				cmd_args = bytes.split(' ', 1)
+				try:
+					self.handle_command(args[0], origin, cmd_args[0][1:], cmd_args[1])
+				except IndexError:
+					self.handle_command(args[0], origin, cmd_args[0][1:], '')
+			else:
+				sbserver.message(irc_msg_temp.substitute(colordict, name=origin.nick, message=bytes))
+	def handle_nick_in_use(self, origin, event, args, bytes):
+		logging.error('Nickname already in use')
+	def handle_command(self, channel, origin, command, bytes):
+		try:
+			self.command_handlers[command](channel, origin, command, bytes)
+		except KeyError:
+			pass
+	def handle_complete_connect(self):
+		for chan in self.channels:
+			self.write(('JOIN', chan))
+	def cmd_status(self, channel, origin, command, bytes):
+		self.msg(channel, status_message.substitute(colordict, num_clients=str(clientCount()), map_name=currentMap()))
+	def broadcast(self, message):
+		if not self.connect_complete:
+			return
+		for chan in self.channels:
+			self.msg(chan, message)
+
 irc_msg_temp = string.Template(irc_msg_temp)
 status_message = string.Template(status_message)
 
-class ServerBot(asynirc.IrcClient):
-	def __init__(self, serverinfo, clientinfo, msg_gw):
-		asynirc.IrcClient.__init__(self, serverinfo, clientinfo)
-		self.msg_gw = msg_gw
-		self.do_reconnect = True
-		self.reconnect_count = 0
-		self.part_message = part_message
-	def reconnect(self):
-		if self.is_connected == True:
-			return
-		if self.reconnect_count >= 5:
-			logging.error('Max recconect failures (5) occoured.')
-		else:
-			self.reconnect_count += 1
-			self.doConnect()
-	def handle_connect(self):
-		self.reconnect_count = 0
-		asynirc.IrcClient.handle_connect(self)
-	def handle_close(self):
-		asynirc.IrcClient.handle_close(self)
-		if self.do_reconnect:
-			addTimer(20000, self.reconnect)
-	def handle_privmsg(self, who, to, message):
-		if message[0] in '.!@#':
-			command = message.split(' ')[0].strip()[1:]
-			message = message[len(command)+1:].strip()
-			self.handle_msg_command(who, to, command, message)
-		elif self.msg_gw and to[0] == channel:
-			name = who.split('!', 1)[0]
-			sbserver.message(irc_msg_temp.substitute(colordict, name=name, message=message, channel=to))
-	def handle_msg_command(self, who, to, command, message):
-		if command == 'status':
-			message = status_message.substitute(num_clients=clientCount(), map_name=sbserver.mapName())
-			self.message(message, channel)
-	def quit(self):
-		self.do_reconnect = False
-		asynirc.IrcClient.quit(self)
-
-bot = ServerBot(
-	(servername, 6667),
-	(nickname, nickname.lower(), 'localhost', 'localhost', nickname),
-	msg_gw)
-if(ipaddress):
-	bot.ip_address = ipaddress
-bot.join(channel)
-
+bot = Bot(nickname, 'xsbs', channel)
 if enable:
-	bot.doConnect()
-
-@commandHandler('ircbot')
-@adminRequired
-def ircbotCmd(cn, args):
-	'''@description Enable or disable the irc bot
-	   @usage <on/off>'''
-	if args == 'off':
-		bot.quit()
-		sbserver.playerMessage(cn, info('Irc bot disabled'))
-	elif args == 'on':
-		bot.doConnect()
-		sbserver.playerMessage(cn, info('Irc bot enabled'))
-	else:
-		raise UsageError('off/on')
-
-def onPlayerConnect(cn):
-	bot.message('\x032CONNECT         \x03Player %s (%i) has joined' % (sbserver.playerName(cn), cn), channel)
-
-def onPlayerDisconnect(cn):
-	bot.message('\x032DISCONNECT      \x03Player %s (%i) has disconnected' % (sbserver.playerName(cn), cn), channel)
-
-def onMsg(cn, text):
-	bot.message('\x033MESSAGE\x03         %s (%i): %s' % (sbserver.playerName(cn), cn, text), channel)
-
-def onTeamMsg(cn, text):
-	bot.message('\x033MESSAGE (TEAM)\x03  %s (%i) (Team): %s' % (sbserver.playerName(cn), cn, text), channel)
-
-def onMapChange(map, mode):
-	bot.message('\x035MAP CHANGE\x03      %s (%s)' % (map, sbserver.modeName(mode)), channel)
-
-def onGainMaster(cn):
-	bot.message('\x037MASTER\x03          %s gained master' % sbserver.playerName(cn), channel)
-
-def onGainAdmin(cn):
-	bot.message('\x037ADMIN\x03           %s gained admin' % sbserver.playerName(cn), channel)
-
-def onAuth(cn, authname):
-	bot.message('\x037AUTH\x03            %s has authenticated as %s' % (sbserver.playerName(cn), authname), channel)
-
-def onReleaseAdmin(cn):
-	bot.message('\x037ADMIN RELINQ\x03    %s released admin' % sbserver.playerName(cn), channel)
-
-def onReleaseMaster(cn):
-	bot.message('\x037MASTER RELINQ\x03   %s released master' % sbserver.playerName(cn), channel)
-
-def onBan(cn, seconds, reason):
-	bot.message('\x0313BAN\x03            %s banned for %i for %s' % (sbserver.playerName(cn), seconds, reason), channel)
-
-def onSpectated(cn):
-	bot.message('\x0314SPECTATED\x03      %s became a spectator' % sbserver.playerName(cn), channel)
-
-def onUnSpectated(cn):
-	bot.message('\x0314UNSPECTATED\x03    %s unspectated' % sbserver.playerName(cn), channel)
-
-def onNameChanged(cn, new_name):
-	bot.message('\x0314NAME CHANGE\x03    %s (%i) changed name' % (new_name, cn), channel)
-
-def onReload():
-	bot.quit()
-
-def onStop():
-	bot.quit()
+	bot.run(servername, port)
 
 event_abilities = {
-	'player_active': ('player_connect', onPlayerConnect),
-	'player_disconnect': ('player_disconnect', onPlayerDisconnect),
-	'message': ('player_message', onMsg),
-	'message_team': ('player_message_team', onTeamMsg),
-	'map_change': ('map_changed', onMapChange),
-	'gain_admin': ('player_claimed_admin', onGainAdmin),
-	'gain_master': ('player_claimed_master', onGainMaster),
-	'auth': ('player_auth_succeed', onAuth),
-	'relinquish_admin': ('player_released_admin', onReleaseAdmin),
-	'relinquish_master': ('player_released_master', onReleaseMaster),
-	'ban': ('player_banned', onBan),
-	'spectate': ('player_spectated', onSpectated),
-	'unspectate': ('player_unspectated', onUnSpectated),
-	'name_change': ('player_name_changed', onNameChanged),
+	'player_active': ('player_connect', lambda x: bot.broadcast(
+		'CONNECT        %s (%i)' % (sbserver.playerName(x), x))),
+	'player_disconnect': ('player_disconnect', lambda x: bot.broadcast(
+		'DISCONNECT     %s (%i)' % (sbserver.playerName(x), x))),
+	'message': ('player_message', lambda x, y: bot.broadcast(
+		'MESSAGE        %s (%i): %s' % (sbserver.playerName(x), x, y))),
+	'map_change': ('map_changed', lambda x, y: bot.broadcast(
+		'MAP CHANGE     %s (%s)' % (map, sbserver.modeName(mode)))),
+	'gain_admin': ('player_claimed_admin', lambda x: bot.broadcast(
+		'CLAIM ADMIN    %s (%i)' % (sbserver.playerName(x), x))),
+	'gain_master': ('player_claimed_master', lambda x: bot.broadcast(
+		'CLAIM MASTER   %s (%i)' % (sbserver.playerName(x), x))),
+	'auth': ('player_auth_succeed', lambda x, y: bot.broadcast(
+		'AUTH           %s (%i) as %s@sauerbraten.org' % (sbserver.playerName(x), x, y))),
+	'relinquish_admin': ('player_released_admin', lambda x: bot.broadcast(
+		'RELINQ ADMIN   %s (%i)' % (sbserver.playerName(x), x))),
+	'relinquish_master': ('player_released_master', lambda x: bot.broadcast(
+		'RELINQ MASTER  %s (%i)' % (sbserver.playerName(x), x))),
 }
 
 for key in event_abilities.keys():
@@ -164,7 +117,4 @@ for key in event_abilities.keys():
 		ev = event_abilities[key]
 		registerServerEventHandler(ev[0], ev[1])
 del config
-
-registerServerEventHandler('reload', onReload)
-registerServerEventHandler('server_stop', onStop)
 
