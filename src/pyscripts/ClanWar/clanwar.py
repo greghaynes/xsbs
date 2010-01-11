@@ -19,7 +19,7 @@ def clanWarTimer(count):
 @commandHandler('clanwar')
 @masterRequired
 def clanWar(cn, args):
-	'''@description Start a clan war with currint teams
+	'''@description Start a clan war with currunt teams
 	   @usage map (mode)'''
 	sender = player(cn)
 	if args == '':
