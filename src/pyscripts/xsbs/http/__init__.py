@@ -3,6 +3,18 @@ import asyncore
 
 path_handlers = {}
 
+def registerUrlHandler(url, func):
+	path_handlers[url] = func
+
+class urlHandler(object):
+	def __init__(self, url):
+		self.url = name
+	def __call__(self, f):
+		self.__doc__ = f.__doc__
+		self.__name__ = f.__name__
+		registerUrlHandler(self.url, f)
+		return f
+
 class RequestHandler(simpleasync.RequestHandler):
 	def __init__(self, conn, addr, server):
 		simpleasync.RequestHandler.__init__(self, conn, addr, server)
