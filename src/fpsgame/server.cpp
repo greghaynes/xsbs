@@ -52,13 +52,6 @@ namespace server
     bool restart_py = false;
     bool allow_modevote = false;
 
-    struct demofile
-    {
-        string info;
-        uchar *data;
-        int len;
-    };
-
 #define MAXDEMOS 5
     vector<demofile> demos;
 
@@ -413,6 +406,7 @@ namespace server
         demotmp->seek(0, SEEK_SET);
         demotmp->read(d.data, len);
         DELETEP(demotmp);
+        SbPy::triggerEventInt("demo_recorded", demos.ulen - 1);
     }
 
     void setupdemorecord()

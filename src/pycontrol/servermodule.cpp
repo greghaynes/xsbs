@@ -759,6 +759,32 @@ static PyObject *setRecordNextMatch(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *demoSize(PyObject *self, PyObject *args)
+{
+	int num;
+	if(!PyArg_ParseTuple(args, "i", &num))
+		return 0;
+	if(!server::demos.inrange(num))
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid demo number");
+		return 0;
+	}
+	return Py_BuildValue("i", server::demos[num].len);
+}
+
+static PyObject *demoData(PyObject *self, PyObject *args)
+{
+	int num;
+	if(!PyArg_ParseTuple(args, "i", &num))
+		return 0;
+	if(!server::demos.inrange(num))
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid demo number");
+		return 0;
+	}
+	return Py_BuildValue("s", server::demos[num].data);
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -815,6 +841,8 @@ static PyMethodDef ModuleMethods[] = {
 	{"teamScore", teamScore, METH_VARARGS, "Score of team."},
 	{"nextMatchRecorded", nextMatchRecorded, METH_VARARGS, "Is next match being recorded."},
 	{"setRecordNextMatch", setRecordNextMatch, METH_VARARGS, "Set to record demo of next match."},
+	{"demoSize", demoSize, METH_VARARGS, "Size of demo in bytes."},
+    {"demoData", demoData, METH_VARARGS, "Demo data."},
 	{NULL, NULL, 0, NULL}
 };
 

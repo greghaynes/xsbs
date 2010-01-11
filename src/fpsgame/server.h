@@ -321,6 +321,12 @@ namespace server
 */
 namespace server
 {
+	struct demofile
+	{
+		string info;
+		uchar *data;
+		int len;
+	};
 
 	extern int gamemillis;
 	extern vector<clientinfo *> connects, clients, bots;
@@ -336,6 +342,7 @@ namespace server
 	extern int minremain;
 	extern int port;
 	extern bool demonextmatch;
+	extern vector<demofile> demos;
 
 	struct servmode
 	{
