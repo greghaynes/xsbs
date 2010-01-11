@@ -4,6 +4,7 @@ import sbserver, xsbs.events
 import xsbs.log
 import xsbs.teamcontrol
 import xsbs.persistteam
+import xsbs.http
 import logging
 
 plugins = {}
