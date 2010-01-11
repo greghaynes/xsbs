@@ -202,7 +202,7 @@ namespace server
 	
     struct clientinfo
     {
-        int clientnum, ownernum, connectmillis, sessionid;
+        int clientnum, ownernum, connectmillis, sessionid, overflow;
         string name, team, mapvote;
         int playermodel;
         int modevote;
@@ -235,6 +235,7 @@ namespace server
             mapvote[0] = 0;
             state.reset();
             events.deletecontentsp();
+            overflow = 0;
             timesync = false;
             lastevent = 0;
             clientmap[0] = '\0';
@@ -262,7 +263,7 @@ namespace server
             messages.setsizenodelete(0);
             ping = 0;
             aireinit = 0;
-	    active = false;
+            active = false;
             mapchange();
         }
 		
