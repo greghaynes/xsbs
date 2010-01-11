@@ -2,8 +2,10 @@ import sbserver
 from xsbs.timers import addTimer
 from xsbs.ban import ban
 from xsbs.settings import PluginConfig
-from xsbs.ui import warning
+from xsbs.ui import warning, notice
+from xsbs.commands import commandHandler, UsageError
 from xsbs import players
+from UserPrivilege.userpriv import masterRequired
 
 config = PluginConfig('pinglimiter')
 enable = config.getOption('Config', 'enable', 'yes') == 'yes'
@@ -19,7 +21,11 @@ class PingLimiter:
 		self.action_interval = action_interval
 		self.counter = action_interval
 		self.warned_cns = []
+		self.enabled = True
 	def checkPlayers(self):
+		addTimer(5000, self.checkPlayers, ())
+		if not self.enabled:
+			return
 		self.update_averages()
 		if self.counter == 0:
 			laggers = []
@@ -39,7 +45,6 @@ class PingLimiter:
 					self.warned_cns.append(lagger)
 			for r_cns in remove_cns:
 				self.warned_cns.remove(r_cns)
-		addTimer(5000, self.checkPlayers, ())
 	def update_averages(self):
 		"""
 		Uses an exponential average, this will punish spikes harder than a multiple of instances calculated into an average.
@@ -56,7 +61,21 @@ class PingLimiter:
 		else:
 			self.counter = self.action_interval
 
-if enable:
-	limiter = PingLimiter(max_ping, action_interval)
-	addTimer(5000, limiter.checkPlayers, ())
+limiter = PingLimiter(max_ping, action_interval)
+limiter.enabled = enable
+addTimer(5000, limiter.checkPlayers, ())
+
+@commandHandler('pinglimiter')
+@masterRequired
+def pingLimiterCmd(cn, args):
+	'''@description Enable or disable kicking high ping users
+	   @usage enable/disable'''
+	if args == 'enable':
+		limiter.enabled = True
+		sbserver.playerMessage(cn, notice('Ping limiter enabled'))
+	elif args == 'disable':
+		limiter.enabled = False
+		sbserver.playerMessage(cn, notice('Ping limiter disabled'))
+	else:
+		raise UsageError('enable/disable')
 
