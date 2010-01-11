@@ -785,6 +785,26 @@ static PyObject *demoData(PyObject *self, PyObject *args)
 	return Py_BuildValue("s", server::demos[num].data);
 }
 
+static PyObject *sendDemo(PyObject *self, PyObject *args)
+{
+	int cn, num;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "ii", &cn, &num))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	if(!server::demos.inrange(num))
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid demo number");
+		return 0;
+	}
+	server::senddemo(cn, num);
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -843,6 +863,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"setRecordNextMatch", setRecordNextMatch, METH_VARARGS, "Set to record demo of next match."},
 	{"demoSize", demoSize, METH_VARARGS, "Size of demo in bytes."},
     {"demoData", demoData, METH_VARARGS, "Demo data."},
+	{"sendDemo", sendDemo, METH_VARARGS, "Send demo to client."},
 	{NULL, NULL, 0, NULL}
 };
 
