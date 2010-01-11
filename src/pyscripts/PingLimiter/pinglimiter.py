@@ -5,7 +5,7 @@ from xsbs.settings import PluginConfig
 from xsbs.ui import warning, notice
 from xsbs.commands import commandHandler, UsageError
 from xsbs import players
-from UserPrivilege.userpriv import masterRequired
+from UserPrivilege.userpriv import adminRequired
 
 config = PluginConfig('pinglimiter')
 enable = config.getOption('Config', 'enable', 'yes') == 'yes'
@@ -66,7 +66,7 @@ limiter.enabled = enable
 addTimer(5000, limiter.checkPlayers, ())
 
 @commandHandler('pinglimiter')
-@masterRequired
+@adminRequired
 def pingLimiterCmd(cn, args):
 	'''@description Enable or disable kicking high ping users
 	   @usage enable/disable'''
