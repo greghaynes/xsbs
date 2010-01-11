@@ -1,5 +1,14 @@
 import simpleasync
 import asyncore
+from xsbs.settings import PluginConfig
+
+config = PluginConfig('httpserver')
+enable = config.getOption('Config', 'enable', 'yes') == 'yes'
+address = config.getOption('Config', 'ipaddress', '')
+port = config.getOption('Config', 'port', '8081')
+del config
+
+port = int(port)
 
 path_handlers = {}
 
@@ -27,7 +36,8 @@ class RequestHandler(simpleasync.RequestHandler):
 			self.outgoing.append('Invalid URL')
 			self.outgoing.append(None)
 
-server = simpleasync.Server('', 8081, RequestHandler)
-if __name__=="__main__":
+if enable or __name__ == '__main__':
+	server = simpleasync.Server(address, port, RequestHandler)
+if __name__ == '__main__':
 	asyncore.loop()
 
