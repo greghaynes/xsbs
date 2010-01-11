@@ -1,79 +1,36 @@
 import asyncore, asynchat
 import socket
-import SimpleHttpServer
+import SimpleHTTPServer
 import cStringIO
-import traceback, os
+import traceback, sys
 import logging
 
-class CaseInsensitiveDict:
-    """
-	Taken from http://code.activestate.com/recipes/66315/
+# Much of this cade is taken from http://code.activestate.com/recipes/259148/
 
-	Dictionary, that has case-insensitive keys.
-
-	Keys are retained in their original form
-	when queried with .keys() or .items().
-
-	Implementation: An internal dictionary maps lowercase
-	keys to (key,value) pairs. All key lookups are done
-	against the lowercase keys, but all methods that expose
-	keys to the user retrieve the original keys."""
-	def __init__(self, dict=None):
-		"""Create an empty dictionary, or update from 'dict'."""
-		self._dict = {}
-		if dict:
-			self.update(dict)
-	def __getitem__(self, key):
-		"""Retrieve the value associated with 'key' (in any case)."""
-		k = key.lower()
-		return self._dict[k][1]
-	def __setitem__(self, key, value):
-		"""Associate 'value' with 'key'. If 'key' already exists, but
-		in different case, it will be replaced."""
-		k = key.lower()
-		self._dict[k] = (key, value)
-	def has_key(self, key):
-		"""Case insensitive test wether 'key' exists."""
-		k = key.lower()
-		return self._dict.has_key(k)
-	def keys(self):
-		"""List of keys in their original case."""
-		return [v[0] for v in self._dict.values()]
-	def values(self):
-		"""List of values."""
-		return [v[1] for v in self._dict.values()]
-	def items(self):
-		"""List of (key,value) pairs."""
-		return self._dict.values()
-	def get(self, key, default=None):
-		"""Retrieve value associated with 'key' or return default value
-		if 'key' doesn't exist."""
-		try:
-			return self[key]
-		except KeyError:
-			return default
-	def setdefault(self, key, default):
-		"""If 'key' doesn't exists, associate it with the 'default' value.
-		Return value associated with 'key'."""
-		if not self.has_key(key):
-			self[key] = default
-		return self[key]
-	def update(self, dict):
-		"""Copy (key,value) pairs from 'dict'."""
-		for k,v in dict.items():
-			self[k] = v
-	def __repr__(self):
-		"""String representation of the dictionary."""
-		items = ", ".join([("%r: %r" % (k,v)) for k,v in self.items()])
-		return "{%s}" % items
-	def __str__(self):
-		"""String representation of the dictionary."""
-		return repr(self)
+class CI_dict(dict):
+	"""Dictionary with case-insensitive keys
+	Replacement for the deprecated mimetools.Message class
+	"""
+	def __init__(self, infile, *args):
+		self._ci_dict = {}
+		lines = infile.readlines()
+		for line in lines:
+			k,v=line.split(":",1)
+			self._ci_dict[k.lower()] = self[k] = v.strip()
+		self.headers = self.keys()
+	def getheader(self,key,default=""):
+		return self._ci_dict.get(key.lower(),default)
+	def get(self,key,default=""):
+		return self._ci_dict.get(key.lower(),default)
+	def __getitem__(self,key):
+		return self._ci_dict[key.lower()]
+	def __contains__(self,key):
+		return key.lower() in self._ci_dict
 
 class RequestHandler(asynchat.async_chat,
-	SimpleHttpServer.SimpleHttpRequestHandler):
+	SimpleHTTPServer.SimpleHTTPRequestHandler):
 	protocol_version = 'HTTP/1.1'
-	MessageClass = CaseInsensitiveDict
+	MessageClass = CI_dict
 	def __init__(self, connection, address, server):
 		asynchat.async_chat.__init__(self, connection)
 		self.client_address = address
@@ -112,9 +69,10 @@ class HttpServer(asyncore.dispatcher):
 		asyncore.dispatcher.__init__(self)
 		self.address = address
 		self.port = port
+		self.handler = handler
 		self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.set_reuse_addr()
-		self.bind(self.address, self.port)
+		self.bind((self.address, self.port))
 		self.listen(5)
 	def handle_accept(self):
 		try:
@@ -125,4 +83,13 @@ class HttpServer(asyncore.dispatcher):
 			logging.error('Accept threw EWOULDBLOCK')
 		else:
 			self.handler(conn, addr, self)
+
+if __name__=="__main__":
+	port = 8081
+	s=HttpServer('',port,RequestHandler)
+	print "Running on port %s" %port
+	try:
+		asyncore.loop(timeout=2)
+	except KeyboardInterrupt:
+		print "Crtl+C pressed. Shutting down."
 
