@@ -45,17 +45,33 @@ class UserPrivilege(Base):
 		self.privilege = privilege
 		self.user_id = user_id
 
+def isUser(user_id):
+	try:
+		priv = session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==USER).one()
+		return True
+	except NoResultFound:
+		return False
+
+
 def isMaster(user_id):
 	try:
 		priv = session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==MASTER).one()
 		return True
 	except NoResultFound:
 		return False
+		
+def isAdmin(user_id):
+	try:
+		priv = session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==ADMIN).one()
+		return True
+	except NoResultFound:
+		return False
+
 
 def isPlayerMaster(cn):
 	try:
 		p = player(cn)
-		if p.privilege() > 0:
+		if p.privilege() ==1:
 			return True
 		user = loggedInAs(cn)
 		if isMaster(user.id):
@@ -64,6 +80,20 @@ def isPlayerMaster(cn):
 			return False
 	except (AttributeError, KeyError):
 		return False
+		
+def isPlayerAdmin(cn):
+	try:
+		p = player(cn)
+		if p.privilege() > 1:
+			return True
+		user = loggedInAs(cn)
+		if isAdmin(user.id):
+			return True
+		else:
+			return False
+	except (AttributeError, KeyError):
+		return False
+
 
 class masterRequired(object):
 	def __init__(self, func):
@@ -71,7 +101,7 @@ class masterRequired(object):
 		self.__doc__ = func.__doc__
 		self.__name__ = func.__name__
 	def __call__(self, *args):
-		if sbserver.playerPrivilege(args[0]) == 0 and not isPlayerMaster(args[0]):
+		if sbserver.playerPrivilege(args[0]) == 0 and not isPlayerMaster(args[0]) and not isPlayerAdmin(args[0]):
 			insufficientPermissions(args[0])
 		else:
 			self.func(*args)
@@ -82,7 +112,7 @@ class adminRequired(object):
 		self.__doc__ = func.__doc__
 		self.__name__ = func.__name__
 	def __call__(self, *args):
-		if sbserver.playerPrivilege(args[0]) <= 1:
+		if sbserver.playerPrivilege(args[0]) <= 1 and not isPlayerAdmin(args[0]):
 			insufficientPermissions(args[0])
 		else:
 			self.func(*args)
@@ -125,8 +155,26 @@ def onRelMaster(cn):
 def onRelAdmin(cn):
 	sbserver.message(info(ratemp.substitute(colordict, name=sbserver.playerName(cn))))
 
-def userPrivAddCmd(cn, tcn, args):
-	if args == 'master':
+def userPrivSetCmd(cn, tcn, args):
+	user_id = player(tcn).user.id
+	if args == 'user':
+		try:
+			if isUser(player(tcn).user.id):
+				sbserver.playerMessage(cn, error('%s already has user permissions.' % sbserver.playerName(tcn)))
+				return
+		except (ValueError, AttributeError):
+			pass
+		else:
+			try:
+				user = loggedInAs(tcn)
+			except AttributeError:
+				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
+			else:
+				session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
+				session.add(UserPrivilege(0, user.id))
+				session.commit()
+				sbserver.playerMessage(cn, info('User privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
+	elif args == 'master':
 		try:
 			if isMaster(player(tcn).user.id):
 				sbserver.playerMessage(cn, error('%s already has master permissions.' % sbserver.playerName(tcn)))
@@ -139,33 +187,61 @@ def userPrivAddCmd(cn, tcn, args):
 			except AttributeError:
 				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
 			else:
-				priv = UserPrivilege(1, user.id)
-				session.add(priv)
+				session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
+				session.add(UserPrivilege(1, user.id))
 				session.commit()
 				sbserver.playerMessage(cn, info('Master privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
+	elif args == 'admin':
+		try:
+			if isAdmin(player(tcn).user.id):
+				sbserver.playerMessage(cn, error('%s already has admin permissions.' % sbserver.playerName(tcn)))
+				return
+		except (ValueError, AttributeError):
+			pass
+		else:
+			try:
+				user = loggedInAs(tcn)
+			except AttributeError:
+				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
+			else:
+				session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
+				session.add(UserPrivilege(2, user.id))
+				session.commit()
+				sbserver.playerMessage(cn, info('Admin privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
 	else:
-		sbserver.playerMessage(cn, error('Privilege level must be \'master\''))
-
-def userPrivDelCmd(cn, tcn, args):
-	sbserver.playerMessage(cn, error('Not yet implemented.'))
+		sbserver.playerMessage(cn, error('Privilege level must be \'master\' to set master permissions and \'admin\' to set master or admin permissions'))
 
 @adminRequired
 def onUserPrivCmd(cn, args):
 	'''@description Set privileges for server account
-	   @usage <cn> <action> <level>'''
+		@usage <cn> <action> <level>'''
 	sp = args.split(' ')
 	try:
-		tcn = int(sp[0])
+		if sp[0] == 'set':
+			subcmd = sp[0]
+			tcn = int(sp[2])
+			args = sp[1]
+		elif sp[0] == 'wipe':
+			subcmd = sp[0]
+			tcn = int(sp[1])
+			args = 'user'
+		else:
+			subcmd = sp[1]
+			tcn = int(sp[0])
+			args = sp[2]
 	except ValueError:
-		raise UsageError('<cn> <action> <level>')
-	subcmd = sp[1]
-	args = args[len(sp[0])+len(sp[1])+2:]
+		raise UsageError('#userpriv set <level> <cn>')
+
 	if subcmd == 'add':
-		userPrivAddCmd(cn, tcn, args)
+		userPrivSetCmd(cn, tcn, args)
 	elif subcmd == 'del':
-		userPrivDelCmd(cn, tcn, args)
+		userPrivSetCmd(cn, tcn, 'user')
+	elif subcmd == 'set':
+		userPrivSetCmd(cn, tcn, args)
+	elif subcmd == 'wipe':
+		userPrivSetCmd(cn, tcn, args)
 	else:
-		sbserver.playerMessage(cn, error('Usage: #userpriv <cn> <action> <level>'))
+		sbserver.playerMessage(cn, error('Usage: #userpriv set <level> <cn>'))
 
 def init():
 	registerCommandHandler('master', masterCmd)
@@ -181,4 +257,3 @@ def init():
 	Base.metadata.create_all(dbmanager.engine)
 
 init()
-
