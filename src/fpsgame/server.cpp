@@ -673,7 +673,14 @@ namespace server
         if(type>=SV_EDITENT && type<=SV_EDITVAR && !m_edit) return -1;
         // server only messages
         static int servtypes[] = { SV_SERVINFO, SV_INITCLIENT, SV_WELCOME, SV_MAPRELOAD, SV_SERVMSG, SV_DAMAGE, SV_HITPUSH, SV_SHOTFX, SV_DIED, SV_SPAWNSTATE, SV_FORCEDEATH, SV_ITEMACC, SV_ITEMSPAWN, SV_TIMEUP, SV_CDIS, SV_CURRENTMASTER, SV_PONG, SV_RESUME, SV_BASESCORE, SV_BASEINFO, SV_BASEREGEN, SV_ANNOUNCE, SV_SENDDEMOLIST, SV_SENDDEMO, SV_DEMOPLAYBACK, SV_SENDMAP, SV_DROPFLAG, SV_SCOREFLAG, SV_RETURNFLAG, SV_RESETFLAG, SV_INVISFLAG, SV_CLIENT, SV_AUTHCHAL, SV_INITAI };
-        if(ci) loopi(sizeof(servtypes)/sizeof(int)) if(type == servtypes[i]) return -1;
+        if(ci)
+        {
+             loopi(sizeof(servtypes)/sizeof(int)) if(type == servtypes[i]) return -1;
+             if(type < SV_EDITENT || type > SV_EDITVAR || !m_edit)
+             {
+                 if(++ci->overflow >= 200) return -2;
+             }
+        }
         return type;
     }
 
@@ -725,6 +732,7 @@ namespace server
         {
             clientinfo &ci = *clients[i];
             if(ci.state.aitype != AI_NONE) continue;
+            ci.overflow = 0;
             addclientstate(ws, ci);
             loopv(ci.bots)
             {
@@ -1912,9 +1920,12 @@ namespace server
             {
                 QUEUE_MSG;
                 getstring(text, p);
+                char *oldname = (char*)malloc(strlen(ci->name)+1);
+                strcpy(oldname, ci->name);
                 filtertext(ci->name, text, false, MAXNAMELEN);
                 if(!ci->name[0]) copystring(ci->name, "unnamed");
-                SbPy::triggerEventIntString("player_name_changed", ci->clientnum, ci->name);
+                SbPy::triggerEventIntStringString("player_name_changed", ci->clientnum, oldname, ci->name);
+                free(oldname);
                 QUEUE_STR(ci->name);
                 break;
             }
@@ -2237,6 +2248,7 @@ namespace server
             {
                 int size = server::msgsizelookup(type);
                 if(size==-1) { disconnect_client(sender, DISC_TAGT); return; }
+                if(size==-2) { disconnect_client(sender, DISC_OVERFLOW); return; }
                 if(size>0) loopi(size-1) getint(p);
                 if(ci && cq && (ci != cq || ci->state.state!=CS_SPECTATOR)) { QUEUE_AI; QUEUE_MSG; }
                 break;

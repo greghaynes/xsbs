@@ -1,4 +1,4 @@
-from xsbs.events import eventHandler, execLater
+from xsbs.events import eventHandler, execLater, registerServerEventHandler
 from xsbs.players import player
 from xsbs.ui import warning
 from xsbs.colors import red
@@ -120,7 +120,7 @@ def onConnect(cn):
 		pass
 
 @eventHandler('player_name_changed')
-def onNameChange(cn, name):
+def onNameChange(cn, oldname, newname):
 	onConnect(cn)
 
 Base.metadata.create_all(dbmanager.engine)

@@ -60,6 +60,9 @@ def presetRotate():
 		sbserver.setPaused(True)
 
 def onNextMapCmd(cn, args):
+	'''@description Display next map
+	   @usage
+	   @public'''
 	if args != '':
 		sbserver.playerMessage(cn, error('Usage: #nextmap'))
 	else:

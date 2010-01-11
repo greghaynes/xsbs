@@ -1,0 +1,7 @@
+Each component of XSBS uses one of two Licenses:
+ - The GNU Public License Version 2
+ - ZLib License
+
+The license used is specified in either the header of each source file or in a
+LICENSE file in the directory containing the file.
+

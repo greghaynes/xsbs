@@ -27,6 +27,8 @@ def checkModified(cn):
 
 @masterRequired
 def mapModifiedSpecCmd(cn, args):
+	'''@description Enable or disable spectate clients with modified map
+	   @usage enable/disable'''
 	if args == 'disable':
 		spectate_map_modified = False
 		sbserver.playerMessage(info('Spectate modified mapes disabled'))

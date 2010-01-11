@@ -18,6 +18,8 @@ servermsg_template = string.Template(servermsg_template)
 @commandHandler('pause')
 @masterRequired
 def onPauseCmd(cn, args):
+	'''@description Pause the game
+	   @usage'''
 	if args != '':
 		raise UsageError('')
 		return
@@ -26,6 +28,8 @@ def onPauseCmd(cn, args):
 @commandHandler('resume')
 @masterRequired
 def onResumeCmd(cn, args):
+	'''@description Resume game from pause
+	   @usage'''
 	if args != '':
 		raise UsageError('')
 		return
@@ -34,6 +38,8 @@ def onResumeCmd(cn, args):
 @commandHandler('reload')
 @adminRequired
 def onReloadCmd(cn, args):
+	'''@description Reload server plugins
+	   @usage'''
 	if args != '':
 		raise UsageError('')
 	else:
@@ -43,6 +49,8 @@ def onReloadCmd(cn, args):
 @commandHandler('givemaster')
 @masterRequired
 def onGiveMaster(cn, args):
+	'''@description Give master to a client
+	   @usage cn'''
 	if args == '':
 		raise UsageError('cn')
 		return
@@ -57,6 +65,8 @@ def onGiveMaster(cn, args):
 @commandHandler('resize')
 @adminRequired
 def onResize(cn, args):
+	'''@description Change maximum clients allowed in server
+	   @usage maxclients'''
 	if args == '':
 		raise UsageError('maxclients')
 	else:
@@ -66,6 +76,8 @@ def onResize(cn, args):
 @commandHandler('minsleft')
 @masterRequired
 def onMinsLeft(cn, args):
+	'''@description Set minutes left in current match
+	   @usage minutes'''
 	if args == '':
 		raise UsageError('minutes')
 	else:
@@ -74,6 +86,8 @@ def onMinsLeft(cn, args):
 @commandHandler('specall')
 @masterRequired
 def specAll(cn, args):
+	'''@description Make all clients spectators
+	   @usage'''
 	if args != '':
 		raise UsageError('')
 	else:
@@ -83,6 +97,8 @@ def specAll(cn, args):
 @commandHandler('unspecall')
 @masterRequired
 def unspecAll(cn, args):
+	'''@description Make all clients players
+	   @usage'''
 	if args != '':
 		raise UsageError('')
 	else:
@@ -92,6 +108,8 @@ def unspecAll(cn, args):
 @commandHandler('servermsg')
 @masterRequired
 def serverMessage(cn, args):
+	'''@description Broadcast message to all clients in server
+	   @usage message'''
 	if args == '':
 		raise UsageError('message')
 	else:
@@ -101,6 +119,8 @@ def serverMessage(cn, args):
 @commandHandler('ip')
 @masterRequired
 def playerIp(cn, args):
+	'''@description Get string representation of client ip
+	   @usage cn'''
 	if args == '':
 		raise UsageError('cn')
 	else:

@@ -89,6 +89,8 @@ def onMuteCommand(cn, args):
 @commandHandler('unmute')
 @masterRequired
 def onUnmuteCommand(cn, args):
+	'''@description Unmute a player
+	   @usage cn'''
 	try:
 		args = args.split(' ')
 		tcn = int(args[0])

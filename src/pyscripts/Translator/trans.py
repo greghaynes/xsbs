@@ -101,6 +101,9 @@ def is_lang(s,langs):
 	return False
 
 def onCommand(cn, command):
+	'''@description Translate text using Google translator
+	   @usage text src_lang dest_lang
+	   @public'''
 	if count_player_requests(cn) < player_fd_limit:
 		cmd_list = command.split()
 		length = len(cmd_list)
