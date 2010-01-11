@@ -32,6 +32,7 @@ void deinitPy();
 bool restartPy();
 bool triggerEvent(const char *event_name, std::vector<PyObject*> *args);
 bool triggerEventInt(const char *event_name, int cn);
+bool triggerEventIntBool(const char *event_name, int cn, bool b);
 bool triggerEventStr(const char *event_name, const char *str);
 bool triggerEventIntString(const char *event_name, int cn, const char *text);
 bool triggerEventIntStringInt(const char *event_name, int cn, const char *text, int cn2);

@@ -335,6 +335,7 @@ namespace server
 	extern bool allow_modevote;
 	extern int minremain;
 	extern int port;
+	extern bool demonextmatch;
 
 	struct servmode
 	{

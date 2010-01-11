@@ -259,6 +259,21 @@ bool triggerFuncEventString(const char *name, const char *str, PyObject *func)
 	return triggerFuncEvent(name, &args, func);
 }
 
+bool triggerFuncEventIntBool(const char *name, int cn, bool b, PyObject *func)
+{
+	std::vector<PyObject*> args;
+	PyObject *pCn = PyInt_FromLong(cn);
+	PyObject *pB;
+	if(b)
+		pB = Py_True;
+	else
+		pB = Py_False;
+	args.push_back(pCn);
+	args.push_back(pB);
+	
+	return triggerFuncEvent(name, &args, func);
+}
+
 bool triggerFuncEventIntString(const char *name, int cn, const char *text, PyObject *func)
 {
 	std::vector<PyObject*> args;
@@ -301,6 +316,11 @@ bool triggerEvent(const char*name, std::vector<PyObject*>* args)
 bool triggerEventInt(const char *name, int cn)
 {
 	return triggerFuncEventInt(name, cn, triggerEventFunc);
+}
+
+bool triggerEventIntBool(const char *name, int cn, bool b)
+{
+	return triggerFuncEventIntBool(name, cn, b, triggerEventFunc);
 }
 
 bool triggerEventStr(const char *name, const char *str)

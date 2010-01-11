@@ -369,6 +369,10 @@ namespace server
         return worst->name;
     }
 
+    int welcomepacket(packetbuf &p, clientinfo *ci);
+    void sendwelcome(clientinfo *ci);
+
+/** Demo Recording **/
     void writedemo(int chan, void *data, int len)
     {
         if(!demorecord) return;
@@ -410,9 +414,6 @@ namespace server
         demotmp->read(d.data, len);
         DELETEP(demotmp);
     }
-
-    int welcomepacket(packetbuf &p, clientinfo *ci);
-    void sendwelcome(clientinfo *ci);
 
     void setupdemorecord()
     {
@@ -2113,10 +2114,13 @@ namespace server
             case SV_RECORDDEMO:
             {
                 int val = getint(p);
+                SbPy::triggerEventIntBool("player_record_demo", ci->clientnum, val != 0);
+/*
                 if(ci->privilege<PRIV_ADMIN && !ci->local) break;
                 demonextmatch = val!=0;
                 defformatstring(msg)("demo recording is %s for next match", demonextmatch ? "enabled" : "disabled");
                 sendservmsg(msg);
+*/
                 break;
             }
 

@@ -744,6 +744,21 @@ static PyObject *teamScore(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", server::smode->getteamscore(team));
 }
 
+static PyObject *nextMatchRecorded(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("b", server::demonextmatch);
+}
+
+static PyObject *setRecordNextMatch(PyObject *self, PyObject *args)
+{
+	bool val;
+	if(!PyArg_ParseTuple(args, "b", &val))
+		return 0;
+	server::demonextmatch = val;
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -798,6 +813,8 @@ static PyMethodDef ModuleMethods[] = {
 	{"setTeam", setTeam, METH_VARARGS, "Set team of player."},
 	{"pregameSetTeam", pregameSetTeam, METH_VARARGS, "Set team of player as a result of autoteam event."},
 	{"teamScore", teamScore, METH_VARARGS, "Score of team."},
+	{"nextMatchRecorded", nextMatchRecorded, METH_VARARGS, "Is next match being recorded."},
+	{"setRecordNextMatch", setRecordNextMatch, METH_VARARGS, "Set to record demo of next match."},
 	{NULL, NULL, 0, NULL}
 };
 
