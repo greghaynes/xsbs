@@ -17,7 +17,7 @@ def registerUrlHandler(url, func):
 
 class urlHandler(object):
 	def __init__(self, url):
-		self.url = name
+		self.url = url
 	def __call__(self, f):
 		self.__doc__ = f.__doc__
 		self.__name__ = f.__name__
@@ -31,10 +31,16 @@ class RequestHandler(simpleasync.RequestHandler):
 		try:
 			path_handlers[self.path](self)
 		except KeyError:
-			self.send_response(404)
-			self.end_headers()
-			self.outgoing.append('Invalid URL')
-			self.outgoing.append(None)
+			self.respond_with(404, 'text/html', 0, '<html><body>Invalid URL</body></html>')
+	def respond_with(self, code, type, length, data):
+		if length <= 0:
+			length = len(data)
+		self.send_response(code)
+		self.send_header("Content-type", type)
+		self.send_header("Content-Length", length)
+		self.end_headers()
+		self.outgoing.append(data)
+		self.outgoing.append(None)
 
 if enable or __name__ == '__main__':
 	server = simpleasync.Server(address, port, RequestHandler)
