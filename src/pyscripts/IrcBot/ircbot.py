@@ -93,23 +93,23 @@ if enable:
 
 event_abilities = {
 	'player_active': ('player_connect', lambda x: bot.broadcast(
-		'CONNECT        %s (%i)' % (sbserver.playerName(x), x))),
+		'\x032CONNECT\x03        %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
 	'player_disconnect': ('player_disconnect', lambda x: bot.broadcast(
-		'DISCONNECT     %s (%i)' % (sbserver.playerName(x), x))),
+		'\x032DISCONNECT\x03     %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
 	'message': ('player_message', lambda x, y: bot.broadcast(
-		'MESSAGE        %s (%i): %s' % (sbserver.playerName(x), x, y))),
+		'\x033MESSAGE\x03        %s (\x037 %i \x03): %s' % (sbserver.playerName(x), x, y))),
 	'map_change': ('map_changed', lambda x, y: bot.broadcast(
-		'MAP CHANGE     %s (%s)' % (map, sbserver.modeName(mode)))),
+		'\x038MAP CHANGE\x03     %s (%s)' % (map, sbserver.modeName(mode)))),
 	'gain_admin': ('player_claimed_admin', lambda x: bot.broadcast(
-		'CLAIM ADMIN    %s (%i)' % (sbserver.playerName(x), x))),
+		'\x036CLAIM ADMIN\x03    %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
 	'gain_master': ('player_claimed_master', lambda x: bot.broadcast(
-		'CLAIM MASTER   %s (%i)' % (sbserver.playerName(x), x))),
+		'\x036CLAIM MASTER\x03   %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
 	'auth': ('player_auth_succeed', lambda x, y: bot.broadcast(
-		'AUTH           %s (%i) as %s@sauerbraten.org' % (sbserver.playerName(x), x, y))),
+		'\x036AUTH\x03           %s (\x037 %i \x03) as %s@sauerbraten.org' % (sbserver.playerName(x), x, y))),
 	'relinquish_admin': ('player_released_admin', lambda x: bot.broadcast(
-		'RELINQ ADMIN   %s (%i)' % (sbserver.playerName(x), x))),
+		'\x036RELINQ ADMIN\x03   %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
 	'relinquish_master': ('player_released_master', lambda x: bot.broadcast(
-		'RELINQ MASTER  %s (%i)' % (sbserver.playerName(x), x))),
+		'\x036RELINQ MASTER\x03  %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
 }
 
 for key in event_abilities.keys():
