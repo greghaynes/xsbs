@@ -2,6 +2,7 @@ import simpleasync
 import asyncore
 import re
 from xsbs.settings import PluginConfig
+from UserManager.usermanager import userAuth
 
 config = PluginConfig('httpserver')
 enable = config.getOption('Config', 'enable', 'yes') == 'yes'
@@ -19,6 +20,14 @@ def registerRegexUrlHandler(regex, func):
 
 def registerUrlHandler(url, func):
 	path_handlers[url] = func
+
+def isMaster(email, password):
+	user = userAuth(email, password)
+	if user:
+		del user
+		return True
+	else:
+		return False
 
 class regexUrlHandler(object):
 	def __init__(self, url):
