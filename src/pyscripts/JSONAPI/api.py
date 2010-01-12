@@ -49,7 +49,8 @@ def clientDetail(request, cn):
 			'team': p.team(),
 			'frags': p.frags(),
 			'deaths': p.deaths(),
-			'teamkills': p.teamkills() }
+			'teamkills': p.teamkills(),
+			'privilege': p.privilege() }
 	request.respond_with(200, 'text/plain', 0, json.dumps(response))
 
 @urlHandler('/json/clients')
