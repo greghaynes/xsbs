@@ -1,12 +1,12 @@
-function getClientState(hostname, cn) {
+function getClientState(hostname, cn, callback) {
 	$.getJSON('http://' + hostname + '/json/clients/' + cn), function(data) {
-		return data.items
+		callback(data);
 	}
 }
 
-function getClients(hostname) {
+function getClients(hostname, callback) {
 	$.getJSON('http://' + hostname + '/json/clients', function(data) {
-		return data.items
+		callback(data);
 		});
 }
 

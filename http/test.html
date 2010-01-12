@@ -1,0 +1,18 @@
+<html>
+<head>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/xsbs.js"></script>
+<script type="text/javascript">
+getClients('localhost:8081', function(data) {
+	$.each(data, function(i, item) {
+		$("<li>" + item.name + "</li>").appendTo("#content");
+		});
+	});
+</script>
+</head>
+<body>
+Clients
+<ul id="content"></div>
+</body>
+</html>
+
