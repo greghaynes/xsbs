@@ -63,6 +63,7 @@ class RequestHandler(simpleasync.RequestHandler):
 		if length <= 0:
 			length = len(data)
 		self.send_response(code)
+		self.send_header("Access-Control-Allow-Origin", "*")
 		self.send_header('Connection', 'close')
 		self.send_header('Content-type', type)
 		self.send_header('Content-Length', length)
