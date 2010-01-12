@@ -267,6 +267,14 @@ class RequestHandler(asynchat.async_chat, SimpleHTTPServer.SimpleHTTPRequestHand
         elif self.command=="POST":
             # if method is POST, call prepare_POST, don't finish yet
             self.prepare_POST()
+        elif self.command=="OPTIONS":
+            self.send_response(200)
+            self.send_header("Allow", "GET,HEAD,POST,OPTIONS")
+            self.send_header("Connection", 'close')
+            self.send_header("Content-Length", 0)
+            self.send_header("Content-type", 'text/plain')
+            self.end_headers()
+            self.outgoing.append(None)
         else:
             self.send_error(501, "Unsupported method (%s)" %self.command)
 

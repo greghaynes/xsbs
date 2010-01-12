@@ -51,6 +51,7 @@ class RequestHandler(simpleasync.RequestHandler):
 	def __init__(self, conn, addr, server):
 		simpleasync.RequestHandler.__init__(self, conn, addr, server)
 	def handle_data(self):
+		print self.path
 		try:
 			path_handlers[self.path](self)
 		except KeyError:
