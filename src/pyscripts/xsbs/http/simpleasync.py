@@ -256,11 +256,8 @@ class RequestHandler(asynchat.async_chat, SimpleHTTPServer.SimpleHTTPRequestHand
         # prepare attributes needed in parse_request()
         self.rfile = cStringIO.StringIO(''.join(popall(self.incoming)))
         self.rfile.seek(0)
-        print self.rfile.read()
-        self.rfile.seek(0)
         self.raw_requestline = self.rfile.readline()
         self.parse_request()
-        print self.command
 
         if self.command in ['GET','HEAD']:
             # if method is GET or HEAD, call do_GET or do_HEAD and finish
