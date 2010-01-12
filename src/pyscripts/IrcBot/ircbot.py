@@ -99,7 +99,7 @@ event_abilities = {
 	'message': ('player_message', lambda x, y: bot.broadcast(
 		'\x033MESSAGE\x03        %s (\x037 %i \x03): %s' % (sbserver.playerName(x), x, y))),
 	'map_change': ('map_changed', lambda x, y: bot.broadcast(
-		'\x038MAP CHANGE\x03     %s (%s)' % (map, sbserver.modeName(y)))),
+		'\x038MAP CHANGE\x03     %s (%s)' % (x, sbserver.modeName(y)))),
 	'gain_admin': ('player_claimed_admin', lambda x: bot.broadcast(
 		'\x036CLAIM ADMIN\x03    %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
 	'gain_master': ('player_claimed_master', lambda x: bot.broadcast(
