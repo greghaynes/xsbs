@@ -3,8 +3,10 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/xsbs.js"></script>
 <script type="text/javascript">
-foreachClient('socrates.greghaynes.net:8081', function(data) {
-		$("<li>" + data.name + "</li>").appendTo("#content");
+foreachClient('localhost:8081', function(data) {
+		getClientState(data.cn, function(client) {
+			$("<li>" + client.name + "</li>").appendTo("#content");
+			});
 	});
 </script>
 </head>

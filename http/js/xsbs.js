@@ -1,7 +1,7 @@
 function getClientState(hostname, cn, callback) {
-	$.getJSON('http://' + hostname + '/json/clients/' + cn), function(data) {
+	$.getJSON('http://' + hostname + '/json/clients/' + cn, function(data) {
 		callback(data);
-	}
+	});
 }
 
 function foreachClient(hostname, callback) {
