@@ -1,14 +1,12 @@
+function getScoreboard(hostname, callback) {
+	$.getJSON('http://' + hostname + '/json/scoreboard' + cn, function(data) {
+		callback(data);
+	}
+}
+
 function getClientState(hostname, cn, callback) {
 	$.getJSON('http://' + hostname + '/json/clients/' + cn, function(data) {
 		callback(data);
-		});
-}
-
-function foreachClientState(hostname, callback) {
-	foreachClient(hostname, function(client) {
-		getClientState(hostname, client.cn, function(state) {
-			callback(state);
-			});
 		});
 }
 

@@ -1,28 +1,9 @@
 from xsbs.http import urlHandler, regexUrlHandler, isMaster
+from xsbs.http.json import jsonMasterRequired
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.net import ipLongToString
 import sbserver
 import json
-
-class jsonMasterRequired(object):
-	def __init__(self, func):
-		self.func = func
-		self.__doc__ = func.__doc__
-		self.__name__ = func.__name__
-	def __call__(self, *args, **kwargs):
-		try:
-			username = args[0].body['username'][0]
-			password = args[0].body['password'][0]
-			ismaster = isMaster(username, password)
-		except (AttributeError, KeyError):
-			args[0].respond_with(200, 'text/plain', 0, json.dumps(
-				{ 'error': 'INVALID_LOGIN' }))
-		else:
-			if ismaster:
-				self.func(*args, **kwargs)
-			else:
-				args[0].respond_with(200, 'text/plain', 0, json.dumps(
-					{ 'error': 'INVALID_LOGIN' }))
 
 @urlHandler('/json/admin/set_map')
 @jsonMasterRequired
@@ -54,6 +35,20 @@ def server(request):
 		'master_mode': sbserver.masterMode(),
 		'uptime': sbserver.uptime() }))
 
+@urlHandler('/json/scoreboard')
+def scoreboard(request):
+	response = []
+	for p in allClients():
+		response.append( {
+			'name': p.name(),
+			'team': p.team(),
+			'frags': p.frags(),
+			'deaths': p.deaths(),
+			'teamkills': p.teamkills(),
+			'privilege': p.privilege(),
+			})
+	request.respond_with(200, 'text/plain', 0, json.dumps(response))
+
 @regexUrlHandler('/json/clients/(?P<cn>\d+)')
 def clientDetail(request, cn):
 	try:
@@ -67,7 +62,8 @@ def clientDetail(request, cn):
 			'frags': p.frags(),
 			'deaths': p.deaths(),
 			'teamkills': p.teamkills(),
-			'privilege': p.privilege() }
+			'privilege': p.privilege()
+			}
 	request.respond_with(200, 'text/plain', 0, json.dumps(response))
 
 @urlHandler('/json/clients')
@@ -77,6 +73,7 @@ def getClients(request):
 		response.append( {
 			'cn': p.cn,
 			'name': p.name(),
-			'team': p.team() } )
+			'team': p.team() 
+			})
 	request.respond_with(200, 'text/plain', 0, json.dumps(response))
 
