@@ -256,8 +256,11 @@ class RequestHandler(asynchat.async_chat, SimpleHTTPServer.SimpleHTTPRequestHand
         # prepare attributes needed in parse_request()
         self.rfile = cStringIO.StringIO(''.join(popall(self.incoming)))
         self.rfile.seek(0)
+        print self.rfile.read()
+        self.rfile.seek(0)
         self.raw_requestline = self.rfile.readline()
         self.parse_request()
+        print self.command
 
         if self.command in ['GET','HEAD']:
             # if method is GET or HEAD, call do_GET or do_HEAD and finish
@@ -267,6 +270,18 @@ class RequestHandler(asynchat.async_chat, SimpleHTTPServer.SimpleHTTPRequestHand
         elif self.command=="POST":
             # if method is POST, call prepare_POST, don't finish yet
             self.prepare_POST()
+        elif self.command=="OPTIONS":
+             self.send_response(200)
+             self.send_header("Access-Control-Allow-Origin", "*")
+             self.send_header("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+             self.send_header("Access-Control-Allow-Headers", "X-PINGOTHER, X-Requested-With, Accept")
+             self.send_header("Access-Control-Max-Age", "1728000")
+             self.send_header("Connection", "close")
+             self.send_header("Content-Length", 0)
+             self.send_header("Content-Type", "application/json")
+             self.end_headers()
+             self.outgoing.append('\r\n')
+             self.outgoing.append(None)
         else:
             self.send_error(501, "Unsupported method (%s)" %self.command)
 
