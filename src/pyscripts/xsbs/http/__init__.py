@@ -1,5 +1,6 @@
 import simpleasync
 import asyncore
+import re
 from xsbs.settings import PluginConfig
 
 config = PluginConfig('httpserver')
@@ -11,9 +12,22 @@ del config
 port = int(port)
 
 path_handlers = {}
+regex_path_handlers = []
+
+def registerRegexUrlHandler(regex, func):
+	regex_path_handlers.append((re.compile(regex), func))
 
 def registerUrlHandler(url, func):
 	path_handlers[url] = func
+
+class regexUrlHandler(object):
+	def __init__(self, url):
+		self.url = url
+	def __call__(self, f):
+		self.__doc__ = f.__doc__
+		self.__name__ = f.__name__
+		registerUrlHandler(self.url, f)
+		return f
 
 class urlHandler(object):
 	def __init__(self, url):
@@ -21,7 +35,7 @@ class urlHandler(object):
 	def __call__(self, f):
 		self.__doc__ = f.__doc__
 		self.__name__ = f.__name__
-		registerUrlHandler(self.url, f)
+		registerRegexUrlHandler(self.url, f)
 		return f
 
 class RequestHandler(simpleasync.RequestHandler):
@@ -31,6 +45,9 @@ class RequestHandler(simpleasync.RequestHandler):
 		try:
 			path_handlers[self.path](self)
 		except KeyError:
+			for exph in regex_path_handlers:
+				if exph[0].match(self.path):
+					exph[1](*exph[0].groups(), **exph[0].groupdict())
 			self.respond_with(404, 'text/html', 0, '<html><body>Invalid URL</body></html>')
 	def respond_with(self, code, type, length, data):
 		if length <= 0:
