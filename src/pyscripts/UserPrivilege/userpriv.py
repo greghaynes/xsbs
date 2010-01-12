@@ -121,7 +121,8 @@ class adminRequired(object):
 def masterCmd(cn, args):
 	'''@description Claim master
 	   @usage'''
-	sbserver.setMaster(cn)
+	if sbserver.playerPrivilege(cn) == 0:
+		sbserver.setMaster(cn)
 
 @masterRequired
 def unsetMaster(cn, args):
