@@ -1,6 +1,10 @@
-from xsbs.http import urlHandler
+from xsbs.http import urlHandler, regexUrlHandler
 from xsbs.players import all as allClients
 import json
+
+@regexUrlHandler('/json/clients/(?P<cn>\d+)')
+def clientDetail(request, cn):
+	print cn
 
 @urlHandler('/json/clients')
 def getClients(request):
