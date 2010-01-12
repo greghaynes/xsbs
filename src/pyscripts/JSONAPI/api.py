@@ -13,14 +13,31 @@ class jsonMasterRequired(object):
 		try:
 			username = args[0].body['username'][0]
 			password = args[0].body['password'][0]
-			if not isMaster(username, password):
-				args[0].respond_with(200, 'text/html', 0, json.dumps(
-					{ 'error': 'Invalid username/password' }))
-			else:
-				self.func(*args, **kwargs)
+			ismaster = isMaster(username, password)
 		except (AttributeError, KeyError):
-			args[0].respond_with(200, 'text/html', 0, json.dumps(
-				{ 'error': 'Invalid username/password' }))
+			args[0].respond_with(200, 'text/plain', 0, json.dumps(
+				{ 'error': 'INVALID_LOGIN' }))
+		else:
+			if ismaster:
+				self.func(*args, **kwargs)
+			else:
+				args[0].respond_with(200, 'text/plain', 0, json.dumps(
+					{ 'error': 'INVALID_LOGIN' }))
+
+@urlHandler('/json/admin/set_map')
+@jsonMasterRequired
+def setMap(request):
+	try:
+		map = request.body['map'][0]
+		mode = request.body['mode'][0]
+		mode = int(mode)
+	except (KeyError, IndexError):
+		request.respond_with(200, 'text/plain', 0, json.dumps({
+			'error': 'INVALID_PARAMS' }))
+	else:
+		request.respond_with(200, 'text/plain', 0, json.dumps({
+			'result': 'SUCCESS' }))
+		sbserver.setMap(map, mode)
 
 @urlHandler('/json/game')
 def game(request):

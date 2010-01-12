@@ -3,6 +3,7 @@ import asyncore
 import re
 from xsbs.settings import PluginConfig
 from UserManager.usermanager import userAuth
+from UserPrivilege.userpriv import isMaster as isUserMaster
 
 config = PluginConfig('httpserver')
 enable = config.getOption('Config', 'enable', 'yes') == 'yes'
@@ -24,8 +25,9 @@ def registerUrlHandler(url, func):
 def isMaster(email, password):
 	user = userAuth(email, password)
 	if user:
+		val = isUserMaster(user.id)
 		del user
-		return True
+		return val
 	else:
 		return False
 
@@ -51,14 +53,17 @@ class RequestHandler(simpleasync.RequestHandler):
 	def __init__(self, conn, addr, server):
 		simpleasync.RequestHandler.__init__(self, conn, addr, server)
 	def handle_data(self):
+		print self.path
 		try:
-			path_handlers[self.path](self)
+			handler = path_handlers[self.path]
 		except KeyError:
 			for exph in regex_path_handlers:
 				m = exph[0].match(self.path)
 				if m:
 					exph[1](self, **m.groupdict())
 			self.respond_with(404, 'text/html', 0, '<html><body>Invalid URL</body></html>')
+		else:
+			handler(self)
 	def respond_with(self, code, type, length, data):
 		if length <= 0:
 			length = len(data)
