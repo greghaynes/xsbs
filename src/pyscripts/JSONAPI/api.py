@@ -1,5 +1,7 @@
 from xsbs.http import urlHandler, regexUrlHandler, isMaster
-from xsbs.players import all as allClients, player
+from xsbs.players import all as allClients, player, playerCount, spectatorCount
+from xsbs.net import ipLongToString
+import sbserver
 import json
 
 class jsonMasterRequired(object):
@@ -20,11 +22,20 @@ class jsonMasterRequired(object):
 			args[0].respond_with(200, 'text/html', 0, json.dumps(
 				{ 'error': 'Invalid username/password' }))
 
-@urlHandler('/json/test')
-@jsonMasterRequired
-def testlogin(request):
-	request.respond_with(200, 'text/html', 0, json.dumps(
-		['success']))
+@urlHandler('/json/game')
+def game(request):
+	request.respond_with(200, 'text/plain', 0, json.dumps({
+		'map': sbserver.mapName(),
+		'mode': sbserver.gameMode(),
+		'players': playerCount(),
+		'spectators': spectatorCount() }))
+
+@urlHandler('/json/server')
+def server(request):
+	request.respond_with(200, 'text/plain', 0, json.dumps({
+		'num_clients': sbserver.numClients(),
+		'master_mode': sbserver.masterMode(),
+		'uptime': sbserver.uptime() }))
 
 @regexUrlHandler('/json/clients/(?P<cn>\d+)')
 def clientDetail(request, cn):
@@ -39,15 +50,15 @@ def clientDetail(request, cn):
 			'frags': p.frags(),
 			'deaths': p.deaths(),
 			'teamkills': p.teamkills() }
-	request.respond_with(200, 'text/html', 0, json.dumps(response))
+	request.respond_with(200, 'text/plain', 0, json.dumps(response))
 
 @urlHandler('/json/clients')
 def getClients(request):
 	response = []
-	for player in allClients():
+	for p in allClients():
 		response.append( {
-			'cn': player.cn,
-			'name': player.name(),
-			'team': player.team() } )
-	request.respond_with(200, 'text/html', 0, json.dumps(response))
+			'cn': p.cn,
+			'name': p.name(),
+			'team': p.team() } )
+	request.respond_with(200, 'text/plain', 0, json.dumps(response))
 
