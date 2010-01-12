@@ -4,6 +4,14 @@ function getClientState(hostname, cn, callback) {
 	}
 }
 
+function foreachClient(hostname, callback) {
+	getClients(hostname, function(clients) {
+		$.each(clients, function(i, client) {
+			callback(client)
+			});
+		});
+}
+
 function getClients(hostname, callback) {
 	$.getJSON('http://' + hostname + '/json/clients', function(data) {
 		callback(data);
