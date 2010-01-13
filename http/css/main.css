@@ -3,7 +3,7 @@ body
 	background: #444;
 }
 
-#login_container
+.alert_box
 {
 	background: #FFF;
 	width: 500px;

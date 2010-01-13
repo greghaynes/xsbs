@@ -37,12 +37,12 @@ function tryLogin(hostname, username, password, error_callback, success_callback
 }
 
 function loadLoginPage(hostname, callback) {
-	html_page = '<div id=\"login_container\"><h3>Please login</h3>Username: <input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password_input\" /><br /><input type=\"submit\" value=\"Login\" id=\"login_submit\" /><br /><span id=\"login_status\"></span></div>';
+	html_page = '<div class=\"alert_box\" id=\"login_container\"><h3>Please login</h3>Username: <input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password_input\" /><br /><input type=\"submit\" value=\"Login\" id=\"login_submit\" /><br /><span id=\"login_status\"></span></div>';
 	$('#content').empty();
 	$(html_page).fadeIn('slow').appendTo('#content');
 	$('#login_submit').click(function() {
-		$('login_status').empty();
-		$('login_status').html('Trying login...');
+		$('#login_status').empty();
+		$('#login_status').html('Trying login...');
 		var username = $('#username_input').val();
 		var password = $('#password_input').val();
 		tryLogin(hostname, username, password, function() {
