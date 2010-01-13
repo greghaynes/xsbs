@@ -113,6 +113,18 @@ def playerByName(name):
 			return p
 	raise ValueError('No player by specified name')
 
+def playerByIpLong(ip):
+	'''Return Player instance with matching long (int) ip'''
+	for p in all():
+		if ip == p.ipLong():
+			return p
+	raise ValueError('No player found matching ip')
+
+def playerByIpString(ip):
+	'''Return Player instance with matching string ip'''
+	ip_long = ipStringToLong(ip)
+	return playerByIpLong(ip)
+
 @eventHandler('player_disconnect_post')
 def playerDisconnect(cn):
 	try:
