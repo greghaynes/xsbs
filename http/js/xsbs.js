@@ -24,9 +24,12 @@ function foreachClient(hostname, callback) {
 		});
 }
 
+function loadPlayerAdmin(username, password) {
+}
+
 function doLogin(callback) {
-	form_html = '<form id=\"login_form\">Username: <input type=\"text\" id=\"username_input\"><br />Password: <input type=\"password\" id=\"password_input\"><br /><input type=\"submit\" value=\"Login\"></form>';
-	$('#content').append(form_html);
+	form_html = '<div id=\"login_container\"><h3>Please login</h3><form id=\"login_form\">Username: <input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password_input\" /><br /><input type=\"submit\" value=\"Login\" /></form></div>';
+	$(form_html).appendTo('#content');
 	$('#login_form').submit(function() {
 		callback($('#username_input').val(),
 			$('#password_input').val());

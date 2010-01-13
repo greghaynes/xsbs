@@ -1,0 +1,16 @@
+body
+{
+	background: #444;
+}
+
+#login_container
+{
+	background: #FFF;
+	width: 500px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: 200px;
+	padding: 20px;
+	border: 3px solid #222;
+}
+
