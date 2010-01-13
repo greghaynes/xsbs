@@ -27,13 +27,30 @@ function foreachClient(hostname, callback) {
 function loadPlayerAdminPage(username, password) {
 }
 
-function loadLoginPage(callback) {
-	html_page = '<div id=\"login_container\"><h3>Please login</h3><form id=\"login_form\">Username: <input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password_input\" /><br /><input type=\"submit\" value=\"Login\" /></form></div>';
+function tryLogin(hostname, username, password, error_callback, success_callback) {
+	$.getJSON('http://' + hostname + '/json/login?username=' + username + '&password=' + password, function(data) {
+		if(data.hasOwnProperty('result') && data.result == 'SUCCESS')
+			success_callback();
+		else
+			error_callback();
+		});
+}
+
+function loadLoginPage(hostname, callback) {
+	html_page = '<div id=\"login_container\"><h3>Please login</h3>Username: <input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password_input\" /><br /><input type=\"submit\" value=\"Login\" id=\"login_submit\" /><br /><span id=\"login_status\"></span></div>';
 	$('#content').empty();
 	$(html_page).fadeIn('slow').appendTo('#content');
-	$('#login_form').submit(function() {
-		callback($('#username_input').val(),
-			$('#password_input').val());
+	$('#login_submit').click(function() {
+		var username = $('#username_input').val();
+		var password = $('#password_input').val();
+		tryLogin(hostname, username, password, function() {
+				$('#login_status').empty();
+				$('#login_status').html('Invalid login.');
+				},
+			function() {
+				$('#login_status').empty();
+				$('#login_status').html('Success.');
+				});
 		});
 }
 

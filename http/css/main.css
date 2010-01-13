@@ -14,3 +14,8 @@ body
 	border: 3px solid #222;
 }
 
+#login_status
+{
+	color: red;
+}
+
