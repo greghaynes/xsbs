@@ -1,4 +1,4 @@
-from xsbs.events import eventHandler, triggerServerEvent
+from xsbs.events import eventHandler, triggerServerEvent, execLater
 from xsbs.timers import addTimer
 from xsbs.net import ipLongToString, ipStringToLong
 import sbserver
@@ -50,7 +50,7 @@ class Player:
 		sbserver.playerMessage(self.cn, msg)
 	def kick(self):
 		'''Disconnect client from server'''
-		sbserver.playerKick(self.cn)
+		execLater(sbserver.playerKick, (self.cn,))
 	def spectate(self):
 		'''Make client spectator'''
 		sbserver.spectate(self.cn)
