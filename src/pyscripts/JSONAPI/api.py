@@ -1,5 +1,5 @@
 from xsbs.http import urlHandler, regexUrlHandler, isMaster
-from xsbs.http.json import jsonMasterRequired
+from xsbs.http import jsonMasterRequired
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.net import ipLongToString
 from xsbs.ban import ban
