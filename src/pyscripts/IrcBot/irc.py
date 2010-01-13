@@ -71,7 +71,10 @@ class Bot(asynchat.async_chat):
          message = 'Connecting to %s:%s...' % (host, port)
          logging.info(message)
       self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-      self.connect((host, port))
+      try:
+      	self.connect((host, port))
+      except socket.gaierror:
+        logging.error('Irc bot could not find hostname')
 
    def handle_connect(self): 
       if self.verbose: 
