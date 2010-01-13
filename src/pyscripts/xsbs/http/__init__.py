@@ -1,6 +1,8 @@
 import simpleasync
 import asyncore
 import re
+import logging
+import sys, traceback
 from xsbs.settings import PluginConfig
 from UserManager.usermanager import userAuth
 from UserPrivilege.userpriv import isMaster as isUserMaster
@@ -60,7 +62,11 @@ class RequestHandler(simpleasync.RequestHandler):
 			for exph in regex_path_handlers:
 				m = exph[0].match(self.path)
 				if m:
-					exph[1](self, **m.groupdict())
+					try:
+						exph[1](self, **m.groupdict())
+					except Error as e:
+						logging.error(traceback.format_exc())
+						self.respond_with(500, 'text/html', 0, '<html><body>Server Error</body></html>')
 			self.respond_with(404, 'text/html', 0, '<html><body>Invalid URL</body></html>')
 		else:
 			handler(self)
