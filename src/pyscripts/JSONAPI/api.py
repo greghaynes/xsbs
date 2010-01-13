@@ -6,6 +6,12 @@ from xsbs.ban import ban
 import sbserver
 import json
 
+@urlHandler('/json/login')
+@jsonMasterRequired
+def login(request):
+	request.respond_with(200, 'text/plain', 0, json.dumps({
+		'result': 'SUCCESS' }))
+
 @urlHandler('/json/admin/ban_client')
 @jsonMasterRequired
 def banClient(request):
