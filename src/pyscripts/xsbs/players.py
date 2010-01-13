@@ -1,6 +1,6 @@
 from xsbs.events import eventHandler, triggerServerEvent
 from xsbs.timers import addTimer
-from xsbs.net import ipLongToString
+from xsbs.net import ipLongToString, ipStringToLong
 import sbserver
 import logging
 
@@ -122,8 +122,7 @@ def playerByIpLong(ip):
 
 def playerByIpString(ip):
 	'''Return Player instance with matching string ip'''
-	ip_long = ipStringToLong(ip)
-	return playerByIpLong(ip)
+	return playerByIpLong(ipStringToLong(ip))
 
 @eventHandler('player_disconnect_post')
 def playerDisconnect(cn):
