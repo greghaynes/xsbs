@@ -41,6 +41,8 @@ function loadLoginPage(hostname, callback) {
 	$('#content').empty();
 	$(html_page).fadeIn('slow').appendTo('#content');
 	$('#login_submit').click(function() {
+		$('login_status').empty();
+		$('login_status').html('Trying login...');
 		var username = $('#username_input').val();
 		var password = $('#password_input').val();
 		tryLogin(hostname, username, password, function() {
