@@ -82,7 +82,10 @@ class MasterClient(asyncore.dispatcher):
 			self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
 			if sbserver.ip():
 				self.bind((sbserver.ip(), 0))
-			self.connect((self.hostname, self.port))
+			try:
+				self.connect((self.hostname, self.port))
+			except socket.gaierror:
+				logging.error('Master server hostname not found')
 			self.do_connect = False
 		self.request_queue.append(request)
 	def try_auth(self, cn, name):
