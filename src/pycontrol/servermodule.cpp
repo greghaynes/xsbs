@@ -194,8 +194,15 @@ static PyObject *playerIpLong(PyObject *self, PyObject *args)
 static PyObject *playerKick(PyObject *self, PyObject *args)
 {
 	int cn;
+	server::clientinfo *ci;
 	if(!PyArg_ParseTuple(args, "i", &cn))
 		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
 	disconnect_client(cn, DISC_KICK);
 	Py_INCREF(Py_None);
 	return Py_None;
