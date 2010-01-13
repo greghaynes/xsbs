@@ -2,8 +2,31 @@ from xsbs.http import urlHandler, regexUrlHandler, isMaster
 from xsbs.http.json import jsonMasterRequired
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.net import ipLongToString
+from xsbs.ban import ban
 import sbserver
 import json
+
+@urlHandler('/json/admin/ban_client')
+@jsonMasterRequired
+def banClient(request):
+	try:
+		cn = request.body['cn'][0]
+		cn = int(cn)
+	except (KeyError, IndexError):
+		request.respond_with(200, 'text/plain', 0, json.dumps({
+			'error': 'INVALID_PARAMS' }))
+	try:
+		secs = request.body['seconds'][0]
+	except (KeyError, IndexError):
+		secs = 1450
+	secs = int(secs)
+	try:
+		reason = request.body['reason'][0]
+	except (KeyError, IndexError):
+		reason = 'Unspecified'
+	request.respond_with(200, 'text/plain', 0, json.dumps({
+		'result': 'SUCCESS' }))
+	ban(cn, seconds, reason, -1)
 
 @urlHandler('/json/admin/set_map')
 @jsonMasterRequired
