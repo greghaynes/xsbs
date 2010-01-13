@@ -14,7 +14,7 @@ import string
 import logging
 
 config = PluginConfig('ircbot')
-enable = config.getOption('Config', 'enable', 'yes') == 'yes'
+enable = config.getOption('Config', 'enable', 'no') == 'yes'
 channel = config.getOption('Config', 'channel', '#xsbs-newserver')
 servername = config.getOption('Config', 'servername', 'irc.gamesurge.net')
 nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
