@@ -18,10 +18,15 @@ class ExtraArgumentError(UsageError):
 	def __init__(self):
 		UsageError.__init__(self, 'Extra argument specified')
 
-class StateError(Error):
+class StateError(Exception):
 	'''State of server is invalid for command'''
 	def __init__(self, value):
-		Error.__init__(self, value)
+		Exception.__init__(self, value)
+
+class ArgumentValueError(Exception):
+	'''Value of an argument is erroneous'''
+	def __init__(self, value):
+		Exception.__init__(self, value)
 
 class CommandManager:
 	def __init__(self):
@@ -48,6 +53,8 @@ class CommandManager:
 						p.message(info('Usage: ' + command + ' ' + usage))
 				except StateError as e:
 					p.message(error(str(e)))
+				except ArgumentValueError as e:
+					p.message(error('Invalid argument. ' + str(e)))
 				except ValueError:
 					p.message(error('Value Error: Did you specify a valid cn?'))
 					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
