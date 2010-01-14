@@ -9,12 +9,19 @@ import logging
 import sys, traceback
 
 class UsageError(Exception):
+	'''Invalid client usage of command'''
 	def __init__(self, value=''):
 		Exception.__init__(self, value)
 
 class ExtraArgumentError(UsageError):
+	'''Argument specified when none expected'''
 	def __init__(self):
 		UsageError.__init__(self, 'Extra argument specified')
+
+class StateError(Error):
+	'''State of server is invalid for command'''
+	def __init__(self, value):
+		Error.__init__(self, value)
 
 class CommandManager:
 	def __init__(self):
@@ -39,6 +46,8 @@ class CommandManager:
 					p.message(error('Invalid Usage of #' + command + ' command. ' + str(e)))
 					for usage in usages:
 						p.message(info('Usage: ' + command + ' ' + usage))
+				except StateError as e:
+					p.message(error(str(e)))
 				except ValueError:
 					p.message(error('Value Error: Did you specify a valid cn?'))
 					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
