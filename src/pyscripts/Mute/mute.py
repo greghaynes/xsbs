@@ -4,7 +4,7 @@ from xsbs.ui import info, notice, error
 from xsbs.events import registerPolicyEventHandler, registerServerEventHandler
 from xsbs.players import player, masterRequired
 from xsbs.settings import PluginConfig
-from xsbs.commands import commandHandler, UsageError
+from xsbs.commands import commandHandler, UsageError, StateError
 import string
 
 config = PluginConfig('mute')
@@ -35,12 +35,12 @@ def onMuteSpectatorsCmd(cn, args):
 	   @usage'''
 	if args == '':
 		if mute_spectators[0] == True:
-			player(cn).message(error('Spectators are arleady muted'))
+			raise StateError('Spectators are arleady muted')
 		else:
 			mute_spectators[0] = True
 			sbserver.message(notice('Spectators are now muted'))
 	else:
-		raise UsageError('')
+		raise UsageError()
 
 @commandHandler('unmutespectators')
 @masterRequired
@@ -49,12 +49,12 @@ def onUnMuteSpectatorsCmd(cn, args):
 	   @usage'''
 	if args == '':
 		if mute_spectators[0] == False:
-			player(cn).message(error('Spectators are not currently muted'))
+			raise StateError('Spectators are not currently muted')
 		else:
 			mute_spectators[0] = False
 			sbserver.message(notice('Spectators are no longer muted'))
 	else:
-		raise UsageError('')
+		raise UsageError()
 
 @commandHandler('mute')
 @masterRequired
@@ -69,21 +69,21 @@ def onMuteCommand(cn, args):
 		try:	
 			p = player(tcn)
 		except ValueError:
-			sbserver.playerMessage(cn, error('Invalid player cn'))
+			raise StateError('Invalid player cn')
 		else:
 			try:
 				muted = p.is_muted
 			except AttributeError:
 			 	muted = False
 			if muted:
-				sbserver.playerMessage(cn, error('Player is already muted.'))
+				raise StateError('Player is already muted.')
 			else:
 				p.is_muted = True
 				name = p.name()
 				muter = player(cn).name()
 				sbserver.message(info(muted_temp.substitute(colordict, muted_name=name, muter=muter)))
 	except KeyError:
-		raise UsageError('cn')
+		raise UsageError()
 			
 @commandHandler('unmute')
 @masterRequired
@@ -106,7 +106,7 @@ def onUnmuteCommand(cn, args):
 		except AttributeError:
 			sbserver.playerMessage(cn, error('Specified player is not currently muted.'))
 	except KeyError:
-		raise UsageError('cn')
+		raise UsageError()
 	except ValueError:
 		sbserver.playerMessage(cn, error('Invalid player cn'))
 
