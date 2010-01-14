@@ -1,16 +1,19 @@
 import sbserver
 from events import registerServerEventHandler, registerPolicyEventHandler
 from colors import red
-from xsbs.ui import error, insufficientPermissions
-from xsbs.players import playerByName
+from xsbs.ui import error, info, insufficientPermissions
+from xsbs.players import playerByName, player
+from xsbs.help import command_info
 import xsbs.help
 import logging
 import sys, traceback
 
 class UsageError(Exception):
-	def __init__(self, value):
+	def __init__(self, value=''):
 		self.value = value
 	def __str__(self):
+		if self.value == '':
+			return 'Invalid usage'
 		return str(self.value)
 
 class CommandManager:
@@ -23,14 +26,21 @@ class CommandManager:
 			self.command_handlers[command] = []
 		self.command_handlers[command].append(func)
 	def trigger(self, cn, command, text):
+		p = player(cn)
 		if self.command_handlers.has_key(command):
 			for func in self.command_handlers[command]:
 				try:
 					func(cn, text)
 				except UsageError as e:
-					sbserver.playerMessage(cn, error('Usage: #' + command + ' ' + str(e)))
+					try:
+						usages = command_info[command].usages
+					except KeyError:
+						usages = [str(e)]
+					p.message(error('Invalid Usage of #\'' + command + '\' command'))
+					for usage in usages:
+						p.message(info('Usage: ' + command + ' ' + usage))
 				except ValueError:
-					sbserver.playerMessage(cn, error('Value Error: Did you specify a valid cn?'))
+					p.message(error('Value Error: Did you specify a valid cn?'))
 					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
 					logging.warn('Uncaught ValueError raised in command handler.')
 					logging.warn(traceback.format_exc())
