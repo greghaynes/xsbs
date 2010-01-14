@@ -10,11 +10,11 @@ import sys, traceback
 
 class UsageError(Exception):
 	def __init__(self, value=''):
-		self.value = value
-	def __str__(self):
-		if self.value == '':
-			return 'Invalid usage'
-		return str(self.value)
+		Exception.__init__(self, value)
+
+class ExtraArgumentError(UsageError):
+	def __init__(self):
+		UsageError.__init__(self, 'Extra argument specified')
 
 class CommandManager:
 	def __init__(self):
@@ -35,8 +35,8 @@ class CommandManager:
 					try:
 						usages = command_info[command].usages
 					except KeyError:
-						usages = [str(e)]
-					p.message(error('Invalid Usage of #\'' + command + '\' command'))
+						pass
+					p.message(error('Invalid Usage of #' + command + ' command. ' + str(e)))
 					for usage in usages:
 						p.message(info('Usage: ' + command + ' ' + usage))
 				except ValueError:

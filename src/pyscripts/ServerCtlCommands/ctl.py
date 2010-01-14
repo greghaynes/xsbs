@@ -1,6 +1,6 @@
 import sbserver
 from xsbs.events import triggerServerEvent
-from xsbs.commands import commandHandler, UsageError
+from xsbs.commands import commandHandler, UsageError, ExtraArgumentError
 from xsbs.settings import PluginConfig
 from xsbs.colors import red, yellow, blue, green, colordict
 from xsbs.plugins import reload as pluginReload
@@ -21,7 +21,7 @@ def onPauseCmd(cn, args):
 	'''@description Pause the game
 	   @usage'''
 	if args != '':
-		raise UsageError('')
+		raise ExtraArgumentError()
 		return
 	sbserver.setPaused(True)
 
@@ -31,7 +31,7 @@ def onResumeCmd(cn, args):
 	'''@description Resume game from pause
 	   @usage'''
 	if args != '':
-		raise UsageError('')
+		raise ExtraArgumentError()
 		return
 	sbserver.setPaused(False)
 
@@ -41,7 +41,7 @@ def onReloadCmd(cn, args):
 	'''@description Reload server plugins
 	   @usage'''
 	if args != '':
-		raise UsageError('')
+		raise ExtraArgumentError()
 	else:
 		sbserver.playerMessage(cn, yellow('NOTICE: ') + blue('Reloading server plugins.  Fasten your seatbelts...'))
 		pluginReload()
@@ -52,12 +52,12 @@ def onGiveMaster(cn, args):
 	'''@description Give master to a client
 	   @usage cn'''
 	if args == '':
-		raise UsageError('cn')
+		raise UsageError()
 		return
 	try:
 		tcn = int(args)
 	except TypeError:
-		raise UsageError('cn')
+		raise UsageError()
 		return
 	sbserver.playerMessage(cn, info('You have given master to %s') % sbserver.playerName(tcn))
 	sbserver.setMaster(tcn)
@@ -68,7 +68,7 @@ def onResize(cn, args):
 	'''@description Change maximum clients allowed in server
 	   @usage maxclients'''
 	if args == '':
-		raise UsageError('maxclients')
+		raise UsageError()
 	else:
 		size = int(args)
 		sbserver.setMaxClients(int(args))
@@ -79,7 +79,7 @@ def onMinsLeft(cn, args):
 	'''@description Set minutes left in current match
 	   @usage minutes'''
 	if args == '':
-		raise UsageError('minutes')
+		raise UsageError()
 	else:
 		sbserver.setMinsRemaining(int(args))
 
@@ -89,7 +89,7 @@ def specAll(cn, args):
 	'''@description Make all clients spectators
 	   @usage'''
 	if args != '':
-		raise UsageError('')
+		raise ExtraArgumentError()
 	else:
 		for s in sbserver.players():
 			sbserver.spectate(s)
@@ -100,7 +100,7 @@ def unspecAll(cn, args):
 	'''@description Make all clients players
 	   @usage'''
 	if args != '':
-		raise UsageError('')
+		raise ExtraArgumentError()
 	else:
 		for s in sbserver.spectators():
 			sbserver.unspectate(s)
@@ -111,7 +111,7 @@ def serverMessage(cn, args):
 	'''@description Broadcast message to all clients in server
 	   @usage message'''
 	if args == '':
-		raise UsageError('message')
+		raise UsageError()
 	else:
 		msg = servermsg_template.substitute(colordict, sender=sbserver.playerName(cn), message=args)
 		sbserver.message(msg)
@@ -122,7 +122,7 @@ def playerIp(cn, args):
 	'''@description Get string representation of client ip
 	   @usage cn'''
 	if args == '':
-		raise UsageError('cn')
+		raise UsageError()
 	else:
 		sbserver.message(info(player(int(args)).ipString()))
 
@@ -133,6 +133,8 @@ def playerIp(cn, args):
 def masterCmd(cn, args):
 	'''@description Claim master
 	   @usage'''
+	if args != '':
+		raise ExtraArgumentError()
 	if sbserver.playerPrivilege(cn) == 0:
 		sbserver.setMaster(cn)
 
@@ -142,7 +144,7 @@ def unsetMaster(cn, args):
 	'''@description Force release master from current master
 	   @usage'''
 	if args != '':
-		sbserver.playerMessage(cn, error('Usage: #unsetmaster'))
+		raise ExtraArgumentError()
 	else:
 		sbserver.setMaster(-1)
 
@@ -222,7 +224,7 @@ def onUserPrivCmd(cn, args):
 			tcn = int(sp[0])
 			args = sp[2]
 	except ValueError:
-		raise UsageError('#userpriv set <level> <cn>')
+		raise UsageError()
 
 	if subcmd == 'add':
 		userPrivSetCmd(cn, tcn, args)
@@ -233,5 +235,5 @@ def onUserPrivCmd(cn, args):
 	elif subcmd == 'wipe':
 		userPrivSetCmd(cn, tcn, args)
 	else:
-		sbserver.playerMessage(cn, error('Usage: #userpriv set <level> <cn>'))
+		raise UsageError()
 
