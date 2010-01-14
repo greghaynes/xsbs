@@ -18,10 +18,10 @@ class Plugin:
 		self.path = path
 		conf = ConfigParser()
 		conf.read(config_path)
-		self.isenabled = True
+		self.m_isenabled = True
 		try:
 			self.initmodule = conf.get('Plugin', 'module')
-			self.isenabled = (conf.get('Plugin', 'enable') == 'yes')
+			self.m_isenabled = (conf.get('Plugin', 'enable') == 'yes')
 			self.name = conf.get('Plugin', 'name')
 			self.version = conf.get('Plugin', 'version')
 			self.author = conf.get('Plugin', 'author')
@@ -31,6 +31,8 @@ class Plugin:
 	def load(self):
 		if self.initmodule and self.isenabled:
 			self.module = __import__(os.path.basename(self.path) + '.' + self.initmodule)
+	def enabled(self):
+		return self.isenabled
 
 def plugin(name):
 	return plugins[name]
