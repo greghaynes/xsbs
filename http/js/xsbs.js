@@ -25,11 +25,14 @@ function foreachClient(hostname, callback) {
 }
 
 function displayAlert(text) {
-	$('#content').fadeTo('slow', 0.4);
+	$('#content').fadeTo('slow', 0.4).attr('disabled', '');
 	$('<div class=\"alert_box\" id=\"alert\">' + text + '</div>').fadeIn('slow').appendTo('#alerts');
 }
 
 function clearAlert() {
+	$('#alert_box').fadeOut('slow', function() {
+		$('#alerts').empty();
+		});
 }
 
 function loadPlayerAdminPage(username, password) {
@@ -42,6 +45,16 @@ function tryLogin(hostname, username, password, error_callback, success_callback
 		else
 			error_callback();
 		});
+}
+
+function disableTopNav()
+{
+	$('#topnav_players').click(function() { });
+}
+
+function enableTopNav()
+{
+	$('#topnav_players').click(function() { alert('foo'); });
 }
 
 function loadLoginPage(hostname, callback) {
@@ -59,7 +72,15 @@ function loadLoginPage(hostname, callback) {
 			function() {
 				$('#login_status').empty();
 				$('#login_status').html('Success.');
+				callback();
 				});
+		});
+}
+
+function setup(hostname) {
+	loadLoginPage(hostname, function(username, password) {
+		clearAlert();
+		enableTopNav();
 		});
 }
 

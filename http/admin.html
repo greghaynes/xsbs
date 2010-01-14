@@ -5,12 +5,28 @@
 <script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/xsbs.js"></script>
 <script type="text/javascript">
+	var hostname = 'localhost:8081';
+
+	function start()
+	{
+		setup(hostname);
+	}
 </script>
 </head>
 
-<body onload="loadLoginPage('localhost:8081', function(user, pass) {alert(user); })">
+<body onload="start()">
 <div id="content">
 	<h2>XSBS Admin Panel</h2>
+	<div id="topnav">
+		<ul id="topnav_list">
+			<li><a id="topnav_players">Players</a></li>
+			<li><a id="topnav_server">Server</a></li>
+			<li><a id="logiout">Logout</a></li>
+		</ul>
+	</div>
+	<div id="main_content">
+	</div>
+	</div>
 </div>
 <div id="alerts"></div>
 </body>
