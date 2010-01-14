@@ -25,9 +25,8 @@ function foreachClient(hostname, callback) {
 }
 
 function displayAlert(text) {
-	$('#content').fadeTo('slow', 0.4, function() {
-		$('<div class=\"alert_box\" id=\"alert\">' + text + '</div>').fadeIn('slow').appendTo('#alerts');
-		});
+	$('#content').fadeTo('slow', 0.4);
+	$('<div class=\"alert_box\" id=\"alert\">' + text + '</div>').fadeIn('slow').appendTo('#alerts');
 }
 
 function clearAlert() {
