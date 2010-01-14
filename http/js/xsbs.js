@@ -24,6 +24,15 @@ function foreachClient(hostname, callback) {
 		});
 }
 
+function displayAlert(text) {
+	$('#content').fadeTo('slow', 0.4, function() {
+		$('<div class=\"alert_box\" id=\"alert\">' + text + '</div>').fadeIn('slow').appendTo('#alerts');
+		});
+}
+
+function clearAlert() {
+}
+
 function loadPlayerAdminPage(username, password) {
 }
 
@@ -37,9 +46,8 @@ function tryLogin(hostname, username, password, error_callback, success_callback
 }
 
 function loadLoginPage(hostname, callback) {
-	html_page = '<div class=\"alert_box\" id=\"login_container\"><h3>Please login</h3>Username: <input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password_input\" /><br /><input type=\"submit\" value=\"Login\" id=\"login_submit\" /><br /><span id=\"login_status\"></span></div>';
-	$('#content').empty();
-	$(html_page).fadeIn('slow').appendTo('#content');
+	html_page = '<h3>Please login</h3>Username: <input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password_input\" /><br /><input type=\"submit\" value=\"Login\" id=\"login_submit\" /><br /><span id=\"login_status\"></span>';
+	displayAlert(html_page);
 	$('#login_submit').click(function() {
 		$('#login_status').empty();
 		$('#login_status').html('Trying login...');
