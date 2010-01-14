@@ -77,14 +77,11 @@ class Bot(asynchat.async_chat):
         logging.error('Irc bot could not find hostname')
 
    def handle_connect(self): 
-      if self.verbose: 
-         logging.info('Connected')
       self.write(('NICK', self.nick))
       self.write(('USER', self.user, '+iw', self.nick), self.name)
 
    def handle_close(self): 
       self.close()
-      logging.info('Closed')
 
    def collect_incoming_data(self, data): 
       self.buffer += data

@@ -45,6 +45,23 @@ class Bot(irc.Bot):
 			'433': self.handle_nick_in_use }
 		self.command_handlers = { 'status': self.cmd_status }
 		self.connect_complete = False
+		self.is_connecting = False
+	def run(self, host, port):
+		if self.is_connecting or self.connect_complete:
+			return
+		self.is_connecting = True
+		irc.Bot.run(self, host, port)
+	def close(self):
+		logging.info('Closed')
+		self.is_connecting = False
+		self.connect_complete = False
+		irc.Bot.close(self)
+	def handle_connect(self):
+		if self.verbose: 
+			logging.info('Connected')
+		irc.Bot.handle_connect(self)
+	def handle_close(self):
+		irc.Bot.handle_close(self)
 	def dispatch(self, origin, args):
 		bytes, event, args = args[0], args[1], args[2:]
 		text = decode(bytes)
@@ -54,7 +71,6 @@ class Bot(irc.Bot):
 			pass
 	def handle_mode(self, origin, event, args, bytes):
 		if not self.connect_complete:
-			self.connect_complete = True
 			self.handle_complete_connect()
 	def handle_privmsg(self, origin, event, args, bytes):
 		if args[0] in self.channels:
@@ -74,6 +90,8 @@ class Bot(irc.Bot):
 		except KeyError:
 			pass
 	def handle_complete_connect(self):
+		self.is_connecting = False
+		self.connect_complete = True
 		for chan in self.channels:
 			self.write(('JOIN', chan))
 	def cmd_status(self, channel, origin, command, bytes):
@@ -90,6 +108,16 @@ status_message = string.Template(status_message)
 bot = Bot(nickname, 'xsbs', channel)
 if enable:
 	bot.run(servername, port)
+
+@commandHandler('ircbot')
+@adminRequired
+def ircbotCmd(cn, args):
+	if args == 'enable':
+		bot.run(servername, port)
+	elif args == 'disable':
+		bot.close()
+	else:
+		raise UsageError('enable/disable')
 
 event_abilities = {
 	'player_active': ('player_connect', lambda x: bot.broadcast(
