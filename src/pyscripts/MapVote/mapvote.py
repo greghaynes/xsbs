@@ -66,7 +66,7 @@ def onMapVote(cn, mapname, mapmode):
 	elif isAtLeastMaster(cn) and sbserver.masterMode() > 0:
 		sbserver.setMap(mapname, mapmode)
 	elif mapmode != sbserver.gameMode() and (lock_mode or not allow_modevote):
-		p.message(cn, error('You cannot vote for a new game mode'))
+		p.message(error('You cannot vote for a new game mode'))
 	else:
 		try:
 			vote = player(cn).gamevars['mapvote']
