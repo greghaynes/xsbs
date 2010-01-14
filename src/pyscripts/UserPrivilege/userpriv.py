@@ -74,7 +74,7 @@ def isPlayerMaster(cn):
 		if p.privilege() ==1:
 			return True
 		user = loggedInAs(cn)
-		if isMaster(user.id):
+		if isMaster(user.id) or isAdmin(user.id):
 			return True
 		else:
 			return False
