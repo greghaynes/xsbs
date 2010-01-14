@@ -8,6 +8,7 @@ from xsbs.ui import info, error
 from xsbs.commands import commandHandler, UsageError
 from xsbs.players import clientCount
 from xsbs.game import currentMap
+from xsbs.players import player
 from UserPrivilege.userpriv import masterRequired, adminRequired
 import irc
 import string
@@ -113,8 +114,10 @@ if enable:
 @adminRequired
 def ircbotCmd(cn, args):
 	if args == 'enable':
+		player(cn).message(info('Enabling irc bot'))
 		bot.run(servername, port)
 	elif args == 'disable':
+		player(cn).message(info('Disabling irc bot'))
 		bot.close()
 	else:
 		raise UsageError('enable/disable')
