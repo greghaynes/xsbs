@@ -5,8 +5,8 @@ import logging
 import sys, traceback
 import json
 from xsbs.settings import PluginConfig
-from UserManager.usermanager import userAuth
-from UserPrivilege.userpriv import isMaster as isUserMaster
+from xsbs.users import userAuth
+from xsbs.users.privilege import isUserMaster
 
 config = PluginConfig('httpserver')
 enable = config.getOption('Config', 'enable', 'yes') == 'yes'

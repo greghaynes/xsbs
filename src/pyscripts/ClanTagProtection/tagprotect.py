@@ -5,7 +5,7 @@ from xsbs.colors import red
 from xsbs.timers import addTimer
 from xsbs.db import dbmanager
 from xsbs.ban import ban
-from UserManager.usermanager import User, isLoggedIn
+from xsbs.users import User, isLoggedIn
 import sbserver
 from sqlalchemy.orm import relation
 from sqlalchemy import Column, Integer, String, ForeignKey

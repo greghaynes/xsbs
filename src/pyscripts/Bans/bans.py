@@ -7,7 +7,7 @@ from xsbs.commands import commandHandler, UsageError
 from xsbs.events import triggerServerEvent, eventHandler, policyHandler, execLater
 from xsbs.ban import ban, isIpBanned, isNickBanned, Ban
 from xsbs.net import ipLongToString, ipStringToLong
-from UserPrivilege.userpriv import masterRequired
+from xsbs.players import masterRequired
 import time, string
 import logging
 

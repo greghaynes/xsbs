@@ -3,9 +3,8 @@ from xsbs.ui import error, notice
 from xsbs.colors import green
 from xsbs.timers import addTimer
 from xsbs.game import modeNumber
-from xsbs.players import player
+from xsbs.players import player, masterRequired
 from xsbs.persistteam import persistentTeams
-from UserPrivilege.userpriv import masterRequired
 import sbserver
 
 def clanWarTimer(count):

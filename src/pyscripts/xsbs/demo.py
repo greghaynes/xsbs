@@ -3,7 +3,7 @@ from xsbs.events import eventHandler
 from xsbs.ui import notice
 from xsbs.settings import PluginConfig
 from xsbs.colors import colordict
-from UserPrivilege.userpriv import masterRequired
+from xsbs.players import masterRequired
 import string
 
 config = PluginConfig('demorecord')

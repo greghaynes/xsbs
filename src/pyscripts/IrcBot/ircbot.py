@@ -8,8 +8,7 @@ from xsbs.ui import info, error
 from xsbs.commands import commandHandler, UsageError
 from xsbs.players import clientCount
 from xsbs.game import currentMap
-from xsbs.players import player
-from UserPrivilege.userpriv import masterRequired, adminRequired
+from xsbs.players import player, masterRequired, adminRequired
 import irc
 import string
 import logging

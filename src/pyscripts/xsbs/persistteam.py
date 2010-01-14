@@ -2,7 +2,7 @@ from xsbs.events import eventHandler
 from xsbs.commands import commandHandler, UsageError
 from xsbs.players import player, all as allPlayers
 from xsbs.ui import error, notice
-from UserPrivilege.userpriv import masterRequired
+from xsbs.players import masterRequired
 import sbserver
 
 player_pteams = []

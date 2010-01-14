@@ -2,10 +2,9 @@ import sbserver
 from xsbs.colors import colordict
 from xsbs.ui import info, notice, error
 from xsbs.events import registerPolicyEventHandler, registerServerEventHandler
-from xsbs.players import player
+from xsbs.players import player, masterRequired
 from xsbs.settings import PluginConfig
 from xsbs.commands import commandHandler, UsageError
-from UserPrivilege.userpriv import masterRequired
 import string
 
 config = PluginConfig('mute')

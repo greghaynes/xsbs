@@ -1,8 +1,56 @@
 from xsbs.events import eventHandler, triggerServerEvent, execLater
 from xsbs.timers import addTimer
 from xsbs.net import ipLongToString, ipStringToLong
+from xsbs.ui import insufficientPermissions
+from xsbs.users.privilege import isUserMaster, isUserAdmin, isUserAtLeastMaster
 import sbserver
 import logging
+
+def isMaster(cn):
+	if sbserver.playerPrivilege(cn) == 1:
+		return True
+	try:
+		return isUserMaster(player(cn).user.id)
+	except AttributeError, ValueError:
+		return False
+
+def isAtLeastMaster(cn):
+	if sbserver.playerPrivilege(cn) > 0:
+		return True
+	try:
+		return isUserAtLeastMaster(player(cn).user.id)
+	except AttributeError, ValueError:
+		return False
+
+def isAdmin(cn):
+	if sbserver.playerPrivilege(cn) == 2:
+		return True
+	try:
+		return isUserAdmin(player(cn).user.id)
+	except AttributeError, ValueError:
+		return False
+
+class masterRequired(object):
+	def __init__(self, func):
+		self.func = func
+		self.__doc__ = func.__doc__
+		self.__name__ = func.__name__
+	def __call__(self, *args):
+		if not isAtLeastMaster(args[0]):
+			insufficientPermissions(args[0])
+		else:
+			self.func(*args)
+
+class adminRequired(object):
+	def __init__(self, func):
+		self.func = func
+		self.__doc__ = func.__doc__
+		self.__name__ = func.__name__
+	def __call__(self, *args):
+		if not isAdmin(args[0]):
+			insufficientPermissions(args[0])
+		else:
+			self.func(*args)
 
 class Player:
 	'''Represents a client on the server'''
@@ -45,6 +93,12 @@ class Player:
 	def isSpectator(self):
 		'''Is client a spectator'''
 		return sbserver.playerIsSpectator(self.cn)
+	def isMaster(self):
+		return isMaster(self.cn)
+	def isAtLeastMaster(self):
+		return isAtLeastMaster(self.cn)
+	def isAdmin(self):
+		return isAdmin(self.cn)
 	def message(self, msg):
 		'''Send message to client'''
 		sbserver.playerMessage(self.cn, msg)

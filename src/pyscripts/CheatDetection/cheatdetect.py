@@ -1,7 +1,6 @@
 import sbserver
-from UserPrivilege.userpriv import masterRequired
 from xsbs.events import registerServerEventHandler
-from xsbs.players import player
+from xsbs.players import player, masterRequired
 from xsbs.ui import warning, error, info
 from xsbs.settings import PluginConfig
 from xsbs.commands import registerCommandHandler

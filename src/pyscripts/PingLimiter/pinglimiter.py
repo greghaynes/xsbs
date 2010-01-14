@@ -5,7 +5,7 @@ from xsbs.settings import PluginConfig
 from xsbs.ui import warning, notice
 from xsbs.commands import commandHandler, UsageError
 from xsbs import players
-from UserPrivilege.userpriv import adminRequired
+from xsbs.players import adminRequired
 
 config = PluginConfig('pinglimiter')
 enable = config.getOption('Config', 'enable', 'yes') == 'yes'

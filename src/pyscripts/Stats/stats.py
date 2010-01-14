@@ -4,7 +4,7 @@ from xsbs.commands import commandHandler
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
 from xsbs.ui import insufficientPermissions, error
-from UserPrivilege.userpriv import isPlayerMaster
+from xsbs.players import isAtLeastMaster
 
 config = PluginConfig('stats')
 template = config.getOption('Config', 'template', '${white}Stats for ${orange}${name}\n${white}Frags: ${green}${frags} ${white}Deaths: ${red}${deaths} ${white}Teamkills: ${magenta}${teamkills} ${white}Accuracy: ${yellow}${accuracy}% ${white}KpD: ${orange}${ktd}')

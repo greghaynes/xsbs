@@ -6,7 +6,7 @@ from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.commands import registerCommandHandler
 from xsbs.db import dbmanager
-from UserPrivilege.userpriv import isPlayerMaster
+from xsbs.players import isAtLeastMaster
 import sbserver
 
 config = PluginConfig('namesdb')
@@ -44,7 +44,7 @@ def namesCmd(cn, args):
 	'''@description Display names used by client
 	   @usage cn
 	   @public'''
-	if master_required and not isPlayerMaster(cn):
+	if master_required and not isAtLeastMaster(cn):
 		insufficientPermissions(cn)
 		return
 	if args == '':

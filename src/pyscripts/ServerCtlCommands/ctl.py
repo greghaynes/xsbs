@@ -7,7 +7,7 @@ from xsbs.plugins import reload as pluginReload
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.net import ipLongToString
 from Motd.motd import motdstring
-from UserPrivilege.userpriv import masterRequired, adminRequired
+from xsbs.players import masterRequired, adminRequired
 import string
 
 config = PluginConfig('servercommands')
@@ -125,4 +125,113 @@ def playerIp(cn, args):
 		raise UsageError('cn')
 	else:
 		sbserver.message(info(player(int(args)).ipString()))
+
+# user commands
+
+@commandHandler('master')
+@masterRequired
+def masterCmd(cn, args):
+	'''@description Claim master
+	   @usage'''
+	if sbserver.playerPrivilege(cn) == 0:
+		sbserver.setMaster(cn)
+
+@commandHandler('unsetmaster')
+@masterRequired
+def unsetMaster(cn, args):
+	'''@description Force release master from current master
+	   @usage'''
+	if args != '':
+		sbserver.playerMessage(cn, error('Usage: #unsetmaster'))
+	else:
+		sbserver.setMaster(-1)
+
+def userPrivSetCmd(cn, tcn, args):
+	user_id = player(tcn).user.id
+	if args == 'user':
+		try:
+			if isUser(player(tcn).user.id):
+				sbserver.playerMessage(cn, error('%s already has user permissions.' % sbserver.playerName(tcn)))
+				return
+		except (ValueError, AttributeError):
+			pass
+		else:
+			try:
+				user = loggedInAs(tcn)
+			except AttributeError:
+				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
+			else:
+				session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
+				session.add(UserPrivilege(0, user.id))
+				session.commit()
+				sbserver.playerMessage(cn, info('User privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
+	elif args == 'master':
+		try:
+			if isMaster(player(tcn).user.id):
+				sbserver.playerMessage(cn, error('%s already has master permissions.' % sbserver.playerName(tcn)))
+				return
+		except (ValueError, AttributeError):
+			pass
+		else:
+			try:
+				user = loggedInAs(tcn)
+			except AttributeError:
+				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
+			else:
+				session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
+				session.add(UserPrivilege(1, user.id))
+				session.commit()
+				sbserver.playerMessage(cn, info('Master privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
+	elif args == 'admin':
+		try:
+			if isAdmin(player(tcn).user.id):
+				sbserver.playerMessage(cn, error('%s already has admin permissions.' % sbserver.playerName(tcn)))
+				return
+		except (ValueError, AttributeError):
+			pass
+		else:
+			try:
+				user = loggedInAs(tcn)
+			except AttributeError:
+				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
+			else:
+				session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
+				session.add(UserPrivilege(2, user.id))
+				session.commit()
+				sbserver.playerMessage(cn, info('Admin privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
+	else:
+		sbserver.playerMessage(cn, error('Privilege level must be \'master\' to set master permissions and \'admin\' to set master or admin permissions'))
+
+@commandHandler('userpriv')
+@adminRequired
+def onUserPrivCmd(cn, args):
+	'''@description Set privileges for server account
+		@usage <cn> <action> <level>'''
+	sp = args.split(' ')
+	try:
+		if sp[0] == 'set':
+			subcmd = sp[0]
+			tcn = int(sp[2])
+			args = sp[1]
+		elif sp[0] == 'wipe':
+			subcmd = sp[0]
+			tcn = int(sp[1])
+			args = 'user'
+		else:
+			subcmd = sp[1]
+			tcn = int(sp[0])
+			args = sp[2]
+	except ValueError:
+		raise UsageError('#userpriv set <level> <cn>')
+
+	if subcmd == 'add':
+		userPrivSetCmd(cn, tcn, args)
+	elif subcmd == 'del':
+		userPrivSetCmd(cn, tcn, 'user')
+	elif subcmd == 'set':
+		userPrivSetCmd(cn, tcn, args)
+	elif subcmd == 'wipe':
+		userPrivSetCmd(cn, tcn, args)
+	else:
+		sbserver.playerMessage(cn, error('Usage: #userpriv set <level> <cn>'))
 
