@@ -1,11 +1,11 @@
 from xsbs.db import dbmanager
 from xsbs.settings import PluginConfig
 from xsbs.net import ipLongToString, ipStringToLong
-from xsbs.events import execLater
+from xsbs.timers import addTimer
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
-from xsbs.ui import info
+from xsbs.ui import info, notice
 from xsbs.colors import colordict
 import time, string
 import logging
@@ -82,7 +82,7 @@ def ban(cn, seconds, reason, banner_cn):
 	newban = Ban(ip, expiration, reason, nick, banner_ip, banner_nick, time.time())
 	session.add(newban)
 	session.commit()
-	execLater(sbserver.playerKick, (cn,))
+	addTimer(200, sbserver.playerKick, (cn,))
 	logging.info('Player %s (%s) banned for %s by %s (%s)',
 		nick,
 		ipLongToString(ip),
