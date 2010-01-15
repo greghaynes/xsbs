@@ -43,7 +43,7 @@ function tryLogin(hostname, username, password, error_callback, success_callback
 		if(data.hasOwnProperty('result') && data.result == 'SUCCESS')
 			success_callback();
 		else
-			error_callback();
+			error_callback(data.error);
 		});
 }
 
@@ -65,14 +65,17 @@ function loadLoginPage(hostname, callback) {
 		$('#login_status').html('Trying login...');
 		var username = $('#username_input').val();
 		var password = $('#password_input').val();
-		tryLogin(hostname, username, password, function() {
+		tryLogin(hostname, username, password, function(error_code) {
 				$('#login_status').empty();
-				$('#login_status').html('Invalid login.');
+				if(error_code == 'INVALID_LOGIN')
+					$('#login_status').html('Invalid login.');
+				else
+					$('#login_status').html('Unknown error.');
 				},
 			function() {
 				$('#login_status').empty();
 				$('#login_status').html('Success.');
-				callback();
+				callback(username, password);
 				});
 		});
 }
