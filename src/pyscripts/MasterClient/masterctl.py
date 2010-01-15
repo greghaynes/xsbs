@@ -4,6 +4,7 @@ from twisted.internet.task import LoopingCall
 
 from xsbs.settings import PluginConfig
 from xsbs.events import triggerServerEvent, eventHandler
+from xsbs.net import ipLongToString
 
 import sbserver
 import time
@@ -120,7 +121,11 @@ class MasterClientFactory(protocol.ClientFactory):
 		self.response_handler.auth_id_map.clear()
 	def send(self, data):
 		if self.client == None:
-			reactor.connectTCP(master_host, int(master_port), self)
+			ip = sbserver.ip()
+			if ip != None:
+				reactor.connectTCP(master_host, int(master_port), self, 30, (sbserver.ip(), sbserver.port()))
+			else:
+				reactor.connectTCP(master_host, int(master_port), self)
 			self.send_buffer.append(data)
 		else:
 			self.client.sendLine(data)
