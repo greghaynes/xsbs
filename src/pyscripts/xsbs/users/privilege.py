@@ -58,7 +58,6 @@ def isUserMaster(user_id):
 		return False
 		
 def isUserAdmin(user_id):
-	print 'test'
 	try:
 		priv = session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==ADMIN).one()
 		return True
