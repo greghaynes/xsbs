@@ -653,6 +653,7 @@ void initserver(bool listen, bool dedicated)
         return;
     }
     signal(SIGINT, server_sigint);
+	signal(SIGTERM, server_sigint);
 
     if(listen)
     {

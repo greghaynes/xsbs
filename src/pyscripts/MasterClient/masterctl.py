@@ -98,7 +98,7 @@ class MasterClient(LineReceiver):
 	def connectionMade(self):
 		logging.debug('Connected to master server')
 		self.factory.clientConnected(self)
-	def connectionLost(self):
+	def connectionLost(self, reason):
 		self.factory.clientDisconnected(self)
 	def lineReceived(self, line):
 		self.factory.response_handler.handle(line)
