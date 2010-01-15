@@ -30,4 +30,4 @@ colordict = { 'green': green(),
 	'white': white() }
 
 def colorstring(str, text):
-	textcolor(colordic[str],text)
+	textcolor(colordict[str],text)
