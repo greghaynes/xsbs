@@ -128,7 +128,6 @@ class MasterClientFactory(protocol.ClientFactory):
 factory = MasterClientFactory()
 
 def registerServer():
-	print 'foo'
 	factory.send('regserv %i' % sbserver.port())
 
 registerRepeater = LoopingCall(registerServer)
