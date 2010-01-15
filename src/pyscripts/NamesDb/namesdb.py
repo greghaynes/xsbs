@@ -4,7 +4,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from xsbs.settings import PluginConfig
 from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info, insufficientPermissions
-from xsbs.commands import registerCommandHandler
+from xsbs.commands import commandHandler, UsageError
 from xsbs.db import dbmanager
 from xsbs.players import isAtLeastMaster
 import sbserver
@@ -40,6 +40,7 @@ def onConnect(cn):
 def onNameChange(cn, oldname, newname):
 	onConnect(cn)
 
+@commandHandler('names')
 def namesCmd(cn, args):
 	'''@description Display names used by client
 	   @usage cn
@@ -48,16 +49,16 @@ def namesCmd(cn, args):
 		insufficientPermissions(cn)
 		return
 	if args == '':
-		sbserver.playerMessage(cn, error('Usage: #names <cn>'))
+		raise UsageError()
 		return
 	try:
 		tcn = int(args)
 		names = session.query(IpToNick).filter(IpToNick.ip==sbserver.playerIpLong(tcn)).all()
 		if len(names) == 0:
-			sbserver.playerMessage(cn, error('No names found'))
+			sbserver.playerMessage(cn, info('No names found'))
 			return
 	except NoResultFound:
-		sbserver.playerMessage(cn, error('No names found'))
+		sbserver.playerMessage(cn, info('No names found'))
 		return
 	except ValueError:
 		sbserver.playerMessage(cn, error('Invalid cn'))
@@ -67,11 +68,7 @@ def namesCmd(cn, args):
 		namestr += name.nick + ' '
 	sbserver.playerMessage(cn, info(namestr))
 
-def init():
-	Base.metadata.create_all(dbmanager.engine)
-
-init()
+Base.metadata.create_all(dbmanager.engine)
 registerServerEventHandler('player_connect', onConnect)
 registerServerEventHandler('player_name_changed', onNameChange)
-registerCommandHandler('names', namesCmd)
 
