@@ -1,10 +1,12 @@
 from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor, protocol
+from twisted.internet.base import DelayedCall
 
 from xsbs.settings import PluginConfig
 from xsbs.events import triggerServerEvent, eventHandler
 
 import sbserver
+import time
 import logging
 
 config = PluginConfig('masterclient')
@@ -124,6 +126,12 @@ class MasterClientFactory(protocol.ClientFactory):
 			self.client.sendLine(data)
 
 factory = MasterClientFactory()
+
+def registerServer():
+	factory.send('regserv %i' % sbserver.port())
+	DelayedCall(time.time() + 3600, registerServer, (), None, None, None)
+
+registerServer()
 
 @eventHandler('player_auth_request')
 def authRequest(cn, name):
