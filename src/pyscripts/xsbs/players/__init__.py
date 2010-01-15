@@ -185,6 +185,14 @@ def playerDisconnect(cn):
 	except KeyError:
 		logging.error('Player disconnected but does not have player class instance!')
 
+def triggerConnectDelayed(cn):
+	try:
+		player(cn)
+	except ValueError:
+		return
+	else:
+		triggerServerEvent('player_connect_delayed', (cn,))
+
 @eventHandler('player_connect_pre')
 def playerConnect(cn):
 	try:
@@ -192,7 +200,7 @@ def playerConnect(cn):
 	except KeyError:
 		pass
 	players[cn] = Player(cn)
-	addTimer(1000, triggerServerEvent, ('player_connect_delayed', (cn,)))
+	addTimer(1000, triggerConnectDelayed, (cn,))
 
 @eventHandler('restart_complete')
 def reload():
