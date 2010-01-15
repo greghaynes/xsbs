@@ -3,6 +3,8 @@ import asyncore
 import logging
 import sys
 import traceback
+from twisted.internet import reactor
+from twisted.internet.error import ReactorNotRunning
 
 class EventManager:
 	def __init__(self):
@@ -87,7 +89,13 @@ def triggerExecQueue():
 	del exec_queue[:]
 
 def update():
+	try:
+		reactor.runUntilCurrent()
+	except ReactorNotRunning:
+		reactor.stopRunning()
+	reactor.doIteration(0)
 	timers.update()
-	asyncore.loop(0, False, None, count=1)
 	triggerExecQueue()
+
+reactor.startRunning()
 
