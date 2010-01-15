@@ -9,6 +9,7 @@ import xsbs.teamcontrol
 import xsbs.persistteam
 import xsbs.demo
 import xsbs.http
+import xsbs.http.jsonapi
 
 import logging
 
