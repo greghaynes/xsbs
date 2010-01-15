@@ -57,7 +57,10 @@ def tagId(tag):
 	return session.query(ClanTag).filter(ClanTag.tag==tag).one().id
 
 def setUsedTags(cn):
-	p = player(cn)
+	try:
+		p = player(cn)
+	except ValueError:
+		return
 	nick = p.name()
 	potentials = []
 	matches = regex.findall(nick)
