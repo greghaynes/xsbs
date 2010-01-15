@@ -112,6 +112,8 @@ if enable:
 @commandHandler('ircbot')
 @adminRequired
 def ircbotCmd(cn, args):
+	'''@description Enable/disable the xsbs irc bot
+	   @usage enable/disable'''
 	if args == 'enable':
 		player(cn).message(info('Enabling irc bot'))
 		bot.run(servername, port)
