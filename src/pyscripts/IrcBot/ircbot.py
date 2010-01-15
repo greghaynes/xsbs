@@ -3,6 +3,7 @@ from twisted.internet import reactor, protocol
 
 from xsbs.settings import PluginConfig, NoOptionError
 from xsbs.events import registerServerEventHandler
+import sbserver
 
 import string
 
@@ -42,21 +43,11 @@ class IrcBot(irc.IRCClient):
 		for channel in self.joined_channels:
 			self.say(channel, message)
 
-class ServerEventDispatcher(object):
-	def __init__(self, factory):
-		self.factory = factory
-	def broadcast(self, message):
-		for bot in self.factory.bots:
-			bot.broadcast(message)
-	def playerConnected(self, cn):
-		self.broadcast('User connected')
-
 class IrcBotFactory(protocol.ClientFactory):
 	protocol = IrcBot
 	def __init__(self, nickname, channels):
 		self.nickname = nickname
 		self.channels = channels
-		self.event_dispatch = ServerEventDispatcher(self)
 		self.bots = []
 	def signedOn(self, bot):
 		if bot not in self.bots:
@@ -64,10 +55,37 @@ class IrcBotFactory(protocol.ClientFactory):
 	def signedOut(self, bot):
 		if bot in self.bots:
 			self.bots.remove(bot)
+	def broadcast(self, message):
+		for bot in self.bots:
+			bot.broadcast(message)
 
 factory = IrcBotFactory(nickname, [channel])
 
-registerServerEventHandler('player_connect', lambda x: factory.event_dispatch.playerConnected(x))
+event_abilities = {
+	'player_active': ('player_connect', lambda x: factory.broadcast(
+		'\x032CONNECT\x03        %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
+	'player_disconnect': ('player_disconnect', lambda x: factory.broadcast(
+		'\x032DISCONNECT\x03     %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
+	'message': ('player_message', lambda x, y: factory.broadcast(
+		'\x033MESSAGE\x03        %s (\x037 %i \x03): %s' % (sbserver.playerName(x), x, y))),
+	'map_change': ('map_changed', lambda x, y: factory.broadcast(
+		'\x038MAP CHANGE\x03     %s (%s)' % (x, sbserver.modeName(y)))),
+	'gain_admin': ('player_claimed_admin', lambda x: factory.broadcast(
+		'\x036CLAIM ADMIN\x03    %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
+	'gain_master': ('player_claimed_master', lambda x: factory.broadcast(
+		'\x036CLAIM MASTER\x03   %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
+	'auth': ('player_auth_succeed', lambda x, y: factory.broadcast(
+		'\x036AUTH\x03           %s (\x037 %i \x03) as %s@sauerbraten.org' % (sbserver.playerName(x), x, y))),
+	'relinquish_admin': ('player_released_admin', lambda x: factory.broadcast(
+		'\x036RELINQ ADMIN\x03   %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
+	'relinquish_master': ('player_released_master', lambda x: factory.broadcast(
+		'\x036RELINQ MASTER\x03  %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
+}
+
+for key in event_abilities.keys():
+	if config.getOption('Abilities', key, 'no') == 'yes':
+		ev = event_abilities[key]
+		registerServerEventHandler(ev[0], ev[1])
 
 reactor.connectTCP(servername, int(port), factory)
 
