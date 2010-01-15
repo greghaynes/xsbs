@@ -1,16 +1,25 @@
 from xsbs.http import urlHandler, regexUrlHandler, isMaster
 from xsbs.http import jsonMasterRequired
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
+from xsbs.users import userAuth
 from xsbs.net import ipLongToString
 from xsbs.ban import ban
 import sbserver
 import json
 
 @urlHandler('/json/login')
-@jsonMasterRequired
 def login(request):
-	request.respond_with(200, 'text/plain', 0, json.dumps({
-		'result': 'SUCCESS' }))
+	try:
+		user = userAuth(request.body['username'][0], request.body['password'][0])
+	except (AttributeError, KeyError):
+		request.respond_with(200, 'text/plain', 0, json.dumps({
+			'error': 'INVALID_LOGIN'}))
+	if user:
+		request.respond_with(200, 'text/plain', 0, json.dumps({
+			'result': 'SUCCESS' }))
+	else:
+		request.respond_with(200, 'text/plain', 0, json.dumps({
+			'error': 'INVALID_LOGIN'}))
 
 @urlHandler('/json/admin/ban_client')
 @jsonMasterRequired

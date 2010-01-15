@@ -6,7 +6,7 @@ import sys, traceback
 import json
 from xsbs.settings import PluginConfig
 from xsbs.users import userAuth
-from xsbs.users.privilege import isUserMaster
+from xsbs.users.privilege import isUserAtLeastMaster
 
 config = PluginConfig('httpserver')
 enable = config.getOption('Config', 'enable', 'yes') == 'yes'
@@ -18,6 +18,15 @@ port = int(port)
 
 path_handlers = {}
 regex_path_handlers = []
+
+def isMaster(email, password):
+	user = userAuth(email, password)
+	if user:
+		val = isUserAtLeastMaster(user.id)
+		del user
+		return val
+	else:
+		return False
 
 class jsonMasterRequired(object):
 	def __init__(self, func):
@@ -44,15 +53,6 @@ def registerRegexUrlHandler(regex, func):
 
 def registerUrlHandler(url, func):
 	path_handlers[url] = func
-
-def isMaster(email, password):
-	user = userAuth(email, password)
-	if user:
-		val = isUserMaster(user.id)
-		del user
-		return val
-	else:
-		return False
 
 class regexUrlHandler(object):
 	def __init__(self, url):
