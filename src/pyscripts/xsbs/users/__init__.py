@@ -169,7 +169,7 @@ def warnNickReserved(cn, count, sessid):
 	if isLoggedIn(cn):
 		user = loggedInAs(cn)
 		if nickacct.user_id != user.id:
-			ban(cn, 0, 'Use of reserved name')
+			ban(cn, 0, 'Use of reserved name', -1)
 		p.warning_for_login = False
 		return
 	if count > 4:

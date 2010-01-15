@@ -75,7 +75,7 @@ def onPlayerCommands(cn, args):
 		sbserver.playerMessage(cn, error('Usage: #playercommands'))
 	else:
 		msg = blue('Available commands: ')
-		for command in helptexts.keys():
+		for command in command_info.keys():
 			msg += '#' + command + ' '
 		sbserver.playerMessage(cn, orange(msg))
 

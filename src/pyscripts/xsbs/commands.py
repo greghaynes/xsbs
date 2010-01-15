@@ -96,7 +96,7 @@ class cnArg(object):
 		self.__doc__ = f.__doc__
 		self.__name__ = f.__name__
 		return self.handle
-	def handle(cn, args):
+	def handle(self, cn, args):
 		arg = args[self.argnum]
 		try:
 			cn = int(arg)

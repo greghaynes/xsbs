@@ -1,4 +1,5 @@
 import sbserver
+
 from xsbs.events import triggerServerEvent
 from xsbs.commands import commandHandler, UsageError, ExtraArgumentError
 from xsbs.settings import PluginConfig
@@ -6,14 +7,20 @@ from xsbs.colors import red, yellow, blue, green, colordict
 from xsbs.plugins import reload as pluginReload
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.net import ipLongToString
+from xsbs.users import loggedInAs
+from xsbs.users.privilege import isUserMaster, UserPrivilege
+from xsbs.players import masterRequired, adminRequired, player
+from xsbs.db import dbmanager
+
 from Motd.motd import motdstring
-from xsbs.players import masterRequired, adminRequired
 import string
 
 config = PluginConfig('servercommands')
 servermsg_template = config.getOption('Templates', 'servermsg', '${orange}${sender}${white}: ${message}')
 del config
 servermsg_template = string.Template(servermsg_template)
+
+session = dbmanager.session()
 
 @commandHandler('pause')
 @masterRequired
@@ -169,7 +176,7 @@ def userPrivSetCmd(cn, tcn, args):
 				sbserver.playerMessage(cn, info('User privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
 	elif args == 'master':
 		try:
-			if isMaster(player(tcn).user.id):
+			if isUserMaster(player(tcn).user.id):
 				sbserver.playerMessage(cn, error('%s already has master permissions.' % sbserver.playerName(tcn)))
 				return
 		except (ValueError, AttributeError):
