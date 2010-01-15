@@ -28,8 +28,11 @@ class ScoreboardSite(resource.Resource):
 				'frags': p.frags(),
 				'teamkills': p.teamkills(),
 				'deaths': p.deaths(),
-				'team': p.team()
 				})
+			try:
+				clients_response['team'] = p.team()
+			except ValueError:
+				clients_response['team'] = 'spectator'
 		return json.dumps({'clients': clients_response})
 
 jsonSite.putChild('account', AccountSite())
