@@ -3,6 +3,7 @@ import asyncore
 import logging
 import sys
 import traceback
+from twisted.internet import reactor
 
 class EventManager:
 	def __init__(self):
@@ -87,7 +88,7 @@ def triggerExecQueue():
 	del exec_queue[:]
 
 def update():
+	reactor.doIteration(0)
 	timers.update()
-	asyncore.loop(0, False, None, count=1)
 	triggerExecQueue()
 
