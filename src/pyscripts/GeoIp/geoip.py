@@ -21,7 +21,10 @@ def getCountry(ip):
 	return country
 
 def announce(cn):
-	msg = string.Template(template).substitute(colordict, user=sbserver.playerName(cn), country=getCountry(sbserver.playerIpLong(cn)))
+	try:
+		msg = string.Template(template).substitute(colordict, user=sbserver.playerName(cn), country=getCountry(sbserver.playerIpLong(cn)))
+	except ValueError:
+		return
 	sbserver.message(info(msg))
 
 registerServerEventHandler('player_connect_delayed', announce)
