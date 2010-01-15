@@ -1,11 +1,19 @@
-from xsbs.http import urlHandler, regexUrlHandler, isMaster
-from xsbs.http import jsonMasterRequired
+from twisted.web import resource
+
+from xsbs.http.jsonapi import site, jsonResponse, jsonUserRequired, jsonMasterRequired
+
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.users import userAuth
 from xsbs.net import ipLongToString
 from xsbs.ban import ban
 import sbserver
 import json
+
+class AccountSite(resource.Resource):
+	@httpGetMasterRequired
+	@jsonResponse
+	def render_GET(self, request, user):
+		
 
 @urlHandler('/json/login')
 def login(request):
