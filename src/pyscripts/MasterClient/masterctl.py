@@ -1,14 +1,11 @@
-from xsbs.events import registerServerEventHandler, triggerServerEvent
-from xsbs.timers import addTimer
-from xsbs.colors import colordict
-from xsbs.ui import error, info
+from twisted.protocols.basic import LineReceiver
+from twisted.internet import reactor, protocol
+
 from xsbs.settings import PluginConfig
-from xsbs.net import ipLongToString
+from xsbs.events import triggerServerEvent, eventHandler
+
 import sbserver
-import asyncore
-import socket
 import logging
-import string
 
 config = PluginConfig('masterclient')
 claimstr = config.getOption('Config', 'auth_message', '${green}${name}${white} has authenticated as ${magenta}${authname}')
@@ -17,136 +14,125 @@ master_port = config.getOption('Config', 'master_port', '28787')
 allow_auth = config.getOption('Config', 'allow_auth', 'yes') == 'yes'
 register_interval = config.getOption('Config', 'register_interval', '3600')
 del config
-claimstr = string.Template(claimstr)
-master_port = int(master_port)
-register_interval = int(register_interval)
 
-class Request:
-	def __init__(self, data):
-		self.data = data
-		self.is_running = False
-	def do(self, *args):
-		if not self.is_running:
-			args[0].send(self.data)
-			self.is_running = True
-
-class AuthRequest(Request):
+class AuthRequest(object):
 	def __init__(self, id, cn, name):
-		Request.__init__(self, 'reqauth %i %s\n' % (id, name))
 		self.id = id
 		self.cn = cn
 		self.name = name
 
-class AuthManager:
-	def __init__(self):
-		self.attempts = []
-		self.id = 0
-	def getAuth(self, id):
-		for auth in self.attempts:
-			if auth.id == id:
-				return auth
-		raise ValueError('Non existent auth request id')
-	def request(self, cn, name):
-		req = AuthRequest(self.id, cn, name)
-		self.attempts.append(req)
-		self.id += 1
-		return req
-	def challenge(self, id, chal):
-		auth = self.getAuth(id)
-		sbserver.authChallenge(auth.cn, auth.id, chal)
-	def challengeResponse(self, id, response):
-		auth = self.getAuth(id)
-		return Request('confauth %i %s\n' % (id, response))
-	def delAuth(self, id):
-		i = 0
-		for auth in self.attempts:
-			if auth.id == id:
-				del self.attempts[i]
-				return
-			i += 1
-		raise ValueError('Non existent auth reqest id')
+class AuthIdNotFoundError(Exception):
+	pass
 
-class MasterClient(asyncore.dispatcher):
-	def __init__(self, hostname='sauerbraten.org', port=28787):
-		asyncore.dispatcher.__init__(self)
-		self.hostname = hostname
-		self.port = port
-		self.request_queue = []
+class ResponseHandler(object):
+	def __init__(self, factory):
+		self.key_handlers = {
+			'succreg': self.succreg,
+			'failreg': self.failreg,
+			'succauth': self.succauth,
+			'failauth': self.failauth,
+			'chalauth': self.chalauth
+			}
+		self.auth_id_map = {}
+		self.factory = factory
+		self.last_auth_id = -1
 		self.responses_needed = 0
-		self.read_buff = ''
-		self.authman = AuthManager()
-		self.do_connect = True
-		self.register()
-	def makeRequest(self, request):
-		if self.do_connect:
-			self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
-			if sbserver.ip():
-				self.bind((sbserver.ip(), 0))
-			try:
-				self.connect((self.hostname, self.port))
-			except socket.gaierror:
-				logging.error('Master server hostname not found')
-			self.do_connect = False
-		self.request_queue.append(request)
-	def try_auth(self, cn, name):
-		self.makeRequest(self.authman.request(cn, name))
-	def challenge_response(self, cn, id, response):
-		self.makeRequest(self.authman.challengeResponse(id, response))
-	def register(self):
-		addTimer(register_interval*1000, self.register)
-		self.makeRequest(Request('regserv %i\n' % sbserver.port()))
-	def handle_response(self, response):
-		args = response.split(' ')
-		key = args[0]
-		response_end = True
-		if key == 'succreg':
-			logging.info('Master server registration succeded')
-			triggerServerEvent('master_registration_succeeded', ())
-		elif key == 'failreg':
-			logging.warning('Master server registration failed')
-			triggerServerEvent('master_registration_failed', ())
-		elif key == 'succauth':
-			auth = self.authman.getAuth(int(args[1]))
-			triggerServerEvent('player_auth_succeed', (auth.cn, auth.name))
-			self.authman.delAuth(auth.id)
-		elif key == 'failauth':
-			auth = self.authman.getAuth(int(args[1]))
-			triggerServerEvent('player_auth_fail', (auth.cn, auth.name))
-			self.authman.delAuth(auth.id)
-		elif key == 'chalauth':
-			response_end = False
-			self.authman.challenge(int(args[1]), args[2])
-		if self.responses_needed == 0:
-			logging.error('Got response when none needed')
-		else:
-			self.responses_needed -= 1
-		if response_end:
-			if self.responses_needed == 0:
-				self.close()
-				self.do_connect = True
-	def handle_connect(self):
-		logging.debug('Connected to master server')
-	def handle_write(self):
-		item = self.request_queue.pop(0)
-		self.send(item.data)
-		self.responses_needed += 1
-	def handle_close(self):
-		self.do_connect = True
-		self.close()
-	def handle_read(self):
+	def handle(self, response):
+		key = response.split(' ')[0]
 		try:
-			self.read_buff += self.recv(4096)
-		except socket.error:
-			logging.error('Could not read from socket')
+			self.key_handlers[key](response[len(key)+1:])
+		except KeyError:
+			logging.error('Invalid response key: %s' % key)
+		except AuthIdNotFoundError:
+			logging.error('Could not find matching auth request for given auth request id')
+		if self.responses_needed <= 0:
+			self.responses_needed = 0
+			self.factory.client.transport.loseConnection()
+	def succreg(self, args):
+		self.responses_needed -= 1
+		logging.debug('Master server registration successful')
+		triggerServerEvent('master_registration_succeeded', ())
+	def failreg(self, args):
+		self.responses_needed -= 1
+		logging.error('Master server registration failed: %s' % args)
+		triggerServerEvent('master_registration_failed', ())
+	def pop_auth(self, auth_id):
+		auth = self.auth_id_map[auth_id]
+		del self.auth_id_map[auth_id]
+		return auth
+	def succauth(self, args):
+		self.responses_needed -= 1
+		auth_id = args.split(' ')[0]
+		try:
+			auth = self.pop_auth(int(auth_id))
+		except KeyError:
+			raise AuthIdNotFoundError()
 			return
-		tmp_buff = self.read_buff.split('\n')
-		self.read_buff = tmp_buff.pop()
-		for line in tmp_buff:
-			self.handle_response(line)
-	def writable(self):
-		return len(self.request_queue) > 0
+		triggerServerEvent('player_auth_succeed', (auth.cn, auth.name))
+	def failauth(self, args):
+		self.responses_needed -= 1
+		auth_id = args.split(' ')[0]
+		try:
+			self.pop_auth(int(auth_id))
+		except KeyError:
+			raise AuthIdNotFoundError()
+		triggerServerEvent('player_auth_fail', (auth.cn, auth.name))
+	def chalauth(self, args):
+		args = args.split(' ')
+		auth_id = args[0]
+		auth_challenge = args[1]
+		try:
+			auth_req = self.auth_id_map[int(auth_id)]
+		except KeyError:
+			raise AuthIdNotFoundError()
+		sbserver.authChallenge(auth_req.cn, auth_req.id, auth_challenge)
+	def nextAuthId(self):
+		self.last_auth_id += 1
+		return self.last_auth_id
 
-mc = MasterClient(master_host, master_port)
-registerServerEventHandler('player_auth_request', mc.try_auth)
-registerServerEventHandler('player_auth_challenge_response', mc.challenge_response)
+class MasterClient(LineReceiver):
+	delimiter = '\n'
+	def connectionMade(self):
+		logging.debug('Connected to master server')
+		self.factory.clientConnected(self)
+	def connectionLost(self, reason):
+		self.factory.clientDisconnected(self)
+	def lineReceived(self, line):
+		self.factory.response_handler.handle(line)
+
+class MasterClientFactory(protocol.ClientFactory):
+	protocol = MasterClient
+	def __init__(self):
+		self.response_handler = ResponseHandler(self)
+		self.client = None
+		self.send_buffer = []
+	def clientConnected(self, client):
+		if self.client != None:
+			del self.client
+		self.client = client
+		for data in self.send_buffer:
+			self.client.sendLine(data)
+		del self.send_buffer[:]
+	def clientDisconnected(self, client):
+		self.client = None
+		self.response_handler.auth_id_map.clear()
+	def send(self, data):
+		if self.client == None:
+			reactor.connectTCP(master_host, int(master_port), self)
+			self.send_buffer.append(data)
+		else:
+			self.client.sendLine(data)
+
+factory = MasterClientFactory()
+
+@eventHandler('player_auth_request')
+def authRequest(cn, name):
+	factory.response_handler.responses_needed += 1
+	req = AuthRequest(factory.response_handler.nextAuthId(), cn, name)
+	factory.response_handler.auth_id_map[req.id] = req
+	factory.send('reqauth %i %s' % (req.id, req.name))
+
+@eventHandler('player_auth_challenge_response')
+def authChallengeResponse(cn, id, response):
+	factory.send('confauth %i %s' % (id, response))
 
