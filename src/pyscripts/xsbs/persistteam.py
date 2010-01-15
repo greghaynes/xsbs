@@ -44,6 +44,8 @@ def persistentTeams(enabled):
 @commandHandler('persistteam')
 @masterRequired
 def persistentTeamsCmd(cn, args):
+	'''@description Keep current teams as they are across multiple games.
+	   @usage on/off'''
 	if args == 'on':
 		persistentTeams(True)
 		sbserver.message(notice('Persistent teams enabled'))
