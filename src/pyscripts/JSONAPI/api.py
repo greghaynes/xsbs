@@ -17,5 +17,21 @@ class AccountSite(resource.Resource):
 			'id': user.id
 			}})
 
+class ScoreboardSite(resource.Resource):
+	def render_GET(self, request):
+		request.setHeader('Content-Type', 'text/plain')
+		clients_response = []
+		for p in allClients():
+			clients_response.append({
+				'cn': p.cn,
+				'name': p.name(),
+				'frags': p.frags(),
+				'teamkills': p.teamkills(),
+				'deaths': p.deaths(),
+				'team': p.team()
+				})
+		return json.dumps({'clients': clients_response})
+
 jsonSite.putChild('account', AccountSite())
+jsonSite.putChild('scoreboard', ScoreboardSite())
 
