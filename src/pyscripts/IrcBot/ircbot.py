@@ -1,17 +1,10 @@
-import sbserver
-from ConfigParser import NoOptionError
-from xsbs.settings import PluginConfig
+from twisted.words.protocols import irc
+from twisted.internet import reactor, protocol
+
+from xsbs.settings import PluginConfig, NoOptionError
 from xsbs.events import registerServerEventHandler
-from xsbs.timers import addTimer
-from xsbs.colors import red, green, colordict
-from xsbs.ui import info, error
-from xsbs.commands import commandHandler, UsageError
-from xsbs.players import clientCount
-from xsbs.game import currentMap
-from xsbs.players import player, masterRequired, adminRequired
-import irc
+
 import string
-import logging
 
 config = PluginConfig('ircbot')
 enable = config.getOption('Config', 'enable', 'no') == 'yes'
@@ -28,123 +21,53 @@ try:
 except NoOptionError:
 	ipaddress = None
 
-# This decode is borrowed from Phenny, under same license as irc.py
-def decode(bytes): 
-	try: text = bytes.decode('utf-8')
-	except UnicodeDecodeError: 
-		try: text = bytes.decode('iso-8859-1')
-		except UnicodeDecodeError: 
-			text = bytes.decode('cp1252')
-	return text
-
-class Bot(irc.Bot):
-	def __init__(self, nick, name, channel):
-		irc.Bot.__init__(self, nick, name, (channel,))
-		self.event_handlers = { '251': self.handle_mode,
-			'PRIVMSG': self.handle_privmsg,
-			'433': self.handle_nick_in_use }
-		self.command_handlers = { 'status': self.cmd_status }
-		self.connect_complete = False
-		self.is_connecting = False
-	def run(self, host, port):
-		if self.is_connecting or self.connect_complete:
-			return
-		self.is_connecting = True
-		irc.Bot.run(self, host, port)
-	def close(self):
-		logging.info('Closed')
-		self.is_connecting = False
-		self.connect_complete = False
-		irc.Bot.close(self)
-	def handle_connect(self):
-		if self.verbose: 
-			logging.info('Connected')
-		irc.Bot.handle_connect(self)
-	def handle_close(self):
-		irc.Bot.handle_close(self)
-	def dispatch(self, origin, args):
-		bytes, event, args = args[0], args[1], args[2:]
-		text = decode(bytes)
-		try:
-			self.event_handlers[event](origin, event, args, bytes)
-		except KeyError:
-			pass
-	def handle_mode(self, origin, event, args, bytes):
-		if not self.connect_complete:
-			self.handle_complete_connect()
-	def handle_privmsg(self, origin, event, args, bytes):
-		if args[0] in self.channels:
-			if bytes[0] in '.!#@':
-				cmd_args = bytes.split(' ', 1)
-				try:
-					self.handle_command(args[0], origin, cmd_args[0][1:], cmd_args[1])
-				except IndexError:
-					self.handle_command(args[0], origin, cmd_args[0][1:], '')
-			else:
-				sbserver.message(irc_msg_temp.substitute(colordict, name=origin.nick, message=bytes))
-	def handle_nick_in_use(self, origin, event, args, bytes):
-		logging.error('Nickname already in use')
-	def handle_command(self, channel, origin, command, bytes):
-		try:
-			self.command_handlers[command](channel, origin, command, bytes)
-		except KeyError:
-			pass
-	def handle_complete_connect(self):
-		self.is_connecting = False
-		self.connect_complete = True
-		for chan in self.channels:
-			self.write(('JOIN', chan))
-	def cmd_status(self, channel, origin, command, bytes):
-		self.msg(channel, status_message.substitute(colordict, num_clients=str(clientCount()), map_name=currentMap()))
+class IrcBot(irc.IRCClient):
+	def connectionMade(self):
+		self.nickname = self.factory.nickname
+		irc.IRCClient.connectionMade(self)
+		self.joined_channels = []
+	def signedOn(self):
+		for channel in self.factory.channels:
+			self.join(channel)
+		self.factory.signedOn(self)
+	def connectionLost(self):
+		self.factory.signedOut(self)
+	def joined(self, channel):
+		if channel not in self.joined_channels:
+			self.joined_channels.append(channel)
+	def left(self, channel):
+		if channel in self.joined_channels:
+			self.joined_channels.remove(channel)
 	def broadcast(self, message):
-		if not self.connect_complete:
-			return
-		for chan in self.channels:
-			self.msg(chan, message)
+		for channel in self.joined_channels:
+			self.say(channel, message)
 
-irc_msg_temp = string.Template(irc_msg_temp)
-status_message = string.Template(status_message)
+class ServerEventDispatcher(object):
+	def __init__(self, factory):
+		self.factory = factory
+	def broadcast(self, message):
+		for bot in self.factory.bots:
+			bot.broadcast(message)
+	def playerConnected(self, cn):
+		self.broadcast('User connected')
 
-bot = Bot(nickname, 'xsbs', channel)
-if enable:
-	bot.run(servername, port)
+class IrcBotFactory(protocol.ClientFactory):
+	protocol = IrcBot
+	def __init__(self, nickname, channels):
+		self.nickname = nickname
+		self.channels = channels
+		self.event_dispatch = ServerEventDispatcher(self)
+		self.bots = []
+	def signedOn(self, bot):
+		if bot not in self.bots:
+			self.bots.append(bot)
+	def signedOut(self, bot):
+		if bot in self.bots:
+			self.bots.remove(bot)
 
-@commandHandler('ircbot')
-@adminRequired
-def ircbotCmd(cn, args):
-	if args == 'enable':
-		player(cn).message(info('Enabling irc bot'))
-		bot.run(servername, port)
-	elif args == 'disable':
-		player(cn).message(info('Disabling irc bot'))
-		bot.close()
-	else:
-		raise UsageError('enable/disable')
+factory = IrcBotFactory(nickname, [channel])
 
-event_abilities = {
-	'player_active': ('player_connect', lambda x: bot.broadcast(
-		'\x032CONNECT\x03        %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
-	'player_disconnect': ('player_disconnect', lambda x: bot.broadcast(
-		'\x032DISCONNECT\x03     %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
-	'message': ('player_message', lambda x, y: bot.broadcast(
-		'\x033MESSAGE\x03        %s (\x037 %i \x03): %s' % (sbserver.playerName(x), x, y))),
-	'map_change': ('map_changed', lambda x, y: bot.broadcast(
-		'\x038MAP CHANGE\x03     %s (%s)' % (x, sbserver.modeName(y)))),
-	'gain_admin': ('player_claimed_admin', lambda x: bot.broadcast(
-		'\x036CLAIM ADMIN\x03    %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
-	'gain_master': ('player_claimed_master', lambda x: bot.broadcast(
-		'\x036CLAIM MASTER\x03   %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
-	'auth': ('player_auth_succeed', lambda x, y: bot.broadcast(
-		'\x036AUTH\x03           %s (\x037 %i \x03) as %s@sauerbraten.org' % (sbserver.playerName(x), x, y))),
-	'relinquish_admin': ('player_released_admin', lambda x: bot.broadcast(
-		'\x036RELINQ ADMIN\x03   %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
-	'relinquish_master': ('player_released_master', lambda x: bot.broadcast(
-		'\x036RELINQ MASTER\x03  %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
-}
+registerServerEventHandler('player_connect', lambda x: factory.event_dispatch.playerConnected(x))
 
-for key in event_abilities.keys():
-	if config.getOption('Abilities', key, 'no') == 'yes':
-		ev = event_abilities[key]
-		registerServerEventHandler(ev[0], ev[1])
-del config
+reactor.connectTCP(servername, int(port), factory)
 
