@@ -33,6 +33,17 @@ def response(name, description=None, **kwargs):
 	response.update(kwargs)
 	return json.dumps(response)
 
+class jsonAPI(object):
+	def __init__(self, f):
+		self.f = f
+	def __call__(self, *args, **kwargs):
+		args[0].setHeader('Content-Type', 'application/json')
+		args[0].setHeader('Access-Control-Allow-Origin', '*')
+		args[0].setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+		args[0].setHeader('Access-Control-Allow-Headers', 'X-PINGOTHER, X-Requested-With, Accept')
+		args[0].setHeader('Access-Control-Max-Age', '1728000')
+		return self.f(*args, **kwargs)
+
 class jsonUserRequired(object):
 	def __init__(self, f):
 		self.f = f

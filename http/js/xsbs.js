@@ -39,11 +39,11 @@ function loadPlayerAdminPage(username, password) {
 }
 
 function tryLogin(hostname, username, password, error_callback, success_callback) {
-	$.getJSON('http://' + hostname + '/json/login?username=' + username + '&password=' + password, function(data) {
-		if(data.hasOwnProperty('result') && data.result == 'SUCCESS')
-			success_callback();
+	$.getJSON('http://' + hostname + '/json/account?username=' + username + '&password=' + password, function(data) {
+		if(data.hasOwnProperty('user'))
+			success_callback(data);
 		else
-			error_callback(data.error);
+			error_callback(data);
 		});
 }
 
@@ -65,14 +65,15 @@ function loadLoginPage(hostname, callback) {
 		$('#login_status').html('Trying login...');
 		var username = $('#username_input').val();
 		var password = $('#password_input').val();
-		tryLogin(hostname, username, password, function(error_code) {
+		tryLogin(hostname, username, password, function(data) {
+				error_code = data.error
 				$('#login_status').empty();
 				if(error_code == 'INVALID_LOGIN')
 					$('#login_status').html('Invalid login.');
 				else
 					$('#login_status').html('Unknown error.');
 				},
-			function() {
+			function(data) {
 				$('#login_status').empty();
 				$('#login_status').html('Success.');
 				callback(username, password);
