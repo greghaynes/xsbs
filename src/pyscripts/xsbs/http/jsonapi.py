@@ -6,8 +6,21 @@ from xsbs.users.privilege import isUserAtLeastMaster
 
 import json
 
+class jsonAPI(object):
+	def __init__(self, f):
+		self.f = f
+	def __call__(self, *args, **kwargs):
+		args[0].setHeader('Content-Type', 'application/json')
+		args[0].setHeader('Access-Control-Allow-Origin', '*')
+		args[0].setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+		args[0].setHeader('Access-Control-Allow-Headers', 'X-PINGOTHER, X-Requested-With, Accept')
+		args[0].setHeader('Access-Control-Max-Age', '1728000')
+		return self.f(*args, **kwargs)
+
 class JsonSite(resource.Resource):
-	pass
+	@jsonAPI
+	def render_OPTIONS(self, request):
+		return None
 
 site = JsonSite()
 rootSite.putChild('json', site)
@@ -32,17 +45,6 @@ def response(name, description=None, **kwargs):
 		response['description'] = description
 	response.update(kwargs)
 	return json.dumps(response)
-
-class jsonAPI(object):
-	def __init__(self, f):
-		self.f = f
-	def __call__(self, *args, **kwargs):
-		args[0].setHeader('Content-Type', 'application/json')
-		args[0].setHeader('Access-Control-Allow-Origin', '*')
-		args[0].setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-		args[0].setHeader('Access-Control-Allow-Headers', 'X-PINGOTHER, X-Requested-With, Accept')
-		args[0].setHeader('Access-Control-Max-Age', '1728000')
-		return self.f(*args, **kwargs)
 
 class jsonUserRequired(object):
 	def __init__(self, f):

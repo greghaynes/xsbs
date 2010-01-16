@@ -1,6 +1,6 @@
 from twisted.web import resource
 
-from xsbs.http.jsonapi import site as jsonSite, jsonUserRequired, jsonAPI
+from xsbs.http.jsonapi import JsonSite, site as jsonSite, jsonUserRequired, jsonAPI
 from JSONAPI.admin import setup
 
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
@@ -12,25 +12,17 @@ from xsbs.game import currentMap, currentMode, modeName
 import sbserver
 import json
 
-class AccountSite(resource.Resource):
+class AccountSite(JsonSite):
 	@jsonAPI
 	@jsonUserRequired
 	def render_GET(self, request, user):
-		request.setHeader('Content-Type', 'text/plain')
-		return json.dumps({'user': {
-			'id': user.id
-			}})
-	@jsonAPI
-	@jsonUserRequired
-	def render_OPTIONS(self, request, user):
-		request.setHeader('Content-Type', 'text/plain')
 		return json.dumps({'user': {
 			'id': user.id
 			}})
 
-class ScoreboardSite(resource.Resource):
+class ScoreboardSite(JsonSite):
+	@jsonAPI
 	def render_GET(self, request):
-		request.setHeader('Content-Type', 'text/plain')
 		clients_response = []
 		for p in allClients():
 			clients_response.append({
@@ -46,17 +38,17 @@ class ScoreboardSite(resource.Resource):
 				clients_response['team'] = 'spectator'
 		return json.dumps({'clients': clients_response})
 
-class GameSite(resource.Resource):
+class GameSite(JsonSite):
+	@jsonAPI
 	def render_GET(self, request):
-		request.setHeader('Content-Type', 'text/plain')
 		return json.dumps({
 			'map': currentMap(),
 			'mode': modeName(currentMode())
 			})
 
-class ServerSite(resource.Resource):
+class ServerSite(JsonSite):
+	@jsonAPI
 	def render_GET(self, request):
-		request.setHeader('Content-Type', 'text/plain')
 		return json.dumps({
 			'num_clients': sbserver.numClients()
 			})
