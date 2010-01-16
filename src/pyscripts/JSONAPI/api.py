@@ -1,11 +1,13 @@
 from twisted.web import resource
 
-from xsbs.http.jsonapi import site as jsonSite, jsonUserRequired, jsonMasterRequired
+from xsbs.http.jsonapi import site as jsonSite, jsonUserRequired
+from JSONAPI.admin import setup
 
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.users import userAuth
 from xsbs.net import ipLongToString
 from xsbs.ban import ban
+
 import sbserver
 import json
 
@@ -45,4 +47,5 @@ class ServerSite(resource.Resource):
 jsonSite.putChild('account', AccountSite())
 jsonSite.putChild('scoreboard', ScoreboardSite())
 jsonSite.putChild('server', ServerSite())
+setup(jsonSite)
 

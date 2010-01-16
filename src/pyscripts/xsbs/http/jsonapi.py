@@ -11,6 +11,27 @@ class JsonSite(resource.Resource):
 
 site = JsonSite()
 rootSite.putChild('json', site)
+default_responses = {
+	'invalid_parameters': {
+		'error': 'INVALID_PARAMETERS'
+		},
+	'invalid_login': {
+		'error': 'INVALID_LOGIN'
+		},
+	'insufficient_permissions': {
+		'error': 'INSUFFICIENT_PERMISSIONS'
+		},
+	'success': {
+		'result': 'SUCCESS'
+		}
+	}
+
+def response(name, description=None, **kwargs):
+	response = default_responses[name].copy()
+	if description != None:
+		response['description'] = description
+	response.update(kwargs)
+	return json.dumps(response)
 
 class jsonUserRequired(object):
 	def __init__(self, f):
@@ -21,10 +42,10 @@ class jsonUserRequired(object):
 			username = args[0].args['username'][0]
 			password = args[0].args['password'][0]
 		except KeyError:
-			return json.dumps({'error': 'INVALID_LOGIN'})
+			return response('invalid_login', 'Missing username or password')
 		user = userAuth(username, password)
 		if not user:
-			return json.dumps({'error': 'INVALID_LOGIN'})
+			return response('invalid_login', 'No user found with matching username and password')
 		return self.f(self, *(args + (user,)), **kwargs)
 
 class jsonMasterRequired(object):
@@ -36,12 +57,12 @@ class jsonMasterRequired(object):
 			username = args[0].args['username'][0]
 			password = args[0].args['password'][0]
 		except KeyError:
-			return json.dumps({'error': 'INVALID_LOGIN'})
+			return responses['invalid_login']
 		user = userAuth(username, password)
 		if not user:
-			return json.dumps({'error': 'INVALID_LOGIN'})
+			return responses['invalid_login']
 		if isUserAtLeastMaster(user.id):
 			return self.f(self, *(args + (user,)), **kwargs)
 		else:
-			return json.dumps({'error': 'INSUFFICIENT_PERMISSIONS'})
+			return response('insufficient_permissions', 'User does not have master permissions')
 
