@@ -7,6 +7,7 @@ from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.users import userAuth
 from xsbs.net import ipLongToString
 from xsbs.ban import ban
+from xsbs.game import currentMap, currentMode, modeName
 
 import sbserver
 import json
@@ -37,6 +38,14 @@ class ScoreboardSite(resource.Resource):
 				clients_response['team'] = 'spectator'
 		return json.dumps({'clients': clients_response})
 
+class GameSite(resource.Resource):
+	def render_GET(self, request):
+		request.setHeader('Content-Type', 'text/plain')
+		return json.dumps({
+			'map': currentMap(),
+			'mode': modeName(currentMode())
+			})
+
 class ServerSite(resource.Resource):
 	def render_GET(self, request):
 		request.setHeader('Content-Type', 'text/plain')
@@ -46,6 +55,7 @@ class ServerSite(resource.Resource):
 
 jsonSite.putChild('account', AccountSite())
 jsonSite.putChild('scoreboard', ScoreboardSite())
+jsonSite.putChild('game', GameSite())
 jsonSite.putChild('server', ServerSite())
 setup(jsonSite)
 
