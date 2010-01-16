@@ -20,6 +20,7 @@ class PluginConfig:
 		if self.is_modified:
 			f = open(self.configPath(), 'w')
 			self.parser.write(f)
+		del self.parser
 	def checkRead(self):
 		if not self.read:
 			self.read = True
