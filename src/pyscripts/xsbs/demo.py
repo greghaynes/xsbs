@@ -4,26 +4,42 @@ from xsbs.events import eventHandler
 from xsbs.ui import info, notice
 from xsbs.settings import PluginConfig
 from xsbs.colors import colordict
-from xsbs.players import player, masterRequired, adminRequired
+from xsbs.players import player, masterRequired, adminRequired, isUserAdmin, isUserAtLeastMaster
+from xsbs.ui import insufficientPermissions
 import string
 
 config = PluginConfig('demorecord')
 action_temp = config.getOption('Config', 'record_next_message', 'Demo recording is ${action} for next match (by ${orange}${user}${white}${white}${white}${white})')
 persistant_recording = config.getOption('Config', 'persistant_recording', 'off') == 'on'
+required_permissions = int(config.getOption('Config', 'required_permissions', '2'))
 del config
 action_temp = string.Template(action_temp)
 
+def permissions_ok(cn):
+	if required_permissions == 0:
+		return True
+	if required_permissions == 1:
+		if isUserAtLeastMaster(cn):
+			return True
+	if required_permissions == 2:
+		if isUserAdmin(cn):
+			return True
+	return False
+	
+
 @eventHandler('player_record_demo')
-@masterRequired
 def playerRecordNextMatch(cn, val):
-	if val == sbserver.nextMatchRecorded():
-		return
-	if val:
-		act = 'enabled'
+	if permissions_ok(cn):
+		if val == sbserver.nextMatchRecorded():
+			return
+		if val:
+			act = 'enabled'
+		else:
+			act = 'disabled'
+		sbserver.setRecordNextMatch(val)
+		sbserver.message(notice(action_temp.substitute(colordict, action=act, user=sbserver.playerName(cn))))
 	else:
-		act = 'disabled'
-	sbserver.setRecordNextMatch(val)
-	sbserver.message(notice(action_temp.substitute(colordict, action=act, user=sbserver.playerName(cn))))
+		insufficientPermissions(cn)
 
 @eventHandler('map_changed')
 def persistRecordNextMatch(themap, themode):
@@ -49,3 +65,4 @@ def setPersistantDemoRecord(cn, args):
 		sbserver.setRecordNextMatch(persistant_recording)
 	else:
 		raise UsageError('on/off')
+		
