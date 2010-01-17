@@ -89,7 +89,6 @@ def triggerExecQueue():
 	del exec_queue[:]
 
 def update():
-	timers.update()
 	triggerExecQueue()
 	try:
 		reactor.runUntilCurrent()
