@@ -4,26 +4,52 @@ from xsbs.events import eventHandler
 from xsbs.ui import info, notice
 from xsbs.settings import PluginConfig
 from xsbs.colors import colordict
-from xsbs.players import player, masterRequired, adminRequired
+from xsbs.players import player, masterRequired, adminRequired, isUserAdmin, isUserAtLeastMaster
+from xsbs.ui import insufficientPermissions
 import string
+import logging
 
 config = PluginConfig('demorecord')
 action_temp = config.getOption('Config', 'record_next_message', 'Demo recording is ${action} for next match (by ${orange}${user}${white}${white}${white}${white})')
 persistent_recording = config.getOption('Config', 'persistent_recording', 'no') == 'yes'
+required_permissions = config.getOption('Config', 'required_permissions', 'master')
 del config
 action_temp = string.Template(action_temp)
+if required_permissions == 'user':
+	required_permissions = 0
+elif required_permissions == 'master':
+	required_permissions = 1
+elif required_permissions == 'admin':
+	required_permissions = 2
+else:
+	logging.error('invalid required_permissions')
+	required_permissions = 1
+
+def permissions_ok(cn):
+	if required_permissions == 0:
+		return True
+	p = player(cn)
+	if required_permissions == 1:
+		return p.isAtLeastMaster()
+	if required_permissions == 2:
+		return p.isAdmin()
+	logging.error('required_permissions not an int!')
+	return False
+	
 
 @eventHandler('player_record_demo')
-@masterRequired
 def playerRecordNextMatch(cn, val):
-	if val == sbserver.nextMatchRecorded():
-		return
-	if val:
-		act = 'enabled'
+	if permissions_ok(cn):
+		if val == sbserver.nextMatchRecorded():
+			return
+		if val:
+			act = 'enabled'
+		else:
+			act = 'disabled'
+		sbserver.setRecordNextMatch(val)
+		sbserver.message(notice(action_temp.substitute(colordict, action=act, user=sbserver.playerName(cn))))
 	else:
-		act = 'disabled'
-	sbserver.setRecordNextMatch(val)
-	sbserver.message(notice(action_temp.substitute(colordict, action=act, user=sbserver.playerName(cn))))
+		insufficientPermissions(cn)
 
 @eventHandler('map_changed')
 def persistRecordNextMatch(themap, themode):
