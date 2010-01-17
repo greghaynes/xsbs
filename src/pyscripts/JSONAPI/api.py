@@ -1,61 +1,65 @@
 from twisted.web import resource
 
-from xsbs.http.jsonapi import JsonSite, site as jsonSite, jsonUserRequired, jsonAPI
-from JSONAPI.admin import setup
+from xsbs.http.jsonapi import JsonSite, JsonUserSite, site as jsonSite
+from JSONAPI.admin import setup as setupAdmin
 
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.users import userAuth
 from xsbs.net import ipLongToString
 from xsbs.ban import ban
 from xsbs.game import currentMap, currentMode, modeName
+from xsbs.users.privilege import isUserMaster, isUserAdmin
 
 import sbserver
 import json
 
-class AccountSite(JsonSite):
-	@jsonAPI
-	@jsonUserRequired
-	def render_GET(self, request, user):
+class AccountSite(JsonUserSite):
+	def render_user_JSON(self, request, user):
 		return json.dumps({'user': {
-			'id': user.id
+			'id': user.id,
+			'privileges': {
+				'master': isUserMaster(user.id),
+				'admin': isUserAdmin(user.id)
+				}
 			}})
 
 class ScoreboardSite(JsonSite):
-	@jsonAPI
-	def render_GET(self, request):
+	def render_JSON(self, request):
 		clients_response = []
 		for p in allClients():
-			clients_response.append({
+			client = {
 				'cn': p.cn,
 				'name': p.name(),
 				'frags': p.frags(),
 				'teamkills': p.teamkills(),
 				'deaths': p.deaths(),
-				})
+				}
 			try:
-				clients_response['team'] = p.team()
+				client['team'] = p.team()
 			except ValueError:
-				clients_response['team'] = 'spectator'
+				client['team'] = 'spectator'
+			clients_response.append(client)
 		return json.dumps({'clients': clients_response})
 
 class GameSite(JsonSite):
-	@jsonAPI
-	def render_GET(self, request):
+	def render_JSON(self, request):
 		return json.dumps({
 			'map': currentMap(),
 			'mode': modeName(currentMode())
 			})
 
 class ServerSite(JsonSite):
-	@jsonAPI
-	def render_GET(self, request):
+	def render_JSON(self, request):
 		return json.dumps({
 			'num_clients': sbserver.numClients()
 			})
 
-jsonSite.putChild('account', AccountSite())
-jsonSite.putChild('scoreboard', ScoreboardSite())
-jsonSite.putChild('game', GameSite())
-jsonSite.putChild('server', ServerSite())
-setup(jsonSite)
+def setup():
+	jsonSite.putChild('account', AccountSite())
+	jsonSite.putChild('scoreboard', ScoreboardSite())
+	jsonSite.putChild('game', GameSite())
+	jsonSite.putChild('server', ServerSite())
+	setupAdmin(jsonSite)
+
+setup()
 

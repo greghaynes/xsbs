@@ -1,5 +1,5 @@
 function getScoreboard(hostname, callback) {
-	$.getJSON('http://' + hostname + '/json/scoreboard' + cn, function(data) {
+	$.getJSON('http://' + hostname + '/json/scoreboard', function(data) {
 		callback(data);
 	});
 }
@@ -30,12 +30,21 @@ function displayAlert(text) {
 }
 
 function clearAlert() {
-	$('#alert_box').fadeOut('slow', function() {
+	$('#alert').fadeOut('slow', function() {
 		$('#alerts').empty();
 		});
+	$('#content').fadeTo('slow', 1.0);
 }
 
-function loadPlayerAdminPage(username, password) {
+function loadPlayerAdminPage(hostname, username, password) {
+	$('#main_content').empty();
+	html_page = "<h3>Players</h3><ul id=\"players_list\"></ul>";
+	$(html_page).appendTo('#main_content');
+	getScoreboard(hostname, function(data) {
+		$.each(data.clients, function(i, client) {
+			$('<li>' + client.name + '</li>').appendTo('#players_list');
+			});
+		});
 }
 
 function tryLogin(hostname, username, password, error_callback, success_callback) {
@@ -50,11 +59,15 @@ function tryLogin(hostname, username, password, error_callback, success_callback
 function disableTopNav()
 {
 	$('#topnav_players').click(function() { });
+	$('#topnav_players').click(function() { });
+	$('#topnav_logout').click(function() { });
 }
 
-function enableTopNav()
+function enableTopNav(hostname, username, password)
 {
-	$('#topnav_players').click(function() { alert('foo'); });
+	$('#topnav_players').click(function() { loadPlayerAdminPage(hostname, username, password); });
+	$('#topnav_players').click(function() { } );
+	$('#topnav_logout').click(function() { window.location.reload(); });
 }
 
 function loadLoginPage(hostname, callback) {
@@ -84,7 +97,8 @@ function loadLoginPage(hostname, callback) {
 function setup(hostname) {
 	loadLoginPage(hostname, function(username, password) {
 		clearAlert();
-		enableTopNav();
+		enableTopNav(hostname, username, password);
+		loadPlayerAdminPage(hostname, username, password);
 		});
 }
 
