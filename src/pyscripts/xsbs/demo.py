@@ -9,7 +9,7 @@ import string
 
 config = PluginConfig('demorecord')
 action_temp = config.getOption('Config', 'record_next_message', 'Demo recording is ${action} for next match (by ${orange}${user}${white}${white}${white}${white})')
-persistant_recording = config.getOption('Config', 'persistant_recording', 'off') == 'on'
+persistent_recording = config.getOption('Config', 'persistent_recording', 'no') == 'yes'
 del config
 action_temp = string.Template(action_temp)
 
@@ -27,25 +27,22 @@ def playerRecordNextMatch(cn, val):
 
 @eventHandler('map_changed')
 def persistRecordNextMatch(themap, themode):
-	sbserver.setRecordNextMatch(persistant_recording)
-
+	sbserver.setRecordNextMatch(persistent_recording)
 
 @commandHandler('persistdemo')
 @adminRequired
 def setPersistantDemoRecord(cn, args):
 	'''@description Enable/disable persistant demo recording
-	   @usage on/off'''
-	   
-	global persistant_recording
-	
-	if args == 'on':
+	   @usage enable/disable'''
+	if args == 'enable':
 		player(cn).message(info('Enabling persistant demo recording'))
-		persistant_recording = True
-		sbserver.setRecordNextMatch(persistant_recording)
+		persistent_recording = True
+		sbserver.setRecordNextMatch(persistent_recording)
 		
-	elif args == 'off':
+	elif args == 'disable':
 		player(cn).message(info('Disabling persistant demo recording'))
-		persistant_recording = False
-		sbserver.setRecordNextMatch(persistant_recording)
+		persistent_recording = False
+		sbserver.setRecordNextMatch(persistent_recording)
 	else:
-		raise UsageError('on/off')
+		raise UsageError()
+
