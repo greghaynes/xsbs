@@ -28,14 +28,15 @@ def checkModified(cn):
 def mapModifiedSpecCmd(cn, args):
 	'''@description Enable or disable spectate clients with modified map
 	   @usage enable/disable'''
+		p = player(cn)
 	if args == 'disable':
 		spectate_map_modified = False
-		sbserver.playerMessage(info('Spectate modified mapes disabled'))
+		p.message(info('Spectate modified mapes disabled'))
 	elif args == 'enable':
 		spectate_map_modified = True
-		sbserver.playerMessage(info('Spectate modified mapes enabled'))
+		p.message(info('Spectate modified mapes enabled'))
 	else:
-		sbserver.playerMessage(cn, error('Usage: #mapmodifiedspec (enable/disable)'))
+		p.message(error('Usage: #mapmodifiedspec (enable/disable)'))
 
 registerServerEventHandler('player_modified_map', onMapModified)
 registerServerEventHandler('player_active', checkModified)
