@@ -36,13 +36,27 @@ function clearAlert() {
 	$('#content').fadeTo('slow', 1.0);
 }
 
+function kickClient(hostname, username, password, cn, callback) {
+	displayAlert('Kicking client...');
+	$.getJSON('http://' + hostname + '/json/admin/kick?username=' + username + '&password=' + password + '&cn=' + cn, callback);
+}
+
 function loadPlayerAdminPage(hostname, username, password) {
 	$('#main_content').empty();
 	html_page = "<h3>Players</h3><ul id=\"players_list\"></ul>";
 	$(html_page).appendTo('#main_content');
 	getScoreboard(hostname, function(data) {
 		$.each(data.clients, function(i, client) {
-			$('<li>' + client.name + '</li>').appendTo('#players_list');
+			html_player = '<li>' + client.name + ': ' + client.frags + ' frags, '
+				+ client.deaths + ' deaths (<a href=\"#\" id=\"kick_' + client.cn + '\">kick</a>)</li>';
+			$(html_player).appendTo('#players_list');
+			$('#kick_' + client.cn).click(function() {
+				alert('foo');
+				kickClient(hostname, username, password, client.cn, function(data) {
+					clearAlert();
+					loadPlayerAdminPage(hostname, username, password);
+					});
+				});
 			});
 		});
 }
