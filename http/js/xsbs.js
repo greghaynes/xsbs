@@ -51,7 +51,6 @@ function loadPlayerAdminPage(hostname, username, password) {
 				+ client.deaths + ' deaths (<a href=\"#\" id=\"kick_' + client.cn + '\">kick</a>)</li>';
 			$(html_player).appendTo('#players_list');
 			$('#kick_' + client.cn).click(function() {
-				alert('foo');
 				kickClient(hostname, username, password, client.cn, function(data) {
 					clearAlert();
 					loadPlayerAdminPage(hostname, username, password);
