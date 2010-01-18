@@ -2,18 +2,18 @@ from xsbs.commands import commandHandler, UsageError
 from xsbs.ui import error, notice
 from xsbs.colors import green
 from xsbs.timers import addTimer
-from xsbs.game import modeNumber
+from xsbs.game import modeNumber, setPaused
 from xsbs.players import player, masterRequired
 from xsbs.persistteam import persistentTeams
 import sbserver
 
-def clanWarTimer(count):
+def clanWarTimer(count, cn):
 	if count > 0:
 		sbserver.message(notice('Clan war starts in ' + green(str(count))))
-		addTimer(1000, clanWarTimer, (count-1,))
+		addTimer(1000, clanWarTimer, (count-1, cn))
 	else:
 		sbserver.message(notice('Fight!'))
-		sbserver.setPaused(False)
+		setPaused(False)
 
 @commandHandler('clanwar')
 @masterRequired
@@ -38,6 +38,6 @@ def clanWar(cn, args):
 		persistentTeams(True)
 		sbserver.setMap(map, mode)
 		sbserver.setMasterMode(2)
-		sbserver.setPaused(True)
-		clanWarTimer(10)
+		setPaused(True, cn)
+		clanWarTimer(10, cn)
 
