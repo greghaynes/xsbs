@@ -338,6 +338,7 @@ namespace server
 	extern char *adminpass;
 	extern char *serverpass;
 	extern int gamemode;
+	extern bool gamepaused;
 	extern bool allow_modevote;
 	extern int minremain;
 	extern int port;

@@ -2232,8 +2232,7 @@ namespace server
             case SV_PAUSEGAME:
             {
                 int val = getint(p);
-                if(ci->privilege<PRIV_ADMIN && !ci->local) break;
-                pausegame(val > 0);
+				SbPy::triggerEventIntBool("player_pause", ci->clientnum, val != 0);
                 break;
             }
 

@@ -535,6 +535,11 @@ static PyObject *setPaused(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *isPaused(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("b", server::gamepaused);
+}
+
 static PyObject *setMap(PyObject *self, PyObject *args)
 {
 	const char *map;
@@ -843,6 +848,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"setAdmin", setAdmin, METH_VARARGS, "Set cn to admin."},
 	{"resetPrivilege", resetPrivilege, METH_VARARGS, "Set cn to non-privileged."},
 	{"setPaused", setPaused, METH_VARARGS, "Set game to be paused."},
+	{"isPaused", isPaused, METH_VARARGS, "Is the game currently paused."},
 	{"setMap", setMap, METH_VARARGS, "Set to map and mode."},
 	{"setMasterMode", setMasterMode, METH_VARARGS, "Set server master mode."},
 	{"masterMode", masterMode, METH_VARARGS, "Server master mode."},
