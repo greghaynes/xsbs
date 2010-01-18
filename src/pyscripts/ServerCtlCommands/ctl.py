@@ -10,6 +10,7 @@ from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
 from xsbs.users.privilege import isUserMaster, UserPrivilege
 from xsbs.players import masterRequired, adminRequired, player
+from xsbs.game import setPaused
 from xsbs.db import dbmanager
 
 from Motd.motd import motdstring
@@ -30,7 +31,7 @@ def onPauseCmd(cn, args):
 	if args != '':
 		raise ExtraArgumentError()
 		return
-	sbserver.setPaused(True)
+	setPaused(True, cn)
 
 @commandHandler('resume')
 @masterRequired
@@ -40,7 +41,7 @@ def onResumeCmd(cn, args):
 	if args != '':
 		raise ExtraArgumentError()
 		return
-	sbserver.setPaused(False)
+	setPaused(False, cn)
 
 @commandHandler('reload')
 @adminRequired
