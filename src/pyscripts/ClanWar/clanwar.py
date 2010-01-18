@@ -1,4 +1,4 @@
-from xsbs.commands import commandHandler, UsageError
+from xsbs.commands import commandHandler, UsageError, ArgumentValueError
 from xsbs.ui import error, notice
 from xsbs.colors import green
 from xsbs.timers import addTimer
@@ -22,7 +22,7 @@ def clanWar(cn, args):
 	   @usage map (mode)'''
 	sender = player(cn)
 	if args == '':
-		raise UsageError('<map> (mode)')
+		raise UsageError()
 	else:
 		args = args.split(' ')
 		if len(args) == 1:
@@ -33,8 +33,7 @@ def clanWar(cn, args):
 			try:
 				mode = modeNumber(args[1])
 			except ValueError:
-				sender.message(error('Invalid game mode'))
-				return
+				raise ArgumentValueError('Invalid game mode')
 		persistentTeams(True)
 		sbserver.setMap(map, mode)
 		sbserver.setMasterMode(2)
