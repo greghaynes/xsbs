@@ -28,6 +28,7 @@ def onSwitchTeam(cn, team):
 	elif mode in switchteam_modes:
 		if team == 'good' or team == 'evil':
 			p.setTeam(team)
+			execLater(p.suicide())
 		else:
 			p.message(error('You cannot join specified team in current game mode.'))
 	else:
@@ -45,6 +46,7 @@ def onSetTeam(tcn, cn, team):
 	elif mode in switchteam_modes:
 		if team == 'good' or team == 'evil':
 			p.setTeam(team)
+			execLater(p.suicide())
 		else:
 			p.message(error('You cannot join specified team in current game mode.'))
 	else:

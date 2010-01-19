@@ -114,6 +114,9 @@ class Player:
 	def setTeam(self, team):
 		'''Set team client belongs to'''
 		sbserver.setTeam(self.cn, team)
+	def suicide(self):
+		'''Force client to commit suicide'''
+		sbserver.suicide(self.cn)
 
 players = {}
 
