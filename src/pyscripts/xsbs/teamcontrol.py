@@ -1,6 +1,7 @@
-from xsbs.events import eventHandler
-from xsbs.players import isAtLeastMaster
+from xsbs.events import eventHandler, execLater
+from xsbs.players import isAtLeastMaster, player
 from xsbs.ui import error, insufficientPermissions
+from xsbs.game import currentMode
 import sbserver
 
 #modes where clients can swtich team
@@ -20,30 +21,32 @@ setteam_modes = [
 
 @eventHandler('player_switch_team')
 def onSwitchTeam(cn, team):
-	mode =  sbserver.gameMode()
+	p = player(cn)
+	mode = currentMode()
 	if mode in setteam_modes:
-		sbserver.setTeam(cn, team)
+		p.setTeam(team)
 	elif mode in switchteam_modes:
 		if team == 'good' or team == 'evil':
-			sbserver.setTeam(cn, team)
+			p.setTeam(team)
 		else:
-			sbserver.playerMessage(cn, error('You cannot join specified team in current game mode.'))
+			p.message(error('You cannot join specified team in current game mode.'))
 	else:
-		sbserver.playerMessage(cn, error('You can not set team in this game mode.'))
+		p.message(error('You can not set team in this game mode.'))
 
 @eventHandler('player_set_team')
 def onSetTeam(tcn, cn, team):
+	p = player(cn)
 	if cn != tcn and not isAtLeastMaster(tcn):
 		insufficientPermissions(tcn)
 		return
-	mode =  sbserver.gameMode()
+	mode = currentMode()
 	if mode in setteam_modes:
-		sbserver.setTeam(cn, team)
+		p.setTeam(team)
 	elif mode in switchteam_modes:
 		if team == 'good' or team == 'evil':
-			sbserver.setTeam(cn, team)
+			p.setTeam(team)
 		else:
-			sbserver.playerMessage(cn, error('You cannot join specified team in current game mode.'))
+			p.message(error('You cannot join specified team in current game mode.'))
 	else:
-		sbserver.playerMessage(cn, error('You can not set team in this game mode.'))
+		p.wessage(error('You can not set team in this game mode.'))
 
