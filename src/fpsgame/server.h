@@ -393,6 +393,7 @@ namespace server
 	void resetpriv(clientinfo *ci);
 	void sendmapreload();
 	void senddemo(int cn, int num);
+	void suicide(clientinfo *ci);
 }
 
 extern void server_sigint(int);

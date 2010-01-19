@@ -817,6 +817,23 @@ static PyObject *sendDemo(PyObject *self, PyObject *args)
 	server::senddemo(cn, num);
 }
 
+static PyObject *suicide(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "i", &cn))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn");
+		return 0;
+	}
+	server::suicide(ci);
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -877,6 +894,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"demoSize", demoSize, METH_VARARGS, "Size of demo in bytes."},
     {"demoData", demoData, METH_VARARGS, "Demo data."},
 	{"sendDemo", sendDemo, METH_VARARGS, "Send demo to client."},
+	{"suicide", suicide, METH_VARARGS, "Force client to commit suicide."},
 	{NULL, NULL, 0, NULL}
 };
 
