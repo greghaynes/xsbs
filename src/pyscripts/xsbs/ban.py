@@ -4,7 +4,7 @@ from xsbs.net import ipLongToString, ipStringToLong
 from xsbs.timers import addTimer
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from xsbs.ui import info, notice
 from xsbs.colors import colordict
 import time, string
@@ -50,7 +50,10 @@ class BanNick(Base):
 		self.reason = reason
 
 def getCurrentBanByIp(ipaddress):
-	return session.query(Ban).filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
+	try:
+		return session.query(Ban).filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
+	except MultipleResultsFound:
+		return False
 
 def getCurrentBanByNick(nick):
 	return session.query(BanNick).filter(BanNick.nick==nick).one()
