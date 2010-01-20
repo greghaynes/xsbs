@@ -65,7 +65,7 @@ def login(cn, user):
 def userAuth(email, password):
 	try:
 		user = session.query(User).filter(User.email==email).filter(User.password==password).one()
-	except NoResultFound:
+	except (NoResultFound, MultipleResultsFound):
 		return False
 	return user
 
@@ -92,6 +92,8 @@ def onRegisterCommand(cn, args):
 		session.commit()
 		sbserver.playerMessage(cn, green('Account created'))
 		return
+	except MultipleResultsFound:
+		pass
 	sbserver.playerMessage(cn, error('An account with that email address already exists.'))
 
 @commandHandler('login')
@@ -126,15 +128,15 @@ def onLinkName(cn, args):
 	try:
 		session.query(NickAccount).filter(NickAccount.nick==sbserver.playerName(cn)).one()
 	except NoResultFound:
-		pass
-	else:
-		sbserver.playerMessage(cn, error('Your name is already linked to an account.'))
+		user = loggedInAs(cn)
+		nickacct = NickAccount(sbserver.playerName(cn), user.id)
+		session.add(nickacct)
+		session.commit()
+		sbserver.playerMessage(cn, info('Your name is now linked to your account.'))
 		return
-	user = loggedInAs(cn)
-	nickacct = NickAccount(sbserver.playerName(cn), user.id)
-	session.add(nickacct)
-	session.commit()
-	sbserver.playerMessage(cn, info('Your name is now linked to your account.'))
+	except MultipleResultsFound:
+		pass
+	sbserver.playerMessage(cn, error('Your name is already linked to an account.'))
 
 @eventHandler('player_setmaster')
 def onSetMaster(cn, givenhash):
@@ -145,13 +147,15 @@ def onSetMaster(cn, givenhash):
 	except NoResultFound:
 		if givenhash != adminhash:
 			sbserver.playerMessage(cn, error('Your name is not assigned to any accounts.'))
-		return
-	nickhash = sbserver.hashPassword(cn, na.user.password)
-	if givenhash == nickhash:
-		login(cn, na.user)
+	except MultipleResultsFound:
+		sbserver.playerMessage(cn, error('Multiple names linked to account. Contact system administrator.'))
 	else:
-		if givenhash != adminhash:
-			sbserver.playerMessage(cn, error('Invalid password'))
+		nickhash = sbserver.hashPassword(cn, na.user.password)
+		if givenhash == nickhash:
+			login(cn, na.user)
+		else:
+			if givenhash != adminhash:
+				sbserver.playerMessage(cn, error('Invalid password'))
 
 def warnNickReserved(cn, count, sessid):
 	try:
