@@ -18,8 +18,10 @@ import string
 
 config = PluginConfig('servercommands')
 servermsg_template = config.getOption('Templates', 'servermsg', '${orange}${sender}${white}: ${message}')
+pm_template = config.getOption('Templates', 'pm', '${orange}${sender}${white}: ${message}')
 del config
 servermsg_template = string.Template(servermsg_template)
+pm_template = string.Template(pm_template)
 
 session = dbmanager.session()
 
@@ -244,4 +246,8 @@ def onUserPrivCmd(cn, args):
 		userPrivSetCmd(cn, tcn, args)
 	else:
 		raise UsageError()
+
+@commandHandler('pm')
+def onPmCommand(cn, args):
+	player(args[0]).message(pm_template.substitute(colordict, sender=player(cn).name(), message=args[1])
 
