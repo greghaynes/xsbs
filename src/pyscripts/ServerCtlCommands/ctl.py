@@ -249,5 +249,5 @@ def onUserPrivCmd(cn, args):
 
 @commandHandler('pm')
 def onPmCommand(cn, args):
-	player(args[0]).message(pm_template.substitute(colordict, sender=player(cn).name(), message=args[1])
+	player(args[0]).message(pm_template.substitute(colordict, sender=player(cn).name(), message=args[1]))
 
