@@ -1618,6 +1618,8 @@ namespace server
                 copystring(ci->name, text, MAXNAMELEN+1);
 
                 getstring(text, p);
+                SbPy::triggerEventInt("player_connect_pre", ci->clientnum);
+                SbPy::triggerEventInt("player_connect", ci->clientnum);
                 int disc = allowconnect(ci, text);
                 if(disc)
                 {
@@ -1648,8 +1650,6 @@ namespace server
 
                 if(m_demo) setupdemoplayback();
 
-                SbPy::triggerEventInt("player_connect_pre", ci->clientnum);
-                SbPy::triggerEventInt("player_connect", ci->clientnum);
             }
         }
         else if(chan==2)

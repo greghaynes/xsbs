@@ -61,8 +61,8 @@ def onRecentBans(cn, args):
 @policyHandler('connect_kick')
 def allowClient(cn, pwd):
 	p = player(cn)
-	ip = p.ipLong(cn)
-	return not isIpBanned(ip) and not isNickBanned(p.name(cn))
+	ip = p.ipLong()
+	return not isIpBanned(ip) and not isNickBanned(p.name())
 
 @eventHandler('player_kick')
 @masterRequired
