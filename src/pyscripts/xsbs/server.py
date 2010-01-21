@@ -59,6 +59,14 @@ def setMap(map, mode_number):
 	'''Set current map and mode.'''
 	sbserver.setMap(map, mode_number)
 
+def setMasterMode(mm_number):
+	'''Set server master mode.
+	   0 - open
+	   1 - veto
+	   2 - locked
+	   3 - private'''
+	sbserver.setMasterMode(mm_number)
+
 @eventHandler('player_pause')
 @masterRequired
 def onPlayerPause(cn, val):
