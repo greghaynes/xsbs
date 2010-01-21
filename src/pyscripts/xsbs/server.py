@@ -55,6 +55,10 @@ def message(string):
 	'''Send message to server.'''
 	sbserver.message(string)
 
+def setMap(map, mode_number):
+	'''Set current map and mode.'''
+	sbserver.setMap(map, mode_number)
+
 @eventHandler('player_pause')
 @masterRequired
 def onPlayerPause(cn, val):
