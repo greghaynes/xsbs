@@ -24,10 +24,12 @@ def teamkill_broadcast(cn, tcn):
 	serverMessage(info(tktemp.substitute(colordict, tker=tker.name(), victim=target.name(), tkcount=tker.teamkills())))
 
 def getmap(cn):
-	serverMessage(info(getmaptemp.substitute(colordict, name=sbserver.playerName(cn))))
+	p = player(cn)
+	serverMessage(info(getmaptemp.substitute(colordict, name=p.name())))
 
 def onUploadMap(cn):
-	serverMessage(info(uptemp.substitute(colordict, name=sbserver.playerName(cn))))
+	p = player(cn)
+	serverMessage(info(uptemp.substitute(colordict, name=p.name())))
 
 registerServerEventHandler('player_teamkill', teamkill_broadcast)
 registerServerEventHandler('player_uploaded_map', onUploadMap)
