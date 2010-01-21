@@ -1,5 +1,14 @@
 XSBS is a protocol compatible Sauerbraten server which allows for server side modifications through a python plugin system.
 
+PREREQUISITES
+-------------
+Before you can build and install the server, you must have the following installed on your computer.
+ - Python 2.4 or greater (Python 2.6 recommended)
+ - Twisted python framework
+ - Zlib
+ - CMake
+ - C++ compiler
+
 INSTALL
 -------
 cd into xsbs folder
@@ -12,5 +21,5 @@ RUN XSBS
 cd into xsbs
 ./bin/start_server.py
 
-If you experienced an error, or for more detailed information, see the project wiki: http://wiki.github.com/greghaynes/xsbs
+If you experienced an error, or for more detailed information, see the project documentation: http://xsbs.greghaynes.net/documentation
 
