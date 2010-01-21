@@ -2,7 +2,8 @@ from xsbs.events import registerServerEventHandler
 from xsbs.players import player, all as allPlayers
 from xsbs.settings import PluginConfig
 from xsbs.colors import colordict
-import sbserver
+from xsbs.server import message as serverMessage
+
 import string
 
 config = PluginConfig('gameawards')
@@ -62,7 +63,7 @@ def onIntermission():
 		msg += matemp.substitute(colordict, name=player(most_accurate_cn).name(), count=most_accuracy)
 	if msg != '':
 		msg = awards_prefix + msg
-		sbserver.message(msg)
+		serverMessage(msg)
 
 registerServerEventHandler('intermission_begin', onIntermission)
 
