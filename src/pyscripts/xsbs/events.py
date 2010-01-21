@@ -44,9 +44,11 @@ policy_events = PolicyEventManager()
 exec_queue = []
 
 def registerServerEventHandler(event, func):
+	'''Call function when event has been executed.'''
 	server_events.connect(event, func)
 
 class eventHandler(object):
+	'''Decorator which registers a function as an event handler.'''
 	def __init__(self, name):
 		self.name = name
 	def __call__(self, f):
@@ -56,12 +58,15 @@ class eventHandler(object):
 		return f
 
 def triggerServerEvent(event, args):
+	'''Trigger event with arguments.'''
 	server_events.trigger(event, args)
 
 def registerPolicyEventHandler(event, func):
+	'''Call function when policy event has been executed.'''
 	policy_events.connect(event, func)
 
 class policyHandler(object):
+	'''Decorator which registers a function as a policy event handler.'''
 	def __init__(self, name):
 		self.name = name
 	def __call__(self, f):
@@ -71,9 +76,11 @@ class policyHandler(object):
 		return f
 
 def triggerPolicyEvent(event, args):
+	'''Trigger policy event with arguments.'''
 	return policy_events.trigger(event, args)
 
 def execLater(func, args):
+	'''Call function at a later time with arguments in tuple args.'''
 	exec_queue.append((func, args))
 
 def triggerExecQueue():
