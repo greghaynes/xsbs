@@ -8,7 +8,7 @@ from xsbs.plugins import reload as pluginReload
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
-from xsbs.users.privilege import isUserMaster, UserPrivilege
+from xsbs.users.privilege import isUserMaster, isUserAdmin, UserPrivilege
 from xsbs.players import masterRequired, adminRequired, player
 from xsbs.server import setPaused
 from xsbs.db import dbmanager
@@ -196,7 +196,7 @@ def userPrivSetCmd(cn, tcn, args):
 				sbserver.playerMessage(cn, info('Master privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
 	elif args == 'admin':
 		try:
-			if isAdmin(player(tcn).user.id):
+			if isUserAdmin(player(tcn).user.id):
 				sbserver.playerMessage(cn, error('%s already has admin permissions.' % sbserver.playerName(tcn)))
 				return
 		except (ValueError, AttributeError):
