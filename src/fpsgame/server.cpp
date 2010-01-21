@@ -1070,16 +1070,12 @@ namespace server
 
     void setgamemins(int mins)
     {
-        gamelimit = gamemillis + (mins * 60000);
-        minremain = gamemillis>=gamelimit ? 0 : (gamelimit - gamemillis + 60000 - 1)/60000;
-        sendf(-1, 1, "ri2", SV_TIMEUP, minremain);
+        gamelimit = gamemillis + (mins * 60000) + 1;
     }
 
     void endgame()
     {
-        gamelimit = gamemillis;
-        minremain = gamemillis>=gamelimit ? 0 : (gamelimit - gamemillis + 60000 - 1)/60000;
-        sendf(-1, 1, "ri2", SV_TIMEUP, minremain);
+		setgamemins(0);
     }
 
     void checkintermission()
@@ -1346,15 +1342,6 @@ namespace server
             masterupdate = false;
         }
 
-        if(!gamepaused && m_timed && smapname[0] && gamemillis-curtime>0 && gamemillis/60000!=(gamemillis-curtime)/60000) checkintermission();
-        if(interm && gamemillis>interm)
-        {
-            if(demorecord) enddemorecord();
-            interm = 0;
-            SbPy::triggerEvent("intermission_ended", 0);
-            //if(clients.length()) sendf(-1, 1, "ri", SV_MAPRELOAD);
-        }
-
         SbPy::update();
 
         if(restart_py)
@@ -1363,6 +1350,15 @@ namespace server
             restart_py = false;
             signal(SIGINT, server_sigint);
             sendservmsg("Reloading completed.");
+        }
+
+        if(!gamepaused && m_timed && smapname[0] && gamemillis-curtime>0 && gamemillis/60000!=(gamemillis-curtime)/60000) checkintermission();
+        if(interm && gamemillis>interm)
+        {
+            if(demorecord) enddemorecord();
+            interm = 0;
+            SbPy::triggerEvent("intermission_ended", 0);
+            //if(clients.length()) sendf(-1, 1, "ri", SV_MAPRELOAD);
         }
     }
 
