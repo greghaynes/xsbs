@@ -272,6 +272,7 @@ namespace server
         if(!strcmp(ci->team, team)) return true;
         copystring(ci->team, team, MAXTEAMLEN+1);
         sendf(-1, 1, "riis", SV_SETTEAM, ci->clientnum, team);
+        return true;
     }
 
     void autoteam()
