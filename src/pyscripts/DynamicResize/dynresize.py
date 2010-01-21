@@ -1,7 +1,7 @@
 from xsbs.events import eventHandler
 from xsbs.players import player, playerCount, spectatorCount
 from xsbs.settings import PluginConfig
-from sbserver import maxClients, setMaxClients
+from xsbs.server import maxClients, setMaxClients
 import logging
 
 config = PluginConfig('DynamicResize')
