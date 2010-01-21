@@ -51,6 +51,10 @@ def uptime():
 	'''Server uptime in miliseconds.'''
 	return sbserver.uptime()
 
+def message(string):
+	'''Send message to server.'''
+	sbserver.message(string)
+
 @eventHandler('player_pause')
 @masterRequired
 def onPlayerPause(cn, val):
