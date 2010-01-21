@@ -1,4 +1,3 @@
-import sbserver
 from xsbs.events import registerServerEventHandler
 from xsbs.players import player, masterRequired
 from xsbs.ui import warning, error, info
@@ -17,8 +16,8 @@ def checkModified(cn):
 	try:
 		p = player(cn)
 		if p.gamevars['modified_map'] and spectate_map_modified:
-			sbserver.playerMessage(cn, warning('You cannot play with a modified map.'))
-			sbserver.spectate(cn)
+			p.message(warning('You cannot play with a modified map.'))
+			p.spectate()
 	except KeyError:
 		pass
 	except ValueError:
