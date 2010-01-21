@@ -1,6 +1,7 @@
 from xsbs.players import masterRequired, player
 from xsbs.events import eventHandler
 from xsbs.commands import commandHandler
+from xsbs.ui import notice
 import sbserver
 
 def isPaused():
