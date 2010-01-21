@@ -4,7 +4,7 @@ from xsbs.commands import commandHandler
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
 from xsbs.ui import insufficientPermissions, error
-from xsbs.players import isAtLeastMaster
+from xsbs.players import player, isAtLeastMaster
 
 config = PluginConfig('stats')
 template = config.getOption('Config', 'template', '${white}Stats for ${orange}${name}\n${white}Frags: ${green}${frags} ${white}Deaths: ${red}${deaths} ${white}Teamkills: ${magenta}${teamkills} ${white}Accuracy: ${yellow}${accuracy}% ${white}KpD: ${orange}${ktd}')
@@ -37,17 +37,8 @@ def onCommand(cn, command):
 	teamkills = sbserver.playerTeamkills(tcn)
 	shots = sbserver.playerShots(tcn)
 	hits = sbserver.playerHits(tcn)
-	accuracy = 0
-	if shots != 0:
-		accuracy = hits / float(shots)
-		accuracy = math.floor(accuracy * 100)
-	if deaths == 0:
-		ktd = frags
-	else:
-		ktd = frags / float(deaths)
-		ktd *= float(100)
-		ktd = math.floor(ktd)
-		ktd = ktd / 100
+	accuracy = player(tcn).accuracy()
+	ktd = player(tcn).kpd()
 	msg = template.substitute(colordict, name=name, frags=frags, deaths=deaths, teamkills=teamkills, shots=shots, hits=hits, accuracy=accuracy, ktd=ktd)
 	sbserver.playerMessage(cn, msg)
 

@@ -5,6 +5,7 @@ from xsbs.ui import insufficientPermissions
 from xsbs.users.privilege import isUserMaster, isUserAdmin, isUserAtLeastMaster
 import sbserver
 import logging
+import math
 
 def isMaster(cn):
 	if sbserver.playerPrivilege(cn) == 1:
@@ -117,6 +118,32 @@ class Player:
 	def suicide(self):
 		'''Force client to commit suicide'''
 		sbserver.suicide(self.cn)
+	def shots(self):
+		'''Shots the player has fired'''
+		return sbserver.playerShots(self.cn)
+	def hits(self):
+		'''Number of hits the player has dealt'''
+		return sbserver.playerHits(self.cn)
+	def accuracy(self):
+		'''Accuracy of player'''
+		shots = self.shots()
+		accuracy = 0
+		if shots != 0:
+			accuracy = self.hits() / float(shots)
+			accuracy = math.floor(accuracy * 100)
+		return accuracy
+	def kpd(self):
+		'''Kills Per Death'''
+		deaths = self.deaths()
+		frags = self.frags()
+		if deaths == 0:
+			kpd = frags
+		else:
+			kpd = frags / float(deaths)
+			kpd *= float(100)
+			kpd = math.floor(kpd)
+			kpd = kpd / 100
+		return kpd
 
 players = {}
 
