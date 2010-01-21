@@ -67,6 +67,14 @@ def setMasterMode(mm_number):
 	   3 - private'''
 	sbserver.setMasterMode(mm_number)
 
+def maxClients():
+	'''Maximum clients allowed in server.'''
+	return sbserver.maxClients()
+
+def setMaxClients(num_clients):
+	'''Set the maximum clients allowed in server.'''
+	return sbserver.setMaxClients(number)
+
 @eventHandler('player_pause')
 @masterRequired
 def onPlayerPause(cn, val):
