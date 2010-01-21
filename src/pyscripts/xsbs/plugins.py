@@ -5,6 +5,7 @@ import sbserver, xsbs.events
 # Initialize these before loading plugins
 import xsbs.log
 import xsbs.users
+import xsbs.server
 import xsbs.game
 import xsbs.teamcontrol
 import xsbs.persistteam
