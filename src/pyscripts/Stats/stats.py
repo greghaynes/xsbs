@@ -1,5 +1,4 @@
-import sbserver
-import string, math
+import string
 from xsbs.commands import commandHandler
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
@@ -13,32 +12,26 @@ del config
 template = string.Template(template)
 
 @commandHandler('stats')
-def onCommand(cn, command):
+def onCommand(cn, args):
 	'''@description Stats for the current match
 	   @usage (cn)
 	   @public'''
-	if command != '':
+	cp = player(cn)
+	if args != '':
 		if require_master and not isPlayerMaster(cn):
 			insufficientPermissions(cn)
 			return
 		try:
-			tcn = int(command)
+			p = player(int(args))
 		except ValueError:
-			sbserver.playerMessage(cn, error('Usage: #stats (cn)'))
+			cp.message(error('Usage: #stats (cn)'))
 			return
 	else:
-		tcn = cn
-	name = sbserver.playerName(tcn)
-	if not name:
-		sbserver.playerMessage(cn, error('You must use a valid cn'))
+		p = cp
+	if not p.name():
+		cp.message(error('You must use a valid cn'))
 		return
-	frags = sbserver.playerFrags(tcn)
-	deaths = sbserver.playerDeaths(tcn)
-	teamkills = sbserver.playerTeamkills(tcn)
-	shots = sbserver.playerShots(tcn)
-	hits = sbserver.playerHits(tcn)
-	accuracy = player(tcn).accuracy()
-	ktd = player(tcn).kpd()
-	msg = template.substitute(colordict, name=name, frags=frags, deaths=deaths, teamkills=teamkills, shots=shots, hits=hits, accuracy=accuracy, ktd=ktd)
-	sbserver.playerMessage(cn, msg)
+
+	msg = template.substitute(colordict, name=p.name(), frags=p.frags(), deaths=p.deaths(), teamkills=p.teamkills(), shots=p.shots(), hits=p.hits(), accuracy=p.accuracy(), ktd=p.kpd())
+	cp.message(msg)
 
