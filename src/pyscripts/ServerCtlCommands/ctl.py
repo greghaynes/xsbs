@@ -148,6 +148,16 @@ def masterCmd(cn, args):
 	if sbserver.playerPrivilege(cn) == 0:
 		sbserver.setMaster(cn)
 
+@commandHandler('admin')
+@adminRequired
+def adminCmd(cn, args):
+	'''@description Claim master
+	   @usage'''
+	if args != '':
+		raise ExtraArgumentError()
+	if sbserver.playerPrivilege(cn) == 0 or sbserver.playerPrivilege(cn) == 1:
+		sbserver.setAdmin(cn)
+
 @commandHandler('unsetmaster')
 @masterRequired
 def unsetMaster(cn, args):
