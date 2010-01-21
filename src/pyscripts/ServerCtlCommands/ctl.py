@@ -10,7 +10,7 @@ from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
 from xsbs.users.privilege import isUserMaster, UserPrivilege
 from xsbs.players import masterRequired, adminRequired, player
-from xsbs.game import setPaused
+from xsbs.server import setPaused
 from xsbs.db import dbmanager
 
 from Motd.motd import motdstring

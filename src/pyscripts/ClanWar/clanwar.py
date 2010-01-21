@@ -2,7 +2,8 @@ from xsbs.commands import commandHandler, UsageError, ArgumentValueError
 from xsbs.ui import error, notice
 from xsbs.colors import green
 from xsbs.timers import addTimer
-from xsbs.game import modeNumber, setPaused
+from xsbs.game import modeNumber
+from xsbs.server import setPaused
 from xsbs.players import player, masterRequired
 from xsbs.persistteam import persistentTeams
 import sbserver

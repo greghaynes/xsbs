@@ -4,7 +4,6 @@ import logging
 import sys
 import traceback
 from twisted.internet import reactor
-from twisted.internet.error import ReactorNotRunning
 
 class EventManager:
 	def __init__(self):
@@ -89,13 +88,9 @@ def triggerExecQueue():
 	del exec_queue[:]
 
 def update():
+	reactor.runUntilCurrent()
+	reactor.doIteration(0)
 	triggerExecQueue()
-	try:
-		reactor.runUntilCurrent()
-	except ReactorNotRunning:
-		reactor.stop()
-	else:
-		reactor.doIteration(0)
 
 reactor.startRunning()
 
