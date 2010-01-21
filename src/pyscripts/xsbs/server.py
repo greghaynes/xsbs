@@ -27,6 +27,30 @@ def setPaused(val, cn=-1):
 		name=name)))
 	sbserver.setPaused(val)
 
+def adminPassword():
+	'''Administrator password of server.'''
+	return sbserver.adminPassword()
+
+def ip():
+	'''Ip address server is bound to.'''
+	return sbserver.ip()
+
+def port():
+	'''Port server is bound to.'''
+	return sbserver.port()
+
+def reload():
+	'''Reload python system.'''
+	return sbserver.reload()
+
+def setBotLimit(limit):
+	'''Set maximum number of bots.'''
+	return sbserver.setBotLimit(limit)
+
+def uptime():
+	'''Server uptime in miliseconds.'''
+	return sbserver.uptime()
+
 @eventHandler('player_pause')
 @masterRequired
 def onPlayerPause(cn, val):
