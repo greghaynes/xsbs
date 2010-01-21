@@ -56,13 +56,3 @@ class PluginConfig:
 	def configPath(self):
 		return configuration_path + self.plugin_name + configuration_extension
 
-def adminPassword():
-	'''Server administrator password'''
-	return sbserver.adminPassword()
-
-def ip():
-	'''Server listen ip address'''
-
-def port():
-	'''Server listen port'''
-
