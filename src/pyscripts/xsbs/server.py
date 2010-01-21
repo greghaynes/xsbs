@@ -55,10 +55,6 @@ def message(string):
 	'''Send message to server.'''
 	sbserver.message(string)
 
-def setMap(map, mode_number):
-	'''Set current map and mode.'''
-	sbserver.setMap(map, mode_number)
-
 def setMasterMode(mm_number):
 	'''Set server master mode.
 	   0 - open

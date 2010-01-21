@@ -51,3 +51,7 @@ def currentMode():
 	'''Integer value of current game mode'''
 	return sbserver.gameMode()
 
+def setMap(map_name, mode_number):
+	'''Set current map and mode'''
+	sbserver.setMap(map_name, mode_number)
+
