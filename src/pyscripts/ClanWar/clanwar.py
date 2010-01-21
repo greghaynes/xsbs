@@ -2,18 +2,18 @@ from xsbs.commands import commandHandler, UsageError, ArgumentValueError
 from xsbs.ui import error, notice
 from xsbs.colors import green
 from xsbs.timers import addTimer
-from xsbs.game import modeNumber
+from xsbs.game import modeNumber, currentMode
 from xsbs.server import setPaused
 from xsbs.players import player, masterRequired
 from xsbs.persistteam import persistentTeams
-import sbserver
+from xsbs.server import message, setMap, setMasterMode
 
 def clanWarTimer(count, cn):
 	if count > 0:
-		sbserver.message(notice('Clan war starts in ' + green(str(count))))
+		message(notice('Clan war starts in ' + green(str(count))))
 		addTimer(1000, clanWarTimer, (count-1, cn))
 	else:
-		sbserver.message(notice('Fight!'))
+		message(notice('Fight!'))
 		setPaused(False)
 
 @commandHandler('clanwar')
@@ -28,7 +28,7 @@ def clanWar(cn, args):
 		args = args.split(' ')
 		if len(args) == 1:
 			map = args
-			mode = sbserver.gameMode()
+			mode = currentMode()
 		elif len(args) == 2:
 			map = args[0]
 			try:
@@ -36,8 +36,8 @@ def clanWar(cn, args):
 			except ValueError:
 				raise ArgumentValueError('Invalid game mode')
 		persistentTeams(True)
-		sbserver.setMap(map, mode)
-		sbserver.setMasterMode(2)
+		setMap(map, mode)
+		setMasterMode(2)
 		setPaused(True, cn)
 		clanWarTimer(10, cn)
 
