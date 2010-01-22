@@ -1,7 +1,7 @@
 import sbserver
 
 from xsbs.events import triggerServerEvent
-from xsbs.commands import commandHandler, UsageError, ExtraArgumentError
+from xsbs.commands import commandHandler, UsageError, ExtraArgumentError, StateError
 from xsbs.settings import PluginConfig
 from xsbs.colors import red, yellow, blue, green, colordict
 from xsbs.plugins import reload as pluginReload
@@ -9,7 +9,7 @@ from xsbs.ui import error, info, insufficientPermissions
 from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
 from xsbs.users.privilege import isUserMaster, isUserAdmin, UserPrivilege
-from xsbs.players import masterRequired, adminRequired, player
+from xsbs.players import masterRequired, adminRequired, player, currentAdmin
 from xsbs.server import setPaused
 from xsbs.db import dbmanager
 
@@ -145,6 +145,8 @@ def masterCmd(cn, args):
 	   @usage'''
 	if args != '':
 		raise ExtraArgumentError()
+	if currentAdmin() != None:
+		raise StateError('Admin is present')
 	if sbserver.playerPrivilege(cn) == 0:
 		sbserver.setMaster(cn)
 
