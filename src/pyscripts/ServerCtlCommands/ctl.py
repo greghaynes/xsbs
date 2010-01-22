@@ -10,7 +10,7 @@ from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
 from xsbs.users.privilege import isUserMaster, isUserAdmin, UserPrivilege
 from xsbs.players import masterRequired, adminRequired, player, currentAdmin
-from xsbs.server import setPaused, message as serverMessage
+from xsbs.server import setPaused, message as sendServerMessage
 from xsbs.db import dbmanager
 
 from Motd.motd import motdstring
@@ -19,7 +19,7 @@ import string
 config = PluginConfig('servercommands')
 servermsg_template = config.getOption('Templates', 'servermsg', '${orange}${sender}${white}: ${message}')
 pm_template = config.getOption('Templates', 'pm', '${orange}${sender}${white}: ${message}')
-smite_template = config.getOption('Templates', 'smite', '${orange}${smited}${white} has been smited by ${green}${smiter}')
+smite_template = config.getOption('Templates', 'smite', '${green}${smited}${white} has been smited by ${orange}${smiter}')
 del config
 servermsg_template = string.Template(servermsg_template)
 pm_template = string.Template(pm_template)
@@ -269,11 +269,11 @@ def onPmCommand(cn, args):
 @commandHandler('smite')
 @masterRequired
 def onSmiteCommand(cn, args):
-	if args != '':
-		raise ExtraArgumentError()
+	if args == '':
+		raise UsageError()
 	p = player(cn)
-	t = player(args)
-	serverMessage(smite_template.substitute(colordict, smiter=p.name(), smited=t.name()))
+	t = player(int(args))
+	sendServerMessage(info(smite_template.substitute(colordict, smiter=p.name(), smited=t.name())))
 	t.suicide()
 
 

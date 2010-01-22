@@ -47,7 +47,7 @@ class CommandManager:
 					try:
 						usages = command_info[command].usages
 					except KeyError:
-						pass
+						usages = []
 					p.message(error('Invalid Usage of #' + command + ' command. ' + str(e)))
 					for usage in usages:
 						p.message(info('Usage: ' + command + ' ' + usage))
