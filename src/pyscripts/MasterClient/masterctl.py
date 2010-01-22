@@ -34,7 +34,9 @@ class ResponseHandler(object):
 			'failreg': self.failreg,
 			'succauth': self.succauth,
 			'failauth': self.failauth,
-			'chalauth': self.chalauth
+			'chalauth': self.chalauth,
+			'cleargbans': self.cleargbans,
+			'addgban': self.addgban
 			}
 		self.auth_id_map = {}
 		self.factory = factory
@@ -50,7 +52,8 @@ class ResponseHandler(object):
 			logging.error('Could not find matching auth request for given auth request id')
 		if self.responses_needed <= 0:
 			self.responses_needed = 0
-			self.factory.client.transport.loseConnection()
+			# We are going to keep connections open
+			#self.factory.client.transport.loseConnection()
 	def succreg(self, args):
 		self.responses_needed -= 1
 		logging.debug('Master server registration successful')
@@ -59,6 +62,10 @@ class ResponseHandler(object):
 		self.responses_needed -= 1
 		logging.error('Master server registration failed: %s' % args)
 		triggerServerEvent('master_registration_failed', ())
+	def cleargbans(self, args):
+		triggerServerEvent('master_cleargbans', ())
+	def addgban(self, args):
+		triggerServerEvent('master_addgban', (args,))
 	def pop_auth(self, auth_id):
 		auth = self.auth_id_map[auth_id]
 		del self.auth_id_map[auth_id]
