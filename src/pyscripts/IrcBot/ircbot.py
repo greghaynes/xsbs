@@ -69,8 +69,6 @@ class IrcBotFactory(protocol.ClientFactory):
 		for bot in self.bots:
 			bot.broadcast(message)
 
-factory = IrcBotFactory(nickname, [channel])
-
 event_abilities = {
 	'player_active': ('player_connect', lambda x: factory.broadcast(
 		'\x032CONNECT\x03        %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
@@ -91,6 +89,9 @@ event_abilities = {
 	'relinquish_master': ('player_released_master', lambda x: factory.broadcast(
 		'\x036RELINQ MASTER\x03  %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
 }
+
+factory = IrcBotFactory(nickname, [channel])
+factory.doConnect()
 
 for key in event_abilities.keys():
 	if config.getOption('Abilities', key, 'no') == 'yes':
