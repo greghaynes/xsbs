@@ -4,7 +4,7 @@ from xsbs.settings import PluginConfig
 from xsbs.server import maxClients, setMaxClients
 import logging
 
-config = PluginConfig('DynamicResize')
+config = PluginConfig('dynamicresize')
 # For every n spectators add one to maxclients
 spectatorsAddClient = config.getOption('Config', 'spectators_addclient_rate', '2')
 del config
