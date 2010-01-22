@@ -223,6 +223,18 @@ def triggerConnectDelayed(cn):
 	else:
 		triggerServerEvent('player_connect_delayed', (cn,))
 
+def currentMaster():
+	for p in all():
+		if p.privilege() == 1:
+			return p
+	return None
+
+def currentAdmin():
+	for p in all():
+		if p.privilege() == 1:
+			return p
+	return None
+
 @eventHandler('player_connect_pre')
 def playerConnect(cn):
 	try:
