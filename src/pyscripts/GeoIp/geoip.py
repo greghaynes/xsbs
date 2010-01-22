@@ -4,6 +4,7 @@ from xsbs.ui import info
 from xsbs.events import eventHandler
 from xsbs.net import ipLongToString
 from xsbs.server import message as serverMessage
+from xsbs.players import player
 
 import string
 import pygeoip
