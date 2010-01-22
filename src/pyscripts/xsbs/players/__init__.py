@@ -1,7 +1,7 @@
 from xsbs.events import eventHandler, triggerServerEvent, execLater
 from xsbs.timers import addTimer
 from xsbs.net import ipLongToString, ipStringToLong
-from xsbs.ui import insufficientPermissions
+from xsbs.ui import insufficientPermissions, error
 from xsbs.users.privilege import isUserMaster, isUserAdmin, isUserAtLeastMaster
 import sbserver
 import logging
@@ -248,4 +248,11 @@ def playerConnect(cn):
 def reload():
 	for cn in sbserver.clients():
 		playerConnect(cn)
+
+@eventHandler('player_auth_succeed')
+def onAuthSuccess(cn, name):
+	if currentAdmin() != None:
+		sbserver.playerMessage(cn, error('Admin present'))
+		return
+	sbserver.setMaster(cn)
 
