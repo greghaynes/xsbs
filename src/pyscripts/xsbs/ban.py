@@ -99,22 +99,3 @@ def ban(cn, seconds, reason, banner_cn):
 
 Base.metadata.create_all(dbmanager.engine)
 
-gbans = {}
-
-@policyHandler('connect_kick')
-def isNotGBanned(cn, pwd):
-	p = player(cn)
-	try:
-		gbans[p.ipString()]
-		return False
-	except KeyError:
-		return True
-
-@eventHandler('master_addgban')
-def adGBan(ip_string):
-	gbans[ip_string] = True
-
-@eventHandler('master_cleargbans')
-def clearGBans():
-	gbans.clear()
-
