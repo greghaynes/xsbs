@@ -261,4 +261,12 @@ def onUserPrivCmd(cn, args):
 def onPmCommand(cn, args):
 	args = args.split()
 	player(int(args[0])).message(pm_template.substitute(colordict, sender=player(cn).name(), message=args[1]))
+	
+@commandHandler('smite')
+@masterRequired
+def onSmiteCommand(cn, args):
+	if args != '':
+		raise ExtraArgumentError()
+	player(int(args)).suicide()
+
 
