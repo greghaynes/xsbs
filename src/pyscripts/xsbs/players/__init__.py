@@ -231,7 +231,7 @@ def currentMaster():
 
 def currentAdmin():
 	for p in all():
-		if p.privilege() == 1:
+		if p.privilege() == 2:
 			return p
 	return None
 
@@ -252,7 +252,7 @@ def reload():
 @eventHandler('player_auth_succeed')
 def onAuthSuccess(cn, name):
 	if currentAdmin() != None:
-		sbserver.playerMessage(cn, error('Admin present'))
+		sbserver.playerMessage(cn, error('Admin is present'))
 		return
 	sbserver.setMaster(cn)
 

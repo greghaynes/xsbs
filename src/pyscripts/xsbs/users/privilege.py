@@ -67,7 +67,6 @@ def isUserAdmin(user_id):
 def isUserAtLeastMaster(user_id):
 	return isUserMaster(user_id) or isUserAdmin(user_id)
 
-
 def onSetMaster(cn, hash):
 	if hash == sbserver.hashPassword(cn, sbserver.adminPassword()):
 		sbserver.setAdmin(cn)
