@@ -10,6 +10,7 @@ from xsbs.ui import error, info, insufficientPermissions
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
 from xsbs.db import dbmanager
+from xsbs.players import currentAdmin
 import string
 
 config = PluginConfig('userprivilege')
@@ -73,6 +74,9 @@ def onSetMaster(cn, hash):
 		sbserver.setAdmin(cn)
 
 def onAuthSuccess(cn, name):
+	if currentAdmin() != None:
+		sbserver.playerMessage(cn, error('Admin present'))
+		return
 	sbserver.message(info(authtemp.substitute(colordict, name=sbserver.playerName(cn), authname=name)))
 	sbserver.setMaster(cn)
 
