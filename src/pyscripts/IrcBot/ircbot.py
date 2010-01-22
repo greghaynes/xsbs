@@ -3,6 +3,8 @@ from twisted.internet import reactor, protocol
 
 from xsbs.settings import PluginConfig, NoOptionError
 from xsbs.events import registerServerEventHandler
+from xsbs.timers import addTimer
+
 import sbserver
 
 import string
@@ -49,12 +51,20 @@ class IrcBotFactory(protocol.ClientFactory):
 		self.nickname = nickname
 		self.channels = channels
 		self.bots = []
+		self.reconnect_count = 0
+	def doConnect(self):
+		reactor.connectTCP(servername, int(port), factory)
+	def doReconnect(self):
+		if self.reconnect_count < 5:
+			self.reconnect_count += 1
+			self.doConnect()
 	def signedOn(self, bot):
 		if bot not in self.bots:
 			self.bots.append(bot)
 	def signedOut(self, bot):
 		if bot in self.bots:
 			self.bots.remove(bot)
+			addTimer(5000, self.doReconnect, ())
 	def broadcast(self, message):
 		for bot in self.bots:
 			bot.broadcast(message)
@@ -87,5 +97,4 @@ for key in event_abilities.keys():
 		ev = event_abilities[key]
 		registerServerEventHandler(ev[0], ev[1])
 
-reactor.connectTCP(servername, int(port), factory)
 
