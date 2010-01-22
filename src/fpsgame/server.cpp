@@ -1510,10 +1510,10 @@ namespace server
     void clientdisconnect(int n)
     {
         clientinfo *ci = getinfo(n);
+        SbPy::triggerEventInt("player_disconnect", n);
+        SbPy::triggerEventInt("player_disconnect_post", n);
         if(ci->connected)
         {
-            SbPy::triggerEventInt("player_disconnect", n);
-            SbPy::triggerEventInt("player_disconnect_post", n);
             if(ci->privilege) resetpriv(ci);
             if(smode) smode->leavegame(ci, true);
             ci->state.timeplayed += lastmillis - ci->state.lasttimeplayed;
@@ -1615,8 +1615,10 @@ namespace server
                 copystring(ci->name, text, MAXNAMELEN+1);
 
                 getstring(text, p);
+
                 SbPy::triggerEventInt("player_connect_pre", ci->clientnum);
                 SbPy::triggerEventInt("player_connect", ci->clientnum);
+
                 int disc = allowconnect(ci, text);
                 if(disc)
                 {
