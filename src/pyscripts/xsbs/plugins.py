@@ -4,6 +4,7 @@ import sbserver, xsbs.events
 
 # Initialize these before loading plugins
 import xsbs.log
+import xsbs.ban
 import xsbs.users
 import xsbs.server
 import xsbs.game

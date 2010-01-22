@@ -7,6 +7,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from xsbs.ui import info, notice
 from xsbs.colors import colordict
+from xsbs.events import eventHandler, policyHandler
+
 import time, string
 import logging
 import sbserver
@@ -96,4 +98,23 @@ def ban(cn, seconds, reason, banner_cn):
 	sbserver.message(info(ban_message.substitute(colordict, name=nick, seconds=seconds, reason=reason)))
 
 Base.metadata.create_all(dbmanager.engine)
+
+gbans = {}
+
+@policyHandler('connect_kick')
+def isNotGBanned(cn, pwd):
+	p = player(cn)
+	try:
+		gbans[p.ipString()]
+		return False
+	except KeyError:
+		return True
+
+@eventHandler('master_addgban')
+def adGBan(ip_string):
+	gbans[ip_string] = True
+
+@eventHandler('master_cleargbans')
+def clearGBans():
+	gbans.clear()
 
