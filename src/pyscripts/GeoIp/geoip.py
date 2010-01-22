@@ -1,9 +1,10 @@
-import sbserver
 from xsbs.settings import PluginConfig
 from xsbs.colors import colordict
 from xsbs.ui import info
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 from xsbs.net import ipLongToString
+from xsbs.server import message as serverMessage
+
 import string
 import pygeoip
 
@@ -20,12 +21,9 @@ def getCountry(ip):
 		country = 'Unknown'
 	return country
 
+@eventHandler('player_connect_delayed')
 def announce(cn):
-	try:
-		msg = string.Template(template).substitute(colordict, user=sbserver.playerName(cn), country=getCountry(sbserver.playerIpLong(cn)))
-	except ValueError:
-		return
-	sbserver.message(info(msg))
-
-registerServerEventHandler('player_connect_delayed', announce)
+	p = player(cn)
+	msg = string.Template(template).substitute(colordict, user=p.name(), country=getCountry(p.ipLong()))
+	serverMessage(info(msg))
 
