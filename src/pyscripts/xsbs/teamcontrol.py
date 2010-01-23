@@ -33,7 +33,7 @@ def isSafeTeam(team):
 def onSwitchTeam(cn, team):
 	p = player(cn)
 	if isSafeTeam(team):
-		execLater(p.suicide())
+		execLater(p.suicide(), ())
 		p.setTeam(team)
 	else:
 		p.message(error('You cannot join team \'%s\' in game mode %s' % (
@@ -50,7 +50,7 @@ def onSetTeam(tcn, cn, team):
 		return
 	mode = currentMode()
 	if isSafeTeam(team):
-		execLater(p.suicide())
+		execLater(p.suicide(), ())
 		p.setTeam(team)
 	else:
 		r.message(error('You cannot join team \'%s\' in game mode %s' % (
