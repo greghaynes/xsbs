@@ -49,6 +49,8 @@ class JsonSite(resource.Resource):
 	def render_OPTIONS(self, request):
 		setJsonHeaders(request)
 		return None
+	def render_JSON(self, request):
+		return ''
 
 class JsonUserSite(JsonSite):
 	def render_JSON(self, request):
