@@ -49,7 +49,6 @@ namespace server
     vector<worldstate *> worldstates;
     bool reliablemessages = false;
     bool checkexecqueue = false;
-    bool restart_py = false;
     bool allow_modevote = false;
 
 #define MAXDEMOS 5
@@ -1344,14 +1343,6 @@ namespace server
         }
 
         SbPy::update();
-
-        if(restart_py)
-        {
-            SbPy::restartPy();
-            restart_py = false;
-            signal(SIGINT, server_sigint);
-            sendservmsg("Reloading completed.");
-        }
 
         if(!gamepaused && m_timed && smapname[0] && gamemillis-curtime>0 && gamemillis/60000!=(gamemillis-curtime)/60000) checkintermission();
         if(interm && gamemillis>interm)

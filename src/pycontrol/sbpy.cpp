@@ -180,22 +180,6 @@ bool init(const char *prog_name, const char *arg_pyscripts_path, const char *mod
 	return true;
 }
 
-bool restartPy()
-{
-	triggerEvent("restart_begin", 0);
-	deinitPy();
-	bool val = init("", "", "sbserver");
-	// Initialize
-	if(val)
-		triggerEvent("restart_complete", 0);
-	else
-	{
-		PyErr_Print();
-		fatal("Error reloading python");
-	}
-	return val;
-}
-
 PyObject *callPyFunc(PyObject *func, PyObject *args)
 {
 	PyObject *val;

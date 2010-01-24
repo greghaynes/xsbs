@@ -335,7 +335,6 @@ namespace server
 	extern bool masterupdate;
 	extern int mastermode;
 	extern int mastermask;
-	extern bool restart_py;
 	extern char smapname[260];
 	extern char *adminpass;
 	extern char *serverpass;
