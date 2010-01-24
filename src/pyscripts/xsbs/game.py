@@ -1,16 +1,7 @@
 import sbserver
-from xsbs.settings import PluginConfig
 from xsbs.colors import colordict
 from xsbs.ui import notice
 import string
-
-config = PluginConfig('game')
-pause_message = config.getOption(
-	'Templates',
-	'pause_message',
-	'The game has been ${action} by ${orange}${name}')
-del config
-pause_message = string.Template(pause_message)
 
 modes = [
 	'ffa',
