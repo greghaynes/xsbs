@@ -59,6 +59,7 @@ def onIntermission():
 		msg += ' '
 	if most_deaths > 0:
 		msg += mdtemp.substitute(colordict, name=player(most_deaths_cn).name(), count=most_deaths)
+		msg += ' '
 	if most_accuracy > 0:
 		msg += matemp.substitute(colordict, name=player(most_accurate_cn).name(), count=most_accuracy)
 	if msg != '':
