@@ -2,6 +2,7 @@ from xsbs.players import masterRequired, player
 from xsbs.events import eventHandler
 from xsbs.commands import commandHandler
 from xsbs.ui import notice
+from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
 
 import string
