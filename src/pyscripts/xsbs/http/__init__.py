@@ -2,6 +2,7 @@ from twisted.web import server, resource
 from twisted.internet import reactor
 
 from xsbs.settings import PluginConfig
+from xsbs.events import eventHandler
 
 config = PluginConfig('httpserver')
 port = config.getOption('Config', 'port', '8081')
@@ -11,7 +12,22 @@ del config
 class RootSite(resource.Resource):
 		pass
 
-site = RootSite()
-server_site = server.Site(site)
-reactor.listenTCP(port, server_site)
+class HttpServer(object):
+	def __init__(self, address, port):
+		self.address = address
+		self.port = port
+		self.root_site = RootSite()
+		self.server_site = server.Site(self.root_site)
+	def start(self):
+		self.connection = reactor.listenTCP(port, self.server_site)
+	def stop(self):
+		self.connection.stopListening()
+
+server = HttpServer('', port)
+server.start()
+
+@eventHandler('reload')
+def onReload():
+	server.stop()
+	server.start()
 

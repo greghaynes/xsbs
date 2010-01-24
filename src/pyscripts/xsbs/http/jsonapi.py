@@ -1,6 +1,6 @@
 from twisted.web import resource
 
-from xsbs.http import site as rootSite
+from xsbs.http import server as httpServer
 from xsbs.users import userAuth
 from xsbs.users.privilege import isUserAtLeastMaster
 
@@ -75,7 +75,7 @@ class JsonMasterSite(JsonUserSite):
 		return self.render_master_JSON(request, user)		
 
 site = JsonSite()
-rootSite.putChild('json', site)
+httpServer.root_site.putChild('json', site)
 
 class jsonMasterRequired(object):
 	def __init__(self, f):
