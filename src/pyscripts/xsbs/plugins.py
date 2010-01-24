@@ -39,6 +39,9 @@ class Plugin:
 	def load(self):
 		if self.initmodule and self.isenabled:
 			self.module = __import__(os.path.basename(self.path) + '.' + self.initmodule)
+	def reload(self):
+		if self.enabled():
+			self.reload(self.module)
 	def enabled(self):
 		return self.isenabled
 
@@ -65,8 +68,8 @@ def loadPlugins():
 		plugin.load()
 
 def reload():
-	xsbs.events.triggerServerEvent('reload', ())
-	sbserver.reload()
+	for p in plugins.values():
+		p.reload()
 
 loadPlugins()
 
