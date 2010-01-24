@@ -40,7 +40,11 @@ class ScoreboardSite(JsonSite):
 			except ValueError:
 				client['team'] = 'spectator'
 			clients_response.append(client)
-		return json.dumps({'clients': clients_response})
+		return json.dumps({
+			'clients': clients_response,
+			'map': currentMap(),
+			'mode': modeName(currentMode())
+			})
 
 class GameSite(JsonSite):
 	def render_JSON(self, request):
