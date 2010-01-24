@@ -815,6 +815,8 @@ static PyObject *sendDemo(PyObject *self, PyObject *args)
 		return 0;
 	}
 	server::senddemo(cn, num);
+	Py_INCREF(Py_None);
+	return Py_None;
 }
 
 static PyObject *suicide(PyObject *self, PyObject *args)
