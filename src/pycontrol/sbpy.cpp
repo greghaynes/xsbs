@@ -34,6 +34,7 @@ namespace SbPy
 {
 
 static char *pyscripts_path;
+static char *pn;
 
 PyMODINIT_FUNC initModule(const char *);
 
@@ -128,40 +129,28 @@ bool initPy()
 
 void deinitPy()
 {
-	Py_XDECREF(eventsModule);
 	Py_XDECREF(triggerEventFunc);
 	Py_XDECREF(triggerPolicyEventFunc);
 	Py_XDECREF(updateFunc);
+	Py_XDECREF(eventsModule);
 	Py_Finalize();
-}
-
-bool restartPy()
-{
-	triggerEvent("restart_begin", 0);
-	deinitPy();
-	Py_SetProgramName("Foo");
-	Py_Initialize();
-	initModule("sbserver");
-	// Initialize
-	bool val = initPy();
-	if(val)
-		triggerEvent("restart_complete", 0);
-	else
-	{
-		PyErr_Print();
-		fatal("Error reloading python");
-	}
-	return val;
 }
 
 bool init(const char *prog_name, const char *arg_pyscripts_path, const char *module_name)
 {
 	// Setup env vars and chdir
-	char *pn = new char[strlen(prog_name)+1];
-	if(arg_pyscripts_path[0])
+	if(!pn)
 	{
-		pyscripts_path = new char[strlen(arg_pyscripts_path)+1];
-		strcpy(pyscripts_path, arg_pyscripts_path);
+		pn = new char[strlen(prog_name)+1];
+		strcpy(pn, prog_name);
+	}
+	if(arg_pyscripts_path[0] || pyscripts_path)
+	{
+		if(!pyscripts_path)
+		{
+			pyscripts_path = new char[strlen(arg_pyscripts_path)+1];
+			strcpy(pyscripts_path, arg_pyscripts_path);
+		}
 	}
 	else loadPyscriptsPath();
 	if(!pyscripts_path)
@@ -178,7 +167,6 @@ bool init(const char *prog_name, const char *arg_pyscripts_path, const char *mod
 	}
 
 	// Set program name
-	strcpy(pn, prog_name);
 	Py_SetProgramName(pn);
 
 	// Initialize
@@ -190,6 +178,22 @@ bool init(const char *prog_name, const char *arg_pyscripts_path, const char *mod
 		return false;
 	}
 	return true;
+}
+
+bool restartPy()
+{
+	triggerEvent("restart_begin", 0);
+	deinitPy();
+	bool val = init("", "", "sbserver");
+	// Initialize
+	if(val)
+		triggerEvent("restart_complete", 0);
+	else
+	{
+		PyErr_Print();
+		fatal("Error reloading python");
+	}
+	return val;
 }
 
 PyObject *callPyFunc(PyObject *func, PyObject *args)
