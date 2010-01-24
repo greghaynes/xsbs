@@ -36,9 +36,12 @@ class Plugin:
 		except NoOptionError:
 			self.isenabled = False
 		del conf
-	def load(self):
+	def loadModule(self):
 		if self.initmodule and self.isenabled:
 			self.module = __import__(os.path.basename(self.path) + '.' + self.initmodule)
+	def unloadModule(self):
+		if self.isenabled:
+			del self.module
 	def enabled(self):
 		return self.isenabled
 
@@ -62,11 +65,14 @@ def loadPlugins():
 	logging.info('Found %i plugins' % len(plugins.keys()))
 	logging.info('Initializing plugins...')
 	for plugin in plugins.values():
-		plugin.load()
+		plugin.loadModule()
 
-def reload():
+def reloadPlugins():
 	for p in plugins.values():
-		reload(p.module)
+		p.unloadModule()	
+	xsbs.events.triggerServerEvent('reload', ())
+	for p in plugins.values():
+		p.loadModule()
 
 loadPlugins()
 

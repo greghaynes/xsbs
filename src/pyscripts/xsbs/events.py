@@ -94,6 +94,10 @@ def triggerExecQueue():
 			logging.warn(traceback.extract_tb(exceptionTraceback))
 	del exec_queue[:]
 
+@eventHandler('reload')
+def onReload():
+	server_events.events.clear()
+
 def update():
 	reactor.runUntilCurrent()
 	reactor.doIteration(0)

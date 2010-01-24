@@ -4,7 +4,7 @@ from xsbs.events import triggerServerEvent
 from xsbs.commands import commandHandler, UsageError, ExtraArgumentError, StateError
 from xsbs.settings import PluginConfig
 from xsbs.colors import red, yellow, blue, green, colordict
-from xsbs.plugins import reload as pluginReload
+from xsbs.plugins import reloadPlugins
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
@@ -56,7 +56,7 @@ def onReloadCmd(cn, args):
 		raise ExtraArgumentError()
 	else:
 		sbserver.playerMessage(cn, yellow('NOTICE: ') + blue('Reloading server plugins.  Fasten your seatbelts...'))
-		pluginReload()
+		reloadPlugins()
 
 @commandHandler('givemaster')
 @masterRequired
