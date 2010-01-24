@@ -18,6 +18,7 @@
  */
 
 #include "sbpy.h"
+#include "server.h"
 
 #include <string>
 #include <iostream>
@@ -127,6 +128,7 @@ bool initPy()
 
 void deinitPy()
 {
+	Py_XDECREF(eventsModule);
 	Py_XDECREF(triggerEventFunc);
 	Py_XDECREF(triggerPolicyEventFunc);
 	Py_XDECREF(updateFunc);
@@ -136,17 +138,19 @@ void deinitPy()
 bool restartPy()
 {
 	triggerEvent("restart_begin", 0);
-	Py_DECREF(triggerEventFunc);
-	Py_DECREF(triggerPolicyEventFunc);
-	Py_DECREF(updateFunc);
-	Py_DECREF(eventsModule);
 	deinitPy();
+	Py_SetProgramName("Foo");
 	Py_Initialize();
 	initModule("sbserver");
 	// Initialize
 	bool val = initPy();
 	if(val)
 		triggerEvent("restart_complete", 0);
+	else
+	{
+		PyErr_Print();
+		fatal("Error reloading python");
+	}
 	return val;
 }
 

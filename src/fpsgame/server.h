@@ -319,6 +319,8 @@ namespace server
  This portion of the header is a modified version of the sauerbraten source code.
 
 */
+void fatal(const char *s, ...);
+
 namespace server
 {
 	struct demofile
