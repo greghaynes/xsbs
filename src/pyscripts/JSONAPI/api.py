@@ -34,11 +34,16 @@ class ScoreboardSite(JsonSite):
 				'frags': p.frags(),
 				'teamkills': p.teamkills(),
 				'deaths': p.deaths(),
+				'privilege': p.privilege(),
 				}
 			try:
 				client['team'] = p.team()
 			except ValueError:
 				client['team'] = 'spectator'
+			try:
+				client['is_verified'] = p.user != None
+			except AttributeError:
+				client['is_verified'] = False
 			clients_response.append(client)
 		return json.dumps({
 			'clients': clients_response,
