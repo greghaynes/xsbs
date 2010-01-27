@@ -92,7 +92,7 @@ def setFrozen(val):
 	   to true will keep them from functioning.'''
 	server_frozen[0] = val
 
-def isFrozen(val):
+def isFrozen():
 	'''Is the currently frozen.  See setFrozen(val).'''
 	return server_frozen[0]
 
