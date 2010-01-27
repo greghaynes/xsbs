@@ -3,6 +3,9 @@ from xsbs.colors import colordict
 from xsbs.ui import error, info
 from xsbs.players import player, all as allPlayers, isAtLeastMaster
 from xsbs.settings import PluginConfig
+from xsbs.server import message as serverMessage
+from xsbs.game import setMap
+
 import sbserver
 import logging
 import string
@@ -40,8 +43,8 @@ def countVotes():
 		except (AttributeError, KeyError):
 			pass
 	if bestcount > votes_needed:
-		sbserver.message(info('Vote passed.'))
-		sbserver.setMap(bestmap, bestmode)
+		serverMessage(info('Vote passed.'))
+		setMap(bestmap, bestmode)
 
 mapreload = [False]
 
@@ -49,9 +52,9 @@ mapreload = [False]
 def onMapSet(cn, mapname, mapmode):
 	p = player(cn)
 	if sbserver.mapName() == '':
-		sbserver.setMap(mapname, mapmode)
+		setMap(mapname, mapmode)
 	elif mapreload[0]:
-		sbserver.setMap(mapname, mapmode)
+		setMap(mapname, mapmode)
 		mapreload[0] = False
 	elif isAtLeastMaster(cn) and sbserver.masterMode() > 0:
 		sbserver.setMap(mapname, mapmode)
@@ -62,9 +65,9 @@ def onMapSet(cn, mapname, mapmode):
 def onMapVote(cn, mapname, mapmode):
 	p = player(cn)
 	if sbserver.mapName() == '':
-		sbserver.setMap(mapname, mapmode)
+		setMap(mapname, mapmode)
 	elif isAtLeastMaster(cn) and sbserver.masterMode() > 0:
-		sbserver.setMap(mapname, mapmode)
+		setMap(mapname, mapmode)
 	elif mapmode != sbserver.gameMode() and (lock_mode or not allow_modevote):
 		p.message(error('You cannot vote for a new game mode'))
 	else:
