@@ -1,6 +1,6 @@
 from xsbs.players import masterRequired, player
 from xsbs.events import eventHandler
-from xsbs.commands import commandHandler
+from xsbs.commands import commandHandler, StateError
 from xsbs.ui import notice
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
@@ -12,9 +12,6 @@ config = PluginConfig('server')
 pause_message = config.getOption('Templates', 'pause_message', 'The game has been ${action} by ${orange}${name}')
 del config
 pause_message = string.Template(pause_message)
-
-class StateError(Exception):
-	pass
 
 def isPaused():
 	'''Is the game currently paused'''
