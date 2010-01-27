@@ -13,12 +13,17 @@ pause_message = config.getOption('Templates', 'pause_message', 'The game has bee
 del config
 pause_message = string.Template(pause_message)
 
+class StateError(Exception):
+	pass
+
 def isPaused():
 	'''Is the game currently paused'''
 	return sbserver.isPaused()
 
 def setPaused(val, cn=-1):
 	'''Pause or unpause the game'''
+	if isFrozen():
+		raise StateError('Server is currently frozen')
 	if val == isPaused():
 		return
 	if val:
@@ -80,6 +85,19 @@ def maxClients():
 def setMaxClients(num_clients):
 	'''Set the maximum clients allowed in server.'''
 	return sbserver.setMaxClients(number)
+
+server_frozen = [False]
+
+def setFrozen(val):
+	'''Sets wether the server state is frozen.
+	   This value is recognized by many of the server
+	   commands (such as pause/unpause) and setting this
+	   to true will keep them from functioning.'''
+	server_frozen[0] = val
+
+def isFrozen(val):
+	'''Is the currently frozen.  See setFrozen(val).'''
+	return server_frozen[0]
 
 @eventHandler('player_pause')
 @masterRequired
