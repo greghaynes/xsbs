@@ -3,15 +3,16 @@ import sbserver
 from xsbs.events import triggerServerEvent
 from xsbs.commands import commandHandler, UsageError, ExtraArgumentError, StateError
 from xsbs.settings import PluginConfig
-from xsbs.colors import red, yellow, blue, green, colordict
+from xsbs.colors import red, yellow, blue, green, white, colordict
 from xsbs.plugins import reloadPlugins
-from xsbs.ui import error, info, insufficientPermissions
+from xsbs.ui import error, info, notice, insufficientPermissions
 from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
 from xsbs.users.privilege import isUserMaster, isUserAdmin, UserPrivilege
 from xsbs.players import masterRequired, adminRequired, player, currentAdmin
 from xsbs.server import setPaused, message as sendServerMessage
 from xsbs.db import dbmanager
+from xsbs.timers import addTimer
 
 from Motd.motd import motdstring
 import string
@@ -20,6 +21,7 @@ config = PluginConfig('servercommands')
 servermsg_template = config.getOption('Templates', 'servermsg', '${orange}${sender}${white}: ${message}')
 pm_template = config.getOption('Templates', 'pm', '${orange}${sender}${white}: ${message}')
 smite_template = config.getOption('Templates', 'smite', '${green}${smited}${white} has been smited by ${orange}${smiter}')
+resume_timeout = int(config.getOption('Config', 'resume_timeout', 5))
 del config
 servermsg_template = string.Template(servermsg_template)
 pm_template = string.Template(pm_template)
@@ -37,6 +39,14 @@ def onPauseCmd(cn, args):
 		return
 	setPaused(True, cn)
 
+
+def resumeTimer(count, cn):
+	if count > 0:
+		sendServerMessage(notice('Resuming in ' + green(str(count)) + white('...')))
+		addTimer(1000, resumeTimer, (count-1, cn))
+	else:
+		setPaused(False, cn)
+
 @commandHandler('resume')
 @masterRequired
 def onResumeCmd(cn, args):
@@ -45,7 +55,10 @@ def onResumeCmd(cn, args):
 	if args != '':
 		raise ExtraArgumentError()
 		return
-	setPaused(False, cn)
+	if resume_timeout > 0:
+		resumeTimer(resume_timeout, cn)
+	else:
+		setPaused(False, cn)
 
 @commandHandler('reload')
 @adminRequired
