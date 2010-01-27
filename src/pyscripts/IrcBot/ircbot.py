@@ -53,7 +53,10 @@ class IrcBotFactory(protocol.ClientFactory):
 		self.bots = []
 		self.reconnect_count = 0
 	def doConnect(self):
-		reactor.connectTCP(servername, int(port), factory)
+		if ipaddress == None:
+			reactor.connectTCP(servername, int(port), factory)
+		else:
+			reactor.connectTCP(servername, int(port), factory, 30, (ipaddress, 0))
 	def doReconnect(self):
 		if self.reconnect_count < 5:
 			self.reconnect_count += 1
