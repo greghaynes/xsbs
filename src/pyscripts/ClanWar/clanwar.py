@@ -6,7 +6,7 @@ from xsbs.game import modeNumber, currentMode, setMap
 from xsbs.server import setPaused
 from xsbs.players import player, masterRequired
 from xsbs.persistteam import persistentTeams
-from xsbs.server import message, setMasterMode
+from xsbs.server import message, setMasterMode, setFrozen
 
 def clanWarTimer(count, cn):
 	if count > 0:
@@ -14,6 +14,7 @@ def clanWarTimer(count, cn):
 		addTimer(1000, clanWarTimer, (count-1, cn))
 	else:
 		message(notice('Fight!'))
+		setFrozen(False)
 		setPaused(False)
 
 @commandHandler('clanwar')
@@ -39,5 +40,6 @@ def clanWar(cn, args):
 		setMap(map, mode)
 		setMasterMode(2)
 		setPaused(True, cn)
+		setFrozen(True)
 		clanWarTimer(10, cn)
 
