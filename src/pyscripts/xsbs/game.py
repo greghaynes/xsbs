@@ -1,6 +1,8 @@
 import sbserver
 from xsbs.colors import colordict
 from xsbs.ui import notice
+from xsbs.server import isFrozen
+from xsbs.commands import StateError
 import string
 
 modes = [
@@ -44,5 +46,7 @@ def currentMode():
 
 def setMap(map_name, mode_number):
 	'''Set current map and mode'''
+	if isFrozen():
+		raise StateError('Server is currently frozen')
 	sbserver.setMap(map_name, mode_number)
 
