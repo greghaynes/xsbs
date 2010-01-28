@@ -81,7 +81,7 @@ def maxClients():
 
 def setMaxClients(num_clients):
 	'''Set the maximum clients allowed in server.'''
-	return sbserver.setMaxClients(number)
+	return sbserver.setMaxClients(num_clients)
 
 server_frozen = [False]
 
