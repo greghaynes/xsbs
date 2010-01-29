@@ -365,6 +365,21 @@ static PyObject *playerPing(PyObject *self, PyObject *args)
 	return Py_BuildValue("i", ci->ping);
 }
 
+static PyObject *playerScore(PyObject *self, PyObject *args)
+{
+	int cn;
+	server::clientinfo *ci;
+	if(!PyArg_ParseTuple(args, "i", &cn))
+		return 0;
+	ci = server::getinfo(cn);
+	if(!ci)
+	{
+		PyErr_SetString(PyExc_ValueError, "Invalid cn specified");
+		return 0;
+	}
+	return Py_BuildValue("i", ci->state.flags);
+}
+
 static PyObject *playerDamageDelt(PyObject *self, PyObject *args)
 {
 	int cn;
@@ -847,6 +862,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"playerShots", playerShots, METH_VARARGS, "Shots by player in current match."},
 	{"playerHits", playerHits, METH_VARARGS, "Hits by player in current match."},
 	{"playerPing", playerPing, METH_VARARGS, "Current ping of player."},
+	{"playerScore", playerScore, METH_VARARGS, "Flags player has scored."},
 	{"playerDamageDelt", playerDamageDelt, METH_VARARGS, "Damage delt by player in current game."},
 	{"playerDamageRecieved", playerDamageRecieved, METH_VARARGS, "Damage recieved by player in current game."},
 	{"playerTeam", playerTeam, METH_VARARGS, "Team player is member of."},

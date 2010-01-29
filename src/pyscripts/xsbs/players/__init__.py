@@ -144,6 +144,9 @@ class Player:
 			kpd = math.floor(kpd)
 			kpd = kpd / 100
 		return kpd
+	def score(self):
+		'''Flags the player has scored'''
+		return sbserver.playerScore(self.cn)
 
 players = {}
 
