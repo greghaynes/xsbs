@@ -6,7 +6,7 @@ from xsbs.ui import insufficientPermissions, error
 from xsbs.players import player, isAtLeastMaster
 
 config = PluginConfig('stats')
-template = config.getOption('Config', 'template', '${white}Stats for ${orange}${name}\n${white}Frags: ${green}${frags} ${white}Deaths: ${red}${deaths} ${white}Teamkills: ${magenta}${teamkills} ${white}Accuracy: ${yellow}${accuracy}% ${white}KpD: ${orange}${ktd}')
+template = config.getOption('Config', 'template', '${white}Stats for ${orange}${name}\n${white}Frags: ${green}${frags} ${white}Deaths: ${red}${deaths} ${white}Teamkills: ${magenta}${teamkills} ${white}Accuracy: ${yellow}${accuracy}% ${white}KpD: ${orange}${ktd} ${white}Scores: ${blue}${score}')
 require_master = config.getOption('Config', 'require_master', 'no') == 'yes'
 del config
 template = string.Template(template)
@@ -32,6 +32,6 @@ def onCommand(cn, args):
 		cp.message(error('You must use a valid cn'))
 		return
 
-	msg = template.substitute(colordict, name=p.name(), frags=p.frags(), deaths=p.deaths(), teamkills=p.teamkills(), shots=p.shots(), hits=p.hits(), accuracy=p.accuracy(), ktd=p.kpd())
+	msg = template.substitute(colordict, name=p.name(), frags=p.frags(), deaths=p.deaths(), teamkills=p.teamkills(), shots=p.shots(), hits=p.hits(), accuracy=p.accuracy(), ktd=p.kpd(), score=p.score())
 	cp.message(msg)
 
