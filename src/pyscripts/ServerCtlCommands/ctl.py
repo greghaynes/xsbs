@@ -245,7 +245,7 @@ def userPrivSetCmd(cn, tcn, args):
 @adminRequired
 def onUserPrivCmd(cn, args):
 	'''@description Set privileges for server account
-		@usage <cn> <action> <level>'''
+		@usage cn action level'''
 	sp = args.split(' ')
 	try:
 		if sp[0] == 'set':
@@ -277,7 +277,7 @@ def onUserPrivCmd(cn, args):
 @commandHandler('pm')
 def onPmCommand(cn, args):
 	'''@description Send a private message
-	   @usage <cn> <message>'''
+	   @usage cn message'''
 	args = args.split()
 	if len(args) < 2:
 		raise UsageError()
@@ -292,7 +292,7 @@ def onPmCommand(cn, args):
 @masterRequired
 def onSmiteCommand(cn, args):
 	'''@description Strike a player down
-	   @usage <cn>'''
+	   @usage cn'''
 	if args == '':
 		raise UsageError()
 	p = player(cn)
