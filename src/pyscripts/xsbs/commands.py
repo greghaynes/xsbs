@@ -106,5 +106,5 @@ class cnArg(object):
 		return self.func(cn, args)
 
 registerCommandHandler('help', xsbs.help.onHelpCommand)
-registerCommandHandler('listcommands', xsbs.help.listPublicCommands)
+registerCommandHandler('listcommands', xsbs.help.listCommands)
 
