@@ -212,6 +212,7 @@ def playerByIpString(ip):
 	return playerByIpLong(ipStringToLong(ip))
 
 @eventHandler('player_disconnect_post')
+@eventHandler('game_bot_removed')
 def playerDisconnect(cn):
 	try:
 		del players[cn]
@@ -239,6 +240,7 @@ def currentAdmin():
 	return None
 
 @eventHandler('player_connect_pre')
+@eventHandler('game_bot_added')
 def playerConnect(cn):
 	try:
 		del players[cn]

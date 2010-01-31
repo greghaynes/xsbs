@@ -2175,14 +2175,16 @@ namespace server
             case SV_ADDBOT:
             {
                 aiman::reqadd(ci, getint(p));
-                SbPy::triggerEventInt("game_bot_added", ci->clientnum);
+                //Triggered in aiman::addai
+                //SbPy::triggerEventInt("game_bot_added", ci->clientnum);
                 break;
             }
 
             case SV_DELBOT:
             {
                 aiman::reqdel(ci);
-                SbPy::triggerEventInt("game_bot_removed", ci->clientnum);
+                //Triggered in aiman::deleteai
+                //SbPy::triggerEventInt("game_bot_removed", ci->clientnum);
                 break;
             }
 
