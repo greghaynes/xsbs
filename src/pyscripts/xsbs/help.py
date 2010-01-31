@@ -71,7 +71,6 @@ def msgHelpText(cn, cmd):
 
 def onHelpCommand(cn, args):
 	'''@description Display help information about a command
-	   @usage
 	   @usage (command)
 	   @public'''
 	if args == '':
@@ -90,6 +89,9 @@ def onPlayerCommands(cn, args):
 		sbserver.playerMessage(cn, orange(msg))
 
 def listCommands(cn, args):
+	'''@description Display all commands available to a user
+	   @usage
+	   @public'''
 	if isAdmin(cn):
 		listAdminCommands(cn, args)
 	elif isMaster(cn):
