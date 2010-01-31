@@ -97,28 +97,31 @@ def CheckForOwnage():
 		#impliment traditional killing spree messages
 		if spreemessagesenable:
 			if log[killercn][4] > 1 and (not log[killercn][5][0]):
-				for numkills in spreemessages.keys():
-					if log[killercn][4] == numkills:
-						sbserver.message(info(spreemessages[numkills].substitute(name=sbserver.playerName(killercn))))
-						log[killercn][5][0] = True
+				try:
+					spreemsg = spreemessages[log[killercn][4]]
+					sbserver.message(info(spreemsg.substitute(name=sbserver.playerName(killercn))))
+					log[killercn][5][0] = True
+				except KeyError:
+					pass
 		#impliment halo-like multi-kill messages
 		if neomessagesenable:
 			if log[killercn][2] > 1 and (not log[killercn][5][1]):
-				for numkills in neomessages.keys():
-					if log[killercn][2] == numkills:
-						try:
-							playerinst = player(killercn)
-							playerinst.message(info(neomessages[numkills].substitute()))
-							log[killercn][5][1] = True
-						except (KeyError, ValueError):
-							pass
+				try:
+					neomessage = neomessages[log[killercn][2]]
+					playerinst = player(killercn)
+					playerinst.message(info(neomessage.substitute()))
+					log[killercn][5][1] = True
+				except KeyError:
+					pass
 		#impliment domination messsages.
 		if dommessagesenable:
 			if log[killercn][3] > 1 and (not log[killercn][5][2]):
-				for numkills in dommessages.keys():
-					if log[killercn][3] == numkills:
-						sbserver.message(info(dommessages[numkills].substitute(killername=sbserver.playerName(killercn), victimname=sbserver.playerName(log[killercn][1]))))
-						log[killercn][5][2] = True
+				try:
+					dommessage = dommessages[log[killercn][3]]
+					sbserver.message(info(dommessage.substitute(killername=sbserver.playerName(killercn), victimname=sbserver.playerName(log[killercn][1]))))
+					log[killercn][5][2] = True
+				except KeyError:
+					pass
 	
 	
 	
