@@ -276,12 +276,16 @@ def onUserPrivCmd(cn, args):
 
 @commandHandler('pm')
 def onPmCommand(cn, args):
+	'''@description Send a private message
+	   @usage <cn> <message>'''
 	args = args.split()
 	player(int(args[0])).message(pm_template.substitute(colordict, sender=player(cn).name(), message=args[1]))
 	
 @commandHandler('smite')
 @masterRequired
 def onSmiteCommand(cn, args):
+	'''@description Strike a player down
+	   @usage <cn>'''
 	if args == '':
 		raise UsageError()
 	p = player(cn)
