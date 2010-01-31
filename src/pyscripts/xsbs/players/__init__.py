@@ -239,15 +239,21 @@ def currentAdmin():
 			return p
 	return None
 
-@eventHandler('player_connect_pre')
-@eventHandler('game_bot_added')
-def playerConnect(cn):
+def addPlayerForCn(cn):
 	try:
 		del players[cn]
 	except KeyError:
 		pass
 	players[cn] = Player(cn)
+
+@eventHandler('player_connect_pre')
+def onPlayerConnect(cn):
+	addPlayerForCn(cn)
 	addTimer(1000, triggerConnectDelayed, (cn,))
+
+@eventHandler('game_bot_added')
+def onBotConnect(cn):
+	addPlayerForCn(cn)
 
 @eventHandler('restart_complete')
 def reload():
