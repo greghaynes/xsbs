@@ -279,6 +279,8 @@ def onPmCommand(cn, args):
 	'''@description Send a private message
 	   @usage <cn> <message>'''
 	args = args.split()
+	if len(args) != 2:
+		raise UsageError()
 	player(int(args[0])).message(pm_template.substitute(colordict, sender=player(cn).name(), message=args[1]))
 	
 @commandHandler('smite')
