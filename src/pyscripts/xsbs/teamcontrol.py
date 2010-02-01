@@ -13,12 +13,14 @@ switchteam_modes = [
 	10,
 	11,
 	12,
+	13
     14]
 
 # modes where clients can set team name
 setteam_modes = [
 	2,
-	4]
+	4,
+	6]
 
 def isSafeTeam(team):
 	'''Is team safe based on current mode.
