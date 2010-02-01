@@ -74,10 +74,12 @@ def isValidEmail(email):
 			return True
 	return False
 
-def isValidPassword(password):
+def isValidPassword(password, cn):
 	if password.strip('<').strip('>') == password[1:-1]:
+		sbserver.playerMessage(cn, error('Do not include < or > in your password.'))
 		return False
 	if len(password) < 4:
+		sbserver.playerMessage(cn, error('Your password is to short.'))
 		return False
 	return True	
 
@@ -94,7 +96,7 @@ def onRegisterCommand(cn, args):
 	except NoResultFound:
 		if not isValidEmail(args[0]):
 			raise ArgumentValueError('Invalid email address')
-		if not isValidPassword(args[1]):
+		if not isValidPassword(args[1], cn):
 			raise ArgumentValueError('Invalid password')
 		user = User(args[0], args[1])
 		session.add(user)
@@ -170,7 +172,7 @@ def onChangepass(cn, args):
 	except MultipleResultsFound:
 		pass
 	else:
-		if not isValidPassword(args[1]):
+		if not isValidPassword(args[1], cn):
 			raise ArgumentValueError('Invalid password')
 		session.query(User).filter(User.id==loggedInAs(cn).id).update({ 'password': args[1] })
 		session.commit()
