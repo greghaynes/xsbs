@@ -3,6 +3,7 @@ from xsbs.events import registerServerEventHandler
 from xsbs.colors import blue, red, orange, colordict
 from xsbs.ui import error, info
 from xsbs.settings import PluginConfig
+from xsbs.players import isMaster, isAdmin
 import logging
 
 class CommandInfo:
@@ -22,6 +23,9 @@ def loadCommandInfo(command, handler):
 		info = CommandInfo(command)
 		lines = docs.split('\n')
 		valid = False
+		info.public = False
+		info.master = False
+		info.admin = False
 		for line in lines:
 			line = line.strip()
 			if line[0] == '@':
@@ -37,6 +41,12 @@ def loadCommandInfo(command, handler):
 					valid  = True
 				elif tag == '@public':
 					info.public = True
+					valid = True
+				elif tag == '@master':
+					info.master = True
+					valid = True
+				elif tag == '@admin':
+					info.admin = True
 					valid = True
 		if valid:
 			command_info[command] = info
@@ -61,7 +71,6 @@ def msgHelpText(cn, cmd):
 
 def onHelpCommand(cn, args):
 	'''@description Display help information about a command
-	   @usage
 	   @usage (command)
 	   @public'''
 	if args == '':
@@ -79,10 +88,36 @@ def onPlayerCommands(cn, args):
 			msg += '#' + command + ' '
 		sbserver.playerMessage(cn, orange(msg))
 
+def listCommands(cn, args):
+	'''@description Display all commands available to a user
+	   @usage
+	   @public'''
+	if isAdmin(cn):
+		listAdminCommands(cn, args)
+	elif isMaster(cn):
+		listMasterCommands(cn, args)
+	else:
+		listPublicCommands(cn, args)
+		
 def listPublicCommands(cn, args):
 	str = 'Public commands: '
 	for cmd in command_info.items():
 		if cmd[1].public:
 			str += cmd[1].command + ' '
+	sbserver.playerMessage(cn, info(str))
+	
+def listMasterCommands(cn, args):
+	str = 'Master commands: '
+	for cmd in command_info.items():
+		if cmd[1].public:
+			str += cmd[1].command + ' '
+		elif cmd[1].master:
+			str += cmd[1].command + ' '
+	sbserver.playerMessage(cn, info(str))
+	
+def listAdminCommands(cn, args):
+	str = 'Admin commands: '
+	for cmd in command_info.items():
+		str += cmd[1].command + ' '
 	sbserver.playerMessage(cn, info(str))
 
