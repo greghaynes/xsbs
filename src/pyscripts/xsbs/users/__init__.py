@@ -78,7 +78,7 @@ def isValidEmail(email):
 @commandHandler('register')
 def onRegisterCommand(cn, args):
 	'''@description Register account with server
-	   @usage <email> <password>
+	   @usage email password
 	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
@@ -99,7 +99,7 @@ def onRegisterCommand(cn, args):
 @commandHandler('login')
 def onLoginCommand(cn, args):
 	'''@description Login to server account
-	   @usage <email> <password>
+	   @usage email password
 	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
@@ -141,7 +141,7 @@ def onLinkName(cn, args):
 @commandHandler('newuser')
 def onNewuserCommand(cn, args):
 	'''@description Register account with server
-	   @usage <email> <password>
+	   @usage email password
 	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
