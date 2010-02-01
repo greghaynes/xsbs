@@ -1927,6 +1927,8 @@ namespace server
                 getstring(text, p);
                 filtertext(text, text, false, MAXTEAMLEN);
                 SbPy::triggerEventIntString("player_switch_team", sender, text);
+                if(strcmp(ci->team, text))
+                    sendf(sender, 1, "riis", SV_SETTEAM, sender, ci->team);
 		/*
                 if(strcmp(ci->team, text) && SbPy::triggerPolicyEventIntString("allow_switch_team", ci->clientnum, ci->team))
                 {
