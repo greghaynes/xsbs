@@ -138,14 +138,14 @@ def onLinkName(cn, args):
 		pass
 	sbserver.playerMessage(cn, error('Your name is already linked to an account.'))
 
-@commandHandler('adduser')
-def onUseraddCommand(cn, args):
+@commandHandler('newuser')
+def onNewuserCommand(cn, args):
 	'''@description Register account with server
 	   @usage <email> <password>
 	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
-		sbserver.playerMessage(cn, info('Usage: #adduser <email> <password>'))
+		sbserver.playerMessage(cn, info('Usage: #newuser <email> <password>'))
 		return
 	if sbserver.playerName(cn) in blocked_names:
 		sbserver.playerMessage(cn, error('You cannot reserve your current name.'))
