@@ -51,7 +51,8 @@ def resumeTimer(count, cn):
 @masterRequired
 def onResumeCmd(cn, args):
 	'''@description Resume game from pause
-	   @usage'''
+	   @usage
+	   @master'''
 	if args != '':
 		raise ExtraArgumentError()
 		return
@@ -64,7 +65,8 @@ def onResumeCmd(cn, args):
 @adminRequired
 def onReloadCmd(cn, args):
 	'''@description Reload server plugins
-	   @usage'''
+	   @usage
+	   @admin'''
 	if args != '':
 		raise ExtraArgumentError()
 	else:
@@ -75,7 +77,8 @@ def onReloadCmd(cn, args):
 @masterRequired
 def onGiveMaster(cn, args):
 	'''@description Give master to a client
-	   @usage cn'''
+	   @usage cn
+	   @master'''
 	if args == '':
 		raise UsageError()
 		return
@@ -91,7 +94,8 @@ def onGiveMaster(cn, args):
 @adminRequired
 def onResize(cn, args):
 	'''@description Change maximum clients allowed in server
-	   @usage maxclients'''
+	   @usage maxclients
+	   @admin'''
 	if args == '':
 		raise UsageError()
 	else:
@@ -102,7 +106,8 @@ def onResize(cn, args):
 @masterRequired
 def onMinsLeft(cn, args):
 	'''@description Set minutes left in current match
-	   @usage minutes'''
+	   @usage minutes
+	   @master'''
 	if args == '':
 		raise UsageError()
 	else:
@@ -112,7 +117,8 @@ def onMinsLeft(cn, args):
 @masterRequired
 def specAll(cn, args):
 	'''@description Make all clients spectators
-	   @usage'''
+	   @usage
+	   @master'''
 	if args != '':
 		raise ExtraArgumentError()
 	else:
@@ -123,7 +129,8 @@ def specAll(cn, args):
 @masterRequired
 def unspecAll(cn, args):
 	'''@description Make all clients players
-	   @usage'''
+	   @usage
+	   @master'''
 	if args != '':
 		raise ExtraArgumentError()
 	else:
@@ -134,7 +141,8 @@ def unspecAll(cn, args):
 @masterRequired
 def serverMessage(cn, args):
 	'''@description Broadcast message to all clients in server
-	   @usage message'''
+	   @usage message
+	   @master'''
 	if args == '':
 		raise UsageError()
 	else:
@@ -145,7 +153,8 @@ def serverMessage(cn, args):
 @masterRequired
 def playerIp(cn, args):
 	'''@description Get string representation of client ip
-	   @usage cn'''
+	   @usage cn
+	   @master'''
 	if args == '':
 		raise UsageError()
 	else:
@@ -157,7 +166,8 @@ def playerIp(cn, args):
 @masterRequired
 def masterCmd(cn, args):
 	'''@description Claim master
-	   @usage'''
+	   @usage
+	   @master'''
 	if args != '':
 		raise ExtraArgumentError()
 	if currentAdmin() != None:
@@ -169,7 +179,8 @@ def masterCmd(cn, args):
 @adminRequired
 def adminCmd(cn, args):
 	'''@description Claim master
-	   @usage'''
+	   @usage
+	   @admin'''
 	if args != '':
 		raise ExtraArgumentError()
 	if sbserver.playerPrivilege(cn) == 0 or sbserver.playerPrivilege(cn) == 1:
@@ -179,7 +190,8 @@ def adminCmd(cn, args):
 @masterRequired
 def unsetMaster(cn, args):
 	'''@description Force release master from current master
-	   @usage'''
+	   @usage
+	   @master'''
 	if args != '':
 		raise ExtraArgumentError()
 	else:
@@ -245,7 +257,8 @@ def userPrivSetCmd(cn, tcn, args):
 @adminRequired
 def onUserPrivCmd(cn, args):
 	'''@description Set privileges for server account
-		@usage cn action level'''
+	   @usage <cn> <action> <level>
+	   @admin'''
 	sp = args.split(' ')
 	try:
 		if sp[0] == 'set':
@@ -277,7 +290,8 @@ def onUserPrivCmd(cn, args):
 @commandHandler('pm')
 def onPmCommand(cn, args):
 	'''@description Send a private message
-	   @usage cn message'''
+	   @usage <cn> <message>
+	   @public'''
 	args = args.split()
 	if len(args) < 2:
 		raise UsageError()
@@ -292,7 +306,8 @@ def onPmCommand(cn, args):
 @masterRequired
 def onSmiteCommand(cn, args):
 	'''@description Strike a player down
-	   @usage cn'''
+	   @usage <cn>
+	   @master'''
 	if args == '':
 		raise UsageError()
 	p = player(cn)
