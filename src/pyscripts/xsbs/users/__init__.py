@@ -71,8 +71,8 @@ def userAuth(email, password):
 def isValidEmail(email):
 	if len(email) > 7:
 		if re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", email) != None:
-			return 1
-	return 0
+			return True
+	return False
 
 @commandHandler('register')
 def onRegisterCommand(cn, args):
@@ -85,6 +85,8 @@ def onRegisterCommand(cn, args):
 	try:
 		session.query(User).filter(User.email==args[0]).one()
 	except NoResultFound:
+		if not isValidEmail(args[0]):
+			raise ArgumentValueError('Invalid email address')
 		user = User(args[0], args[1])
 		session.add(user)
 		session.commit()
