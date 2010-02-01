@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
 import sbserver
 from xsbs.db import dbmanager
-from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
+from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, UsageError
 from xsbs.commands import commandHandler
 from xsbs.colors import red, green, orange
 from xsbs.ui import info, error, warning
@@ -82,8 +82,7 @@ def onRegisterCommand(cn, args):
 	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
-		sbserver.playerMessage(cn, info('Usage: #register <email> <password>'))
-		return
+		raise UsageError()
 	try:
 		session.query(User).filter(User.email==args[0]).one()
 	except NoResultFound:
@@ -103,8 +102,7 @@ def onLoginCommand(cn, args):
 	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
-		sbserver.playerMessage(cn, info('Usage: #login <email> <password>'))
-		return
+		raise UsageError()
 	user = userAuth(args[0], args[1])
 	if user:
 		login(cn, user)
@@ -145,8 +143,7 @@ def onNewuserCommand(cn, args):
 	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
-		sbserver.playerMessage(cn, info('Usage: #newuser <email> <password>'))
-		return
+		raise UsageError()
 	if sbserver.playerName(cn) in blocked_names:
 		sbserver.playerMessage(cn, error('You cannot reserve your current name.'))
 		return
