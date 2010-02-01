@@ -96,42 +96,42 @@ def onIntermission():
 			try:
 				try:
 					doublekills	= p.ownagedata.multikill_counts[2]
-				except:
+				except KeyError:
 					doublekills = 0
 					
 				try:
 					triplekills = p.ownagedata.multikill_counts[3]
-				except:
+				except KeyError:
 					triplekills = 0
 					
 				try:
 					overkills = p.ownagedata.multikill_counts[5]
-				except:
+				except KeyError:
 					overkills = 0
 					
 				try:
 					killtaculars = p.ownagedata.multikill_counts[7]
-				except:
+				except KeyError:
 					killtaculars = 0
 					
 				try:
 					killotrocities	= p.ownagedata.multikill_counts[10]
-				except:
+				except KeyError:
 					killotrocities = 0
 					
 				try:
 					killtastrophes 	= p.ownagedata.multikill_counts[15]
-				except:
+				except KeyError:
 					killtastrophes = 0
 					
 				try:
 					killapocalypses	= p.ownagedata.multikill_counts[20]
-				except:
+				except KeyError:
 					killapocalypses = 0
 					
 				try:
 					killionaires = p.ownagedata.multikill_counts[25]
-				except:
+				except KeyError:
 					killionaires = 0
 				
 				
