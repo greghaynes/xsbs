@@ -136,30 +136,31 @@ def onIntermission():
 				
 				
 				
-				if doublekills > most_doublekills or most_doublekills_cn == -1:
-					most_doublekills = doublekills
-					most_doublekills_cn = p.cn
-				if triplekills > most_triplekills or most_triplekills_cn == -1:
-					most_triplekills = triplekills
-					most_triplekills_cn = p.cn
-				if overkills > most_overkills or most_overkills_cn == -1:
-					most_overkills = overkills
-					most_overkills_cn = p.cn
-				if killtaculars > most_killtaculars or most_killtaculars_cn == -1:
-					most_killtaculars = killtaculars
-					most_killtaculars_cn = p.cn
-				if killotrocities > most_killotrocities or most_killotrocities_cn == -1:
-					most_killotrocities = killotrocities
-					most_killotrocities_cn = p.cn
-				if killtastrophes > most_killtastrophes or most_killtastrophes_cn == -1:
-					most_killtastrophes = killtastrophes
-					most_killtastrophes_cn = p.cn
-				if killapocalypses > most_killapocalypses or most_killapocalypses_cn == -1:
-					most_killapocalypses = killapocalypses
-					most_killapocalypses_cn = p.cn
-				if killionaires > most_killionaires or most_killionaires_cn == -1:
-					most_killionaires = killionaires
-					most_killionaires_cn = p.cn
+				if newawards_enabled:
+					if doublekills > most_doublekills or most_doublekills_cn == -1:
+						most_doublekills = doublekills
+						most_doublekills_cn = p.cn
+					if triplekills > most_triplekills or most_triplekills_cn == -1:
+						most_triplekills = triplekills
+						most_triplekills_cn = p.cn
+					if overkills > most_overkills or most_overkills_cn == -1:
+						most_overkills = overkills
+						most_overkills_cn = p.cn
+					if killtaculars > most_killtaculars or most_killtaculars_cn == -1:
+						most_killtaculars = killtaculars
+						most_killtaculars_cn = p.cn
+					if killotrocities > most_killotrocities or most_killotrocities_cn == -1:
+						most_killotrocities = killotrocities
+						most_killotrocities_cn = p.cn
+					if killtastrophes > most_killtastrophes or most_killtastrophes_cn == -1:
+						most_killtastrophes = killtastrophes
+						most_killtastrophes_cn = p.cn
+					if killapocalypses > most_killapocalypses or most_killapocalypses_cn == -1:
+						most_killapocalypses = killapocalypses
+						most_killapocalypses_cn = p.cn
+					if killionaires > most_killionaires or most_killionaires_cn == -1:
+						most_killionaires = killionaires
+						most_killionaires_cn = p.cn
 			except (KeyError, ValueError):
 				continue
 	
