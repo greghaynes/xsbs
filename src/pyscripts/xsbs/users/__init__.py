@@ -138,6 +138,51 @@ def onLinkName(cn, args):
 		pass
 	sbserver.playerMessage(cn, error('Your name is already linked to an account.'))
 
+@commandHandler('adduser')
+def onUseraddCommand(cn, args):
+	'''@description Register account with server
+	   @usage <email> <password>
+	   @public'''
+	args = args.split(' ')
+	if len(args) != 2:
+		sbserver.playerMessage(cn, info('Usage: #adduser <email> <password>'))
+		return
+	if sbserver.playerName(cn) in blocked_names:
+		sbserver.playerMessage(cn, error('You cannot reserve your current name.'))
+		return
+	try:
+		session.query(User).filter(User.email==args[0]).one()
+	except NoResultFound:
+		user = User(args[0], args[1])
+		session.add(user)
+		session.commit()
+		sbserver.playerMessage(cn, green('Account created'))
+	except MultipleResultsFound:
+		return
+	else:
+		sbserver.playerMessage(cn, error('An account with that email address already exists.'))
+	userlogin = userAuth(args[0], args[1])
+	if userlogin:
+		login(cn, userlogin)
+		sbserver.playerMessage(cn, green('You are logged in.'))
+	else:
+		sbserver.playerMessage(cn, error('Invalid login. This means something REALLY got fucked, tell an admin.'))
+		return
+	try:
+		session.query(NickAccount).filter(NickAccount.nick==sbserver.playerName(cn)).one()
+	except NoResultFound:
+		user = loggedInAs(cn)
+		nickacct = NickAccount(sbserver.playerName(cn), user.id)
+		session.add(nickacct)
+		session.commit()
+		sbserver.playerMessage(cn, green('Your name is now linked to your account.'))
+		sbserver.playerMessage(cn, red('You may now login with /setmaster %s' % args[1]))
+		return
+	except MultipleResultsFound:
+		pass
+	else:
+		sbserver.playerMessage(cn, error('Your name is already linked to an account.'))
+
 @eventHandler('player_setmaster')
 def onSetMaster(cn, givenhash):
 	nick = sbserver.playerName(cn)
