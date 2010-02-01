@@ -74,6 +74,13 @@ def isValidEmail(email):
 			return True
 	return False
 
+def isValidPassword(password):
+	if password.strip('<').strip('>') == password[1:-1]:
+		return False
+	if len(password) < 4:
+		return False
+	return True	
+
 @commandHandler('register')
 def onRegisterCommand(cn, args):
 	'''@description Register account with server
@@ -87,6 +94,8 @@ def onRegisterCommand(cn, args):
 	except NoResultFound:
 		if not isValidEmail(args[0]):
 			raise ArgumentValueError('Invalid email address')
+		if not isValidPassword(args[1]):
+			raise ArgumentValueError('Invalid password')
 		user = User(args[0], args[1])
 		session.add(user)
 		session.commit()
@@ -143,6 +152,30 @@ def onNewuserCommand(cn, args):
 	onRegisterCommand(cn, args)
 	onLoginCommand(cn, args)
 	onLinkName(cn, '')
+
+@commandHandler('changepass')
+def onChangepass(cn, args):
+	'''@description Link name to server account, and reserve name.
+	   @usage
+	   @public'''
+	args = args.split(' ')
+	if len(args) != 2:
+		raise UsageError()
+	if not isLoggedIn(cn):
+		raise StateError('You must be logged in to change your password')
+	try:
+		session.query(User).filter(User.id==loggedInAs(cn).id).filter(User.password==args[0]).one()
+	except NoResultFound:
+		raise StateError('Incorrect password.')
+	except MultipleResultsFound:
+		pass
+	else:
+		if not isValidPassword(args[1]):
+			raise ArgumentValueError('Invalid password')
+		session.query(User).filter(User.id==loggedInAs(cn).id).update({ 'password': args[1] })
+		session.commit()
+		return
+
 
 @eventHandler('player_setmaster')
 def onSetMaster(cn, givenhash):
