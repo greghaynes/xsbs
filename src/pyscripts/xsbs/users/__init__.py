@@ -4,8 +4,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm.exc import NoResultFound
 import sbserver
 from xsbs.db import dbmanager
-from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler, UsageError
-from xsbs.commands import commandHandler
+from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
+from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
 from xsbs.colors import red, green, orange
 from xsbs.ui import info, error, warning
 from xsbs.players import player
@@ -55,8 +55,7 @@ def isLoggedIn(cn):
 
 def login(cn, user):
 	if isLoggedIn(cn):
-		sbserver.playerMessage(cn, error('You are already logged in'))
-		return
+		raise StateError('You are already logged in')
 	player(cn).user = user
 	player(cn).logged_in = True
 	triggerServerEvent('player_logged_in', (cn,))
@@ -93,7 +92,7 @@ def onRegisterCommand(cn, args):
 		return
 	except MultipleResultsFound:
 		pass
-	sbserver.playerMessage(cn, error('An account with that email address already exists.'))
+	raise StateError('An account with that email already exists')
 
 @commandHandler('login')
 def onLoginCommand(cn, args):
@@ -115,14 +114,11 @@ def onLinkName(cn, args):
 	   @usage
 	   @public'''
 	if args != '':
-		sbserver.playerMessage(cn, error('Usage: #linkname'))
-		return
+		raise UsageError()
 	if not isLoggedIn(cn):
-		sbserver.playerMessage(cn, error('You must be logged in to link a name to your account.'))
-		return
+		raise StateError('You must be logged in to link a name to your account')
 	if sbserver.playerName(cn) in blocked_names:
-		sbserver.playerMessage(cn, error('You cannot reserve your current name.'))
-		return
+		raise StateError('You can not reserve this name')
 	try:
 		session.query(NickAccount).filter(NickAccount.nick==sbserver.playerName(cn)).one()
 	except NoResultFound:
@@ -134,7 +130,7 @@ def onLinkName(cn, args):
 		return
 	except MultipleResultsFound:
 		pass
-	sbserver.playerMessage(cn, error('Your name is already linked to an account.'))
+	raise StateError('Your name is already linked to an account')
 
 @commandHandler('newuser')
 def onNewuserCommand(cn, args):
@@ -188,16 +184,16 @@ def onSetMaster(cn, givenhash):
 		na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
 	except NoResultFound:
 		if givenhash != adminhash:
-			sbserver.playerMessage(cn, error('Your name is not assigned to any accounts.'))
+			raise StateError('Your name is not assigned to any accounts')
 	except MultipleResultsFound:
-		sbserver.playerMessage(cn, error('Multiple names linked to account. Contact system administrator.'))
+		raise StateError('Multiple names linked to this account.  Contact the system administrator.')
 	else:
 		nickhash = sbserver.hashPassword(cn, na.user.password)
 		if givenhash == nickhash:
 			login(cn, na.user)
 		else:
 			if givenhash != adminhash:
-				sbserver.playerMessage(cn, error('Invalid password'))
+				raise ArgumentValueError('Invalid password')
 
 def warnNickReserved(cn, count, sessid):
 	try:
