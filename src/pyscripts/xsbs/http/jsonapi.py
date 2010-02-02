@@ -4,7 +4,10 @@ from xsbs.http import server as httpServer
 from xsbs.users import userAuth
 from xsbs.users.privilege import isUserAtLeastMaster
 
-import json
+try:
+	import json
+except ImportError:
+	import simplejson as json
 
 def setJsonHeaders(request):
 	request.setHeader('Content-Type', 'application/json')

@@ -6,7 +6,11 @@ from JSONAPI.admin.server import setup as setupServerSite
 from JSONAPI.admin.clients import setup as setupClientsSite
 
 import sbserver
-import json
+
+try:
+	import json
+except ImportError:
+	import simplejson as json
 
 class AdminSite(JsonAtLeastMasterSite):
 	pass

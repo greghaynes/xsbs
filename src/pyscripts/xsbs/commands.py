@@ -43,7 +43,7 @@ class CommandManager:
 			for func in self.command_handlers[command]:
 				try:
 					func(cn, text)
-				except UsageError as e:
+				except UsageError, e:
 					try:
 						usages = command_info[command].usages
 					except KeyError:
@@ -51,9 +51,9 @@ class CommandManager:
 					p.message(error('Invalid Usage of #' + command + ' command. ' + str(e)))
 					for usage in usages:
 						p.message(info('Usage: ' + command + ' ' + usage))
-				except StateError as e:
+				except StateError, e:
 					p.message(error(str(e)))
-				except ArgumentValueError as e:
+				except ArgumentValueError, e:
 					p.message(error('Invalid argument. ' + str(e)))
 				except ValueError:
 					p.message(error('Value Error: Did you specify a valid cn?'))

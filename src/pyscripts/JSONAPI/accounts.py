@@ -2,7 +2,10 @@ from twisted.web import resource
 
 from xsbs.http.jsonapi import JsonSite, JsonUserSite, response
 
-import json
+try:
+	import json
+except ImportError:
+	import simplejson as json
 
 class AccountSite(JsonUserSite):
 	def render_user_JSON(self, request, user):

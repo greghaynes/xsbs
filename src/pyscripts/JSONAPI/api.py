@@ -12,7 +12,11 @@ from xsbs.game import currentMap, currentMode, modeName
 from xsbs.users.privilege import isUserMaster, isUserAdmin
 
 import sbserver
-import json
+
+try:
+	import json
+except ImportError:
+	import simplejson as json
 
 class AccountSite(JsonUserSite):
 	def render_user_JSON(self, request, user):
