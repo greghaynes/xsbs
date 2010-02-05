@@ -101,7 +101,7 @@ def onRegisterCommand(cn, args):
 		user = User(args[0], args[1])
 		session.add(user)
 		session.commit()
-		sbserver.playerMessage(cn, green('Account created'))
+		sbserver.playerMessage(cn, info('Account created'))
 		return
 	except MultipleResultsFound:
 		pass
@@ -140,7 +140,7 @@ def onLinkName(cn, args):
 		session.add(nickacct)
 		session.commit()
 		sbserver.playerMessage(cn, info('Your name is now linked to your account.'))
-		sbserver.playerMessage(cn, info('You may now login with /setmaster %s' % args[1]))
+		sbserver.playerMessage(cn, info('You may now login with /setmaster password'))
 		return
 	except MultipleResultsFound:
 		pass
