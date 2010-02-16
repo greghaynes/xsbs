@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relation
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sbserver
 from xsbs.db import dbmanager
 from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
@@ -181,22 +181,22 @@ def onChangepass(cn, args):
 
 @eventHandler('player_setmaster')
 def onSetMaster(cn, givenhash):
-	nick = sbserver.playerName(cn)
+	p = player(cn)
 	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
 	try:
-		na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
+		na = session.query(NickAccount).filter(NickAccount.nick==p.name()).one()
 	except NoResultFound:
 		if givenhash != adminhash:
-			raise StateError('Your name is not assigned to any accounts')
+			p.message(error('Your name is not assigned to any accounts'))
 	except MultipleResultsFound:
-		raise StateError('Multiple names linked to this account.  Contact the system administrator.')
+		p.message(error('Multiple names linked to this account.  Contact the system administrator.'))
 	else:
 		nickhash = sbserver.hashPassword(cn, na.user.password)
 		if givenhash == nickhash:
 			login(cn, na.user)
 		else:
 			if givenhash != adminhash:
-				raise ArgumentValueError('Invalid password')
+				p.message(error('Invalid password'))
 
 def warnNickReserved(cn, count, sessid):
 	try:
