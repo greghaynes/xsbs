@@ -1,4 +1,5 @@
 from elixir import Entity, Field, Unicode, ManyToOne, OneToMany, setup_all
+from sqlalchemy.orm.exc import NoResultFound
 
 from xsbs.db import dbmanager
 from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
@@ -32,6 +33,9 @@ class User(Entity):
 	password = Field(Unicode(20))
 	nickaccounts = OneToMany('NickAccount')
 	groups = ManyToOne('Group')
+	def __init__(self, email, password):
+		self.email = email
+		self.password = password
 
 def loggedInAs(cn):
 	return player(cn).user
@@ -52,7 +56,7 @@ def login(cn, user):
 
 def userAuth(email, password):
 	try:
-		user = session.query(User).filter(User.email==email).filter(User.password==password).one()
+		user = User.query.filter(User.email==email).filter(User.password==password).one()
 	except (NoResultFound, MultipleResultsFound):
 		return False
 	return user
@@ -81,15 +85,14 @@ def onRegisterCommand(cn, args):
 	if len(args) != 2:
 		raise UsageError()
 	try:
-		session.query(User).filter(User.email==args[0]).one()
+		User.query.filter(User.email==args[0]).one()
 	except NoResultFound:
 		if not isValidEmail(args[0]):
 			raise ArgumentValueError('Invalid email address')
 		if not isValidPassword(args[1], cn):
 			raise ArgumentValueError('Invalid password')
 		user = User(args[0], args[1])
-		session.add(user)
-		session.commit()
+		dbmanager.session().commit()
 		sbserver.playerMessage(cn, info('Account created'))
 		return
 	except MultipleResultsFound:
@@ -122,12 +125,11 @@ def onLinkName(cn, args):
 	if sbserver.playerName(cn) in blocked_names:
 		raise StateError('You can not reserve this name')
 	try:
-		session.query(NickAccount).filter(NickAccount.nick==sbserver.playerName(cn)).one()
+		NickAccount.query.filter(NickAccount.nick==sbserver.playerName(cn)).one()
 	except NoResultFound:
 		user = loggedInAs(cn)
 		nickacct = NickAccount(sbserver.playerName(cn), user.id)
-		session.add(nickacct)
-		session.commit()
+		dbmanager.session().commit()
 		sbserver.playerMessage(cn, info('Your name is now linked to your account.'))
 		sbserver.playerMessage(cn, info('You may now login with /setmaster password'))
 		return
@@ -155,7 +157,7 @@ def onChangepass(cn, args):
 	if not isLoggedIn(cn):
 		raise StateError('You must be logged in to change your password')
 	try:
-		session.query(User).filter(User.id==loggedInAs(cn).id).filter(User.password==args[0]).one()
+		User.query.filter(User.id==loggedInAs(cn).id).filter(User.password==args[0]).one()
 	except NoResultFound:
 		raise StateError('Incorrect password.')
 	except MultipleResultsFound:
@@ -163,8 +165,8 @@ def onChangepass(cn, args):
 	else:
 		if not isValidPassword(args[1], cn):
 			raise ArgumentValueError('Invalid password')
-		session.query(User).filter(User.id==loggedInAs(cn).id).update({ 'password': args[1] })
-		session.commit()
+		User.query.filter(User.id==loggedInAs(cn).id).update({ 'password': args[1] })
+		dbmanager.session().commit()
 		return
 
 
@@ -173,7 +175,7 @@ def onSetMaster(cn, givenhash):
 	p = player(cn)
 	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
 	try:
-		na = session.query(NickAccount).filter(NickAccount.nick==p.name()).one()
+		NickAccount.query.filter(NickAccount.nick==p.name()).one()
 	except NoResultFound:
 		if givenhash != adminhash:
 			p.message(error('Your name is not assigned to any accounts'))
@@ -215,7 +217,7 @@ def warnNickReserved(cn, count, sessid):
 	addTimer(5000, warnNickReserved, (cn, count+1, sessid))
 
 def nickReserver(nick):
-	return session.query(NickAccount).filter(NickAccount.nick==nick).one()
+	return NickAccount.query.filter(NickAccount.nick==nick).one()
 
 @eventHandler('player_connect')
 def onPlayerActive(cn):
