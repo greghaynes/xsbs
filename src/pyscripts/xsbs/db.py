@@ -1,6 +1,7 @@
 from xsbs.settings import PluginConfig
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from elixir import metadata
 
 class DatabaseManager:
 	def __init__(self, uri):
@@ -16,6 +17,7 @@ class DatabaseManager:
 
 config = PluginConfig('db')
 uri = config.getOption('Config', 'uri', 'sqlite:///xsbs.db')
+metadata.bind = (uri)
 del config
 
 dbmanager = DatabaseManager(uri)

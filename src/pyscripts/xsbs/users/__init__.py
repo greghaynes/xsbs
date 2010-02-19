@@ -1,8 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.orm import relation
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-import sbserver
+from elixir import Entity, Field, Unicode, ManyToOne, OneToMany, setup_all
+
 from xsbs.db import dbmanager
 from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
@@ -12,37 +9,29 @@ from xsbs.players import player
 from xsbs.settings import PluginConfig
 from xsbs.ban import ban
 from xsbs.timers import addTimer
+
+import sbserver
 import re
 
 config = PluginConfig('usermanager')
 usertable = config.getOption('Config', 'users_tablename', 'usermanager_users')
-nicktable = config.getOption('Config', 'linkednames_table', 'usermanager_nickaccounts')
 blocked_names = config.getOption('Config', 'blocked_names', 'unnamed, admin')
 del config
-
 blocked_names = blocked_names.strip(' ').split(',')
 
-Base = declarative_base()
-session = dbmanager.session()
+class NickAccount(Entity):
+	nick = Field(Unicode(15))
+	user = ManyToOne('User')
 
-class User(Base):
-	__tablename__ = usertable
-	id = Column(Integer, primary_key=True)
-	email = Column(String, index=True)
-	password = Column(String, index=True)
-	def __init__(self, email, password):
-		self.email = email
-		self.password = password
+class Group(Entity):
+	name = Field(Unicode(30))
+	users = OneToMany('User')
 
-class NickAccount(Base):
-	__tablename__ = nicktable
-	id = Column(Integer, primary_key=True)
-	nick = Column(String, index=True)
-	user_id = Column(Integer, ForeignKey('usermanager_users.id'))
-	user = relation(User, primaryjoin=user_id==User.id)
-	def __init__(self, nick, user_id):
-		self.nick = nick
-		self.user_id = user_id
+class User(Entity):
+	email = Field(Unicode(50))
+	password = Field(Unicode(20))
+	nickaccounts = OneToMany('NickAccount')
+	groups = ManyToOne('Group')
 
 def loggedInAs(cn):
 	return player(cn).user
@@ -246,5 +235,8 @@ def onPlayerActive(cn):
 def onPlayerNameChanged(cn, old_name, new_name):
 	onPlayerActive(cn)
 
-Base.metadata.create_all(dbmanager.engine)
+def main():
+	setup_all(True)
+
+main()
 
