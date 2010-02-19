@@ -1,4 +1,5 @@
 from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+from elixir import Entity, Field, Unicode
 
 # Set this to wherever your configuration files lie.  Must end in a /
 configuration_path = 'Config/'
@@ -7,6 +8,11 @@ configuration_path = 'Config/'
 configuration_extension = '.conf'
 
 ##### DONT MODIFY BELOW HERE ######
+
+class ConfigOption(Entity):
+	plugin = Field(Unicode(30))
+	name = Field(Unicode(30))
+	value = Field(Unicode(30))
 
 class PluginConfig:
 	'''Allows easy reading of configuration options from configuration files'''
