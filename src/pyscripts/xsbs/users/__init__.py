@@ -230,8 +230,3 @@ def onPlayerActive(cn):
 def onPlayerNameChanged(cn, old_name, new_name):
 	onPlayerActive(cn)
 
-def main():
-	setup_all(True)
-
-main()
-
