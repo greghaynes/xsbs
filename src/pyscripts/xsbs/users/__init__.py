@@ -1,4 +1,4 @@
-from elixir import Entity, Field, Unicode, ManyToOne, OneToMany, setup_all
+from elixir import Entity, Field, Unicode, ManyToOne, OneToMany, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound
 
 from xsbs.db import dbmanager
@@ -67,15 +67,6 @@ def isValidEmail(email):
 			return True
 	return False
 
-def isValidPassword(password, cn):
-	if password.strip('<').strip('>') == password[1:-1]:
-		sbserver.playerMessage(cn, error('Do not include < or > in your password.'))
-		return False
-	if len(password) < 4:
-		sbserver.playerMessage(cn, error('Your password is to short.'))
-		return False
-	return True	
-
 @commandHandler('register')
 def onRegisterCommand(cn, args):
 	'''@description Register account with server
@@ -89,10 +80,8 @@ def onRegisterCommand(cn, args):
 	except NoResultFound:
 		if not isValidEmail(args[0]):
 			raise ArgumentValueError('Invalid email address')
-		if not isValidPassword(args[1], cn):
-			raise ArgumentValueError('Invalid password')
 		user = User(args[0], args[1])
-		dbmanager.session().commit()
+		session.commit()
 		sbserver.playerMessage(cn, info('Account created'))
 		return
 	except MultipleResultsFound:
@@ -128,8 +117,8 @@ def onLinkName(cn, args):
 		NickAccount.query.filter(NickAccount.nick==sbserver.playerName(cn)).one()
 	except NoResultFound:
 		user = loggedInAs(cn)
-		nickacct = NickAccount(sbserver.playerName(cn), user.id)
-		dbmanager.session().commit()
+		nickacct = NickAccount(sbserver.playerName(cn), user)
+		session.commit()
 		sbserver.playerMessage(cn, info('\"%s\" is now linked to your account.' % (sbserver.playerName(cn))))
 		sbserver.playerMessage(cn, info('You may now login with /setmaster password'))
 		return
@@ -166,7 +155,7 @@ def onChangepass(cn, args):
 		if not isValidPassword(args[1], cn):
 			raise ArgumentValueError('Invalid password')
 		User.query.filter(User.id==loggedInAs(cn).id).update({ 'password': args[1] })
-		dbmanager.session().commit()
+		session.commit()
 		return
 
 @eventHandler('player_setmaster')
