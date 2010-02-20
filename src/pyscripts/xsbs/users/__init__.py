@@ -130,7 +130,7 @@ def onLinkName(cn, args):
 		user = loggedInAs(cn)
 		nickacct = NickAccount(sbserver.playerName(cn), user.id)
 		dbmanager.session().commit()
-		sbserver.playerMessage(cn, info('Your name is now linked to your account.'))
+		sbserver.playerMessage(cn, info('\"%s\" is now linked to your account.' % (sbserver.playerName(cn))))
 		sbserver.playerMessage(cn, info('You may now login with /setmaster password'))
 		return
 	except MultipleResultsFound:
@@ -148,8 +148,8 @@ def onNewuserCommand(cn, args):
 
 @commandHandler('changepass')
 def onChangepass(cn, args):
-	'''@description Link name to server account, and reserve name.
-	   @usage
+	'''@description Change your password
+	   @usage old_password new_password
 	   @public'''
 	args = args.split(' ')
 	if len(args) != 2:
@@ -169,7 +169,6 @@ def onChangepass(cn, args):
 		dbmanager.session().commit()
 		return
 
-
 @eventHandler('player_setmaster')
 def onSetMaster(cn, givenhash):
 	p = player(cn)
@@ -180,7 +179,7 @@ def onSetMaster(cn, givenhash):
 		if givenhash != adminhash:
 			p.message(error('Your name is not assigned to any accounts'))
 	except MultipleResultsFound:
-		p.message(error('Multiple names linked to this account.  Contact the system administrator.'))
+		p.message(error(' This name is linked to multiple accounts.  Contact the system administrator.'))
 	else:
 		nickhash = sbserver.hashPassword(cn, na.user.password)
 		if givenhash == nickhash:
