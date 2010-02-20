@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relation
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 import sbserver
 from xsbs.db import dbmanager
 from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
@@ -74,15 +74,6 @@ def isValidEmail(email):
 			return True
 	return False
 
-def isValidPassword(password, cn):
-	if password.strip('<').strip('>') == password[1:-1]:
-		sbserver.playerMessage(cn, error('Do not include < or > in your password.'))
-		return False
-	if len(password) < 4:
-		sbserver.playerMessage(cn, error('Your password is to short.'))
-		return False
-	return True	
-
 @commandHandler('register')
 def onRegisterCommand(cn, args):
 	'''@description Register account with server
@@ -96,8 +87,6 @@ def onRegisterCommand(cn, args):
 	except NoResultFound:
 		if not isValidEmail(args[0]):
 			raise ArgumentValueError('Invalid email address')
-		if not isValidPassword(args[1], cn):
-			raise ArgumentValueError('Invalid password')
 		user = User(args[0], args[1])
 		session.add(user)
 		session.commit()
@@ -172,8 +161,6 @@ def onChangepass(cn, args):
 	except MultipleResultsFound:
 		pass
 	else:
-		if not isValidPassword(args[1], cn):
-			raise ArgumentValueError('Invalid password')
 		session.query(User).filter(User.id==loggedInAs(cn).id).update({ 'password': args[1] })
 		session.commit()
 		return
@@ -181,22 +168,22 @@ def onChangepass(cn, args):
 
 @eventHandler('player_setmaster')
 def onSetMaster(cn, givenhash):
-	nick = sbserver.playerName(cn)
+	p = player(cn)
 	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
 	try:
-		na = session.query(NickAccount).filter(NickAccount.nick==nick).one()
+		na = session.query(NickAccount).filter(NickAccount.nick==p.name()).one()
 	except NoResultFound:
 		if givenhash != adminhash:
-			raise StateError('Your name is not assigned to any accounts')
+			p.message(error('Your name is not assigned to any accounts'))
 	except MultipleResultsFound:
-		raise StateError('Multiple names linked to this account.  Contact the system administrator.')
+		p.message(error('Multiple names linked to this account.  Contact the system administrator.'))
 	else:
 		nickhash = sbserver.hashPassword(cn, na.user.password)
 		if givenhash == nickhash:
 			login(cn, na.user)
 		else:
 			if givenhash != adminhash:
-				raise ArgumentValueError('Invalid password')
+				p.message(error('Invalid password'))
 
 def warnNickReserved(cn, count, sessid):
 	try:

@@ -60,10 +60,15 @@ function loadPlayerAdminPage(hostname, username, password) {
 		});
 }
 
-function tryLogin(hostname, username, password, error_callback, success_callback) {
+function tryMasterLogin(hostname, username, password, error_callback, success_callback) {
 	$.getJSON('http://' + hostname + '/json/account?username=' + username + '&password=' + password, function(data) {
-		if(data.hasOwnProperty('user'))
-			success_callback(data);
+		if(data.hasOwnProperty('privileges'))
+		{
+			if(data.privileges.master)
+				success_callback(data);
+			else
+				error_callback('INSUFFICIENT_PERMISSIONS');
+		}
 		else
 			error_callback(data);
 		});
@@ -91,8 +96,7 @@ function loadLoginPage(hostname, callback) {
 		$('#login_status').html('Trying login...');
 		var username = $('#username_input').val();
 		var password = $('#password_input').val();
-		tryLogin(hostname, username, password, function(data) {
-				error_code = data.error
+		tryMasterLogin(hostname, username, password, function(error_code) {
 				$('#login_status').empty();
 				if(error_code == 'INVALID_LOGIN')
 					$('#login_status').html('Invalid login.');
