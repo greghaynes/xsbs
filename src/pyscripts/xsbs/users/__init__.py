@@ -1,4 +1,4 @@
-from elixir import Entity, Field, Unicode, ManyToOne, OneToMany, setup_all, session
+from elixir import Entity, Field, String, ManyToOne, OneToMany, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound
 
 from xsbs.db import dbmanager
@@ -21,21 +21,21 @@ del config
 blocked_names = blocked_names.strip(' ').split(',')
 
 class NickAccount(Entity):
-	nick = Field(Unicode(15))
+	nick = Field(String(15))
 	user = ManyToOne('User')
 	def __init__(self, nick, user):
 		self.nick = nick
 		self.user = user
 
 class Group(Entity):
-	name = Field(Unicode(30))
+	name = Field(String(30))
 	users = OneToMany('User')
 	def __init__(self, name):
 		self.name = name
 
 class User(Entity):
-	email = Field(Unicode(50))
-	password = Field(Unicode(20))
+	email = Field(String(50))
+	password = Field(String(20))
 	nickaccounts = OneToMany('NickAccount')
 	groups = ManyToOne('Group')
 	def __init__(self, email, password):
