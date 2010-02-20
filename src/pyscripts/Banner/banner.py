@@ -3,6 +3,8 @@ from xsbs.timers import addTimer
 from xsbs.colors import colordict
 from xsbs.ui import notice
 from xsbs.server import message
+from xsbs.commands import commandHandler
+from xsbs.players import player
 import string
 
 class Banner:
@@ -15,6 +17,11 @@ class Banner:
 		addTimer(self.delay, self.sendMessage, ())
 
 banners = []
+info_msg = ['']
+
+@commandHandler('info')
+def infoCmd(cn, args):
+	player(cn).message(info_msg[0])
 
 def setup():
 	config = PluginConfig('banner')
@@ -23,6 +30,7 @@ def setup():
 		msg = option[1]
 		delay = config.getOption('Timeouts', option[0], default_timeout, False)
 		banners.append(Banner(msg, int(delay)))
+	info_msg[0] = config.getOption('Config', 'serverinfo', 'XSBS Version 2.0')
 	del config
 
 setup()
