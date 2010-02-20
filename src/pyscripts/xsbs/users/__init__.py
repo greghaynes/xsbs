@@ -23,10 +23,15 @@ blocked_names = blocked_names.strip(' ').split(',')
 class NickAccount(Entity):
 	nick = Field(Unicode(15))
 	user = ManyToOne('User')
+	def __init__(self, nick, user):
+		self.nick = nick
+		self.user = user
 
 class Group(Entity):
 	name = Field(Unicode(30))
 	users = OneToMany('User')
+	def __init__(self, name):
+		self.name = name
 
 class User(Entity):
 	email = Field(Unicode(50))
