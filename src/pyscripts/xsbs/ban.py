@@ -1,10 +1,11 @@
+from elixir import Entity, Field, String, Integer, Boolean, setup_all, session
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+
 from xsbs.db import dbmanager
 from xsbs.settings import PluginConfig
 from xsbs.net import ipLongToString, ipStringToLong
 from xsbs.timers import addTimer
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 from xsbs.ui import info, notice
 from xsbs.colors import colordict
 from xsbs.events import eventHandler, policyHandler
@@ -18,20 +19,16 @@ ban_message = config.getOption('Config', 'message', 'Banning ${orange}${name}${w
 del config
 ban_message = string.Template(ban_message)
 
-Base = declarative_base()
-session = dbmanager.session()
-
-class Ban(Base):
-	__tablename__='bans'
-	id = Column(Integer, primary_key=True)
-	ip = Column(Integer, index=True)
-	expiration = Column(Integer, index=True) # Epoch seconds
-	reason = Column(String)
-	nick = Column(String)
-	banner_ip = Column(Integer)
-	banner_nick = Column(String)
-	time = Column(Integer)
-	def __init__(self, ip, expiration, reason, nick, banner_ip, banner_nick, time):
+class Ban(Entity):
+	ip = Field(Integer, index=True)
+	expiration = Field(Integer, index=True) # Epoch seconds
+	reason = Field(String(50))
+	nick = Field(String(15))
+	banner_ip = Field(Integer)
+	banner_nick = Field(String(15))
+	time = Field(Integer)
+	sticky = Field(Boolean, index=True)
+	def __init__(self, ip, expiration, reason, nick, banner_ip, banner_nick, time, sticky):
 		self.ip = ip
 		self.expiration = expiration
 		self.reason = reason
@@ -39,14 +36,13 @@ class Ban(Base):
 		self.banner_ip = banner_ip
 		self.banner_nick = banner_nick
 		self.time = time
+		self.sticky = sticky
 	def isExpired(self):
 		return self.expiration <= time.time()
 
-class BanNick(Base):
-	__tablename__='banned_nicks'
-	id = Column(Integer, primary_key=True)
+class BanNick(Entity):
 	nick = Column(String, index=True)
-	reason = Column(String)
+	reason = Column(String(50))
 	def __init__(self, nick, reason):
 		self.nick = nick
 		self.reason = reason
@@ -96,6 +92,4 @@ def ban(cn, seconds, reason, banner_cn):
 		banner_nick,
 		ipLongToString(banner_ip))
 	sbserver.message(info(ban_message.substitute(colordict, name=nick, seconds=seconds, reason=reason)))
-
-Base.metadata.create_all(dbmanager.engine)
 
