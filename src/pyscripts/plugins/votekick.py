@@ -4,7 +4,7 @@ from xsbs.players import player, all as allPlayers
 from xsbs.ui import error, info
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
-from Bans.bans import ban
+from xsbs.ban import ban
 import sbserver
 import string
 

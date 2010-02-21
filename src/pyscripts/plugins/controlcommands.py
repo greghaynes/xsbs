@@ -5,7 +5,6 @@ from xsbs.events import triggerServerEvent
 from xsbs.commands import commandHandler, UsageError, ExtraArgumentError, StateError
 from xsbs.settings import PluginConfig
 from xsbs.colors import red, yellow, blue, green, white, colordict
-from xsbs.plugins import reloadPlugins
 from xsbs.ui import error, info, notice, insufficientPermissions
 from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
@@ -14,7 +13,6 @@ from xsbs.players import masterRequired, adminRequired, player, currentAdmin
 from xsbs.server import setPaused, message as sendServerMessage
 from xsbs.timers import addTimer
 
-from Motd.motd import motdstring
 import string
 
 config = PluginConfig('servercommands')
@@ -58,18 +56,6 @@ def onResumeCmd(p, args):
 		resumeTimer(resume_timeout, p.cn)
 	else:
 		setPaused(False, p.cn)
-
-@commandHandler('reload')
-@adminRequired
-def onReloadCmd(p, args):
-	'''@description Reload server plugins
-	   @usage
-	   @admin'''
-	if args != '':
-		raise ExtraArgumentError()
-	else:
-		p.message(yellow('NOTICE: ') + blue('Reloading server plugins.  Fasten your seatbelts...'))
-		reloadPlugins()
 
 @commandHandler('givemaster')
 @masterRequired

@@ -1,8 +1,8 @@
 from twisted.web import resource
 
 from xsbs.http.jsonapi import JsonSite, JsonUserSite, site as jsonSite
-from JSONAPI.admin import setup as setupAdmin
-from JSONAPI.accounts import setup as setupAccounts
+from plugins.JSONAPI.admin import setup as setupAdmin
+from plugins.JSONAPI.accounts import setup as setupAccounts
 
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.users import userAuth

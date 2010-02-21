@@ -1,4 +1,4 @@
-from Bans.bans import ban
+from xsbs.ban import ban
 from xsbs.settings import PluginConfig
 from xsbs.events import eventHandler
 from xsbs.players import player

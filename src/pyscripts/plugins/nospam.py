@@ -2,7 +2,7 @@ from xsbs.events import eventHandler
 from xsbs.timers import addTimer
 from xsbs.settings import PluginConfig
 from xsbs.ui import error, notice, warning
-from Bans.bans import ban
+from xsbs.ban import ban
 from xsbs.colors import colordict
 from xsbs.players import player, all as allPlayers, playerByName, playerByIpString
 import sbserver
