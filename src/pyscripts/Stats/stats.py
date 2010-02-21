@@ -12,14 +12,13 @@ del config
 template = string.Template(template)
 
 @commandHandler('stats')
-def onCommand(cn, args):
+def onCommand(cp, args):
 	'''@description Stats for the current match
 	   @usage (cn)
 	   @public'''
-	cp = player(cn)
 	if args != '':
-		if require_master and not isPlayerMaster(cn):
-			insufficientPermissions(cn)
+		if require_master and not isPlayerMaster(cp.cn):
+			insufficientPermissions(cp.cn)
 			return
 		try:
 			p = player(int(args))

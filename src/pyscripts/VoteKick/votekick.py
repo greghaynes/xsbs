@@ -29,23 +29,23 @@ def checkVotes(cn):
 		ban(cn, 3600, 'Vote', -1)
 
 @commandHandler('votekick')
-def onVoteKick(cn, args):
+def onVoteKick(p, args):
 	'''@description Vote to kick a player from server
 	   @usage <cn>'''
 	if args == '':
-		sbserver.playerMessage(cn, error('Usage #votekick <cn>'))
+		p.message(error('Usage #votekick <cn>'))
 	else:
 		try:
 			tcn = int(args)
-			if player(cn).votekick == tcn:
-				sbserver.playerMessage(cn, error('You have already voted to kick that player.'))
+			if p.votekick == tcn:
+				p.message(error('You have already voted to kick that player.'))
 				allow_vote = False
 			else:
 				allow_vote = True
 		except AttributeError:
 			allow_vote = True
 		if allow_vote:
-			sbserver.message(info(vktemp.substitute(colordict, voter=sbserver.playerName(cn), victim=sbserver.playerName(tcn))))
-			player(cn).votekick = int(args)
+			sbserver.message(info(vktemp.substitute(colordict, voter=p.name(), victim=sbserver.playerName(tcn))))
+			p.votekick = int(args)
 			checkVotes(int(args))
 

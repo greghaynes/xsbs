@@ -30,7 +30,7 @@ def allowMsg(cn, text):
 
 @commandHandler('mutespectators')
 @masterRequired
-def onMuteSpectatorsCmd(cn, args):
+def onMuteSpectatorsCmd(p, args):
 	'''@description Mute all spectators
 	   @usage'''
 	if args == '':
@@ -44,7 +44,7 @@ def onMuteSpectatorsCmd(cn, args):
 
 @commandHandler('unmutespectators')
 @masterRequired
-def onUnMuteSpectatorsCmd(cn, args):
+def onUnMuteSpectatorsCmd(p, args):
 	'''@description Unmute spectators
 	   @usage'''
 	if args == '':
@@ -58,7 +58,7 @@ def onUnMuteSpectatorsCmd(cn, args):
 
 @commandHandler('mute')
 @masterRequired
-def onMuteCommand(cn, args):
+def onMuteCommand(sender, args):
 	'''@description Mute a player
 	   @usage cn'''
 	try:
@@ -80,14 +80,14 @@ def onMuteCommand(cn, args):
 			else:
 				p.is_muted = True
 				name = p.name()
-				muter = player(cn).name()
+				muter = player(sender.cn).name()
 				sbserver.message(info(muted_temp.substitute(colordict, muted_name=name, muter=muter)))
 	except KeyError:
 		raise UsageError()
 			
 @commandHandler('unmute')
 @masterRequired
-def onUnmuteCommand(cn, args):
+def onUnmuteCommand(sender, args):
 	'''@description Unmute a player
 	   @usage cn'''
 	try:
@@ -99,7 +99,7 @@ def onUnmuteCommand(cn, args):
 			p = player(tcn)
 			if p.is_muted:
 				p.is_muted = False
-				muter = player(cn).name()
+				muter = player(sender.cn).name()
 				sbserver.message(info(unmuted_temp.substitute(colordict, muted_name=p.name(), muter=muter)))
 			else:
 				raise StateError('Specified player is not crrently muted')

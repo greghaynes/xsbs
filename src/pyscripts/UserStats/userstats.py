@@ -1,7 +1,7 @@
 import sbserver
 from xsbs.players import player
 from xsbs.settings import PluginConfig
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 from DB.db import dbmanager
 from UserManager.usermanager import loggedInAs
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
@@ -51,6 +51,7 @@ def onConnect(cn):
 	player(cn).stats_deaths = 0
 	player(cn).stats_teamkills = 0
 
+@eventHandler('player_frag')
 def onFrag(cn, tcn):
 	if cn == tcn:
 		val = suicide_fragval
@@ -61,9 +62,8 @@ def onFrag(cn, tcn):
 	except AttributeError:
 		player(cn).stats_frags = val
 
+@eventHandler('player_teamkill')
 def onTeamKill(cn, tcn):
 	pass
 
-registerServerEventHandler('player_frag', onFrag)
-registerServerEventHandler('player_teamkill', onTeamKill)
 

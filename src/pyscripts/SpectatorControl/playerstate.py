@@ -1,8 +1,9 @@
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 from xsbs.players import isAtLeastMaster
 from xsbs.ui import insufficientPermissions, error
 import sbserver
 
+@eventHandler('player_request_spectate')
 def onReqSpectate(cn, tcn):
 	if tcn != cn:
 		if isAtLeastMaster(cn):
@@ -12,6 +13,7 @@ def onReqSpectate(cn, tcn):
 	else:
 		sbserver.spectate(tcn)
 
+@eventHandler('player_request_unspectate')
 def onReqUnspectate(cn, tcn):
 	if tcn != cn:
 		if isAtLeastMaster(cn):
@@ -23,7 +25,4 @@ def onReqUnspectate(cn, tcn):
 			sbserver.playerMessage(cn, error('Master mode is locked.  You cannot unspectate.'))
 		else:
 			sbserver.unspectate(tcn)
-
-registerServerEventHandler('player_request_spectate', onReqSpectate)
-registerServerEventHandler('player_request_unspectate', onReqUnspectate)
 

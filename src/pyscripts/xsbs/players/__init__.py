@@ -37,8 +37,8 @@ class masterRequired(object):
 		self.__doc__ = func.__doc__
 		self.__name__ = func.__name__
 	def __call__(self, *args):
-		if not isAtLeastMaster(args[0]):
-			insufficientPermissions(args[0])
+		if not isAtLeastMaster(args[0].cn):
+			insufficientPermissions(args[0].cn)
 		else:
 			self.func(*args)
 
@@ -48,8 +48,8 @@ class adminRequired(object):
 		self.__doc__ = func.__doc__
 		self.__name__ = func.__name__
 	def __call__(self, *args):
-		if not isAdmin(args[0]):
-			insufficientPermissions(args[0])
+		if not isAdmin(args[0].cn):
+			insufficientPermissions(args[0].cn)
 		else:
 			self.func(*args)
 
