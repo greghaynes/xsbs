@@ -47,11 +47,10 @@ class BanNick(Entity):
 		self.reason = reason
 
 def getCurrentBanByIp(ipaddress):
-	return Ban.query.filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
+	return Ban.query.filter_by(ip=ipaddress).filter('expiration>'+str(time.time())).one()
 
 def getCurrentBanByNick(nick):
-	raise NoResultFound
-	return BanNick.query.filter(BanNick.nick==nick).one()
+	return BanNick.query.filter_by(nick=nick).one()
 
 def isIpBanned(ipaddress):
 	try:
