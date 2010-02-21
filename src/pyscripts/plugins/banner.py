@@ -5,7 +5,7 @@ from xsbs.ui import notice
 from xsbs.server import message
 import string
 
-class Banner:
+class Banner(object):
 	def __init__(self, msg, delay):
 		self.msg = string.Template(msg).substitute(colordict)
 		self.delay = delay

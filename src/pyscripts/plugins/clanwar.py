@@ -19,10 +19,9 @@ def clanWarTimer(count, cn):
 
 @commandHandler('clanwar')
 @masterRequired
-def clanWar(cn, args):
+def clanWar(sender, args):
 	'''@description Start a clan war with current teams
 	   @usage map (mode)'''
-	sender = player(cn)
 	if args == '':
 		raise UsageError()
 	else:
@@ -39,7 +38,7 @@ def clanWar(cn, args):
 		persistentTeams(True)
 		setMap(map, mode)
 		setMasterMode(2)
-		setPaused(True, cn)
+		setPaused(True, sender.cn)
 		setFrozen(True)
-		clanWarTimer(10, cn)
+		clanWarTimer(10, sender.cn)
 

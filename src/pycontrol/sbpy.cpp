@@ -106,24 +106,6 @@ bool initPy()
 	}
 	pluginsModule = PyImport_ImportModule("xsbs.plugins");
 	SBPY_ERR(pluginsModule)
-	pFunc = PyObject_GetAttrString(pluginsModule, "loadPlugins");
-	SBPY_ERR(pFunc)
-	if(!PyCallable_Check(pFunc))
-	{
-		fprintf(stderr, "Error: loadPlugins function could not be loaded.\n");
-		return false;
-	}
-	pArgs = PyTuple_New(0);
-	pValue = PyObject_CallObject(pFunc, pArgs);
-	Py_DECREF(pArgs);
-	Py_DECREF(pFunc);
-	if(!pValue)
-	{
-		PyErr_Print();
-		return false;
-	}
-	Py_DECREF(pValue);
-	Py_DECREF(pluginsModule);
 	return true;
 }
 

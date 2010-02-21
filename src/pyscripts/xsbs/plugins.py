@@ -1,9 +1,9 @@
 from elixir import setup_all, create_all
-from ConfigParser import ConfigParser, NoOptionError
-import os, sys, __builtin__
-import sbserver, xsbs.events, xsbs.db
+import os, sys
 
 # Initialize these before loading plugins
+import xsbs.events
+import xsbs.db
 import xsbs.log
 import xsbs.ban
 import xsbs.users
@@ -15,67 +15,21 @@ import xsbs.demo
 import xsbs.http
 import xsbs.http.jsonapi
 
-import logging
-
-plugins = {}
-paths = [os.curdir]
-config_filename = 'plugin.conf'
-init_modules = sys.modules.keys()
-
-class Plugin:
-	def __init__(self, path, config_path):
-		self.path = path
-		conf = ConfigParser()
-		conf.read(config_path)
-		self.isenabled = True
-		try:
-			self.initmodule = conf.get('Plugin', 'module')
-			self.isenabled = (conf.get('Plugin', 'enable') == 'yes')
-			self.name = conf.get('Plugin', 'name')
-			self.version = conf.get('Plugin', 'version')
-			self.author = conf.get('Plugin', 'author')
-		except NoOptionError:
-			self.isenabled = False
-		del conf
-	def loadModule(self):
-		if self.initmodule and self.isenabled:
-			self.module = __import__(os.path.basename(self.path) + '.' + self.initmodule)
-	def unloadModule(self):
-		if self.isenabled:
-			del self.module
-	def enabled(self):
-		return self.isenabled
-
-def plugin(name):
-	return plugins[name]
-
-def loadPlugins():
-	plugins.clear()
-	logging.info('Loading plugins...')
-	for path in paths:
-		files = os.listdir(path)
+class PluginManager(object):
+	def __init__(self, plugins_path='plugins'):
+		self.plugins_path = plugins_path
+		self.plugin_modules = []
+	def loadPlugins(self):
+		files = os.listdir(self.plugins_path)
 		for file in files:
-			dirpath = path + '/' + file
-			config_path = dirpath + '/' + config_filename
-			if os.path.isdir(dirpath) and os.path.exists(config_path):
-				p = Plugin(dirpath, config_path)
-				if p.isenabled:
-					plugins[p.name] = p
-				else:
-					logging.info('Skipping %s plugin' % file)
-	logging.info('Found %i plugins' % len(plugins.keys()))
-	logging.info('Initializing plugins...')
-	for plugin in plugins.values():
-		plugin.loadModule()
+			if file[0] != '.':
+				self.plugin_modules.append(__import__(os.path.basename(self.plugins_path) + '.' + os.path.splitext(file)[0]))
+
+def main():
+	pm = PluginManager()
+	pm.loadPlugins()
 	setup_all()
 	create_all()
 
-def reloadPlugins():
-	for p in plugins.values():
-		p.unloadModule()	
-	xsbs.events.triggerServerEvent('reload', ())
-	for p in plugins.values():
-		p.loadModule()
-
-loadPlugins()
+main()
 
