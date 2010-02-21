@@ -67,15 +67,15 @@ addTimer(5000, limiter.checkPlayers, ())
 
 @commandHandler('pinglimiter')
 @adminRequired
-def pingLimiterCmd(cn, args):
+def pingLimiterCmd(p, args):
 	'''@description Enable or disable kicking high ping users
 	   @usage enable/disable'''
 	if args == 'enable':
 		limiter.enabled = True
-		sbserver.playerMessage(cn, notice('Ping limiter enabled'))
+		p.message(notice('Ping limiter enabled'))
 	elif args == 'disable':
 		limiter.enabled = False
-		sbserver.playerMessage(cn, notice('Ping limiter disabled'))
+		p.message(notice('Ping limiter disabled'))
 	else:
 		raise UsageError('enable/disable')
 
