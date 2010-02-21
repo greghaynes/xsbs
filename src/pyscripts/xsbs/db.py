@@ -5,6 +5,6 @@ from elixir import metadata
 
 config = PluginConfig('db')
 uri = config.getOption('Config', 'uri', 'sqlite:///xsbs.db')
-metadata.bind = (uri)
+metadata.bind = uri
 del config
 

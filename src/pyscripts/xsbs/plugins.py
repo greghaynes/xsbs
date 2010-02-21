@@ -1,7 +1,7 @@
-from elixir import setup_all
+from elixir import setup_all, create_all
 from ConfigParser import ConfigParser, NoOptionError
 import os, sys, __builtin__
-import sbserver, xsbs.events
+import sbserver, xsbs.events, xsbs.db
 
 # Initialize these before loading plugins
 import xsbs.log
@@ -68,6 +68,7 @@ def loadPlugins():
 	for plugin in plugins.values():
 		plugin.loadModule()
 	setup_all()
+	create_all()
 
 def reloadPlugins():
 	for p in plugins.values():

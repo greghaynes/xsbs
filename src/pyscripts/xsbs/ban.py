@@ -40,17 +40,18 @@ class Ban(Entity):
 		return self.expiration <= time.time()
 
 class BanNick(Entity):
-	nick = Column(String, index=True)
+	nick = Column(String(15), index=True)
 	reason = Column(String(50))
 	def __init__(self, nick, reason):
 		self.nick = nick
 		self.reason = reason
 
 def getCurrentBanByIp(ipaddress):
-	return session.query(Ban).filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
+	return Ban.query.filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
 
 def getCurrentBanByNick(nick):
-	return session.query(BanNick).filter(BanNick.nick==nick).one()
+	raise NoResultFound
+	return BanNick.query.filter(BanNick.nick==nick).one()
 
 def isIpBanned(ipaddress):
 	try:
@@ -81,7 +82,6 @@ def ban(cn, seconds, reason, banner_cn):
 		banner_ip = 0
 		banner_nick = ''
 	newban = Ban(ip, expiration, reason, nick, banner_ip, banner_nick, time.time())
-	session.add(newban)
 	session.commit()
 	addTimer(200, sbserver.playerKick, (cn,))
 	logging.info('Player %s (%s) banned for %s by %s (%s)',
