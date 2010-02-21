@@ -23,11 +23,10 @@ kick_message = string.Template(kick_message)
 
 @commandHandler('ban')
 @masterRequired
-def onBanCmd(cn, text):
+def onBanCmd(p, text):
 	'''@description Ban user from server
 	   @usage <seconds> (reason)'''
 	sp = text.split(' ')
-	p = player(cn)
 	try:
 		tcn = int(sp[0])
 		ip = p.ipLong()
@@ -41,16 +40,15 @@ def onBanCmd(cn, text):
 			length = int(sp[1])
 		else:
 			length = int(default_ban_length)
-		ban(tcn, length, reason, cn)
+		ban(tcn, length, reason, p.cn)
 	except (ValueError, KeyError):
 		raise UsageError('cn (duration) (reason)')
 
 @commandHandler('recentbans')
 @masterRequired
-def onRecentBans(cn, args):
+def onRecentBans(p, args):
 	'''@description Recently added bans
 	   @usage'''
-	p = player(cn)
 	if args != '':
 		raise UsageError()
 	else:
@@ -66,25 +64,24 @@ def allowClient(cn, pwd):
 
 @eventHandler('player_kick')
 @masterRequired
-def onKick(cn, tcn):
-	ban(tcn, 14500, 'Unspecified reason', cn)
+def onKick(p, tcn):
+	ban(tcn, 14500, 'Unspecified reason', p.cn)
 
 @commandHandler('kick')
 @masterRequired
-def onKickCommand(cn, args):
+def onKickCommand(p, args):
 	'''@description Kick player from the server without ban time
 	   @usage <cn>'''
 	tcn = int(args)
 	t = player(tcn)
-	serverMessage(info(kick_message.substitute(colordict, name=p.name())))
+	serverMessage(info(kick_message.substitute(colordict, name=t.name())))
 	t.kick()
 
 @commandHandler('insertban')
 @masterRequired
-def onInsertBan(cn, args):
+def onInsertBan(p, args):
 	'''@description Intert ban for ip address
 	   @usage <ip> <seconds> (reason)'''
-	p = player(cn)
 	args = args.split(' ')
 	if len(args) < 2:
 		raise UsageError('ip length (reason)')
@@ -103,10 +100,9 @@ def onInsertBan(cn, args):
 
 @commandHandler('banname')
 @masterRequired
-def onBanName(cn, args):
+def onBanName(p, args):
 	'''@description Ban name from the server
 	   @usage <name>'''
-	p = player(cn)
 	reason = args.split(' ')
 	if len(reason) == 1:
 		nick = reason[0]
@@ -133,7 +129,7 @@ def reqClearBans(cn):
 
 @commandHandler('clearbans')
 @masterRequired
-def onClearBansCmd(cn, args):
+def onClearBansCmd(p, args):
 	'''@description Remove active bans
 	   @usage'''
 	clearBans()

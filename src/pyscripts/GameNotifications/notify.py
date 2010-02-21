@@ -1,7 +1,7 @@
 from xsbs.colors import red
 from xsbs.ui import info
 from xsbs.colors import colordict
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 from xsbs.settings import PluginConfig
 from xsbs.players import player
 from xsbs.server import message as serverMessage
@@ -18,20 +18,18 @@ tktemp = string.Template(tktemp)
 uptemp = string.Template(uptemp)
 getmaptemp = string.Template(getmaptemp)
 
+@eventHandler('player_teamkill')
 def teamkill_broadcast(cn, tcn):
 	tker = player(cn)
 	target = player(tcn)
 	serverMessage(info(tktemp.substitute(colordict, tker=tker.name(), victim=target.name(), tkcount=tker.teamkills())))
 
+@eventHandler('player_get_map')
 def getmap(cn):
 	p = player(cn)
 	serverMessage(info(getmaptemp.substitute(colordict, name=p.name())))
 
+@eventHandler('player_uploaded_map')
 def onUploadMap(cn):
 	p = player(cn)
 	serverMessage(info(uptemp.substitute(colordict, name=p.name())))
-
-registerServerEventHandler('player_teamkill', teamkill_broadcast)
-registerServerEventHandler('player_uploaded_map', onUploadMap)
-registerServerEventHandler('player_get_map', getmap)
-

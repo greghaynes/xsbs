@@ -1,10 +1,10 @@
 import sbserver
 from xsbs.settings import PluginConfig
 from xsbs.colors import colordict
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 import string
 
-
+@eventHandler('player_connect_delayed')
 def greet(cn):
 	sbserver.playerMessage(cn, motdstring)
 
@@ -13,5 +13,3 @@ motdstring = config.getOption('Config', 'template', '${orange}Welcome to a ${red
 del config
 
 motdstring = string.Template(motdstring).substitute(colordict)
-registerServerEventHandler('player_connect_delayed', greet)
-

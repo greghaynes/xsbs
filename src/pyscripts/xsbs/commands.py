@@ -42,7 +42,7 @@ class CommandManager:
 		if self.command_handlers.has_key(command):
 			for func in self.command_handlers[command]:
 				try:
-					func(cn, text)
+					func(p, text)
 				except UsageError, e:
 					try:
 						usages = command_info[command].usages
@@ -65,7 +65,7 @@ class CommandManager:
 					logging.warn('Uncaught exception occured in command handler.')
 					logging.warn(traceback.format_exc())
 		else:
-			sbserver.playerMessage(cn, error('Command not found'))
+			p.message(error('Command not found'))
 	def onMsg(self, cn, text):
 		if len(text) > 0 and self.prefixes.find(text[0]) != -1:
 			cmd = text[1:].split(' ')[0]

@@ -1,17 +1,20 @@
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 from xsbs.players import player, masterRequired
 from xsbs.ui import warning, error, info
 from xsbs.settings import PluginConfig
-from xsbs.commands import registerCommandHandler
+from xsbs.commands import commandHandler
 
 config = PluginConfig('cheatdetection')
 spectate_map_modified = (config.getOption('Config', 'spectate_map_modified', 'yes') == 'yes')
 del config
 
+@eventHandler('player_modified_map')
 def onMapModified(cn):
 	player(cn).gamevars['modified_map'] = True
 	checkModified(cn)
 
+@eventHandler('player_active')
+@eventHandler('player_unspectated')
 def checkModified(cn):
 	try:
 		p = player(cn)
@@ -23,11 +26,12 @@ def checkModified(cn):
 	except ValueError:
 	 	pass
 
+@commandHandler('mapmodifiedspec')
 @masterRequired
-def mapModifiedSpecCmd(cn, args):
+def mapModifiedSpecCmd(p, args):
 	'''@description Enable or disable spectate clients with modified map
 	   @usage enable/disable'''
-	p = player(cn)
+	global spectate_map_modified
 	if args == 'disable':
 		spectate_map_modified = False
 		p.message(info('Spectate modified mapes disabled'))
@@ -36,9 +40,4 @@ def mapModifiedSpecCmd(cn, args):
 		p.message(info('Spectate modified mapes enabled'))
 	else:
 		p.message(error('Usage: #mapmodifiedspec (enable/disable)'))
-
-registerServerEventHandler('player_modified_map', onMapModified)
-registerServerEventHandler('player_active', checkModified)
-registerServerEventHandler('player_unspectated', checkModified)
-registerCommandHandler('mapmodifiedspec', mapModifiedSpecCmd)
 

@@ -1,6 +1,6 @@
 from Bans.bans import ban
 from xsbs.settings import PluginConfig
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 from xsbs.players import player
 from xsbs.ui import warning
 from xsbs.colors import colordict
@@ -14,6 +14,7 @@ warn_tk_message = config.getOption('Config', 'warn_tk_message', 'This server doe
 del config
 warn_tk_message = string.Template(warn_tk_message)
 
+@eventHandler('player_teamkill')
 def onTeamkill(cn, tcn):
 	try:
 		if player(cn).teamkills() >= limit:
@@ -22,6 +23,3 @@ def onTeamkill(cn, tcn):
 			player(cn).message(warning(warn_tk_message.substitute(colordict, limit=limit)))
 	except KeyError:
 		pass
-
-registerServerEventHandler('player_teamkill', onTeamkill)
-

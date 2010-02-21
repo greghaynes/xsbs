@@ -1,4 +1,4 @@
-from xsbs.events import registerServerEventHandler
+from xsbs.events import eventHandler
 from xsbs.players import player, all as allPlayers
 from xsbs.settings import PluginConfig
 from xsbs.colors import colordict
@@ -42,6 +42,7 @@ most_killapocalypsestemp = string.Template(most_killapocalypsestemp)
 most_killionairestemp = string.Template(most_killionairestemp)
 
 
+@eventHandler('intermission_begin')
 def onIntermission():
 	players = allPlayers()
 	most_frags = 0
@@ -207,6 +208,3 @@ def onIntermission():
 	if msg != '':
 		msg = awards_prefix + msg
 		serverMessage(msg)
-
-registerServerEventHandler('intermission_begin', onIntermission)
-

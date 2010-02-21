@@ -29,13 +29,13 @@ smite_template = string.Template(smite_template)
 
 @commandHandler('pause')
 @masterRequired
-def onPauseCmd(cn, args):
+def onPauseCmd(p, args):
 	'''@description Pause the game
 	   @usage'''
 	if args != '':
 		raise ExtraArgumentError()
 		return
-	setPaused(True, cn)
+	setPaused(True, p.cn)
 
 
 def resumeTimer(count, cn):
@@ -47,7 +47,7 @@ def resumeTimer(count, cn):
 
 @commandHandler('resume')
 @masterRequired
-def onResumeCmd(cn, args):
+def onResumeCmd(p, args):
 	'''@description Resume game from pause
 	   @usage
 	   @master'''
@@ -55,25 +55,25 @@ def onResumeCmd(cn, args):
 		raise ExtraArgumentError()
 		return
 	if resume_timeout > 0:
-		resumeTimer(resume_timeout, cn)
+		resumeTimer(resume_timeout, p.cn)
 	else:
-		setPaused(False, cn)
+		setPaused(False, p.cn)
 
 @commandHandler('reload')
 @adminRequired
-def onReloadCmd(cn, args):
+def onReloadCmd(p, args):
 	'''@description Reload server plugins
 	   @usage
 	   @admin'''
 	if args != '':
 		raise ExtraArgumentError()
 	else:
-		sbserver.playerMessage(cn, yellow('NOTICE: ') + blue('Reloading server plugins.  Fasten your seatbelts...'))
+		p.message(yellow('NOTICE: ') + blue('Reloading server plugins.  Fasten your seatbelts...'))
 		reloadPlugins()
 
 @commandHandler('givemaster')
 @masterRequired
-def onGiveMaster(cn, args):
+def onGiveMaster(p, args):
 	'''@description Give master to a client
 	   @usage cn
 	   @master'''
@@ -85,12 +85,12 @@ def onGiveMaster(cn, args):
 	except TypeError:
 		raise UsageError()
 		return
-	sbserver.playerMessage(cn, info('You have given master to %s') % sbserver.playerName(tcn))
+	p.message(info('You have given master to %s') % sbserver.playerName(tcn))
 	sbserver.setMaster(tcn)
 
 @commandHandler('resize')
 @adminRequired
-def onResize(cn, args):
+def onResize(p, args):
 	'''@description Change maximum clients allowed in server
 	   @usage maxclients
 	   @admin'''
@@ -102,7 +102,7 @@ def onResize(cn, args):
 
 @commandHandler('minsleft')
 @masterRequired
-def onMinsLeft(cn, args):
+def onMinsLeft(p, args):
 	'''@description Set minutes left in current match
 	   @usage minutes
 	   @master'''
@@ -113,7 +113,7 @@ def onMinsLeft(cn, args):
 
 @commandHandler('specall')
 @masterRequired
-def specAll(cn, args):
+def specAll(p, args):
 	'''@description Make all clients spectators
 	   @usage
 	   @master'''
@@ -125,7 +125,7 @@ def specAll(cn, args):
 
 @commandHandler('unspecall')
 @masterRequired
-def unspecAll(cn, args):
+def unspecAll(p, args):
 	'''@description Make all clients players
 	   @usage
 	   @master'''
@@ -137,19 +137,19 @@ def unspecAll(cn, args):
 
 @commandHandler('servermsg')
 @masterRequired
-def serverMessage(cn, args):
+def serverMessage(p, args):
 	'''@description Broadcast message to all clients in server
 	   @usage message
 	   @master'''
 	if args == '':
 		raise UsageError()
 	else:
-		msg = servermsg_template.substitute(colordict, sender=sbserver.playerName(cn), message=args)
+		msg = servermsg_template.substitute(colordict, sender=p.name(), message=args)
 		sbserver.message(msg)
 
 @commandHandler('ip')
 @masterRequired
-def playerIp(cn, args):
+def playerIp(p, args):
 	'''@description Get string representation of client ip
 	   @usage cn
 	   @master'''
@@ -162,7 +162,7 @@ def playerIp(cn, args):
 
 @commandHandler('master')
 @masterRequired
-def masterCmd(cn, args):
+def masterCmd(p, args):
 	'''@description Claim master
 	   @usage
 	   @master'''
@@ -170,23 +170,23 @@ def masterCmd(cn, args):
 		raise ExtraArgumentError()
 	if currentAdmin() != None:
 		raise StateError('Admin is present')
-	if sbserver.playerPrivilege(cn) == 0:
-		sbserver.setMaster(cn)
+	if sbserver.playerPrivilege(p.cn) == 0:
+		sbserver.setMaster(p.cn)
 
 @commandHandler('admin')
 @adminRequired
-def adminCmd(cn, args):
+def adminCmd(p, args):
 	'''@description Claim master
 	   @usage
 	   @admin'''
 	if args != '':
 		raise ExtraArgumentError()
-	if sbserver.playerPrivilege(cn) == 0 or sbserver.playerPrivilege(cn) == 1:
-		sbserver.setAdmin(cn)
+	if sbserver.playerPrivilege(p.cn) == 0 or sbserver.playerPrivilege(p.cn) == 1:
+		sbserver.setAdmin(p.cn)
 
 @commandHandler('unsetmaster')
 @masterRequired
-def unsetMaster(cn, args):
+def unsetMaster(p, args):
 	'''@description Force release master from current master
 	   @usage
 	   @master'''
@@ -253,7 +253,7 @@ def userPrivSetCmd(cn, tcn, args):
 
 @commandHandler('userpriv')
 @adminRequired
-def onUserPrivCmd(cn, args):
+def onUserPrivCmd(p, args):
 	'''@description Set privileges for server account
 	   @usage <cn> <action> <level>
 	   @admin'''
@@ -275,18 +275,18 @@ def onUserPrivCmd(cn, args):
 		raise UsageError()
 
 	if subcmd == 'add':
-		userPrivSetCmd(cn, tcn, args)
+		userPrivSetCmd(p.cn, tcn, args)
 	elif subcmd == 'del':
-		userPrivSetCmd(cn, tcn, 'user')
+		userPrivSetCmd(p.cn, tcn, 'user')
 	elif subcmd == 'set':
-		userPrivSetCmd(cn, tcn, args)
+		userPrivSetCmd(p.cn, tcn, args)
 	elif subcmd == 'wipe':
-		userPrivSetCmd(cn, tcn, args)
+		userPrivSetCmd(p.cn, tcn, args)
 	else:
 		raise UsageError()
 
 @commandHandler('pm')
-def onPmCommand(cn, args):
+def onPmCommand(p, args):
 	'''@description Send a private message
 	   @usage <cn> <message>
 	   @public'''
@@ -298,17 +298,16 @@ def onPmCommand(cn, args):
 		if i > 1:
 			args[1] += (" " + str(key))
 		i += 1
-	player(int(args[0])).message(pm_template.substitute(colordict, sender=player(cn).name(), message=args[1]))
+	player(int(args[0])).message(pm_template.substitute(colordict, sender=p.name(), message=args[1]))
 	
 @commandHandler('smite')
 @masterRequired
-def onSmiteCommand(cn, args):
+def onSmiteCommand(p, args):
 	'''@description Strike a player down
 	   @usage <cn>
 	   @master'''
 	if args == '':
 		raise UsageError()
-	p = player(cn)
 	t = player(int(args))
 	sendServerMessage(info(smite_template.substitute(colordict, smiter=p.name(), smited=t.name())))
 	t.suicide()
