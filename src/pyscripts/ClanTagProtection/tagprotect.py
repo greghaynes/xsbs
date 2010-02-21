@@ -3,13 +3,10 @@ from xsbs.players import player
 from xsbs.ui import warning
 from xsbs.colors import red
 from xsbs.timers import addTimer
-from xsbs.db import dbmanager
 from xsbs.ban import ban
-from xsbs.users import User, isLoggedIn
+from xsbs.users import User, Group, isLoggedIn
 
-from sqlalchemy.orm import relation
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
+from elixir import Entity, Field, String, Integer, ManyToOne, OneToMany, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound
 
 import re
@@ -18,24 +15,11 @@ import logging
 regex = '\[.{1,5}\]|<.{1,5}>|\{.{1,5}\}|\}.{1,5}\{|.{1,5}\||\|.{1,5}\|'
 regex = re.compile(regex)
 
-Base = declarative_base()
-session = dbmanager.session()
-
-class ClanTag(Base):
-	__tablename__ = 'clantags'
-	id = Column(Integer, primary_key=True)
-	tag = Column(String, index=True)
+class ClanTag(Entity):
+	tag = Field(String, index=True)
+	group = ManyToOne(Group)
 	def __init__(self, tag):
 		self.tag = tag
-
-class ClanMember(Base):
-	__tablename__ = 'clanmember'
-	id = Column(Integer, primary_key=True)
-	tag_id = Column(Integer, index=True)
-	user_id = Column(Integer, index=True)
-	def __init__(self, tag_id, user_id):
-		self.tag_id = tag_id
-		self.user_id = user_id
 
 def warnTagReserved(cn, count, sessid, nick):
 	try:
@@ -75,9 +59,10 @@ def setUsedTags(cn):
 			except NoResultFound:
 				pass
 
-def userBelongsTo(user, tag_id):
+def userBelongsTo(user, tag):
+	return False
 	try:
-		session.query(ClanMember).filter(ClanMember.tag_id==tag_id).filter(ClanMember.user_id==user.id).one()
+		## TODO
 		return True
 	except NoResultFound:
 		return False
@@ -126,6 +111,4 @@ def onConnect(cn):
 @eventHandler('player_name_changed')
 def onNameChange(cn, oldname, newname):
 	onConnect(cn)
-
-Base.metadata.create_all(dbmanager.engine)
 

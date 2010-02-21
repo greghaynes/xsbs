@@ -1,7 +1,6 @@
 from elixir import Entity, Field, String, Integer, Boolean, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from xsbs.db import dbmanager
 from xsbs.settings import PluginConfig
 from xsbs.net import ipLongToString, ipStringToLong
 from xsbs.timers import addTimer

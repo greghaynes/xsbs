@@ -1,27 +1,20 @@
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm.exc import NoResultFound
+from elixir import Entity, Field, Integer, String, Boolean, ManyToOne, OneToMany, session
+
 from xsbs.settings import PluginConfig
 from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.commands import commandHandler, UsageError
-from xsbs.db import dbmanager
 from xsbs.players import isAtLeastMaster
+
 import sbserver
 
 config = PluginConfig('namesdb')
-tablename = config.getOption('Config', 'tablename', 'ip_name')
 master_required = config.getOption('Config', 'master_required', 'no') == 'yes'
 del config
 
-Base = declarative_base()
-session = dbmanager.session()
-
-class IpToNick(Base):
-	__tablename__=tablename
-	id = Column(Integer, primary_key=True)
-	ip = Column(Integer, index=True)
-	nick = Column(String)
+class IpToNick(Entity):
+	ip = Field(Integer, index=True)
+	nick = Field(String(15))
 	def __init__(self, ip, nick):
 		self.ip = ip
 		self.nick = nick
@@ -68,7 +61,6 @@ def namesCmd(cn, args):
 		namestr += name.nick + ' '
 	sbserver.playerMessage(cn, info(namestr))
 
-Base.metadata.create_all(dbmanager.engine)
 registerServerEventHandler('player_connect', onConnect)
 registerServerEventHandler('player_name_changed', onNameChange)
 

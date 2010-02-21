@@ -1,13 +1,15 @@
+from elixir import session
+
 from xsbs.settings import PluginConfig
 from xsbs.colors import red, colordict
 from xsbs.ui import insufficientPermissions, error, info
-from xsbs.db import dbmanager
 from xsbs.commands import commandHandler, UsageError, ArgumentValueError
 from xsbs.events import triggerServerEvent, eventHandler, policyHandler, execLater
 from xsbs.ban import ban, isIpBanned, isNickBanned, Ban
 from xsbs.net import ipLongToString, ipStringToLong
 from xsbs.players import masterRequired, player
 from xsbs.server import message as serverMessage
+
 import time, string
 import logging
 
@@ -18,8 +20,6 @@ default_reason = config.getOption('Config', 'default_reason', 'unspecified reaso
 kick_message = config.getOption('Config', 'kick_message', '${green}${name}${white} was ${red}kicked${white} from server')
 del config
 kick_message = string.Template(kick_message)
-
-session = dbmanager.session()
 
 @commandHandler('ban')
 @masterRequired

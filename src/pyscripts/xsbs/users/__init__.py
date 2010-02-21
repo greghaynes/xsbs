@@ -1,7 +1,6 @@
 from elixir import Entity, Field, String, ManyToOne, OneToMany, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound
 
-from xsbs.db import dbmanager
 from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
 from xsbs.colors import red, green, orange

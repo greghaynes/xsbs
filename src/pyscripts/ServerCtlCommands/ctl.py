@@ -1,4 +1,5 @@
 import sbserver
+from elixir import session
 
 from xsbs.events import triggerServerEvent
 from xsbs.commands import commandHandler, UsageError, ExtraArgumentError, StateError
@@ -11,7 +12,6 @@ from xsbs.users import loggedInAs
 from xsbs.users.privilege import isUserMaster, isUserAdmin, UserPrivilege
 from xsbs.players import masterRequired, adminRequired, player, currentAdmin
 from xsbs.server import setPaused, message as sendServerMessage
-from xsbs.db import dbmanager
 from xsbs.timers import addTimer
 
 from Motd.motd import motdstring
@@ -26,8 +26,6 @@ del config
 servermsg_template = string.Template(servermsg_template)
 pm_template = string.Template(pm_template)
 smite_template = string.Template(smite_template)
-
-session = dbmanager.session()
 
 @commandHandler('pause')
 @masterRequired
