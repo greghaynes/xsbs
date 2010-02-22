@@ -27,7 +27,7 @@ def clanWar(sender, args):
 	else:
 		args = args.split(' ')
 		if len(args) == 1:
-			map = args
+			map = args[0]
 			mode = currentMode()
 		elif len(args) == 2:
 			map = args[0]
