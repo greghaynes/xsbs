@@ -16,6 +16,9 @@ class ConfigOption(Entity):
 	value = Field(String(30))
 
 def loadPluginConfig(dict, plugin):
+	'''Accepts a dictionary and plugin name.
+	   All stored values for the plugin will be loaded into dict[section][option] = value.
+	   This allows you to pass a dictionary pre-loaded with default values. '''
 	options = Entity.query.filter_by(plugin=plugin).all()
 	for option in options:
 		try:
