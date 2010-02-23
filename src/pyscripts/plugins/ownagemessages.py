@@ -20,7 +20,7 @@ spreemessages = {
 	15: string.Template(green('$name') + ' is ' + orange('GODLIKE!')) 
 	}
 endmsg = string.Template(orange('$victimname') + '\'s killing spree ended by ' + green('$killername'))
-suicideendmsg = string.Template(orange('$victimname') + 'has ended his own killing spree!')
+suicideendmsg = string.Template(orange('$victimname') + ' has ended his own killing spree!')
 
 neomessages = { 
 	2: string.Template(orange('DOUBLE KILL!')),
