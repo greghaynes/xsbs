@@ -71,6 +71,7 @@ namespace server
     SVAR(serverpass, "");
     SVAR(adminpass, "");
     SVAR(pyscriptspath, "");
+    SVAR(pyconfigpath, "Config/");
     VARF(publicserver, 0, 0, 2, {
         switch(publicserver)
         {
@@ -144,6 +145,7 @@ namespace server
             case 'o': setvar("publicserver", atoi(&arg[2])); return true;
             case 'g': setvar("serverbotlimit", atoi(&arg[2])); return true;
             case 's': setsvar("pyscriptspath", &arg[2]); return true;
+            case 'a': setsvar("pyconfigpath", &arg[2]); return true;
         }
         return false;
     }

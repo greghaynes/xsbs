@@ -1,7 +1,7 @@
 from ConfigParser import ConfigParser, NoOptionError, NoSectionError
+import sbserver
 
-# Set this to wherever your configuration files lie.  Must end in a /
-configuration_path = 'Config/'
+configuration_path = sbserver.configdir()
 
 # Set this to what you want config file names to end with
 configuration_extension = '.conf'

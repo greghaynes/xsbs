@@ -844,6 +844,11 @@ static PyObject *suicide(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *configdir(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("s", server::pyconfigpath);
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
@@ -905,6 +910,7 @@ static PyMethodDef ModuleMethods[] = {
     {"demoData", demoData, METH_VARARGS, "Demo data."},
 	{"sendDemo", sendDemo, METH_VARARGS, "Send demo to client."},
 	{"suicide", suicide, METH_VARARGS, "Force client to commit suicide."},
+    {"configdir", configdir, METH_VARARGS, "Python config dir."},
 	{NULL, NULL, 0, NULL}
 };
 
