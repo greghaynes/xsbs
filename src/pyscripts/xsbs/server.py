@@ -101,3 +101,5 @@ def isFrozen():
 def onPlayerPause(cn, val):
 	setPaused(val, cn)
 
+def cseval(data):
+  return sbserver.cseval(data)

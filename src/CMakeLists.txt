@@ -11,6 +11,7 @@ set(xsbs_srcs
 	fpsgame/server.cpp
 
 	pycontrol/sbpy.cpp
+	pycontrol/sbcs.cpp
 	pycontrol/servermodule.cpp)
 
 set(XSBS_LIBS

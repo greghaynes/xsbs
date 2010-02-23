@@ -19,11 +19,20 @@
 
 #include "servermodule.h"
 #include "server.h"
+#include "sbcs.h"
 
 #include <iostream>
 
 namespace SbPy
 {
+
+static PyObject *cseval(PyObject *self, PyObject *args)
+{
+	char *text;
+	if(!PyArg_ParseTuple(args, "s", &text))
+		return 0;
+	return Py_BuildValue("i", SbCs::cseval(std::string(text)));
+}
 
 static PyObject *numClients(PyObject *self, PyObject *args)
 {
@@ -845,6 +854,7 @@ static PyObject *suicide(PyObject *self, PyObject *args)
 }
 
 static PyMethodDef ModuleMethods[] = {
+	{"cseval", cseval, METH_VARARGS, "Execute a string containing CubeScript"},
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
 	{"clients", clients, METH_VARARGS, "List of client numbers."},
