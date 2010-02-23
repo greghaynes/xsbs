@@ -140,7 +140,6 @@ namespace SbCs
 			return;
 		}
 
-		printf("going to spectate %d\n", *cn);
 		server::spectate(ci, true, *cn);
 	}
 
