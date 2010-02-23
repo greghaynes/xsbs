@@ -1,6 +1,6 @@
 from elixir import session
 
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.colors import red, colordict
 from xsbs.ui import insufficientPermissions, error, info
 from xsbs.commands import commandHandler, UsageError, ArgumentValueError
@@ -13,13 +13,19 @@ from xsbs.server import message as serverMessage
 import time, string
 import logging
 
-config = PluginConfig('bans')
-ban_command = config.getOption('Config', 'ban_command', 'ban')
-default_ban_length = config.getOption('Config', 'default_ban_time', 3600)
-default_reason = config.getOption('Config', 'default_reason', 'unspecified reason')
-kick_message = config.getOption('Config', 'kick_message', '${green}${name}${white} was ${red}kicked${white} from server')
-del config
-kick_message = string.Template(kick_message)
+config = {
+	'Main': {
+		'command': 'ban',
+		'default_length': '3600',
+		'default_reason': 'unspecified reason',
+		'kick_message': '${green}${name}${white} was ${red}kicked${white} from server',
+		}
+	}
+def init():
+	loadPluginConfig(config, 'Bans')
+	config['Main']['kick_message'] = string.Template(config['Main']['kick_message'])
+
+init()
 
 @commandHandler('ban')
 @masterRequired
@@ -35,11 +41,11 @@ def onBanCmd(p, text):
 		if len(sp) >= 3:
 			reason = sp[2]
 		else:
-			reason = default_reason
+			reason = config['Main']['default_reason']
 		if len(sp) >= 2:
 			length = int(sp[1])
 		else:
-			length = int(default_ban_length)
+			length = int(config['Main']['default_length'])
 		ban(tcn, length, reason, p.cn)
 	except (ValueError, KeyError):
 		raise UsageError('cn (duration) (reason)')
@@ -65,7 +71,7 @@ def allowClient(cn, pwd):
 @eventHandler('player_kick')
 @masterRequired
 def onKick(p, tcn):
-	ban(tcn, 14500, 'Unspecified reason', p.cn)
+	ban(tcn, 14500, config['Main']['default_reason'], p.cn)
 
 @commandHandler('kick')
 @masterRequired
@@ -74,7 +80,7 @@ def onKickCommand(p, args):
 	   @usage <cn>'''
 	tcn = int(args)
 	t = player(tcn)
-	serverMessage(info(kick_message.substitute(colordict, name=t.name())))
+	serverMessage(info(config['Main']['kick_message'].substitute(colordict, name=t.name())))
 	t.kick()
 
 @commandHandler('insertban')

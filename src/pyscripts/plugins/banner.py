@@ -1,4 +1,4 @@
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.timers import addTimer
 from xsbs.colors import colordict
 from xsbs.ui import notice
@@ -17,11 +17,21 @@ class Banner(object):
 banners = []
 
 def setup():
-	config = PluginConfig('banner')
-	default_timeout = config.getOption('Config', 'default_timeout', 180000)
-	for option in config.getAllOptions('Banners'):
-		msg = option[1]
-		delay = config.getOption('Timeouts', option[0], default_timeout, False)
+	config = {
+		'Main': {
+			'default_frequency': 180000,
+			},
+		'Banners': {},
+		'Timeouts': {},
+		}
+	loadPluginConfig(config, 'Banners')
+	default_timeout = config['Main']['default_frequency']
+	for key, value in config['Banners'].items():
+		msg = value
+		try:
+			delay = config['Timeouts'][key]
+		except KeyError:
+			delay = default_timeout
 		banners.append(Banner(msg, int(delay)))
 	del config
 
