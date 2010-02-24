@@ -6,7 +6,7 @@ from xsbs.events import eventHandler
 
 config = PluginConfig('httpserver')
 port = config.getOption('Config', 'port', '8081')
-enable = config.getOption('Config', 'enable', 'yes') == yes
+enable = config.getOption('Config', 'enable', 'yes') == 'yes'
 port = int(port)
 del config
 

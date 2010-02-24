@@ -1,5 +1,5 @@
 from ConfigParser import ConfigParser, NoOptionError, NoSectionError
-from elixir import Entity, Field, Unicode
+from elixir import Entity, Field, String
 
 # Set this to wherever your configuration files lie.  Must end in a /
 configuration_path = 'Config/'
