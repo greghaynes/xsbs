@@ -690,6 +690,18 @@ void stoplistenserver()
 COMMAND(stoplistenserver, "");
 #endif
 
+void showhelp()
+{
+	printf("Usage: xsbs -sPYSCRIPTS_PATH [OPTION...]\n");
+	printf("\n");
+	printf(" -cMAXCLIENTS             Set the maximum number of clients.\n");
+	printf(" -iIP_ADDRESS             Set ip address to bind server to.\n");
+	printf(" -jPORT                   Set port to listen on.\n");
+	printf(" -mMASTER_HOSTNAME        Use hostname as master server.\n");
+	printf(" -sPYSCRIPTS_PATH         Path to the pyscripts directory.\n");
+	printf(" -aCONFIGDIR_PATH         Path to configuration directory.\n\n");
+}
+
 bool serveroption(char *opt)
 {
     switch(opt[1])
@@ -703,6 +715,7 @@ bool serveroption(char *opt)
         case 'q': printf("Using home directory: %s\n", opt+2); sethomedir(opt+2); return true;
         case 'k': printf("Adding package directory: %s\n", opt+2); addpackagedir(opt+2); return true;
 #endif
+		case 'h': showhelp(); exit(0);
         default: return false;
     }
 }
