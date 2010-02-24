@@ -1,5 +1,5 @@
 from ConfigParser import ConfigParser, NoOptionError, NoSectionError
-from elixir import Entity, Field, String
+from elixir import Entity, Field, String, Text
 
 # Set this to wherever your configuration files lie.  Must end in a /
 configuration_path = 'Config/'
@@ -13,13 +13,13 @@ class ConfigOption(Entity):
 	plugin = Field(String(30))
 	section = Field(String(30))
 	name = Field(String(30))
-	value = Field(String(30))
+	value = Field(Text)
 
 def loadPluginConfig(dict, plugin):
 	'''Accepts a dictionary and plugin name.
 	   All stored values for the plugin will be loaded into dict[section][option] = value.
 	   This allows you to pass a dictionary pre-loaded with default values. '''
-	options = Entity.query.filter_by(plugin=plugin).all()
+	options = ConfigOption.query.filter_by(plugin=plugin).all()
 	for option in options:
 		try:
 			sectdict = dict[option.section]
