@@ -93,12 +93,14 @@ event_abilities = {
 		'\x036RELINQ MASTER\x03  %s (\x037 %i \x03)' % (sbserver.playerName(x), x))),
 }
 
-factory = IrcBotFactory(nickname, [channel])
-factory.doConnect()
+def init():
+	if enable:
+		factory.doConnect()
+		for key in event_abilities.keys():
+			if config.getOption('Abilities', key, 'no') == 'yes':
+				ev = event_abilities[key]
+				registerServerEventHandler(ev[0], ev[1])
 
-for key in event_abilities.keys():
-	if config.getOption('Abilities', key, 'no') == 'yes':
-		ev = event_abilities[key]
-		registerServerEventHandler(ev[0], ev[1])
+factory = IrcBotFactory(nickname, [channel])
 
 
