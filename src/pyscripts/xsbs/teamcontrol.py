@@ -20,7 +20,9 @@ switchteam_modes = [
 setteam_modes = [
 	2,
 	4,
-	6]
+	6,
+	9,
+	10]
 
 def isSafeTeam(team):
 	'''Is team safe based on current mode.

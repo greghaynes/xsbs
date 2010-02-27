@@ -1,7 +1,7 @@
 from elixir import Entity, Field, String, Integer, Boolean, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.net import ipLongToString, ipStringToLong
 from xsbs.timers import addTimer
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
@@ -13,10 +13,15 @@ import time, string
 import logging
 import sbserver
 
-config = PluginConfig('bans')
-ban_message = config.getOption('Config', 'message', 'Banning ${orange}${name}${white} for $seconds seconds for ${red}${reason}')
-del config
-ban_message = string.Template(ban_message)
+config = {
+	'Main': {
+		'message': 'Banning ${orange}${name}${white} for $seconds seconds for ${red}${reason}',
+		}
+	}
+
+def init():
+	loadPluginConfig(config, 'Bans')
+	config['Main']['message'] = string.Template(config['Main']['message'])
 
 class Ban(Entity):
 	ip = Field(Integer, index=True)
@@ -89,5 +94,5 @@ def ban(cn, seconds, reason, banner_cn):
 		reason,
 		banner_nick,
 		ipLongToString(banner_ip))
-	sbserver.message(info(ban_message.substitute(colordict, name=nick, seconds=seconds, reason=reason)))
+	sbserver.message(info(config['Main']['message'].substitute(colordict, name=nick, seconds=seconds, reason=reason)))
 

@@ -3,7 +3,7 @@ from elixir import session
 
 from xsbs.events import triggerServerEvent
 from xsbs.commands import commandHandler, UsageError, ExtraArgumentError, StateError
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.colors import red, yellow, blue, green, white, colordict
 from xsbs.ui import error, info, notice, insufficientPermissions
 from xsbs.net import ipLongToString
@@ -15,15 +15,25 @@ from xsbs.timers import addTimer
 
 import string
 
-config = PluginConfig('servercommands')
-servermsg_template = config.getOption('Templates', 'servermsg', '${orange}${sender}${white}: ${message}')
-pm_template = config.getOption('Templates', 'pm', '${orange}${sender}${white}: ${message}')
-smite_template = config.getOption('Templates', 'smite', '${green}${smited}${white} has been smited by ${orange}${smiter}')
-resume_timeout = int(config.getOption('Config', 'resume_timeout', 5))
-del config
-servermsg_template = string.Template(servermsg_template)
-pm_template = string.Template(pm_template)
-smite_template = string.Template(smite_template)
+config = {
+	'Main':
+		{
+			'resume_timeout': '5',
+		},
+	'Templates':
+		{
+			'server_message': '${orange}${sender}${white}: ${message}',
+			'pm': '${orange}${sender}${white}: ${message}',
+			'smite': '${green}${smited}${white} has been smited by ${orange}${smiter}'
+		}
+	}
+
+def init():
+	loadPluginConfig(config, 'SereverCtl')
+	config['Templates']['server_message'] = string.Template(config['Templates']['server_message'])
+	config['Templates']['pm'] = string.Template(config['Templates']['pm'])
+	config['Templates']['smite'] = string.Template(config['Templates']['smite'])
+	config['Main']['resume_timeout'] = int(config['Main']['resume_timeout'])
 
 @commandHandler('pause')
 @masterRequired
@@ -53,7 +63,7 @@ def onResumeCmd(p, args):
 		raise ExtraArgumentError()
 		return
 	if resume_timeout > 0:
-		resumeTimer(resume_timeout, p.cn)
+		resumeTimer(config['Main']['resume_timeout'], p.cn)
 	else:
 		setPaused(False, p.cn)
 
@@ -130,7 +140,7 @@ def serverMessage(p, args):
 	if args == '':
 		raise UsageError()
 	else:
-		msg = servermsg_template.substitute(colordict, sender=p.name(), message=args)
+		msg = config['Templates']['server_message'].substitute(colordict, sender=p.name(), message=args)
 		sbserver.message(msg)
 
 @commandHandler('ip')
@@ -284,7 +294,7 @@ def onPmCommand(p, args):
 		if i > 1:
 			args[1] += (" " + str(key))
 		i += 1
-	player(int(args[0])).message(pm_template.substitute(colordict, sender=p.name(), message=args[1]))
+	player(int(args[0])).message(config['Templates']['pm'].substitute(colordict, sender=p.name(), message=args[1]))
 	
 @commandHandler('smite')
 @masterRequired
@@ -295,7 +305,7 @@ def onSmiteCommand(p, args):
 	if args == '':
 		raise UsageError()
 	t = player(int(args))
-	sendServerMessage(info(smite_template.substitute(colordict, smiter=p.name(), smited=t.name())))
+	sendServerMessage(info(config['Templates']['smite'].substitute(colordict, smiter=p.name(), smited=t.name())))
 	t.suicide()
 
 

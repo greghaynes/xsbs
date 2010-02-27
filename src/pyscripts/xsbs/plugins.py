@@ -2,8 +2,8 @@ from elixir import setup_all, create_all
 import os, sys
 
 # Initialize these before loading plugins
-import xsbs.events
 import xsbs.db
+import xsbs.events
 import xsbs.log
 import xsbs.ban
 import xsbs.users
