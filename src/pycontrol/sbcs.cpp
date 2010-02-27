@@ -1,13 +1,17 @@
 #include "server.h"
 #include "sbcs.h"
 #include <string>
+#include <map>
 
 // returned on error if we're returning an int
-const int RINT_ERROR = -1;
+static const int RINT_ERROR = -1;
 
 // boolean constants, since cubescript doesn't have them
-const int CS_FALSE = 0;
-const int CS_TRUE = 1;
+static const int CS_FALSE = 0;
+static const int CS_TRUE = 1;
+
+static std::multimap<std::string, char *> event_dict; // eventname, block
+typedef std::pair<std::string, char *> event_pair;
 
 #define CN_INFO_RET(ret) server::clientinfo *ci = server::getinfo(*cn); \
 		if(!ci) \
@@ -16,28 +20,60 @@ const int CS_TRUE = 1;
 			return; \
 		} \
 		intret(ret);
+
+#define SVARP_M(name, cur) SVARP(##name, cur)
 		
 
 namespace SbCs
 {
-	int cseval(std::string data)
+	char * cseval(std::string data)
 	{
-		return execute(data.c_str());
+		return executeret(data.c_str());
+	}
+
+	void foo()
+	{
+		printf("wtf???\n");
+	}
+
+	void trigger_event(std::string eventname, std::string args[], size_t num_args)
+	{
+		for(std::multimap<std::string, char *>::iterator it = event_dict.begin();it != event_dict.end();++it)
+		{
+			if(it->first == eventname)
+			{
+				for(size_t i = 0;i < num_args;++i)
+				{
+					std::string arg = args[i];
+
+					// fixme: hack
+					defformatstring(hack)("arg%d = \"%s\"", i, args[i].c_str());
+					executeret(hack);
+				}
+
+				defformatstring(hack2)("args = %d", num_args);
+				executeret(hack2);
+
+				executeret(it->second);
+			}
+		}
+	}
+
+	void deinitCs()
+	{
+		for(std::multimap<std::string, char *>::iterator it = event_dict.begin();it != event_dict.end();++it)
+		{
+			free(it->second);
+		}
+	}
+
+	void initCs()
+	{
 	}
 
 	void playershots(int *cn)
 	{
 		CN_INFO_RET(ci->state.shots);
-		/*server::clientinfo *ci = server::getinfo(*cn);
-
-		if(!ci)
-		{
-			// todo: some error mechanism
-			intret(RINT_ERROR);
-			return;
-		}
-
-		intret(ci->state.shots);*/
 	}
 
 	void playerhits(int *cn)
@@ -249,8 +285,20 @@ namespace SbCs
 		intret(totalmillis);
 	}
 
+	void print(char *s)
+	{
+		printf("[cs] %s\n", s);
+	}
+
+	void registerevent(char *eventname, char *block)
+	{
+		event_dict.insert(event_pair(eventname, strdup(block)));
+	}
+
 
 	// command list
+	COMMAND(print, "s");
+	COMMAND(registerevent, "ss");
 	COMMAND(playershots, "i");
 	COMMAND(playerhits, "i");
 	COMMAND(playerfrags, "i");

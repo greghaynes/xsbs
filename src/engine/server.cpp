@@ -9,9 +9,20 @@
 
 #include "engine.h"
 #include "sbpy.h"
+#include "sbcs.h"
 #include "server.h"
 
 #include <signal.h>
+
+static PyObject *loggingModule = 0, *loggingError = 0;
+
+#define PY_ERR(x) \
+	if(!x) \
+	{ \
+		if(PyErr_Occurred()) \
+			PyErr_Print(); \
+		return;\
+	}
 
 #ifdef STANDALONE
 void fatal(const char *s, ...) 
@@ -28,6 +39,24 @@ void conoutfv(int type, const char *fmt, va_list args)
     string sf, sp;
     vformatstring(sf, fmt, args);
     filtertext(sp, sf);
+
+	if(!loggingModule)
+	{
+		loggingModule = PyImport_ImportModule("logging");
+		PY_ERR(loggingModule)
+	}
+
+	if(!loggingError)
+	{
+		loggingError = PyObject_GetAttrString(loggingModule, "error");
+		PY_ERR(loggingError)
+	}
+
+	PyObject *pyargs = Py_BuildValue("(s)", sp);
+	PY_ERR(pyargs)
+
+	PyObject *r = PyObject_CallObject(loggingError, pyargs);
+	PY_ERR(r)
 }
 
 void conoutf(const char *fmt, ...)
@@ -719,6 +748,9 @@ int main(int argc, char* argv[])
     game::parseoptions(gameargs);
     initserver(true, true);
     SbPy::triggerEvent("server_stop", 0);
+	SbCs::deinitCs();
+	Py_XDECREF(loggingModule);
+	Py_XDECREF(loggingError);
     SbPy::deinitPy();
     return 0;
 }

@@ -31,7 +31,59 @@ static PyObject *cseval(PyObject *self, PyObject *args)
 	char *text;
 	if(!PyArg_ParseTuple(args, "s", &text))
 		return 0;
-	return Py_BuildValue("i", SbCs::cseval(std::string(text)));
+	return Py_BuildValue("s", SbCs::cseval(std::string(text)));
+}
+
+static PyObject *triggercsevent(PyObject *self, PyObject *pyargs)
+{
+	PyObject *en = PyTuple_GetItem(pyargs, 0);
+	if(!en || PyErr_Occurred())
+		return 0;
+
+	char *es = PyString_AsString(en);
+	if(!es || PyErr_Occurred())
+		return 0;
+
+	PyObject *args = PyTuple_GetItem(pyargs, 1);
+
+	if(!args || !PyTuple_Check(args))
+		return 0;
+
+	Py_ssize_t size = PyTuple_Size(args);
+	std::string *csargs = new std::string[size];
+	std::string eventname = std::string(es);
+
+	for(Py_ssize_t i = 0;i < size;++i)
+	{
+		PyObject *p = PyTuple_GetItem(args, i);
+
+		if(!p)
+		{
+			if(PyErr_Occurred())
+				PyErr_Print();
+
+			return 0;
+		}
+
+		PyObject *r = PyObject_Str(p);
+
+		if(!r)
+		{
+			if(PyErr_Occurred())
+				PyErr_Print();
+
+			return 0;
+		}
+
+		char *s = PyString_AsString(r);
+		csargs[i] = std::string(s);
+	}
+
+	SbCs::trigger_event(eventname, csargs, (size_t) size);
+	delete [] csargs;
+
+	Py_INCREF(Py_None);
+	return Py_None;
 }
 
 static PyObject *numClients(PyObject *self, PyObject *args)
@@ -855,6 +907,7 @@ static PyObject *suicide(PyObject *self, PyObject *args)
 
 static PyMethodDef ModuleMethods[] = {
 	{"cseval", cseval, METH_VARARGS, "Execute a string containing CubeScript"},
+	{"triggercsevent", triggercsevent, METH_VARARGS, "Trigger a CubeScript event"},
 	{"numClients", numClients, METH_VARARGS, "Return the number of clients on the server."},
 	{"message", message, METH_VARARGS, "Send a server message."},
 	{"clients", clients, METH_VARARGS, "List of client numbers."},

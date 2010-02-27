@@ -102,4 +102,12 @@ def onPlayerPause(cn, val):
 	setPaused(val, cn)
 
 def cseval(data):
-  return sbserver.cseval(data)
+	return sbserver.cseval(data)
+
+def csevalfile(file):
+	f = open(file, "r")
+	try:
+		cseval(f.read())
+	except: pass
+	finally:
+		f.close()

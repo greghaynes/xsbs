@@ -5,6 +5,7 @@
 */
 
 #include "sbpy.h"
+#include "sbcs.h"
 #include "servermodule.h"
 #include "server.h"
 
@@ -152,6 +153,8 @@ namespace server
     {
         smapname[0] = '\0';
         resetitems();
+
+		SbCs::initCs();
 
         // Initialize python modules
         if(!SbPy::init("sauer_server", pyscriptspath, "sbserver"))

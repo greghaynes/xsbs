@@ -5,7 +5,10 @@
 
 namespace SbCs
 {
-	int cseval(std::string data);
+	char * cseval(std::string data);
+	void   trigger_event(std::string eventname, std::string args[], size_t num_args);
+	void   deinitCs();
+	void   initCs();
 }
 
 #endif // SBCS_H

@@ -3,6 +3,7 @@ import asyncore
 import logging
 import sys
 import traceback
+import sbserver
 from twisted.internet import reactor
 
 class EventManager:
@@ -25,6 +26,8 @@ class EventManager:
 					logging.error(traceback.format_exc())
 		except KeyError:
 			pass
+	def trigger_cs(self, eventname, args=()):
+		sbserver.triggercsevent(eventname, args)
 
 class PolicyEventManager(EventManager):
 	def __init__(self):
@@ -60,6 +63,7 @@ class eventHandler(object):
 def triggerServerEvent(event, args):
 	'''Trigger event with arguments.'''
 	server_events.trigger(event, args)
+	server_events.trigger_cs(event, args)
 
 def registerPolicyEventHandler(event, func):
 	'''Call function when policy event has been executed.'''
