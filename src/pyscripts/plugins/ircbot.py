@@ -26,6 +26,7 @@ try:
 except NoOptionError:
 	ipaddress = None
 irc_msg_temp = string.Template(irc_msg_temp)
+ircchannel = channel
 
 class IrcBot(irc.IRCClient):
 	def connectionMade(self):
@@ -48,8 +49,9 @@ class IrcBot(irc.IRCClient):
 		for channel in self.joined_channels:
 			self.say(channel, message)
 	def privmsg(self, user, channel, msg):
-		user = user.split('!', 1)[0]
-		message(irc_msg_temp.substitute(colordict, channel=channel, name=user, message=msg))
+		if channel == ircchannel:
+			user = user.split('!', 1)[0]
+			message(irc_msg_temp.substitute(colordict, channel=channel, name=user, message=msg))
 		
 class IrcBotFactory(protocol.ClientFactory):
 	protocol = IrcBot
