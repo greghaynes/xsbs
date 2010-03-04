@@ -23,6 +23,7 @@ try:
 	ipaddress = config.getOption('Config', 'ipaddress', None, False)
 except NoOptionError:
 	ipaddress = None
+ircchannel = channel
 
 class IrcBot(irc.IRCClient):
 	def connectionMade(self):
@@ -71,6 +72,10 @@ class IrcBotFactory(protocol.ClientFactory):
 	def broadcast(self, message):
 		for bot in self.bots:
 			bot.broadcast(message)
+	def privmsg(self, user, channel, msg):
+		if channel == ircchannel:
+			user = user.split('!', 1)[0]
+			message(irc_msg_temp.substitute(colordict, channel=channel, name=user, message=msg))
 
 event_abilities = {
 	'player_active': ('player_connect', lambda x: factory.broadcast(
