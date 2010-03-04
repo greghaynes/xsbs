@@ -65,7 +65,7 @@ class IrcBot(irc.IRCClient):
 		for channel in self.joined_channels:
 			self.say(channel, message)
 	def privmsg(self, user, channel, msg):
-		if channel == ircchannel:
+		if channel == config['Connection']['channel']:
 			user = user.split('!', 1)[0]
 			message(config['Templates']['irc_message'].substitute(colordict, channel=channel, name=user, message=msg))
 		
