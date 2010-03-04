@@ -46,6 +46,10 @@ class IrcBot(irc.IRCClient):
 	def broadcast(self, message):
 		for channel in self.joined_channels:
 			self.say(channel, message)
+	def privmsg(self, user, channel, msg):
+		if channel == ircchannel:
+			user = user.split('!', 1)[0]
+			message(irc_msg_temp.substitute(colordict, channel=channel, name=user, message=msg))
 
 class IrcBotFactory(protocol.ClientFactory):
 	protocol = IrcBot
@@ -73,11 +77,7 @@ class IrcBotFactory(protocol.ClientFactory):
 	def broadcast(self, message):
 		for bot in self.bots:
 			bot.broadcast(message)
-	def privmsg(self, user, channel, msg):
-		if channel == ircchannel:
-			user = user.split('!', 1)[0]
-			message(irc_msg_temp.substitute(colordict, channel=channel, name=user, message=msg))
-
+	
 event_abilities = {
 	'player_active': ('player_connect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Connected\x03' % (sbserver.playerName(x), x))),
 	'player_disconnect': ('player_disconnect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Disconnected\x03' % (sbserver.playerName(x), x))),
