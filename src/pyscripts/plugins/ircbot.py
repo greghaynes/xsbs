@@ -2,7 +2,7 @@ from twisted.words.protocols import irc
 from twisted.internet import reactor, protocol
 
 from xsbs.colors import colordict
-from xsbs.settings import PluginConfig, NoOptionError
+from xsbs.settings import loadPluginConfig, NoOptionError
 from xsbs.events import registerServerEventHandler
 from xsbs.timers import addTimer
 from xsbs.server import message
@@ -11,22 +11,38 @@ import sbserver
 
 import string
 
-config = PluginConfig('ircbot')
-enable = config.getOption('Config', 'enable', 'no') == 'yes'
-channel = config.getOption('Config', 'channel', '#xsbs-newserver')
-servername = config.getOption('Config', 'servername', 'irc.gamesurge.net')
-nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
-port = int(config.getOption('Config', 'port', '6667'))
-part_message = config.getOption('Config', 'part_message', 'XSBS - eXtensible SauerBraten Server')
-msg_gw = config.getOption('Abilities', 'message_gateway', 'yes') == 'yes'
-irc_msg_temp = config.getOption('Templates', 'irc_message', '${grey}${channel} ${blue}${name}${white}: ${message}')
-status_message = config.getOption('Templates', 'status_message', '${num_clients} clients on map ${map_name}')
-try:
-	ipaddress = config.getOption('Config', 'ipaddress', None, False)
-except NoOptionError:
-	ipaddress = None
-irc_msg_temp = string.Template(irc_msg_temp)
-ircchannel = channel
+config = {
+	'Main': {
+		'enable': 'no',
+		'part_message': 'XSBS - eXtensible SauerBraten Server',
+		'ipaddress': '0',
+		},
+	'Connection': {
+		'server': 'irc.gamesurge.net',
+		'port': '6667',
+		'nickname': 'xsbs-newbot',
+		'channel': '#xsbs-newserver'
+		},
+	'Features': {
+		'message_gateway': 'yes'
+		},
+	'Alerts': {
+		'player_connect': 'yes',
+		'player_disconnect': 'yes',
+		'message': 'yes',
+		'team_message': 'no',
+		'map_change': 'yes',
+		'gain_admin': 'yes',
+		'gain_master': 'yes',
+		'auth': 'yes',
+		'relinquish_master': 'yes',
+		'relinquish_admin': 'yes'
+		},
+	'Templates': {
+		'irc_message': '${grey}${channel} ${blue}${name}${white}: ${message}',
+		'status_message': '${num_clients} clients on map ${map_name}',
+		}
+	}
 
 class IrcBot(irc.IRCClient):
 	def connectionMade(self):
@@ -51,7 +67,7 @@ class IrcBot(irc.IRCClient):
 	def privmsg(self, user, channel, msg):
 		if channel == ircchannel:
 			user = user.split('!', 1)[0]
-			message(irc_msg_temp.substitute(colordict, channel=channel, name=user, message=msg))
+			message(config['Templates']['irc_message'].substitute(colordict, channel=channel, name=user, message=msg))
 		
 class IrcBotFactory(protocol.ClientFactory):
 	protocol = IrcBot
@@ -61,10 +77,10 @@ class IrcBotFactory(protocol.ClientFactory):
 		self.bots = []
 		self.reconnect_count = 0
 	def doConnect(self):
-		if ipaddress == None:
-			reactor.connectTCP(servername, int(port), factory)
+		if ipaddress == '0':
+			reactor.connectTCP(config['Connection']['server'], int(config['Connection']['port']), factory)
 		else:
-			reactor.connectTCP(servername, int(port), factory, 30, (ipaddress, 0))
+			reactor.connectTCP(config['Connection']['server'], int(config['Connection']['port']), factory, 30, (config['Connection']['ipaddress'], 0))
 	def doReconnect(self):
 		if self.reconnect_count < 5:
 			self.reconnect_count += 1
@@ -81,7 +97,7 @@ class IrcBotFactory(protocol.ClientFactory):
 			bot.broadcast(message)
 
 event_abilities = {
-	'player_active': ('player_connect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Connected\x03' % (sbserver.playerName(x), x))),
+	'player_connect': ('player_connect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Connected\x03' % (sbserver.playerName(x), x))),
 	'player_disconnect': ('player_disconnect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Disconnected\x03' % (sbserver.playerName(x), x))),
 	'message': ('player_message', lambda x, y: factory.broadcast('%s (\x037 %i \x03): %s' % (sbserver.playerName(x), x, y))),
 	'map_change': ('map_changed', lambda x, y: factory.broadcast('\x038Map changed to:\x03 %s (%s)' % (x, sbserver.modeName(y)))),
@@ -92,15 +108,17 @@ event_abilities = {
 	'relinquish_master': ('player_released_master', lambda x: factory.broadcast('%s (\x037 %i \x03) \x036Has relinquished master\x03' % (sbserver.playerName(x), x))),
 }
 
+factory = IrcBotFactory(config['Connection']['nickname'], [config['Connection']['channel']])
 
 def init():
-	if enable:
+	loadPluginConfig(config, 'IrcBot')
+	config['Templates']['irc_message'] = string.Template(config['Templates']['irc_message'])
+	if config['Main']['enable'] == 'yes':
 		factory.doConnect()
 		for key in event_abilities.keys():
-			if config.getOption('Abilities', key, 'no') == 'yes':
+			if config['Features'][key] == 'yes':
 				ev = event_abilities[key]
 				registerServerEventHandler(ev[0], ev[1])
 
-factory = IrcBotFactory(nickname, [channel])
-
+init()
 
