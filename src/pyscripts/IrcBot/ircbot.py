@@ -5,6 +5,7 @@ from xsbs.settings import PluginConfig, NoOptionError
 from xsbs.events import registerServerEventHandler
 from xsbs.timers import addTimer
 from xsbs.server import message
+from xsbs.colors import colordict
 
 import sbserver
 import string
