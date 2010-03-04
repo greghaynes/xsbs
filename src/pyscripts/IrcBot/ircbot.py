@@ -7,7 +7,6 @@ from xsbs.timers import addTimer
 from xsbs.server import message
 
 import sbserver
-
 import string
 
 config = PluginConfig('ircbot')
@@ -18,7 +17,7 @@ nickname = config.getOption('Config', 'nickname', 'xsbs-newbot')
 port = int(config.getOption('Config', 'port', '6667'))
 part_message = config.getOption('Config', 'part_message', 'XSBS - eXtensible SauerBraten Server')
 msg_gw = config.getOption('Abilities', 'message_gateway', 'yes') == 'yes'
-irc_msg_temp = config.getOption('Templates', 'irc_message', '${grey}${channel} ${blue}${name}${white}: ${message}')
+irc_msg_temp = string.Template(config.getOption('Templates', 'irc_message', '${grey}${channel} ${blue}${name}${white}: ${message}'))
 status_message = config.getOption('Templates', 'status_message', '${num_clients} clients on map ${map_name}')
 try:
 	ipaddress = config.getOption('Config', 'ipaddress', None, False)
