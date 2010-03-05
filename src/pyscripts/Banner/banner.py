@@ -30,7 +30,7 @@ def setup():
 		msg = option[1]
 		delay = config.getOption('Timeouts', option[0], default_timeout, False)
 		banners.append(Banner(msg, int(delay)))
-	info_msg[0] = config.getOption('Config', 'serverinfo', 'XSBS Version 2.0')
+	info_msg[0] = string.Template(config.getOption('Config', 'serverinfo', 'XSBS Version 2.0')).substitute(colordict)
 	del config
 
 setup()
