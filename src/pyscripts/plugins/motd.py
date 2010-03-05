@@ -16,4 +16,4 @@ motdstring = string.Template(config['Templates']['motd'])
 @eventHandler('player_connect_delayed')
 def greet(cn):
 	p = player(cn)
-	p.message(motdstring.substitute(colordict, name=p.name(), newline='\n'))
+	p.message(motdstring.substitute(colordict, name=p.name()))
