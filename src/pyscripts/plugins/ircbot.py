@@ -15,13 +15,13 @@ config = {
 	'Main': {
 		'enable': 'yes',
 		'part_message': 'XSBS - eXtensible SauerBraten Server',
-		'ipaddress': '0',
 		},
 	'Connection': {
 		'server': 'irc.gamesurge.net',
 		'port': '6667',
 		'nickname': 'xsbs-newbot',
 		'channel': '#xsbs-newserver'
+		'ipaddress': '0',
 		},
 	'Features': {
 		'message_gateway': 'yes',
@@ -118,10 +118,10 @@ class IrcBotFactory(protocol.ClientFactory):
 		self.bots = []
 		self.reconnect_count = 0
 	def doConnect(self):
-		if config['Main']['ipaddress'] == '0':
+		if config['Connection']['ipaddress'] == '0':
 			reactor.connectTCP(config['Connection']['server'], int(config['Connection']['port']), factory)
 		else:
-			reactor.connectTCP(config['Connection']['server'], int(config['Connection']['port']), factory, 30, (config['Main']['ipaddress'], 0))
+			reactor.connectTCP(config['Connection']['server'], int(config['Connection']['port']), factory, 30, (config['Connection']['ipaddress'], 0))
 	def doReconnect(self):
 		if self.reconnect_count < 5:
 			self.reconnect_count += 1
