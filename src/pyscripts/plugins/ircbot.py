@@ -31,6 +31,7 @@ config = {
 		'map_change': 'yes',
 		'gain_admin': 'yes',
 		'gain_master': 'yes',
+		'auth': 'yes',
 		'relinquish_master': 'yes',
 		'relinquish_admin': 'yes'
 		},
