@@ -9,7 +9,7 @@ from xsbs.players import player
 import string
 import pygeoip
 
-db = pygeoip.GeoIP('plugins/GeoIp/GeoIP.dat')
+db = pygeoip.GeoIP('pygeoip/GeoIP.dat')
 
 conf = PluginConfig('geoip')
 template = '${green}${user}${white} connected from ${orange}${country}'
