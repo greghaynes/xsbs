@@ -9,6 +9,8 @@ from xsbs.server import message
 
 import sbserver
 
+from xsbs.players import player
+import GeoIp
 import string
 
 config = {
@@ -51,7 +53,7 @@ config = {
 		'irc_message': '${grey}${channel} ${blue}${name}${white}: ${message}',
 		'status_message': '${num_clients} clients on map ${map_name}',
 
-		'player_connect': '${blue}Connected: ${magenta}${name}${white} (${magenta}${cn}${white}) from ${yellow}Country',
+		'player_connect': '${blue}Connected: ${magenta}${name}${white} (${magenta}${cn}${white}) from ${yellow}${country}',
 		'player_disconnect': '${blue}Disconnected: ${magenta}${name}${white}',
 		'message': '${magenta}${name}${white}: ${message}',
 		'map_change': '${blue}Map: ${magenta}${map} ${yellow}(${mode})',
@@ -141,7 +143,7 @@ def dotemplate(ability, **args):
 	factory.broadcast(string.Template(config['Templates'][ability]).substitute(irccolordict, **args))
 
 event_abilities = {
-	'player_connect': ('player_connect', lambda x: dotemplate('player_connect', name=sbserver.playerName(x), cn=x)),
+	'player_connect': ('player_connect', lambda x: dotemplate('player_connect', name=sbserver.playerName(x), cn=x, country=GeoIp.getCountry(player(x).ipLong()))),
 	'player_disconnect': ('player_disconnect', lambda x: dotemplate('player_disconnect', name=sbserver.playerName(x), cn=x)),
 	'message': ('player_message', lambda x, y: dotemplate('message', name=sbserver.playerName(x), cn=x, message=y)),
 	'map_change': ('map_changed', lambda x, y: dotemplate('map_change', map=x, mode=sbserver.modeName(y))),
