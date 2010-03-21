@@ -70,8 +70,8 @@ def allowClient(cn, pwd):
 
 @eventHandler('player_kick')
 @masterRequired
-def onKick(p, tcn):
-	ban(tcn, 14500, config['Main']['default_reason'], p.cn)
+def onKick(cn, tcn):
+	ban(tcn, 14500, config['Main']['default_reason'], cn)
 
 @commandHandler('kick')
 @masterRequired

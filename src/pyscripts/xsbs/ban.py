@@ -75,7 +75,7 @@ def isNickBanned(nick):
 	except MultipleResultsFound:
 		return True
 
-def ban(cn, seconds, reason, banner_cn):
+def ban(cn, seconds, reason, banner_cn, sticky=False):
 	ip = sbserver.playerIpLong(cn)
 	expiration = time.time() + seconds
 	nick = sbserver.playerName(cn)
@@ -85,7 +85,7 @@ def ban(cn, seconds, reason, banner_cn):
 	else:
 		banner_ip = 0
 		banner_nick = ''
-	newban = Ban(ip, expiration, reason, nick, banner_ip, banner_nick, time.time())
+	newban = Ban(ip, expiration, reason, nick, banner_ip, banner_nick, time.time(), sticky)
 	session.commit()
 	addTimer(200, sbserver.playerKick, (cn,))
 	logging.info('Player %s (%s) banned for %s by %s (%s)',
