@@ -13,7 +13,7 @@ import string
 
 config = {
 	'Main': {
-		'enable': 'yes',
+		'enable': 'no',
 		'part_message': 'XSBS - eXtensible SauerBraten Server',
 		'ipaddress': '0',
 		},
@@ -24,7 +24,15 @@ config = {
 		'channel': '#xsbs-newserver'
 		},
 	'Features': {
-		'message_gateway': 'yes'
+		'message_gateway': 'yes',
+		'player_disconnect': 'yes',
+		'player_connect': 'yes',
+		'message': 'yes',
+		'map_change': 'yes',
+		'gain_admin': 'yes',
+		'gain_master': 'yes',
+		'relinquish_master': 'yes',
+		'relinquish_admin': 'yes'
 		},
 	'Alerts': {
 		'player_connect': 'yes',
@@ -41,7 +49,39 @@ config = {
 	'Templates': {
 		'irc_message': '${grey}${channel} ${blue}${name}${white}: ${message}',
 		'status_message': '${num_clients} clients on map ${map_name}',
+
+		'player_connect': '${magenta}${name}${white} connected',
+		'player_disconnect': '${magenta}${name}${white} disconnected',
+		'message': '${magenta}${name}${white}: ${message}',
+		'map_change': 'map change: ${map}',
+		'gain_admin': '${magenta}${name}${white} has claimed admin',
+		'gain_master': '${magenta}${name}${white} has claimed master',
+		'auth': '${magenta}${name}${white} has authenticated as ${authname}@sauerbraten.org',
+		'relinquish_admin': '${magenta}${white} has relinquished admin',
+		'relinquish_master': '${magenta}${white} has relinquished master'
 		}
+	}
+
+irccolordict = {
+		'black': '\x030',
+		'red': '\x031',
+		'green': '\x032',
+		'yellow': '\x033',
+		'blue': '\x034',
+		'magenta': '\x035',
+		'cyan': '\x036',
+		'white': '\x037',
+		'default': '\x039',
+
+		'bgblack': '\x040',
+		'bgred': '\x041',
+		'bggreen': '\x042',
+		'bgyellow': '\x043',
+		'bgblue': '\x044',
+		'bgmagenta': '\x045',
+		'bgcyan': '\x046',
+		'bgwhite': '\x047',
+		'bgdefault': '\x049',
 	}
 
 class IrcBot(irc.IRCClient):
@@ -77,10 +117,10 @@ class IrcBotFactory(protocol.ClientFactory):
 		self.bots = []
 		self.reconnect_count = 0
 	def doConnect(self):
-		if config['Main']['ipaddress'] == '0':
+		if ipaddress == '0':
 			reactor.connectTCP(config['Connection']['server'], int(config['Connection']['port']), factory)
 		else:
-			reactor.connectTCP(config['Connection']['server'], int(config['Connection']['port']), factory, 30, (config['Main']['ipaddress'], 0))
+			reactor.connectTCP(config['Connection']['server'], int(config['Connection']['port']), factory, 30, (config['Connection']['ipaddress'], 0))
 	def doReconnect(self):
 		if self.reconnect_count < 5:
 			self.reconnect_count += 1
