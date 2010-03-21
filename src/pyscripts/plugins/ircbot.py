@@ -5,7 +5,7 @@ from xsbs.colors import colordict
 from xsbs.settings import loadPluginConfig, NoOptionError
 from xsbs.events import registerServerEventHandler
 from xsbs.timers import addTimer
-from xsbs.server import message
+from xsbs.server import message, masterModeName
 
 import sbserver
 
@@ -168,7 +168,7 @@ event_abilities = {
 	'spectated': ('player_spectated', lambda cn: dotemplate('spectated', name=sbserver.playerName(cn), cn=cn)),
 	'unspectated': ('player_unspectated', lambda cn: dotemplate('unspectated', name=sbserver.playerName(cn), cn=cn)),
 	'kicked': ('player_kick', lambda cn, who: dotemplate('kicked', by=sbserver.playerName(cn), bycn=cn, name=sbserver.playerName(who), cn=who)),
-	'mastermode_changed': ('server_mastermode_changed', lambda mm: dotemplate('mastermode_changed', mm=mm, mode=sbserver.modeName(mm))),
+	'mastermode_changed': ('server_mastermode_changed', lambda mm: dotemplate('mastermode_changed', mm=mm, mode=masterModeName(mm))),
 	'clearbans': ('server_clear_bans', lambda cn: dotemplate('clearbans', name=sbserver.playerName(cn), cn=cn))
 }
 
