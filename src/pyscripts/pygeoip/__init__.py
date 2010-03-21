@@ -564,6 +564,8 @@ class GeoIP:
         addr = socket.gethostbyname(hostname)
         return self.region_by_addr(addr)
 
+from xsbs.net import ipLongToString
+
 db = GeoIP('pygeoip/GeoIP.dat')
 
 def getCountry(ip): 
