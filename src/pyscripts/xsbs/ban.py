@@ -94,5 +94,5 @@ def ban(cn, seconds, reason, banner_cn, sticky=False):
 		reason,
 		banner_nick,
 		ipLongToString(banner_ip))
-	sbserver.message(info(config['Main']['message'].substitute(colordict, name=nick, seconds=seconds, reason=reason)))
+	sbserver.message(info(string.Template(config['Main']['message']).substitute(colordict, name=nick, seconds=seconds, reason=reason)))
 
