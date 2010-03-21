@@ -75,8 +75,8 @@ config = {
 		'spectated': '${orange}${name}${default} is now a spectator',
 		'unspectated': '${orange}${name}${default} is no longer a spectator',
 		'kicked': '${orange}${name}$[default} has been ${red}kicked/banned',
-		'mastermode_changed': 'mastermode is now ${brown}${mode}(${mm})',
-		'clearbans': '${orange}${name}${default} cleared bans'
+		'mastermode_changed': '${teal}Mastermode${default} is now ${brown}${mode} (${mm})',
+		'clearbans': 'Temporary ${red}bans${default} cleared.'
 		}
 	}
 
