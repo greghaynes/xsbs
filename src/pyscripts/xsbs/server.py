@@ -13,6 +13,13 @@ pause_message = config.getOption('Templates', 'pause_message', 'The game has bee
 del config
 pause_message = string.Template(pause_message)
 
+mastermodes = [
+	'open',
+	'veto',
+	'locked',
+	'private',
+]
+
 def isPaused():
 	'''Is the game currently paused'''
 	return sbserver.isPaused()
@@ -74,6 +81,10 @@ def setMasterMode(mm_number):
 	   2 - locked
 	   3 - private'''
 	sbserver.setMasterMode(mm_number)
+
+def masterModeName(mm_number):
+	'''Name of the master mode number'''
+	return mastermodes[mm_number]
 
 def maxClients():
 	'''Maximum clients allowed in server.'''
