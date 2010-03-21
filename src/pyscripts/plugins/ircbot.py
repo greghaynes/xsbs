@@ -35,7 +35,11 @@ config = {
 		'gain_master': 'yes',
 		'auth': 'yes',
 		'relinquish_master': 'yes',
-		'relinquish_admin': 'yes'
+		'relinquish_admin': 'yes',
+		'spectated': 'yes',
+		'unspectated': 'yes',
+		'kicked': 'yes',
+		'mastermode_changed': 'yes'
 		},
 	'Alerts': {
 		'player_connect': 'yes',
@@ -47,7 +51,11 @@ config = {
 		'gain_master': 'yes',
 		'auth': 'yes',
 		'relinquish_master': 'yes',
-		'relinquish_admin': 'yes'
+		'relinquish_admin': 'yes',
+		'spectated': 'yes',
+		'unspectated': 'yes',
+		'kicked': 'yes',
+		'mastermode_changed': 'yes'
 		},
 	'Templates': {
 		'irc_message': '${grey}${channel} ${blue}${name}${white}: ${message}',
@@ -59,9 +67,13 @@ config = {
 		'map_change': '${teal}Map: ${green}${map} (${brown}${mode}${default})',
 		'gain_admin': '${orange}${name}${default} has claimed ${brown}admin',
 		'gain_master': '${orange}${name}${default} has claimed ${brown}master',
-		'auth': '${orange}${name}${default} has authenticated as ${cyan}${authname}@sauerbraten.org',
+		'auth': '${orange}${name}${default} has authenticated as ${brown}${authname}@sauerbraten.org',
 		'relinquish_admin': '${orange}${name}${default} has relinquished ${brown}admin',
-		'relinquish_master': '${orange}${name}${default} has relinquished ${brown}master'
+		'relinquish_master': '${orange}${name}${default} has relinquished ${brown}master',
+		'spectated': '${orange}${name}${default} is now a spectator',
+		'unspectated': '${orange}${name}${default} is no longer a spectator',
+		'kicked': '${orange}${name}$[default} has been ${red}kicked/banned',
+		'mastermode_changed': 'mastermode is now ${brown}${mode}(${num})'
 		}
 	}
 
@@ -150,6 +162,10 @@ event_abilities = {
 	'auth': ('player_auth_succeed', lambda x, y: dotemplate('auth', name=sbserver.playerName(x), cn=x, authname=y)),
 	'relinquish_admin': ('player_released_admin', lambda x: dotemplate('relinquish_admin', name=sbserver.playerName(x), cn=x)),
 	'relinquish_master': ('player_released_master', lambda x: dotemplate('relinquish_master', name=sbserver.playerName(x), cn=x)),
+	'spectated': ('player_spectated', lambda cn: dotemplate('spectated', name=sbserver.playerName(cn), cn=cn)),
+	'unspectated': ('player_unspectated', lambda cn: dotemplate('unspectated', name=sbserver.playerName(cn), cn=cn)),
+	'kicked': ('player_kick', lambda cn, who: dotemplate('kicked', by=sbserver.playerName(cn), bycn=cn, name=sbserver.playerName(who), cn=who)),
+	'mastermode_changed': ('server_mastermode_changed', lambda mm: dotemplate('mastermode_changed', num=mm))
 }
 
 factory = IrcBotFactory(config['Connection']['nickname'], [config['Connection']['channel']])
