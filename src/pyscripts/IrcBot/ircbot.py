@@ -90,12 +90,12 @@ event_abilities = {
 	'relinquish_master': ('player_released_master', lambda x: factory.broadcast('%s (\x037 %i \x03) \x036Has relinquished master\x03' % (sbserver.playerName(x), x))),
 }
 
-factory = IrcBotFactory(nickname, [channel])
-factory.doConnect()
-
-for key in event_abilities.keys():
-	if config.getOption('Abilities', key, 'no') == 'yes':
-		ev = event_abilities[key]
-		registerServerEventHandler(ev[0], ev[1])
+if enable:
+	factory = IrcBotFactory(nickname, [channel])
+	factory.doConnect()
+	for key in event_abilities.keys():
+		if config.getOption('Abilities', key, 'no') == 'yes':
+			ev = event_abilities[key]
+			registerServerEventHandler(ev[0], ev[1])
 
 
