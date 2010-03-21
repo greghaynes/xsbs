@@ -51,15 +51,15 @@ config = {
 		'irc_message': '${grey}${channel} ${blue}${name}${white}: ${message}',
 		'status_message': '${num_clients} clients on map ${map_name}',
 
-		'player_connect': '${blue}Connected: ${magenta}${name}${white} (${cn}) from ${yellow}Country',
+		'player_connect': '${blue}Connected: ${magenta}${name}${white} (${magenta}${cn}${white}) from ${yellow}Country',
 		'player_disconnect': '${blue}Disconnected: ${magenta}${name}${white}',
 		'message': '${magenta}${name}${white}: ${message}',
 		'map_change': '${blue}Map: ${magenta}${map} ${yellow}(${mode})',
 		'gain_admin': '${magenta}${name}${white} has claimed admin',
 		'gain_master': '${magenta}${name}${white} has claimed master',
 		'auth': '${magenta}${name}${white} has authenticated as ${authname}@sauerbraten.org',
-		'relinquish_admin': '${magenta}${white} has relinquished admin',
-		'relinquish_master': '${magenta}${white} has relinquished master'
+		'relinquish_admin': '${magenta}${name}${white} has relinquished admin',
+		'relinquish_master': '${magenta}${name}${white} has relinquished master'
 		}
 	}
 
@@ -145,8 +145,8 @@ event_abilities = {
 	'player_disconnect': ('player_disconnect', lambda x: dotemplate('player_disconnect', name=sbserver.playerName(x), cn=x)),
 	'message': ('player_message', lambda x, y: dotemplate('message', name=sbserver.playerName(x), cn=x, message=y)),
 	'map_change': ('map_changed', lambda x, y: dotemplate('map_change', map=x, mode=sbserver.modeName(y))),
-	'gain_admin': ('player_claimed_admin', lambda x: dotemplate('player_claimed_admin', name=sbserver.playerName(x), cn=x)),
-	'gain_master': ('player_claimed_master', lambda x: dotemplate('player_claimed_master', name=sbserver.playerName(x), cn=x)),
+	'gain_admin': ('player_claimed_admin', lambda x: dotemplate('gain_admin', name=sbserver.playerName(x), cn=x)),
+	'gain_master': ('player_claimed_master', lambda x: dotemplate('gain_master', name=sbserver.playerName(x), cn=x)),
 	'auth': ('player_auth_succeed', lambda x, y: dotemplate('auth', name=sbserver.playerName(x), cn=x, authname=y)),
 	'relinquish_admin': ('player_released_admin', lambda x: dotemplate('relinquish_admin', name=sbserver.playerName(x), cn=x)),
 	'relinquish_master': ('player_released_master', lambda x: dotemplate('relinquish_master', name=sbserver.playerName(x), cn=x)),
