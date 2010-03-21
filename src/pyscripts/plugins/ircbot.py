@@ -14,13 +14,13 @@ import string
 config = {
 	'Main': {
 		'enable': 'yes',
-		'part_message': 'XSBS - eXtensible SauerBraten Server',
+		'part_message': 'XSBS - eXtensible SauerBraten Server'
 		},
 	'Connection': {
 		'server': 'irc.gamesurge.net',
 		'port': '6667',
 		'nickname': 'xsbs-newbot',
-		'channel': '#xsbs-newserver'
+		'channel': '#xsbs-newserver',
 		'ipaddress': '0',
 		},
 	'Features': {
