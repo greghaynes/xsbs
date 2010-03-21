@@ -137,8 +137,11 @@ class IrcBotFactory(protocol.ClientFactory):
 		for bot in self.bots:
 			bot.broadcast(message)
 
+def dotemplate(ability, **args):
+	factory.broadcast(string.Template(config['Templates'][ability]).substitute(irccolordict, **args))
+
 event_abilities = {
-	'player_connect': ('player_connect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Connected\x03' % (sbserver.playerName(x), x))),
+	'player_connect': ('player_connect', lambda x: dotemplate('player_connect', name=sbserver.playerName(x), cn=x)),
 	'player_disconnect': ('player_disconnect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Disconnected\x03' % (sbserver.playerName(x), x))),
 	'message': ('player_message', lambda x, y: factory.broadcast('%s (\x037 %i \x03): %s' % (sbserver.playerName(x), x, y))),
 	'map_change': ('map_changed', lambda x, y: factory.broadcast('\x038Map changed to:\x03 %s (%s)' % (x, sbserver.modeName(y)))),
