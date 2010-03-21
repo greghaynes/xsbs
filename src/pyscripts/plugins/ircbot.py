@@ -51,10 +51,10 @@ config = {
 		'irc_message': '${grey}${channel} ${blue}${name}${white}: ${message}',
 		'status_message': '${num_clients} clients on map ${map_name}',
 
-		'player_connect': '${magenta}${name}${white} connected',
-		'player_disconnect': '${magenta}${name}${white} disconnected',
+		'player_connect': '${blue}Connected: ${magenta}${name}${white} (${cn}) from ${yellow}Country',
+		'player_disconnect': '${blue}Disconnected: ${magenta}${name}${white}',
 		'message': '${magenta}${name}${white}: ${message}',
-		'map_change': 'map change: ${map}',
+		'map_change': '${blue}Map: ${magenta}${map} ${yellow}(${mode})',
 		'gain_admin': '${magenta}${name}${white} has claimed admin',
 		'gain_master': '${magenta}${name}${white} has claimed master',
 		'auth': '${magenta}${name}${white} has authenticated as ${authname}@sauerbraten.org',
