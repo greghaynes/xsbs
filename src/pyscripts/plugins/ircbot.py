@@ -142,14 +142,14 @@ def dotemplate(ability, **args):
 
 event_abilities = {
 	'player_connect': ('player_connect', lambda x: dotemplate('player_connect', name=sbserver.playerName(x), cn=x)),
-	'player_disconnect': ('player_disconnect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Disconnected\x03' % (sbserver.playerName(x), x))),
-	'message': ('player_message', lambda x, y: factory.broadcast('%s (\x037 %i \x03): %s' % (sbserver.playerName(x), x, y))),
-	'map_change': ('map_changed', lambda x, y: factory.broadcast('\x038Map changed to:\x03 %s (%s)' % (x, sbserver.modeName(y)))),
-	'gain_admin': ('player_claimed_admin', lambda x: factory.broadcast('%s (\x037 %i \x03) \x036Has claimed admin\x03' % (sbserver.playerName(x), x))),
-	'gain_master': ('player_claimed_master', lambda x: factory.broadcast('%s (\x037 %i \x03) \x036Has claimed master\x03' % (sbserver.playerName(x), x))),
-	'auth': ('player_auth_succeed', lambda x, y: factory.broadcast('%s (\x037 %i \x03) has authenticated as\x036 %s@sauerbraten.org\x03' % (sbserver.playerName(x), x, y))),
-	'relinquish_admin': ('player_released_admin', lambda x: factory.broadcast('%s (\x037 %i \x03) \x036Has relinquished admin\x03' % (sbserver.playerName(x), x))),
-	'relinquish_master': ('player_released_master', lambda x: factory.broadcast('%s (\x037 %i \x03) \x036Has relinquished master\x03' % (sbserver.playerName(x), x))),
+	'player_disconnect': ('player_disconnect', lambda x: dotemplate('player_disconnect', name=sbserver.playerName(x), cn=x)),
+	'message': ('player_message', lambda x, y: dotemplate('message', name=sbserver.playerName(x), cn=x, message=y)),
+	'map_change': ('map_changed', lambda x, y: dotemplate('map_change', map=x, mode=sbserver.modeName(y))),
+	'gain_admin': ('player_claimed_admin', lambda x: dotemplate('player_claimed_admin', name=sbserver.playerName(x), cn=x)),
+	'gain_master': ('player_claimed_master', lambda x: dotemplate('player_claimed_master', name=sbserver.playerName(x), cn=x)),
+	'auth': ('player_auth_succeed', lambda x, y: dotemplate('auth', name=sbserver.playerName(x), cn=x, authname=y)),
+	'relinquish_admin': ('player_released_admin', lambda x: dotemplate('relinquish_admin', name=sbserver.playerName(x), cn=x)),
+	'relinquish_master': ('player_released_master', lambda x: dotemplate('relinquish_master', name=sbserver.playerName(x), cn=x)),
 }
 
 factory = IrcBotFactory(config['Connection']['nickname'], [config['Connection']['channel']])
