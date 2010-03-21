@@ -10,7 +10,7 @@ from xsbs.server import message
 import sbserver
 
 from xsbs.players import player
-import GeoIp
+from pygeoip import getCountry
 import string
 
 config = {
@@ -141,7 +141,7 @@ def dotemplate(ability, **args):
 	factory.broadcast(string.Template(config['Templates'][ability]).substitute(irccolordict, **args))
 
 event_abilities = {
-	'player_connect': ('player_connect', lambda x: dotemplate('player_connect', name=sbserver.playerName(x), cn=x, country=GeoIp.getCountry(player(x).ipLong()))),
+	'player_connect': ('player_connect', lambda x: dotemplate('player_connect', name=sbserver.playerName(x), cn=x, country=getCountry(player(x).ipLong()))),
 	'player_disconnect': ('player_disconnect', lambda x: dotemplate('player_disconnect', name=sbserver.playerName(x), cn=x)),
 	'message': ('player_message', lambda x, y: dotemplate('message', name=sbserver.playerName(x), cn=x, message=y)),
 	'map_change': ('map_changed', lambda x, y: dotemplate('map_change', map=x, mode=sbserver.modeName(y))),

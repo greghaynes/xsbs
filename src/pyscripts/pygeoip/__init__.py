@@ -563,4 +563,12 @@ class GeoIP:
         """
         addr = socket.gethostbyname(hostname)
         return self.region_by_addr(addr)
-    
+
+db = pygeoip.GeoIP('pygeoip/GeoIP.dat')
+
+def getCountry(ip): 
+	country = db.country_name_by_addr(ipLongToString(ip))
+	if country == '':
+		country = 'Unknown'
+	return country
+

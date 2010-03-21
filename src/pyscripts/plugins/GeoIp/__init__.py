@@ -7,20 +7,13 @@ from xsbs.server import message as serverMessage
 from xsbs.players import player
 
 import string
-import pygeoip
-
-db = pygeoip.GeoIP('pygeoip/GeoIP.dat')
+from pygeoip import getCountry
 
 conf = PluginConfig('geoip')
 template = '${green}${user}${white} connected from ${orange}${country}'
 template = conf.getOption('Config', 'template', template)
 del conf
 
-def getCountry(ip): 
-	country = db.country_name_by_addr(ipLongToString(ip))
-	if country == '':
-		country = 'Unknown'
-	return country
 
 @eventHandler('player_connect_delayed')
 def announce(cn):
