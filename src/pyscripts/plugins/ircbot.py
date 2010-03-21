@@ -52,39 +52,37 @@ config = {
 	'Templates': {
 		'irc_message': '${grey}${channel} ${blue}${name}${white}: ${message}',
 		'status_message': '${num_clients} clients on map ${map_name}',
-
-		'player_connect': '${blue}Connected: ${magenta}${name}${white} (${magenta}${cn}${white}) from ${yellow}${country}',
-		'player_disconnect': '${blue}Disconnected: ${magenta}${name}${white}',
-		'message': '${magenta}${name}${white}: ${message}',
-		'map_change': '${blue}Map: ${magenta}${map} ${yellow}(${mode})',
-		'gain_admin': '${magenta}${name}${white} has claimed admin',
-		'gain_master': '${magenta}${name}${white} has claimed master',
-		'auth': '${magenta}${name}${white} has authenticated as ${authname}@sauerbraten.org',
-		'relinquish_admin': '${magenta}${name}${white} has relinquished admin',
-		'relinquish_master': '${magenta}${name}${white} has relinquished master'
+		
+		'player_connect': '${teal}Connected: ${orange}${name}${default} (${cyan}${cn}${default}) from ${green}${country}',
+		'player_disconnect': '${teal}Disconnected: ${orange}${name}${default}',
+		'message': '${orange}${name}${default}: ${message}',
+		'map_change': '${teal}Map: ${green}${map} (${cyan}${mode}${default})',
+		'gain_admin': '${orange}${name}${default} has claimed ${brown}admin',
+		'gain_master': '${orange}${name}${default} has claimed ${brown}master',
+		'auth': '${orange}${name}${default} has authenticated as ${cyan}${authname}@sauerbraten.org',
+		'relinquish_admin': '${orange}${name}${default} has relinquished ${brown}admin',
+		'relinquish_master': '${orange}${name}${default} has relinquished ${brown}master'
 		}
 	}
 
 irccolordict = {
-		'black': '\x030',
-		'red': '\x031',
-		'green': '\x032',
-		'yellow': '\x033',
-		'blue': '\x034',
-		'magenta': '\x035',
-		'cyan': '\x036',
-		'white': '\x037',
-		'default': '\x039',
-
-		'bgblack': '\x040',
-		'bgred': '\x041',
-		'bggreen': '\x042',
-		'bgyellow': '\x043',
-		'bgblue': '\x044',
-		'bgmagenta': '\x045',
-		'bgcyan': '\x046',
-		'bgwhite': '\x047',
-		'bgdefault': '\x049',
+		'white': '\x030',
+		'black': '\x031',
+		'blue': '\x032',
+		'green': '\x033',
+		'red': '\x034',
+		'brown': '\x035',
+		'purple': '\x036',
+		'orange': '\x037',
+		'yellow': '\x038',
+		'lime': '\x039',
+		'teal': '\x0310',
+		'cyan': '\x0311',
+		'lightblue': '\x0312',
+		'pink': '\x0313',
+		'gray': '\x0314',
+		'silver': '\x0315',
+		'default': '\x03'
 	}
 
 class IrcBot(irc.IRCClient):
