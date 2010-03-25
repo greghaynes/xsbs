@@ -1,5 +1,5 @@
 from elixir import Entity, Field, String, ManyToOne, OneToMany, setup_all, session
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
