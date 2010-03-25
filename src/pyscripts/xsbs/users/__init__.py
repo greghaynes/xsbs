@@ -19,7 +19,7 @@ config = {
 		}
 	}
 
-config['Main']['blocked_reserved_names'] = blocked_names.strip(' ').split(',')
+config['Main']['blocked_reserved_names'] = config['Main']['blocked_reserved_names'].strip(' ').split(',')
 
 class NickAccount(Entity):
 	nick = Field(String(15))
