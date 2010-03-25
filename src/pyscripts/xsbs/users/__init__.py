@@ -6,18 +6,20 @@ from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueE
 from xsbs.colors import red, green, orange
 from xsbs.ui import info, error, warning
 from xsbs.players import player
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.ban import ban
 from xsbs.timers import addTimer
 
 import sbserver
 import re
 
-config = PluginConfig('usermanager')
-usertable = config.getOption('Config', 'users_tablename', 'usermanager_users')
-blocked_names = config.getOption('Config', 'blocked_names', 'unnamed, admin')
-del config
-blocked_names = blocked_names.strip(' ').split(',')
+config = {
+	'Main': {
+		'blocked_reserved_names': 'unnamed, admin',
+		}
+	}
+
+config['Main']['blocked_reserved_names'] = blocked_names.strip(' ').split(',')
 
 class NickAccount(Entity):
 	nick = Field(String(15))
@@ -115,7 +117,7 @@ def onLinkName(p, args):
 		raise UsageError()
 	if not isLoggedIn(p.cn):
 		raise StateError('You must be logged in to link a name to your account')
-	if p.name() in blocked_names:
+	if p.name() in config['Main']['blocked_reserved_names']:
 		raise StateError('You cannot reserve this name')
 	try:
 		NickAccount.query.filter(NickAccount.nick==p.name()).one()
