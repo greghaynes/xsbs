@@ -83,6 +83,10 @@ function enableTopNav(hostname, username, password)
 	$('#topnav_logout').click(function() { window.location.reload(); });
 }
 
+function adminPage(hostname) {
+	$("#tabs").tabs();
+}
+
 function loginDialog(hostname, callback) {
 	$("<div id=\"dialog\" title=\"Please login\">Username:<input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password\" /><br /><span id=\"login_status\"></span></div>").dialog(
 		{
@@ -105,6 +109,7 @@ function loginDialog(hostname, callback) {
 						function(data) {
 								$('#login_status').empty();
 								$('#login_status').html('Success.');
+								$(this).dialog('close');
 								callback(username, password);
 							});
 					}
@@ -113,6 +118,7 @@ function loginDialog(hostname, callback) {
 }
 
 function setup(hostname) {
+	adminPage('');
 	loginDialog('localhost:8081', function(username, password) { })
 }
 
