@@ -988,6 +988,7 @@ namespace server
 
     void changemap(const char *s, int mode)
     {
+        SbPy::triggerEvent("map_changed_pre", 0);
         stopdemo();
         pausegame(false);
         if(smode) smode->reset(false);
