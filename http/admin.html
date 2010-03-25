@@ -18,12 +18,19 @@
 
 <body onload="start()">
 <div id="content">
+	<h1>XSBS Admin Panel</h1>
 	<div id="tabs">
 		<ul>
 			<li><a href="#tab-1">Status</a></li>
 			<li><a href="#tab-2">Configuration</a></li>
 		</ul>
-		<div id="tab-1">tab 1</div>
+		<div id="tab-1">
+			<ul style="list-style-type: none">
+				<li><span id="status_serverdesc"></span></li>
+				<li>Uptime: <span id="status_uptime">?</span></li>
+				<li>Clients: <span id="status_clients">?</span> (<span id="status_players">?</span> players, <span id="status_spectators">?</span> spectatrs)</li>
+			</ul>
+		</div>
 		<div id="tab-2">tab 2</div>
 	</div>
 </div>

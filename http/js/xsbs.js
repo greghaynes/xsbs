@@ -118,7 +118,7 @@ function loginDialog(hostname, callback) {
 }
 
 function setup(hostname) {
-	adminPage('');
-	loginDialog('localhost:8081', function(username, password) { })
+	adminPage(hostname);
+	loginDialog(hostname, function(username, password) { })
 }
 
