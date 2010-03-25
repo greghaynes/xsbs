@@ -83,35 +83,36 @@ function enableTopNav(hostname, username, password)
 	$('#topnav_logout').click(function() { window.location.reload(); });
 }
 
-function loadLoginPage(hostname, callback) {
-	html_page = '<h3>Please login</h3>Username: <input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password_input\" /><br /><input type=\"submit\" value=\"Login\" id=\"login_submit\" /><br /><span id=\"login_status\"></span>';
-	displayAlert(html_page);
-	$('#login_submit').click(function() {
-		$('#login_status').empty();
-		$('#login_status').html('Trying login...');
-		var username = $('#username_input').val();
-		var password = $('#password_input').val();
-		tryLogin(hostname, username, password, function(data) {
-				error_code = data.error
-				$('#login_status').empty();
-				if(error_code == 'INVALID_LOGIN')
-					$('#login_status').html('Invalid login.');
-				else
-					$('#login_status').html('Unknown error.');
-				},
-			function(data) {
-				$('#login_status').empty();
-				$('#login_status').html('Success.');
-				callback(username, password);
-				});
+function loginDialog(hostname, callback) {
+	$("<div id=\"dialog\" title=\"Please login\">Username:<input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password\" /><br /><span id=\"login_status\"></span></div>").dialog(
+		{
+			modal: true,
+			buttons: {
+				"Login": function() {
+					$('#login_status').empty();
+					$('#login_status').html('Trying login...');
+					var username = $('#username_input').val();
+					var password = $('#password_input').val();
+					tryLogin(hostname, username, password,
+						function(data) {
+							error_code = data.error
+							$('#login_status').empty();
+							if(error_code == 'INVALID_LOGIN')
+								$('#login_status').html('Invalid login.');
+							else
+								$('#login_status').html('Unknown error.');
+							},
+						function(data) {
+								$('#login_status').empty();
+								$('#login_status').html('Success.');
+								callback(username, password);
+							});
+					}
+				}
 		});
 }
 
 function setup(hostname) {
-	loadLoginPage(hostname, function(username, password) {
-		clearAlert();
-		enableTopNav(hostname, username, password);
-		loadPlayerAdminPage(hostname, username, password);
-		});
+	loginDialog('localhost:8081', function(username, password) { })
 }
 
