@@ -93,7 +93,7 @@ irccolordict = {
 		'green': '\x033',
 		'red': '\x034',
 		'brown': '\x035',
-		'purple': '\x036',
+		'magenta': '\x036',
 		'orange': '\x037',
 		'yellow': '\x038',
 		'lime': '\x039',
@@ -101,7 +101,7 @@ irccolordict = {
 		'cyan': '\x0311',
 		'lightblue': '\x0312',
 		'pink': '\x0313',
-		'gray': '\x0314',
+		'grey': '\x0314',
 		'silver': '\x0315',
 		'default': '\x03'
 	}
