@@ -212,7 +212,7 @@ def userPrivSetCmd(cn, tcn, args):
 			except AttributeError:
 				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
 			else:
-				session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
+				dbmanager.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
 				session.add(UserPrivilege(0, user.id))
 				session.commit()
 				sbserver.playerMessage(cn, info('User privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
@@ -229,7 +229,7 @@ def userPrivSetCmd(cn, tcn, args):
 			except AttributeError:
 				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
 			else:
-				session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
+				dbmanager.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
 				session.add(UserPrivilege(1, user.id))
 				session.commit()
 				sbserver.playerMessage(cn, info('Master privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))
@@ -246,7 +246,7 @@ def userPrivSetCmd(cn, tcn, args):
 			except AttributeError:
 				sbserver.playerMessage(cn, error('%s is not logged in.' % sbserver.playerName(tcn)))
 			else:
-				session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
+				dbmanager.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).update({ 'privilege': None })
 				session.add(UserPrivilege(2, user.id))
 				session.commit()
 				sbserver.playerMessage(cn, info('Admin privilege has been given to %s (%s)' % (sbserver.playerName(tcn), user.email)))

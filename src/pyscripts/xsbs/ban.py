@@ -52,10 +52,10 @@ class BanNick(Base):
 		self.reason = reason
 
 def getCurrentBanByIp(ipaddress):
-	return session.query(Ban).filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
+	return dbmanager.query(Ban).filter(Ban.ip==ipaddress).filter('expiration>'+str(time.time())).one()
 
 def getCurrentBanByNick(nick):
-	return session.query(BanNick).filter(BanNick.nick==nick).one()
+	return dbmanager.query(BanNick).filter(BanNick.nick==nick).one()
 
 def isIpBanned(ipaddress):
 	try:

@@ -55,7 +55,7 @@ def warnTagReserved(cn, count, sessid, nick):
 	addTimer(5000, warnTagReserved, (cn, count+1, sessid, nick))
 
 def tagId(tag):
-	return session.query(ClanTag).filter(ClanTag.tag==tag).one().id
+	return dbmanager.query(ClanTag).filter(ClanTag.tag==tag).one().id
 
 def setUsedTags(cn):
 	try:
@@ -77,7 +77,7 @@ def setUsedTags(cn):
 
 def userBelongsTo(user, tag_id):
 	try:
-		session.query(ClanMember).filter(ClanMember.tag_id==tag_id).filter(ClanMember.user_id==user.id).one()
+		dbmanager.query(ClanMember).filter(ClanMember.tag_id==tag_id).filter(ClanMember.user_id==user.id).one()
 		return True
 	except NoResultFound:
 		return False

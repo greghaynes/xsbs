@@ -28,7 +28,7 @@ class IpToNick(Base):
 
 def onConnect(cn):
 	try:
-		same = session.query(IpToNick).filter(IpToNick.ip==sbserver.playerIpLong(cn)).filter(IpToNick.nick==sbserver.playerName(cn)).all()
+		same = dbmanager.query(IpToNick).filter(IpToNick.ip==sbserver.playerIpLong(cn)).filter(IpToNick.nick==sbserver.playerName(cn)).all()
 		if len(same) > 0:
 			return
 	except NoResultFound:
@@ -53,7 +53,7 @@ def namesCmd(cn, args):
 		return
 	try:
 		tcn = int(args)
-		names = session.query(IpToNick).filter(IpToNick.ip==sbserver.playerIpLong(tcn)).all()
+		names = dbmanager.query(IpToNick).filter(IpToNick.ip==sbserver.playerIpLong(tcn)).all()
 		if len(names) == 0:
 			sbserver.playerMessage(cn, info('No names found'))
 			return

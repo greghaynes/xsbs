@@ -44,7 +44,7 @@ class UserPrivilege(Base):
 
 def isUser(user_id):
 	try:
-		priv = session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==USER).one()
+		priv = dbmanager.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==USER).one()
 		return True
 	except NoResultFound:
 		return False
@@ -52,14 +52,14 @@ def isUser(user_id):
 
 def isUserMaster(user_id):
 	try:
-		priv = session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==MASTER).one()
+		priv = dbmanager.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==MASTER).one()
 		return True
 	except NoResultFound:
 		return False
 		
 def isUserAdmin(user_id):
 	try:
-		priv = session.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==ADMIN).one()
+		priv = dbmanager.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==ADMIN).one()
 		return True
 	except NoResultFound:
 		return False

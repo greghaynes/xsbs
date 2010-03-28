@@ -54,7 +54,7 @@ def onRecentBans(cn, args):
 	if args != '':
 		raise UsageError()
 	else:
-		recent = session.query(Ban).order_by(Ban.time.desc())[:5]
+		recent = dbmanager.query(Ban).order_by(Ban.time.desc())[:5]
 		for ban in recent:
 			p.message(info('Nick: %s' % ban.nick))
 
@@ -120,7 +120,7 @@ def onBanName(cn, args):
 	p.message(info('Inserted nick ban of %s for %s' % (nick, reason)))
 
 def clearBans():
-	bans = session.query(Ban).filter('expiration>'+str(time.time())).all()
+	bans = dbmanager.query(Ban).filter('expiration>'+str(time.time())).all()
 	for b in bans:
 		session.delete(b)
 	session.commit()

@@ -63,7 +63,7 @@ def login(cn, user):
 
 def userAuth(email, password):
 	try:
-		user = session.query(User).filter(User.email==email).filter(User.password==password).one()
+		user = dbmanager.query(User).filter(User.email==email).filter(User.password==password).one()
 	except (NoResultFound, MultipleResultsFound):
 		return False
 	return user
@@ -83,7 +83,7 @@ def onRegisterCommand(cn, args):
 	if len(args) != 2:
 		raise UsageError()
 	try:
-		session.query(User).filter(User.email==args[0]).one()
+		dbmanager.query(User).filter(User.email==args[0]).one()
 	except NoResultFound:
 		if not isValidEmail(args[0]):
 			raise ArgumentValueError('Invalid email address')
@@ -122,7 +122,7 @@ def onLinkName(cn, args):
 	if sbserver.playerName(cn) in blocked_names:
 		raise StateError('You can not reserve this name')
 	try:
-		session.query(NickAccount).filter(NickAccount.nick==sbserver.playerName(cn)).one()
+		dbmanager.query(NickAccount).filter(NickAccount.nick==sbserver.playerName(cn)).one()
 	except NoResultFound:
 		user = loggedInAs(cn)
 		nickacct = NickAccount(sbserver.playerName(cn), user.id)
@@ -155,13 +155,13 @@ def onChangepass(cn, args):
 	if not isLoggedIn(cn):
 		raise StateError('You must be logged in to change your password')
 	try:
-		session.query(User).filter(User.id==loggedInAs(cn).id).filter(User.password==args[0]).one()
+		dbmanager.query(User).filter(User.id==loggedInAs(cn).id).filter(User.password==args[0]).one()
 	except NoResultFound:
 		raise StateError('Incorrect password.')
 	except MultipleResultsFound:
 		pass
 	else:
-		session.query(User).filter(User.id==loggedInAs(cn).id).update({ 'password': args[1] })
+		dbmanager.query(User).filter(User.id==loggedInAs(cn).id).update({ 'password': args[1] })
 		session.commit()
 		return
 
@@ -171,7 +171,7 @@ def onSetMaster(cn, givenhash):
 	p = player(cn)
 	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
 	try:
-		na = session.query(NickAccount).filter(NickAccount.nick==p.name()).one()
+		na = dbmanager.query(NickAccount).filter(NickAccount.nick==p.name()).one()
 	except NoResultFound:
 		if givenhash != adminhash:
 			p.message(error('Your name is not assigned to any accounts'))
@@ -213,7 +213,7 @@ def warnNickReserved(cn, count, sessid):
 	addTimer(5000, warnNickReserved, (cn, count+1, sessid))
 
 def nickReserver(nick):
-	return session.query(NickAccount).filter(NickAccount.nick==nick).one()
+	return dbmanager.query(NickAccount).filter(NickAccount.nick==nick).one()
 
 @eventHandler('player_connect')
 def onPlayerActive(cn):
