@@ -19,7 +19,7 @@ class DatabaseManager:
 		self.connect()
 	def session(self):
 		return self.m_session
-	def query(self, *args, **kwargs)
+	def query(self, *args, **kwargs):
 		try:
 			q = self.session().query(*args, **kwargs)
 		except (OperationalError, InvalidRequestError):
