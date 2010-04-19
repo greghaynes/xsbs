@@ -40,7 +40,9 @@ config = {
 		'unspectated': 'yes',
 		'kicked': 'yes',
 		'mastermode_changed': 'yes',
-		'clearbans': 'yes'
+		'clearbans': 'yes',
+		'banned': 'yes',
+		'teamkill': 'yes'
 		},
 	'Alerts': {
 		'player_connect': 'yes',
@@ -57,7 +59,9 @@ config = {
 		'unspectated': 'yes',
 		'kicked': 'yes',
 		'mastermode_changed': 'yes',
-		'clearbans': 'yes'
+		'clearbans': 'yes',
+		'banned': 'yes',
+		'teamkill': 'yes'
 		},
 	'Templates': {
 		'irc_message': '${grey}${channel} ${blue}${name}${white}: ${message}',
@@ -66,7 +70,7 @@ config = {
 		'player_connect': '${teal}Connected: ${orange}${name}${default} (${brown}${cn}${default}) from ${green}${country}',
 		'player_disconnect': '${teal}Disconnected: ${orange}${name}${default}',
 		'message': '${orange}${name}: ${default}${message}',
-		'map_change': '${teal}Map: ${green}${map} (${brown}${mode}${default})',
+		'map_change': '${teal}Map: ${green}${map}${default} (${brown}${mode}${default})',
 		'gain_admin': '${orange}${name}${default} has claimed ${brown}admin',
 		'gain_master': '${orange}${name}${default} has claimed ${brown}master',
 		'auth': '${orange}${name}${default} has authenticated as ${brown}${authname}@sauerbraten.org',
@@ -74,9 +78,11 @@ config = {
 		'relinquish_master': '${orange}${name}${default} has relinquished ${brown}master',
 		'spectated': '${orange}${name}${default} is now a spectator',
 		'unspectated': '${orange}${name}${default} is no longer a spectator',
-		'kicked': '${orange}${name}$[default} has been ${red}kicked/banned',
-		'mastermode_changed': '${teal}Mastermode${default} is now ${brown}${mode} (${mm})',
-		'clearbans': 'Temporary ${red}bans${default} cleared.'
+		'kicked': '${orange}${name}${default} has been ${red}kicked/banned',
+		'mastermode_changed': '${teal}Mastermode${default} is now ${brown}${mode}${default} (${mm}${default})',
+		'clearbans': 'Temporary ${red}bans${default} cleared.',
+		'banned': '${orange}${name}${default} (${brown}${cn}${default}) has been ${red}banned${default} for ${seconds} seconds for ${red}${reason}',
+		'teamkill': '${orange}${name} ${red}teamkilled ${orange}${victim}'
 		}
 	}
 
@@ -87,7 +93,7 @@ irccolordict = {
 		'green': '\x033',
 		'red': '\x034',
 		'brown': '\x035',
-		'purple': '\x036',
+		'magenta': '\x036',
 		'orange': '\x037',
 		'yellow': '\x038',
 		'lime': '\x039',
@@ -95,7 +101,7 @@ irccolordict = {
 		'cyan': '\x0311',
 		'lightblue': '\x0312',
 		'pink': '\x0313',
-		'gray': '\x0314',
+		'grey': '\x0314',
 		'silver': '\x0315',
 		'default': '\x03'
 	}
@@ -169,7 +175,9 @@ event_abilities = {
 	'unspectated': ('player_unspectated', lambda cn: dotemplate('unspectated', name=sbserver.playerName(cn), cn=cn)),
 	'kicked': ('player_kick', lambda cn, who: dotemplate('kicked', by=sbserver.playerName(cn), bycn=cn, name=sbserver.playerName(who), cn=who)),
 	'mastermode_changed': ('server_mastermode_changed', lambda mm: dotemplate('mastermode_changed', mm=mm, mode=masterModeName(mm))),
-	'clearbans': ('server_clear_bans', lambda cn: dotemplate('clearbans', name=sbserver.playerName(cn), cn=cn))
+	'clearbans': ('server_clear_bans', lambda cn: dotemplate('clearbans', name=sbserver.playerName(cn), cn=cn)),
+	'banned': ('player_banned', lambda cn, seconds, reason: dotemplate('banned', name=sbserver.playerName(cn), cn=cn, seconds=seconds, reason=reason)),
+	'teamkill': ('player_teamkill', lambda cn, victim: dotemplate('teamkill', name=sbserver.playerName(cn), cn=cn, victim=sbserver.playerName(victim), victimcn=victim))
 }
 
 factory = IrcBotFactory(config['Connection']['nickname'], [config['Connection']['channel']])
