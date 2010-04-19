@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import sys, urllib, urllib2
 
 HOST = None
