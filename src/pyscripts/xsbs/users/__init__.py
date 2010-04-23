@@ -8,7 +8,7 @@ from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHan
 from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
 from xsbs.colors import red, green, orange
 from xsbs.ui import info, error, warning
-from xsbs.players import player
+from xsbs.players import player, currentAdmin, currentMaster
 from xsbs.settings import PluginConfig
 from xsbs.ban import ban
 from xsbs.timers import addTimer
@@ -174,7 +174,7 @@ def onSetMaster(cn, givenhash):
 		na = dbmanager.query(NickAccount).filter(NickAccount.nick==p.name()).one()
 	except NoResultFound:
 		if givenhash != adminhash:
-			p.message(error('Your name is not assigned to any accounts'))
+			setSimpleMaster(cn)
 	except MultipleResultsFound:
 		p.message(error('Multiple names linked to this account.  Contact the system administrator.'))
 	else:
@@ -183,7 +183,20 @@ def onSetMaster(cn, givenhash):
 			login(cn, na.user)
 		else:
 			if givenhash != adminhash:
-				p.message(error('Invalid password'))
+				setSimpleMaster(cn)
+
+def setSimpleMaster(cn):
+	p = player(cn)
+	if sbserver.publicServer() == 1:
+		sbserver.playerMessage(cn, error('This is not an open server, you need AUTH or master privileges to get master.'))
+		return
+	if currentAdmin() != None:
+		sbserver.playerMessage(cn, error('Admin is present'))
+		return
+	if currentMaster() != None:
+		sbserver.playerMessage(cn, error('Master is present'))
+		return
+	sbserver.setMaster(cn)
 
 def warnNickReserved(cn, count, sessid):
 	try:
