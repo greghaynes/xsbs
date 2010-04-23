@@ -703,6 +703,11 @@ static PyObject *adminPass(PyObject *self, PyObject *args)
 	return Py_BuildValue("s", server::adminpass);
 }
 
+static PyObject *publicServer(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("i", server::publiserver);
+}
+
 static PyObject *sendMapReload(PyObject *self, PyObject *args)
 {
 	server::sendmapreload();

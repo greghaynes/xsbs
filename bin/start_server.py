@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os, sys
 
-xsbs_root_path = ''
+xsbs_root_path = '/home/alex/Projects/sauerbraten/mhserver/'
 pyscripts_path = ''
 xsbs_bin_path = ''
 

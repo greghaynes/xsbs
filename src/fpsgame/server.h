@@ -337,6 +337,7 @@ namespace server
 	extern int mastermask;
 	extern char smapname[260];
 	extern char *pyconfigpath;
+	extern int publicserver;
 	extern char *adminpass;
 	extern char *serverpass;
 	extern int gamemode;
