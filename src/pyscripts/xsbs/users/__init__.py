@@ -188,7 +188,7 @@ def onSetMaster(cn, givenhash):
 def setSimpleMaster(cn):
 	p = player(cn)
 	if sbserver.publicServer() == 1:
-		sbserver.playerMessage(cn, error('This is not an open server, you need AUTH or master privileges to get master.'))
+		sbserver.playerMessage(cn, error('This is not an open server, you need auth or master privileges to get master.'))
 		return
 	if currentAdmin() != None:
 		sbserver.playerMessage(cn, error('Admin is present'))
