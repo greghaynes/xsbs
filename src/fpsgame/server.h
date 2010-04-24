@@ -336,6 +336,7 @@ namespace server
 	extern int mastermode;
 	extern int mastermask;
 	extern char smapname[260];
+	extern int publicserver;
 	extern char *adminpass;
 	extern char *serverpass;
 	extern int gamemode;

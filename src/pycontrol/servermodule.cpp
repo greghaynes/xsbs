@@ -764,6 +764,11 @@ static PyObject *adminPass(PyObject *self, PyObject *args)
 	return Py_BuildValue("s", server::adminpass);
 }
 
+static PyObject *publicServer(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("i", server::publicserver);
+}
+
 static PyObject *sendMapReload(PyObject *self, PyObject *args)
 {
 	server::sendmapreload();
@@ -956,6 +961,7 @@ static PyMethodDef ModuleMethods[] = {
 	{"setMinsRemaining", setGameMins, METH_VARARGS, "Set the minutes remanining in current game."},
 	{"endGame", endGame, METH_VARARGS, "End the current game."},
 	{"adminPassword", adminPass, METH_VARARGS, "Get the administrator password."},
+	{"publicServer", publicServer, METH_VARARGS, "Decides how masters are chosen and what privileges they have."},
 	{"sendMapReload", sendMapReload, METH_VARARGS, "Causes all users to send vote on next map."},
 	{"serverPassword", serverPassword, METH_VARARGS, "Password for entry to the server."},
 	{"minutesRemaining", minRemain, METH_VARARGS, "Minutes remaining in current match."},
