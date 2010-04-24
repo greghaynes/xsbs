@@ -7,7 +7,6 @@ import string
 
 def greet(cn):
 	sbserver.playerMessage(cn, motdstring)
-	sbserver.playerMessage(cn, "publicserver: "+str(sbserver.publicServer()))
 
 config = PluginConfig('motd')
 motdstring = config.getOption('Config', 'template', '${orange}Welcome to a ${red}XSBS ${orange}server')
