@@ -83,11 +83,24 @@ function enableTopNav(hostname, username, password)
 	$('#topnav_logout').click(function() { window.location.reload(); });
 }
 
-function adminPage(hostname) {
-	$("#tabs").tabs();
+function configPage(hostname, username, password) {
+	$('#config-plugins-list').html('Got a valid login');
 }
 
-function loginDialog(hostname, callback) {
+function configPageInvalidLogin() {
+	$('#config-plugins-list').html('<font color=\"red\">Invalid login</font>');
+}
+
+function adminPageNoLogin(hostname) {
+	$("#tabs").tabs();
+	configPageInvalidLogin();
+}
+
+function adminPage(hostname, username, password) {
+	configPage(hostname, username, password);
+}
+
+function adminLoginDialog(hostname, callback) {
 	$("<div id=\"dialog\" title=\"Please login\">Username:<input type=\"text\" id=\"username_input\" /><br />Password: <input type=\"password\" id=\"password\" /><br /><span id=\"login_status\"></span></div>").dialog(
 		{
 			modal: true,
@@ -118,7 +131,9 @@ function loginDialog(hostname, callback) {
 }
 
 function setup(hostname) {
-	adminPage(hostname);
-	loginDialog(hostname, function(username, password) { })
+	adminPageNoLogin(hostname);
+	adminLoginDialog(hostname, function(username, password) { 
+		adminPage(hostname, username, password);
+		});
 }
 
