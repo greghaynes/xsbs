@@ -40,23 +40,26 @@ void conoutfv(int type, const char *fmt, va_list args)
     vformatstring(sf, fmt, args);
     filtertext(sp, sf);
 
-	if(!loggingModule)
-	{
-		loggingModule = PyImport_ImportModule("logging");
-		PY_ERR(loggingModule)
-	}
+    if(Py_IsInitialized())
+    {
+        if(!loggingModule)
+        {
+            loggingModule = PyImport_ImportModule("logging");
+            PY_ERR(loggingModule)
+        }
 
-	if(!loggingError)
-	{
-		loggingError = PyObject_GetAttrString(loggingModule, "error");
-		PY_ERR(loggingError)
-	}
+        if(!loggingError)
+        {
+            loggingError = PyObject_GetAttrString(loggingModule, "error");
+            PY_ERR(loggingError)
+        }
 
-	PyObject *pyargs = Py_BuildValue("(s)", sp);
-	PY_ERR(pyargs)
+        PyObject *pyargs = Py_BuildValue("(s)", sp);
+        PY_ERR(pyargs)
 
-	PyObject *r = PyObject_CallObject(loggingError, pyargs);
-	PY_ERR(r)
+        PyObject *r = PyObject_CallObject(loggingError, pyargs);
+        PY_ERR(r)
+    }
 }
 
 void conoutf(const char *fmt, ...)
