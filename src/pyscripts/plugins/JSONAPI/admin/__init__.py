@@ -2,8 +2,7 @@ from xsbs.http.jsonapi import site as jsonSite, JsonAtLeastMasterSite, response
 from xsbs.players import player
 from xsbs.game import modeNumber
 
-from plugins.JSONAPI.admin.server import setup as setupServerSite
-from plugins.JSONAPI.admin.clients import setup as setupClientsSite
+from config import setup as setupConfigSite
 
 import sbserver
 
@@ -18,7 +17,6 @@ class AdminSite(JsonAtLeastMasterSite):
 def setup(jsonSite):
 	'''Called by JSONAPI/api.py'''
 	adminSite = AdminSite()
-	setupServerSite(adminSite)
-	setupClientsSite(adminSite)
+	setupConfigSite(adminSite)
 	jsonSite.putChild('admin', adminSite)
 

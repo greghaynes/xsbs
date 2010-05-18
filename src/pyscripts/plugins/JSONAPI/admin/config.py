@@ -28,7 +28,7 @@ class ConfigSectionSite(JsonAdminSite):
 			'options': sectionOptions(self.plugin_name, self.section_name)
 			})
 
-def init(site):
+def setup(site):
 	configSite = JsonAdminSite()
 	for name in pluginNames():
 		pluginConfigSite = ConfigPluginSite(name)
