@@ -1,5 +1,5 @@
 # __init__.py
-# Copyright (C) 2005, 2006, 2007, 2008, 2009 Michael Bayer mike_mp@zzzcomputing.com
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Michael Bayer mike_mp@zzzcomputing.com
 #
 # This module is part of SQLAlchemy and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
@@ -9,40 +9,6 @@ import sys
 
 import sqlalchemy.exc as exceptions
 sys.modules['sqlalchemy.exceptions'] = exceptions
-
-from sqlalchemy.types import (
-    BLOB,
-    BOOLEAN,
-    Binary,
-    Boolean,
-    CHAR,
-    CLOB,
-    DATE,
-    DATETIME,
-    DECIMAL,
-    Date,
-    DateTime,
-    FLOAT,
-    Float,
-    INT,
-    Integer,
-    Interval,
-    NCHAR,
-    NUMERIC,
-    Numeric,
-    PickleType,
-    SMALLINT,
-    SmallInteger,
-    String,
-    TEXT,
-    TIME,
-    TIMESTAMP,
-    Text,
-    Time,
-    Unicode,
-    UnicodeText,
-    VARCHAR,
-    )
 
 from sqlalchemy.sql import (
     alias,
@@ -76,10 +42,51 @@ from sqlalchemy.sql import (
     select,
     subquery,
     text,
+    tuple_,
     union,
     union_all,
     update,
     )
+
+from sqlalchemy.types import (
+    BLOB,
+    BOOLEAN,
+    BigInteger,
+    Binary,
+    Boolean,
+    CHAR,
+    CLOB,
+    DATE,
+    DATETIME,
+    DECIMAL,
+    Date,
+    DateTime,
+    Enum,
+    FLOAT,
+    Float,
+    INT,
+    INTEGER,
+    Integer,
+    Interval,
+    LargeBinary,
+    NCHAR,
+    NVARCHAR,
+    NUMERIC,
+    Numeric,
+    PickleType,
+    SMALLINT,
+    SmallInteger,
+    String,
+    TEXT,
+    TIME,
+    TIMESTAMP,
+    Text,
+    Time,
+    Unicode,
+    UnicodeText,
+    VARCHAR,
+    )
+
 
 from sqlalchemy.schema import (
     CheckConstraint,
@@ -107,6 +114,6 @@ from sqlalchemy.engine import create_engine, engine_from_config
 __all__ = sorted(name for name, obj in locals().items()
                  if not (name.startswith('_') or inspect.ismodule(obj)))
                  
-__version__ = '0.5.5'
+__version__ = '0.6.0'
 
 del inspect, sys

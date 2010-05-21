@@ -1,5 +1,5 @@
 # session.py
-# Copyright (C) 2005, 2006, 2007, 2008, 2009 Michael Bayer mike_mp@zzzcomputing.com
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Michael Bayer mike_mp@zzzcomputing.com
 #
 # This module is part of SQLAlchemy and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
@@ -19,7 +19,7 @@ from sqlalchemy.orm.util import class_mapper as _class_mapper
 from sqlalchemy.orm.util import (
     _class_to_mapper, _state_has_identity, _state_mapper,
     )
-from sqlalchemy.orm.mapper import Mapper
+from sqlalchemy.orm.mapper import Mapper, _none_set
 from sqlalchemy.orm.unitofwork import UOWTransaction
 from sqlalchemy.orm import identity
 
@@ -109,9 +109,9 @@ def sessionmaker(bind=None, class_=None, autoflush=True, autocommit=False,
       like::
 
         sess = Session(binds={
-            SomeMappedClass: create_engine('postgres://engine1'),
-            somemapper: create_engine('postgres://engine2'),
-            some_table: create_engine('postgres://engine3'),
+            SomeMappedClass: create_engine('postgresql://engine1'),
+            somemapper: create_engine('postgresql://engine2'),
+            some_table: create_engine('postgresql://engine3'),
             })
 
       Also see the ``bind_mapper()`` and ``bind_table()`` methods.
@@ -121,10 +121,6 @@ def sessionmaker(bind=None, class_=None, autoflush=True, autocommit=False,
       which should be used by the returned class.  This is the only argument
       that is local to the ``sessionmaker()`` function, and is not sent
       directly to the constructor for ``Session``.
-
-    echo_uow
-      Deprecated.  Use
-      ``logging.getLogger('sqlalchemy.orm.unitofwork').setLevel(logging.DEBUG)``.
 
     _enable_transaction_accounting
       Defaults to ``True``.  A legacy-only flag which when ``False``
@@ -169,12 +165,6 @@ def sessionmaker(bind=None, class_=None, autoflush=True, autocommit=False,
       present until they are removed using expunge(), clear(), or purge().
 
     """
-    if 'transactional' in kwargs:
-        util.warn_deprecated(
-            "The 'transactional' argument to sessionmaker() is deprecated; "
-            "use autocommit=True|False instead.")
-        autocommit = not kwargs.pop('transactional')
-
     kwargs['bind'] = bind
     kwargs['autoflush'] = autoflush
     kwargs['autocommit'] = autocommit
@@ -290,23 +280,23 @@ class SessionTransaction(object):
     def _restore_snapshot(self):
         assert self._is_transaction_boundary
 
+        for s in set(self._new).union(self.session._new):
+            self.session._expunge_state(s)
+
         for s in set(self._deleted).union(self.session._deleted):
             self.session._update_impl(s)
 
         assert not self.session._deleted
 
-        for s in set(self._new).union(self.session._new):
-            self.session._expunge_state(s)
-
         for s in self.session.identity_map.all_states():
-            _expire_state(s, None, instance_dict=self.session.identity_map)
+            _expire_state(s, s.dict, None, instance_dict=self.session.identity_map)
 
     def _remove_snapshot(self):
         assert self._is_transaction_boundary
 
         if not self.nested and self.session.expire_on_commit:
             for s in self.session.identity_map.all_states():
-                _expire_state(s, None, instance_dict=self.session.identity_map)
+                _expire_state(s, s.dict, None, instance_dict=self.session.identity_map)
 
     def _connection_for_bind(self, bind):
         self._assert_is_active()
@@ -525,14 +515,14 @@ class Session(object):
 
     public_methods = (
         '__contains__', '__iter__', 'add', 'add_all', 'begin', 'begin_nested',
-        'clear', 'close', 'commit', 'connection', 'delete', 'execute', 'expire',
+        'close', 'commit', 'connection', 'delete', 'execute', 'expire',
         'expire_all', 'expunge', 'expunge_all', 'flush', 'get_bind', 'is_modified', 
-        'merge', 'query', 'refresh', 'rollback', 'save',
-        'save_or_update', 'scalar', 'update')
+        'merge', 'query', 'refresh', 'rollback', 
+        'scalar')
 
     def __init__(self, bind=None, autoflush=True, expire_on_commit=True,
                 _enable_transaction_accounting=True,
-                 autocommit=False, twophase=False, echo_uow=None,
+                 autocommit=False, twophase=False, 
                  weak_identity_map=True, binds=None, extension=None, query_cls=query.Query):
         """Construct a new Session.
 
@@ -541,12 +531,6 @@ class Session(object):
 
         """
         
-        if echo_uow is not None:
-            util.warn_deprecated(
-                "echo_uow is deprecated. "
-                "Use logging.getLogger('sqlalchemy.orm.unitofwork').setLevel(logging.DEBUG).")
-            log.class_logger(UOWTransaction, echo_uow)
-
         if weak_identity_map:
             self._identity_cls = identity.WeakInstanceDict
         else:
@@ -570,13 +554,11 @@ class Session(object):
         self._mapper_flush_opts = {}
 
         if binds is not None:
-            for mapperortable, value in binds.iteritems():
-                if isinstance(mapperortable, type):
-                    mapperortable = _class_mapper(mapperortable).base_mapper
-                self.__binds[mapperortable] = value
-                if isinstance(mapperortable, Mapper):
-                    for t in mapperortable._all_tables:
-                        self.__binds[t] = value
+            for mapperortable, bind in binds.iteritems():
+                if isinstance(mapperortable, (type, Mapper)):
+                    self.bind_mapper(mapperortable, bind)
+                else:
+                    self.bind_table(mapperortable, bind)
 
         if not self.autocommit:
             self.begin()
@@ -638,9 +620,9 @@ class Session(object):
         If no transaction is in progress, this method is a pass-through.
 
         This method rolls back the current transaction or nested transaction
-        regardless of subtransactions being in effect.  All subtrasactions up
+        regardless of subtransactions being in effect.  All subtransactions up
         to the first real transaction are closed.  Subtransactions occur when
-        begin() is called mulitple times.
+        begin() is called multiple times.
 
         """
         if self.transaction is None:
@@ -712,9 +694,9 @@ class Session(object):
           Optional, any ``ClauseElement``
 
         """
-        return self.__connection(self.get_bind(mapper, clause))
+        return self._connection_for_bind(self.get_bind(mapper, clause))
 
-    def __connection(self, engine, **kwargs):
+    def _connection_for_bind(self, engine, **kwargs):
         if self.transaction is not None:
             return self.transaction._connection_for_bind(engine)
         else:
@@ -751,7 +733,7 @@ class Session(object):
 
         engine = self.get_bind(mapper, clause=clause, **kw)
 
-        return self.__connection(engine, close_with_result=True).execute(
+        return self._connection_for_bind(engine, close_with_result=True).execute(
             clause, params or {})
 
     def scalar(self, clause, params=None, mapper=None, **kw):
@@ -794,8 +776,6 @@ class Session(object):
         self.identity_map = self._identity_cls()
         self._new = {}
         self._deleted = {}
-
-    clear = util.deprecated("Use session.expunge_all()")(expunge_all)
 
     # TODO: need much more test coverage for bind_mapper() and similar !
     # TODO: + crystalize + document resolution order vis. bind_mapper/bind_table
@@ -857,7 +837,7 @@ class Session(object):
                     "a binding.")
 
         c_mapper = mapper is not None and _class_to_mapper(mapper) or None
-
+        
         # manually bound?
         if self.__binds:
             if c_mapper:
@@ -865,8 +845,8 @@ class Session(object):
                     return self.__binds[c_mapper.base_mapper]
                 elif c_mapper.mapped_table in self.__binds:
                     return self.__binds[c_mapper.mapped_table]
-            if clause:
-                for t in sql_util.find_tables(clause):
+            if clause is not None:
+                for t in sql_util.find_tables(clause, include_crud=True):
                     if t in self.__binds:
                         return self.__binds[t]
 
@@ -884,7 +864,7 @@ class Session(object):
             context.append('mapper %s' % c_mapper)
         if clause is not None:
             context.append('SQL expression')
-
+        
         raise sa_exc.UnboundExecutionError(
             "Could not locate a bind configured on %s or this Session" % (
             ', '.join(context)))
@@ -902,8 +882,8 @@ class Session(object):
         for state, dict_ in states.items():
             state.commit_all(dict_, self.identity_map)
 
-    def refresh(self, instance, attribute_names=None):
-        """Refresh the attributes on the given instance.
+    def refresh(self, instance, attribute_names=None, lockmode=None):
+        """Expire and refresh the attributes on the given instance.
 
         A query will be issued to the database and all attributes will be
         refreshed with their current database value.
@@ -915,17 +895,24 @@ class Session(object):
         Eagerly-loaded relational attributes will eagerly load within the
         single refresh operation.
 
-        The ``attribute_names`` argument is an iterable collection of
-        attribute names indicating a subset of attributes to be refreshed.
-
+        :param attribute_names: optional.  An iterable collection of
+          string attribute names indicating a subset of attributes to 
+          be refreshed.
+        
+        :param lockmode: Passed to the :class:`~sqlalchemy.orm.query.Query` 
+          as used by :meth:`~sqlalchemy.orm.query.Query.with_lockmode`.
+        
         """
         try:
             state = attributes.instance_state(instance)
         except exc.NO_STATE:
             raise exc.UnmappedInstanceError(instance)
-        self._validate_persistent(state)
+
+        self._expire_state(state, attribute_names)
+
         if self.query(_object_mapper(instance))._get(
                 state.key, refresh_state=state,
+                lockmode=lockmode,
                 only_load_props=attribute_names) is None:
             raise sa_exc.InvalidRequestError(
                 "Could not refresh instance '%s'" %
@@ -935,7 +922,7 @@ class Session(object):
         """Expires all persistent instances within this Session."""
 
         for state in self.identity_map.all_states():
-            _expire_state(state, None, instance_dict=self.identity_map)
+            _expire_state(state, state.dict, None, instance_dict=self.identity_map)
 
     def expire(self, instance, attribute_names=None):
         """Expire the attributes on an instance.
@@ -954,17 +941,31 @@ class Session(object):
             state = attributes.instance_state(instance)
         except exc.NO_STATE:
             raise exc.UnmappedInstanceError(instance)
+        self._expire_state(state, attribute_names)
+        
+    def _expire_state(self, state, attribute_names):
         self._validate_persistent(state)
         if attribute_names:
-            _expire_state(state, attribute_names=attribute_names, instance_dict=self.identity_map)
+            _expire_state(state, state.dict, 
+                                attribute_names=attribute_names, 
+                                instance_dict=self.identity_map)
         else:
             # pre-fetch the full cascade since the expire is going to
             # remove associations
             cascaded = list(_cascade_state_iterator('refresh-expire', state))
-            _expire_state(state, None, instance_dict=self.identity_map)
+            self._conditional_expire(state)
             for (state, m, o) in cascaded:
-                _expire_state(state, None, instance_dict=self.identity_map)
-
+                self._conditional_expire(state)
+        
+    def _conditional_expire(self, state):
+        """Expire a state if persistent, else expunge if pending"""
+        
+        if state.key:
+            _expire_state(state, state.dict, None, instance_dict=self.identity_map)
+        elif state in self._new:
+            self._new.pop(state)
+            state.detach()
+        
     def prune(self):
         """Remove unreferenced instances cached in the identity map.
 
@@ -1017,8 +1018,10 @@ class Session(object):
             if state.key is None:
                 state.key = instance_key
             elif state.key != instance_key:
-                # primary key switch
-                self.identity_map.remove(state)
+                # primary key switch.
+                # use discard() in case another state has already replaced this
+                # one in the identity map (see test/orm/test_naturalpks.py ReversePKsTest)
+                self.identity_map.discard(state)
                 state.key = instance_key
             
             self.identity_map.replace(state)
@@ -1037,43 +1040,11 @@ class Session(object):
         self.identity_map.discard(state)
         self._deleted.pop(state, None)
 
-    @util.deprecated("Use session.add()")
-    def save(self, instance):
-        """Add a transient (unsaved) instance to this ``Session``.
-
-        This operation cascades the `save_or_update` method to associated
-        instances if the relation is mapped with ``cascade="save-update"``.
-
-
-        """
-        state = _state_for_unsaved_instance(instance)
-        self._save_impl(state)
-        self._cascade_save_or_update(state)
-
     def _save_without_cascade(self, instance):
         """Used by scoping.py to save on init without cascade."""
 
         state = _state_for_unsaved_instance(instance, create=True)
         self._save_impl(state)
-
-    @util.deprecated("Use session.add()")
-    def update(self, instance):
-        """Bring a detached (saved) instance into this ``Session``.
-
-        If there is a persistent instance with the same instance key, but
-        different identity already associated with this ``Session``, an
-        InvalidRequestError exception is thrown.
-
-        This operation cascades the `save_or_update` method to associated
-        instances if the relation is mapped with ``cascade="save-update"``.
-
-        """
-        try:
-            state = attributes.instance_state(instance)
-        except exc.NO_STATE:
-            raise exc.UnmappedInstanceError(instance)
-        self._update_impl(state)
-        self._cascade_save_or_update(state)
 
     def add(self, instance):
         """Place an object in the ``Session``.
@@ -1098,11 +1069,9 @@ class Session(object):
         self._save_or_update_impl(state)
         self._cascade_save_or_update(state)
 
-    save_or_update = (
-        util.deprecated("Use session.add()")(add))
-
     def _cascade_save_or_update(self, state):
-        for state, mapper in _cascade_unknown_state_iterator('save-update', state, halt_on=lambda c:c in self):
+        for state, mapper in _cascade_unknown_state_iterator(
+                                    'save-update', state, halt_on=self.__contains__):
             self._save_or_update_impl(state)
 
     def delete(self, instance):
@@ -1139,7 +1108,7 @@ class Session(object):
         for state, m, o in cascade_states:
             self._delete_impl(state)
 
-    def merge(self, instance, dont_load=False):
+    def merge(self, instance, load=True, **kw):
         """Copy the state an instance onto the persistent instance with the same identifier.
 
         If there is no persistent instance currently associated with the
@@ -1152,66 +1121,90 @@ class Session(object):
         mapped with ``cascade="merge"``.
 
         """
-        # TODO: this should be an IdentityDict for instances, but will
-        # need a separate dict for PropertyLoader tuples
+        if 'dont_load' in kw:
+            load = not kw['dont_load']
+            util.warn_deprecated("dont_load=True has been renamed to load=False.")
+        
         _recursive = {}
-        self._autoflush()
+        
+        if load:
+            # flush current contents if we expect to load data
+            self._autoflush()
+            
+        _object_mapper(instance) # verify mapped
         autoflush = self.autoflush
         try:
             self.autoflush = False
-            return self._merge(instance, dont_load=dont_load, _recursive=_recursive)
+            return self._merge(
+                            attributes.instance_state(instance), 
+                            attributes.instance_dict(instance), 
+                            load=load, _recursive=_recursive)
         finally:
             self.autoflush = autoflush
         
-    def _merge(self, instance, dont_load=False, _recursive=None):
-        mapper = _object_mapper(instance)
-        if instance in _recursive:
-            return _recursive[instance]
+    def _merge(self, state, state_dict, load=True, _recursive=None):
+        mapper = _state_mapper(state)
+        if state in _recursive:
+            return _recursive[state]
 
         new_instance = False
-        state = attributes.instance_state(instance)
         key = state.key
-
+        
         if key is None:
-            if dont_load:
+            if not load:
                 raise sa_exc.InvalidRequestError(
-                    "merge() with dont_load=True option does not support "
+                    "merge() with load=False option does not support "
                     "objects transient (i.e. unpersisted) objects.  flush() "
                     "all changes on mapped instances before merging with "
-                    "dont_load=True.")
+                    "load=False.")
             key = mapper._identity_key_from_state(state)
 
-        merged = None
-        if key:
-            if key in self.identity_map:
-                merged = self.identity_map[key]
-            elif dont_load:
-                if state.modified:
-                    raise sa_exc.InvalidRequestError(
-                        "merge() with dont_load=True option does not support "
-                        "objects marked as 'dirty'.  flush() all changes on "
-                        "mapped instances before merging with dont_load=True.")
-                merged = mapper.class_manager.new_instance()
-                merged_state = attributes.instance_state(merged)
-                merged_state.key = key
-                self._update_impl(merged_state)
-                new_instance = True
-            else:
-                merged = self.query(mapper.class_).get(key[1])
-
+        if key in self.identity_map:
+            merged = self.identity_map[key]
+            
+        elif not load:
+            if state.modified:
+                raise sa_exc.InvalidRequestError(
+                    "merge() with load=False option does not support "
+                    "objects marked as 'dirty'.  flush() all changes on "
+                    "mapped instances before merging with load=False.")
+            merged = mapper.class_manager.new_instance()
+            merged_state = attributes.instance_state(merged)
+            merged_state.key = key
+            self._update_impl(merged_state)
+            new_instance = True
+        
+        elif not _none_set.issubset(key[1]) or \
+                    (mapper.allow_partial_pks and 
+                    not _none_set.issuperset(key[1])):
+            merged = self.query(mapper.class_).get(key[1])
+        else:
+            merged = None
+            
         if merged is None:
             merged = mapper.class_manager.new_instance()
             merged_state = attributes.instance_state(merged)
+            merged_dict = attributes.instance_dict(merged)
             new_instance = True
-            self.add(merged)
+            self._save_or_update_state(merged_state)
+        else:
+            merged_state = attributes.instance_state(merged)
+            merged_dict = attributes.instance_dict(merged)
+            
+        _recursive[state] = merged
 
-        _recursive[instance] = merged
+        # check that we didn't just pull the exact same
+        # state out.   
+        if state is not merged_state:
+            merged_state.load_path = state.load_path
+            merged_state.load_options = state.load_options
+            
+            for prop in mapper.iterate_properties:
+                prop.merge(self, state, state_dict, merged_state, merged_dict, load, _recursive)
 
-        for prop in mapper.iterate_properties:
-            prop.merge(self, instance, merged, dont_load, _recursive)
-
-        if dont_load:
-            attributes.instance_state(merged).commit_all(attributes.instance_dict(merged), self.identity_map)  # remove any history
+        if not load:
+            # remove any history
+            merged_state.commit_all(merged_dict, self.identity_map)  
 
         if new_instance:
             merged_state._run_on_load(merged)
@@ -1344,7 +1337,8 @@ class Session(object):
         if objects:
             util.warn_deprecated(
                 "The 'objects' argument to session.flush() is deprecated; "
-                "Please do not add objects to the session which should not yet be persisted.")
+                "Please do not add objects to the session which should not "
+                "yet be persisted.")
         
         if self._flushing:
             raise sa_exc.InvalidRequestError("Session is already flushing")
@@ -1407,7 +1401,10 @@ class Session(object):
                     ["any parent '%s' instance "
                      "via that classes' '%s' attribute" %
                      (cls.__name__, key)
-                     for (key, cls) in chain(*(m.delete_orphans for m in _state_mapper(state).iterate_to_root()))])
+                     for (key, cls) in chain(*(
+                         m.delete_orphans for m in _state_mapper(state).iterate_to_root()
+                        ))
+                    ])
                 raise exc.FlushError(
                     "Instance %s is an unsaved, pending instance and is an "
                     "orphan (is not attached to %s)" % (
@@ -1423,7 +1420,7 @@ class Session(object):
         for state in proc:
             flush_context.register_object(state, isdelete=True)
 
-        if len(flush_context.tasks) == 0:
+        if not flush_context.has_work:
             return
 
         flush_context.transaction = transaction = self.begin(
@@ -1589,6 +1586,22 @@ def _state_for_unknown_persistence_instance(instance):
 
     return state
 
+def make_transient(instance):
+    """Make the given instance 'transient'.
+    
+    This will remove its association with any 
+    session and additionally will remove its "identity key",
+    such that it's as though the object were newly constructed,
+    except retaining its values.
+    
+    """
+    state = attributes.instance_state(instance)
+    s = _state_session(state)
+    if s:
+        s._expunge_state(state)
+    del state.key
+    
+    
 def object_session(instance):
     """Return the ``Session`` to which instance belongs, or None."""
 

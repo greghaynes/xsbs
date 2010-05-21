@@ -2,6 +2,8 @@ import sys, types, weakref
 from collections import deque
 import config
 from sqlalchemy.util import function_named, callable
+import re
+import warnings
 
 class ConnectionKiller(object):
     def __init__(self):
@@ -11,7 +13,8 @@ class ConnectionKiller(object):
         self.proxy_refs[con_proxy] = True
 
     def _apply_all(self, methods):
-        for rec in self.proxy_refs:
+        # must copy keys atomically
+        for rec in self.proxy_refs.keys():
             if rec is not None and rec.is_valid:
                 try:
                     for name in methods:
@@ -22,8 +25,7 @@ class ConnectionKiller(object):
                 except (SystemExit, KeyboardInterrupt):
                     raise
                 except Exception, e:
-                    # fixme
-                    sys.stderr.write("\n" + str(e) + "\n")
+                    warnings.warn("testing_reaper couldn't close connection: %s" % e)
 
     def rollback_all(self):
         self._apply_all(('rollback',))
@@ -38,6 +40,10 @@ class ConnectionKiller(object):
 
 testing_reaper = ConnectionKiller()
 
+def drop_all_tables(metadata):
+    testing_reaper.close_all()
+    metadata.drop_all()
+    
 def assert_conns_closed(fn):
     def decorated(*args, **kw):
         try:
@@ -56,6 +62,14 @@ def rollback_open_connections(fn):
             testing_reaper.rollback_all()
     return function_named(decorated, fn.__name__)
 
+def close_first(fn):
+    """Decorator that closes all connections before fn execution."""
+    def decorated(*args, **kw):
+        testing_reaper.close_all()
+        fn(*args, **kw)
+    return function_named(decorated, fn.__name__)
+    
+    
 def close_open_connections(fn):
     """Decorator that closes all connections after fn execution."""
 
@@ -66,10 +80,15 @@ def close_open_connections(fn):
             testing_reaper.close_all()
     return function_named(decorated, fn.__name__)
 
-def all_dialects():
+def all_dialects(exclude=None):
     import sqlalchemy.databases as d
     for name in d.__all__:
-        mod = getattr(__import__('sqlalchemy.databases.%s' % name).databases, name)
+        # TEMPORARY
+        if exclude and name in exclude:
+            continue
+        mod = getattr(d, name, None)
+        if not mod:
+            mod = getattr(__import__('sqlalchemy.databases.%s' % name).databases, name)
         yield mod.dialect()
         
 class ReconnectFixture(object):
@@ -115,7 +134,11 @@ def testing_engine(url=None, options=None):
     listeners.append(testing_reaper)
 
     engine = create_engine(url, **options)
-
+    
+    # may want to call this, results
+    # in first-connect initializers
+    #engine.connect()
+    
     return engine
 
 def utf8_engine(url=None, options=None):
@@ -123,7 +146,7 @@ def utf8_engine(url=None, options=None):
 
     from sqlalchemy.engine import url as engine_url
 
-    if config.db.name == 'mysql':
+    if config.db.driver == 'mysqldb':
         dbapi_ver = config.db.dialect.dbapi.version_info
         if (dbapi_ver < (1, 2, 1) or
             dbapi_ver in ((1, 2, 1, 'gamma', 1), (1, 2, 1, 'gamma', 2),
@@ -139,19 +162,35 @@ def utf8_engine(url=None, options=None):
 
     return testing_engine(url, options)
 
-def mock_engine(db=None):
-    """Provides a mocking engine based on the current testing.db."""
+def mock_engine(dialect_name=None):
+    """Provides a mocking engine based on the current testing.db.
+    
+    This is normally used to test DDL generation flow as emitted
+    by an Engine.
+    
+    It should not be used in other cases, as assert_compile() and
+    assert_sql_execution() are much better choices with fewer 
+    moving parts.
+    
+    """
     
     from sqlalchemy import create_engine
     
-    dbi = db or config.db
+    if not dialect_name:
+        dialect_name = config.db.name
+
     buffer = []
     def executor(sql, *a, **kw):
         buffer.append(sql)
-    engine = create_engine(dbi.name + '://',
+    def assert_sql(stmts):
+        recv = [re.sub(r'[\n\t]', '', str(s)) for s in buffer]
+        assert  recv == stmts, recv
+        
+    engine = create_engine(dialect_name + '://',
                            strategy='mock', executor=executor)
     assert not hasattr(engine, 'mock')
     engine.mock = buffer
+    engine.assert_sql = assert_sql
     return engine
 
 class ReplayableSession(object):
@@ -168,9 +207,16 @@ class ReplayableSession(object):
     Natives = set([getattr(types, t)
                    for t in dir(types) if not t.startswith('_')]). \
                    difference([getattr(types, t)
+                            # Py3K
+                            #for t in ('FunctionType', 'BuiltinFunctionType',
+                            #          'MethodType', 'BuiltinMethodType',
+                            #          'LambdaType', )])
+                            
+                            # Py2K
                                for t in ('FunctionType', 'BuiltinFunctionType',
                                          'MethodType', 'BuiltinMethodType',
                                          'LambdaType', 'UnboundMethodType',)])
+                            # end Py2K
     def __init__(self):
         self.buffer = deque()
 
@@ -196,7 +242,11 @@ class ReplayableSession(object):
             else:
                 buffer.append(result)
                 return result
-
+        
+        @property
+        def _sqla_unwrap(self):
+            return self._subject
+            
         def __getattribute__(self, key):
             try:
                 return object.__getattribute__(self, key)
@@ -229,7 +279,11 @@ class ReplayableSession(object):
                 return self
             else:
                 return result
-
+        
+        @property
+        def _sqla_unwrap(self):
+            return None
+            
         def __getattribute__(self, key):
             try:
                 return object.__getattribute__(self, key)
@@ -243,3 +297,4 @@ class ReplayableSession(object):
                 raise AttributeError(key)
             else:
                 return result
+

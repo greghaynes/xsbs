@@ -7,7 +7,11 @@ class UnevaluatableError(Exception):
     pass
 
 _straight_ops = set(getattr(operators, op)
-                    for op in ('add', 'mul', 'sub', 'div', 'mod', 'truediv',
+                    for op in ('add', 'mul', 'sub', 
+                                # Py2K
+                                'div',
+                                # end Py2K 
+                                'mod', 'truediv',
                                'lt', 'le', 'ne', 'gt', 'ge', 'eq'))
 
 
@@ -50,7 +54,7 @@ class EvaluatorCompiler(object):
                 if has_null:
                     return None
                 return False
-        if clause.operator is operators.and_:
+        elif clause.operator is operators.and_:
             def evaluate(obj):
                 for sub_evaluate in evaluators:
                     value = sub_evaluate(obj)
@@ -59,6 +63,8 @@ class EvaluatorCompiler(object):
                             return None
                         return False
                 return True
+        else:
+            raise UnevaluatableError("Cannot evaluate clauselist with operator %s" % clause.operator)
 
         return evaluate
 
