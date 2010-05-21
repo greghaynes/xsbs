@@ -8,6 +8,7 @@ except ImportError:
 
 class ConfigPluginSite(JsonAdminSite):
 	def __init__(self, plugin_name):
+		JsonAdminSite.__init__(self)
 		self.plugin_name = plugin_name
 	def render_admin_JSON(self, request):
 		return json.dumps({
@@ -17,6 +18,7 @@ class ConfigPluginSite(JsonAdminSite):
 
 class ConfigSectionSite(JsonAdminSite):
 	def __init__(self, plugin_name, section_name):
+		JsonAdminSite.__init__(self)
 		self.plugin_name = plugin_name
 		self.section_name = section_name
 	def render_admin_JSON(self, request):
@@ -26,7 +28,7 @@ class ConfigSectionSite(JsonAdminSite):
 			'options': sectionOptions(self.plugin_name, self.section_name)
 			})
 
-def init(site):
+def setup(site):
 	configSite = JsonAdminSite()
 	for name in pluginNames():
 		pluginConfigSite = ConfigPluginSite(name)

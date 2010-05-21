@@ -28,6 +28,18 @@ def loadPluginConfig(dict, plugin):
 			sectdict = dict[option.section]
 		sectdict[option.name] = option.value
 
+def pluginNames():
+	return []
+
+def pluginSections(plugin_name):
+	return []
+
+def sectionOptions(plugin_name, section):
+	return []
+
+def setOption(plugin_name, section, option, value):
+	pass
+
 class PluginConfig:
 	'''Allows easy reading of configuration options from configuration files'''
 	def __init__(self, plugin_name):
