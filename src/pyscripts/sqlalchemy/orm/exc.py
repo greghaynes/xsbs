@@ -23,7 +23,9 @@ class FlushError(sa.exc.SQLAlchemyError):
 class UnmappedError(sa.exc.InvalidRequestError):
     """TODO"""
 
-
+class DetachedInstanceError(sa.exc.SQLAlchemyError):
+    """An attempt to access unloaded attributes on a mapped instance that is detached."""
+    
 class UnmappedInstanceError(UnmappedError):
     """An mapping operation was requested for an unknown instance."""
 
@@ -33,10 +35,8 @@ class UnmappedInstanceError(UnmappedError):
                 mapper = sa.orm.class_mapper(type(obj))
                 name = _safe_cls_name(type(obj))
                 msg = ("Class %r is mapped, but this instance lacks "
-                       "instrumentation.  Possible causes: instance created "
-                       "before sqlalchemy.orm.mapper(%s) was called, or "
-                       "instance was pickled/depickled without instrumentation"
-                       "information." % (name, name))
+                       "instrumentation.  This occurs when the instance is created "
+                       "before sqlalchemy.orm.mapper(%s) was called." % (name, name))
             except UnmappedClassError:
                 msg = _default_unmapped(type(obj))
                 if isinstance(obj, type):

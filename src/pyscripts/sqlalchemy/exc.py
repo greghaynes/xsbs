@@ -1,4 +1,4 @@
-# Copyright (C) 2005, 2006, 2007, 2008, 2009 Michael Bayer mike_mp@zzzcomputing.com
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 Michael Bayer mike_mp@zzzcomputing.com
 #
 # This module is part of SQLAlchemy and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
@@ -103,6 +103,7 @@ class DBAPIError(SQLAlchemyError):
 
     """
 
+    @classmethod
     def instance(cls, statement, params, orig, connection_invalidated=False):
         # Don't ever wrap these, just return them directly as if
         # DBAPIError didn't exist.
@@ -115,7 +116,6 @@ class DBAPIError(SQLAlchemyError):
                 cls = glob[name]
 
         return cls(statement, params, orig, connection_invalidated)
-    instance = classmethod(instance)
 
     def __init__(self, statement, params, orig, connection_invalidated=False):
         try:

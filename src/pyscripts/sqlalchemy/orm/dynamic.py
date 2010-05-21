@@ -12,16 +12,17 @@ basic add/delete mutation.
 """
 
 from sqlalchemy import log, util
-import sqlalchemy.exceptions as sa_exc
-
+from sqlalchemy import exc as sa_exc
+from sqlalchemy.orm import exc as sa_exc
+from sqlalchemy.sql import operators
 from sqlalchemy.orm import (
-    attributes, object_session, util as mapperutil, strategies,
+    attributes, object_session, util as mapperutil, strategies, object_mapper
     )
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm.util import _state_has_identity, has_identity
 from sqlalchemy.orm import attributes, collections
 
-class DynaLoader(strategies.AbstractRelationLoader):
+class DynaLoader(strategies.AbstractRelationshipLoader):
     def init_class_attribute(self, mapper):
         self.is_class_level = True
 
@@ -93,14 +94,18 @@ class DynamicAttributeImpl(attributes.AttributeImpl):
         if self.key not in state.committed_state:
             state.committed_state[self.key] = CollectionHistory(self, state)
 
-        state.modified_event(dict_, self, False, attributes.NEVER_SET, passive=attributes.PASSIVE_NO_INITIALIZE)
+        state.modified_event(dict_, 
+                                self, 
+                                False, 
+                                attributes.NEVER_SET, 
+                                passive=attributes.PASSIVE_NO_INITIALIZE)
 
         # this is a hack to allow the _base.ComparableEntity fixture
         # to work
         dict_[self.key] = True
         return state.committed_state[self.key]
 
-    def set(self, state, dict_, value, initiator):
+    def set(self, state, dict_, value, initiator, passive=attributes.PASSIVE_OFF):
         if initiator is self:
             return
 
@@ -172,8 +177,19 @@ class AppenderMixin(object):
 
     def __init__(self, attr, state):
         Query.__init__(self, attr.target_mapper, None)
-        self.instance = state.obj()
+        self.instance = instance = state.obj()
         self.attr = attr
+
+        mapper = object_mapper(instance)
+        prop = mapper.get_property(self.attr.key, resolve_synonyms=True)
+        self._criterion = prop.compare(
+                            operators.eq, 
+                            instance, 
+                            value_is_parent=True, 
+                            alias_secondary=False)
+
+        if self.attr.order_by:
+            self._order_by = self.attr.order_by
 
     def __session(self):
         sess = object_session(self.instance)
@@ -223,7 +239,7 @@ class AppenderMixin(object):
         if sess is None:
             sess = object_session(instance)
             if sess is None:
-                raise sa_exc.UnboundExecutionError(
+                raise orm_exc.DetachedInstanceError(
                     "Parent instance %s is not bound to a Session, and no "
                     "contextual session is established; lazy load operation "
                     "of attribute '%s' cannot proceed" % (
@@ -233,17 +249,21 @@ class AppenderMixin(object):
             query = self.query_class(self.attr.target_mapper, session=sess)
         else:
             query = sess.query(self.attr.target_mapper)
-        query = query.with_parent(instance, self.attr.key)
-
-        if self.attr.order_by:
-            query = query.order_by(self.attr.order_by)
+        
+        query._criterion = self._criterion
+        query._order_by = self._order_by
+        
         return query
 
     def append(self, item):
-        self.attr.append(attributes.instance_state(self.instance), attributes.instance_dict(self.instance), item, None)
+        self.attr.append(
+            attributes.instance_state(self.instance), 
+            attributes.instance_dict(self.instance), item, None)
 
     def remove(self, item):
-        self.attr.remove(attributes.instance_state(self.instance), attributes.instance_dict(self.instance), item, None)
+        self.attr.remove(
+            attributes.instance_state(self.instance), 
+            attributes.instance_dict(self.instance), item, None)
 
 
 class AppenderQuery(AppenderMixin, Query):

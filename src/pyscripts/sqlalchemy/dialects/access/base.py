@@ -5,26 +5,29 @@
 # This module is part of SQLAlchemy and is released under
 # the MIT License: http://www.opensource.org/licenses/mit-license.php
 
+"""
+Support for the Microsoft Access database.
+
+This dialect is *not* ported to SQLAlchemy 0.6.
+
+This dialect is *not* tested on SQLAlchemy 0.6.
+
+
+"""
 from sqlalchemy import sql, schema, types, exc, pool
 from sqlalchemy.sql import compiler, expression
-from sqlalchemy.engine import default, base
-
+from sqlalchemy.engine import default, base, reflection
+from sqlalchemy import processors
 
 class AcNumeric(types.Numeric):
-    def result_processor(self, dialect):
-        return None
-
-    def bind_processor(self, dialect):
-        def process(value):
-            if value is None:
-                # Not sure that this exception is needed
-                return value
-            else:
-                return str(value)
-        return process
-
     def get_col_spec(self):
         return "NUMERIC"
+
+    def bind_processor(self, dialect):
+        return processors.to_str
+
+    def result_processor(self, dialect, coltype):
+        return None
 
 class AcFloat(types.Float):
     def get_col_spec(self):
@@ -32,11 +35,7 @@ class AcFloat(types.Float):
 
     def bind_processor(self, dialect):
         """By converting to string, we can use Decimal types round-trip."""
-        def process(value):
-            if not value is None:
-                return str(value)
-            return None
-        return process
+        return processors.to_str
 
 class AcInteger(types.Integer):
     def get_col_spec(self):
@@ -46,7 +45,7 @@ class AcTinyInteger(types.Integer):
     def get_col_spec(self):
         return "TINYINT"
 
-class AcSmallInteger(types.Smallinteger):
+class AcSmallInteger(types.SmallInteger):
     def get_col_spec(self):
         return "SMALLINT"
 
@@ -79,39 +78,20 @@ class AcUnicode(types.Unicode):
     def bind_processor(self, dialect):
         return None
 
-    def result_processor(self, dialect):
+    def result_processor(self, dialect, coltype):
         return None
 
 class AcChar(types.CHAR):
     def get_col_spec(self):
         return "TEXT" + (self.length and ("(%d)" % self.length) or "")
 
-class AcBinary(types.Binary):
+class AcBinary(types.LargeBinary):
     def get_col_spec(self):
         return "BINARY"
 
 class AcBoolean(types.Boolean):
     def get_col_spec(self):
         return "YESNO"
-
-    def result_processor(self, dialect):
-        def process(value):
-            if value is None:
-                return None
-            return value and True or False
-        return process
-
-    def bind_processor(self, dialect):
-        def process(value):
-            if value is True:
-                return 1
-            elif value is False:
-                return 0
-            elif value is None:
-                return None
-            else:
-                return value and True or False
-        return process
 
 class AcTimeStamp(types.TIMESTAMP):
     def get_col_spec(self):
@@ -155,13 +135,13 @@ class AccessDialect(default.DefaultDialect):
     colspecs = {
         types.Unicode : AcUnicode,
         types.Integer : AcInteger,
-        types.Smallinteger: AcSmallInteger,
+        types.SmallInteger: AcSmallInteger,
         types.Numeric : AcNumeric,
         types.Float : AcFloat,
         types.DateTime : AcDateTime,
         types.Date : AcDate,
         types.String : AcString,
-        types.Binary : AcBinary,
+        types.LargeBinary : AcBinary,
         types.Boolean : AcBoolean,
         types.Text : AcText,
         types.CHAR: AcChar,
@@ -171,6 +151,8 @@ class AccessDialect(default.DefaultDialect):
     supports_sane_rowcount = False
     supports_sane_multi_rowcount = False
 
+    ported_sqla_06 = False
+    
     def type_descriptor(self, typeobj):
         newobj = types.adapt_type(typeobj, self.colspecs)
         return newobj
@@ -317,7 +299,8 @@ class AccessDialect(default.DefaultDialect):
         finally:
             dtbs.Close()
 
-    def table_names(self, connection, schema):
+    @reflection.cache
+    def get_table_names(self, connection, schema=None, **kw):
         # A fresh DAO connection is opened for each reflection
         # This is necessary, so we get the latest updates
         dtbs = daoEngine.OpenDatabase(connection.engine.url.database)
@@ -327,8 +310,8 @@ class AccessDialect(default.DefaultDialect):
         return names
 
 
-class AccessCompiler(compiler.DefaultCompiler):
-    extract_map = compiler.DefaultCompiler.extract_map.copy()
+class AccessCompiler(compiler.SQLCompiler):
+    extract_map = compiler.SQLCompiler.extract_map.copy()
     extract_map.update ({
             'month': 'm',
             'day': 'd',
@@ -341,7 +324,7 @@ class AccessCompiler(compiler.DefaultCompiler):
             'dow': 'w',
             'week': 'ww'
     })
-
+        
     def visit_select_precolumns(self, select):
         """Access puts TOP, it's version of LIMIT here """
         s = select.distinct and "DISTINCT " or ""
@@ -389,12 +372,11 @@ class AccessCompiler(compiler.DefaultCompiler):
         return (self.process(join.left, asfrom=True) + (join.isouter and " LEFT OUTER JOIN " or " INNER JOIN ") + \
             self.process(join.right, asfrom=True) + " ON " + self.process(join.onclause))
 
-    def visit_extract(self, extract):
+    def visit_extract(self, extract, **kw):
         field = self.extract_map.get(extract.field, extract.field)
-        return 'DATEPART("%s", %s)' % (field, self.process(extract.expr))
+        return 'DATEPART("%s", %s)' % (field, self.process(extract.expr, **kw))
 
-
-class AccessSchemaGenerator(compiler.SchemaGenerator):
+class AccessDDLCompiler(compiler.DDLCompiler):
     def get_column_specification(self, column, **kwargs):
         colspec = self.preparer.format_column(column) + " " + column.type.dialect_impl(self.dialect).get_col_spec()
 
@@ -417,14 +399,9 @@ class AccessSchemaGenerator(compiler.SchemaGenerator):
 
         return colspec
 
-class AccessSchemaDropper(compiler.SchemaDropper):
-    def visit_index(self, index):
-        
+    def visit_drop_index(self, drop):
+        index = drop.element
         self.append("\nDROP INDEX [%s].[%s]" % (index.table.name, self._validate_identifier(index.name, False)))
-        self.execute()
-
-class AccessDefaultRunner(base.DefaultRunner):
-    pass
 
 class AccessIdentifierPreparer(compiler.IdentifierPreparer):
     reserved_words = compiler.RESERVED_WORDS.copy()
@@ -436,8 +413,6 @@ class AccessIdentifierPreparer(compiler.IdentifierPreparer):
 dialect = AccessDialect
 dialect.poolclass = pool.SingletonThreadPool
 dialect.statement_compiler = AccessCompiler
-dialect.schemagenerator = AccessSchemaGenerator
-dialect.schemadropper = AccessSchemaDropper
+dialect.ddlcompiler = AccessDDLCompiler
 dialect.preparer = AccessIdentifierPreparer
-dialect.defaultrunner = AccessDefaultRunner
 dialect.execution_ctx_cls = AccessExecutionContext
