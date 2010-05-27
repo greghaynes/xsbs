@@ -82,8 +82,8 @@ class JsonMasterSite(JsonUserSite):
 class JsonAdminSite(JsonUserSite):
 	def render_user_JSON(self, request, user):
 		if not isUserAdmin(user.id):
-			return response('insufficient_permissions', 'User does not have master permissions')
-		return self.render_master_JSON(request, user)		
+			return response('insufficient_permissions', 'User does not have admin permissions')
+		return self.render_admin_JSON(request, user)		
 
 site = JsonSite()
 httpServer.root_site.putChild('json', site)
