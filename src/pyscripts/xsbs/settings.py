@@ -34,11 +34,17 @@ def loadPluginConfig(cfg_dict, plugin):
 				sectdict = cfg_dict[option.section]
 			sectdict[option.name] = option.value
 
+def strip_arr(l):
+	s_l = []
+	for item in l:
+		s_l.append(item[0])
+	return s_l
+
 def pluginNames():
-	return session.query(ConfigOption.plugin)
+	return strip_arr(session.query(ConfigOption.plugin))
 
 def pluginSections(plugin_name):
-	return []
+	return strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name))
 
 def sectionOptions(plugin_name, section):
 	return []
