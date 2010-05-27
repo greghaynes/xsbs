@@ -23,7 +23,7 @@ def loadPluginConfig(cfg_dict, plugin):
 	if len(options) == 0:
 		for section, sectdict in cfg_dict.items():
 			for option, value in sectdict.items():
-				db_opt = ConfigOption(plugin=plugin, section=section, option=option, value=value)
+				db_opt = ConfigOption(plugin=plugin, section=section, name=option, value=value)
 				session.commit()
 	else:
 		for option in options:
