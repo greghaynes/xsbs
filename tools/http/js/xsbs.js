@@ -109,7 +109,7 @@ function adminLoginDialog(hostname, callback) {
 					$('#login_status').empty();
 					$('#login_status').html('Trying login...');
 					var username = $('#username_input').val();
-					var password = $('#password_input').val();
+					var password = $('#password').val();
 					tryLogin(hostname, username, password,
 						function(data) {
 							error_code = data.error
