@@ -10,7 +10,7 @@ class ConfigPluginSite(JsonAdminSite):
 	def __init__(self, plugin_name):
 		JsonAdminSite.__init__(self)
 		self.plugin_name = plugin_name
-	def render_admin_JSON(self, request):
+	def render_admin_JSON(self, request, user):
 		return json.dumps({
 			'plugin': self.plugin_name,
 			'sections': pluginSections(self.plugin_name)
@@ -21,19 +21,30 @@ class ConfigSectionSite(JsonAdminSite):
 		JsonAdminSite.__init__(self)
 		self.plugin_name = plugin_name
 		self.section_name = section_name
-	def render_admin_JSON(self, request):
+	def render_admin_JSON(self, request, user):
 		return json.dumps({
 			'plugin': self.plugin_name,
 			'section': self.section_name,
 			'options': sectionOptions(self.plugin_name, self.section_name)
 			})
 
+class ConfigSite(JsonAdminSite):
+	def __init__(self):
+		JsonAdminSite.__init__(self)
+		self.plugin_names = []
+		for name in pluginNames():
+			pluginConfigSite = ConfigPluginSite(name)
+			for section in pluginSections(name):
+				pluginConfigSite.putChild(section, ConfigSectionSite(name, section))
+			self.putChild(name, pluginConfigSite)
+			if name not in self.plugin_names:
+				self.plugin_names.append(name)
+	def render_admin_JSON(self, request, user):
+		return json.dumps({
+			'plugins': self.plugin_names
+			})
+
 def setup(site):
-	configSite = JsonAdminSite()
-	for name in pluginNames():
-		pluginConfigSite = ConfigPluginSite(name)
-		for section in pluginSections(name):
-			pluginConfigSite.putChild(section, ConfigSectionSite(name, section))
-		configSite.putChild(name, pluginConfigSite)
+	configSite = ConfigSite()
 	site.putChild('config', configSite)
 

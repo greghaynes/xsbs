@@ -1,5 +1,5 @@
 from ConfigParser import ConfigParser, NoOptionError, NoSectionError
-from elixir import Entity, Field, String, Text
+from elixir import Entity, Field, String, Text, session
 
 # Set this to wherever your configuration files lie.  Must end in a /
 configuration_path = 'Config/'
@@ -15,27 +15,39 @@ class ConfigOption(Entity):
 	name = Field(String(30))
 	value = Field(Text)
 
-def loadPluginConfig(dict, plugin):
+def loadPluginConfig(cfg_dict, plugin):
 	'''Accepts a dictionary and plugin name.
 	   All stored values for the plugin will be loaded into dict[section][option] = value.
 	   This allows you to pass a dictionary pre-loaded with default values. '''
 	options = ConfigOption.query.filter_by(plugin=plugin).all()
-	for option in options:
-		try:
-			sectdict = dict[option.section]
-		except KeyError:
-			dict[options.section] = {}
-			sectdict = dict[option.section]
-		sectdict[option.name] = option.value
+	if len(options) == 0:
+		for section, sectdict in cfg_dict.items():
+			for option, value in sectdict.items():
+				db_opt = ConfigOption(plugin=plugin, section=section, name=option, value=value)
+				session.commit()
+	else:
+		for option in options:
+			try:
+				sectdict = cfg_dict[option.section]
+			except KeyError:
+				cfg_dict[options.section] = {}
+				sectdict = cfg_dict[option.section]
+			sectdict[option.name] = option.value
+
+def strip_arr(l):
+	s_l = []
+	for item in l:
+		s_l.append(item[0])
+	return s_l
 
 def pluginNames():
-	return []
+	return strip_arr(session.query(ConfigOption.plugin))
 
 def pluginSections(plugin_name):
-	return []
+	return strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name))
 
 def sectionOptions(plugin_name, section):
-	return []
+	return strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name).filter_by(section=section))
 
 def setOption(plugin_name, section, option, value):
 	pass
