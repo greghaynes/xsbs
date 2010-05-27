@@ -47,7 +47,7 @@ def pluginSections(plugin_name):
 	return strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name))
 
 def sectionOptions(plugin_name, section):
-	return []
+	return strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name).filter_by(section=section))
 
 def setOption(plugin_name, section, option, value):
 	pass
