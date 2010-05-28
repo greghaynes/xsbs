@@ -4,6 +4,11 @@ from xsbs.commands import commandHandler, StateError
 from xsbs.ui import notice
 from xsbs.colors import colordict
 from xsbs.settings import PluginConfig
+from xsbs.users import User
+from xsbs.users.privilege import UserPrivilege
+
+from sqlalchemy.orm.exc import NoResultFound
+from elixir import session
 
 import string
 import sbserver
@@ -19,6 +24,23 @@ mastermodes = [
 	'locked',
 	'private',
 ]
+
+def setupAdminUser():
+	try:
+		adminUser = User.query.filter(User.email=="admin").one()
+	except NoResultFound:
+		adminUser = User("admin", sbserver.adminPassword())
+		session.commit()
+		adminUser = User.query.filter(User.email=="admin").one()
+	else:
+		if adminUser.password != sbserver.adminPassword():
+			adminUser.password = sbserver.adminPassword()
+			adminUser.update()
+	try:
+		adminPriv = UserPrivilege.query.filter(UserPrivilege.user_id==adminUser.id).one()
+	except NoResultFound:
+		adminPriv = UserPrivilege(2, adminUser.id)
+		session.commit()
 
 def isPaused():
 	'''Is the game currently paused'''

@@ -30,6 +30,7 @@ def main():
 	pm.loadPlugins()
 	setup_all()
 	create_all()
+	xsbs.server.setupAdminUser()
 
 main()
 
