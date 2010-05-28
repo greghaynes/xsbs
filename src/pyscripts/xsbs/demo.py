@@ -47,7 +47,7 @@ def playerRecordNextMatch(p, val):
 		else:
 			act = 'disabled'
 		sbserver.setRecordNextMatch(val)
-		sbserver.message(notice(action_temp.substitute(colordict, action=act, user=p.name)))
+		sbserver.message(notice(action_temp.substitute(colordict, action=act, user=p.name())))
 	else:
 		insufficientPermissions(p.cn)
 
