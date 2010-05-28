@@ -1,5 +1,5 @@
 from xsbs.http.jsonapi import JsonAdminSite
-from xsbs.settings import pluginNames, pluginSections, sectionOptions, setOption
+from xsbs.settings import pluginNames, pluginSections, sectionOptionValues, setOption
 
 try:
 	import json
@@ -23,11 +23,15 @@ class ConfigSectionSite(JsonAdminSite):
 		JsonAdminSite.__init__(self)
 		self.plugin_name = plugin_name
 		self.section_name = section_name
+		optvals = sectionOptionValues(plugin_name, section_name)
+		self.options = {}
+		for option, value in optvals:
+			self.options[option] = value
 	def render_admin_JSON(self, request, user):
 		return json.dumps({
 			'plugin': self.plugin_name,
 			'section': self.section_name,
-			'options': sectionOptions(self.plugin_name, self.section_name)
+			'options': self.options
 			})
 
 class ConfigSite(JsonAdminSite):

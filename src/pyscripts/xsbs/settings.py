@@ -53,9 +53,8 @@ def pluginNames():
 def pluginSections(plugin_name):
 	return remove_dups(strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name)))
 
-def sectionOptions(plugin_name, section):
-	
-	return remove_dups(strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name).filter_by(section=section)))
+def sectionOptionValues(plugin_name, section):
+	return session.query(ConfigOption.name, ConfigOption.value).filter_by(plugin=plugin_name).filter_by(section=section)
 
 def setOption(plugin_name, section, option, value):
 	pass
