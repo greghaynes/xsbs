@@ -125,7 +125,7 @@ class IrcBot(irc.IRCClient):
 			self.joined_channels.remove(channel)
 	def broadcast(self, message):
 		for channel in self.joined_channels:
-			self.say(channel, message)
+			self.say(channel, message.encode('iso-8859-5'))
 	def privmsg(self, user, channel, msg):
 		if channel == config['Connection']['channel']:
 			user = user.split('!', 1)[0]
