@@ -83,8 +83,23 @@ function enableTopNav(hostname, username, password)
 	$('#topnav_logout').click(function() { window.location.reload(); });
 }
 
+function configPageAddPlugin(hostname, username, password, plugin_name) {
+	$("<h3><a href=\"#\">" + plugin_name + "</a></h3>").appendTo("#config-plugins-accordion");
+	$("<div>Content about " + plugin_name + "</div>").appendTo("#config-plugins-accordion");
+}
+
 function configPage(hostname, username, password) {
-	$('#config-plugins-list').html('Got a valid login');
+	$.getJSON('http://' + hostname + '/json/admin/config?username=' + username + '&password=' + password, function(data) {
+		if(data.hasOwnProperty('plugins'))
+		{
+			$.each(data.plugins, function(i, plugin_name) {
+				configPageAddPlugin(hostname, username, password, plugin_name);
+			});
+			$("#config-plugins-accordion").accordion();
+		}
+		else
+			alert("Error");
+	});
 }
 
 function configPageInvalidLogin() {

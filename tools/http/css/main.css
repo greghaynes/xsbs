@@ -1,18 +1,13 @@
 body
 {
-	margin: 0;
+	margin-left: 20px;
+	margin-right: 20px;
 	padding: 0;
 }
 
 h1
 {
 	margin: 10px;
-}
-
-h3
-{
-	padding: 10px;
-	margin: 0;
 }
 
 .alert_box
@@ -35,7 +30,6 @@ h3
 	padding-top: 20px;
 	padding-bottom: 0;
 	margin-bottom: 0;
-	height: 40px;
 	width: 750px;
 	margin-left: auto;
 	margin-right: auto;
@@ -55,26 +49,8 @@ h3
 	margin: 0;
 }
 
-#main_content
-{
-	width: 750px;
-	margin-left: auto;
-	margin-right: auto;
-	margin-top: 0;
-	padding: 0;
-	padding-left: 10px;
-	height: 50px;
-	border: 3px solid black;
-	min-height: 500px;
-}
-
 #login_status
 {
 	color: red;
-}
-
-#tabs
-{
-	margin: 50px;
 }
 
