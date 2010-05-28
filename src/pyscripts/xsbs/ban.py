@@ -45,8 +45,8 @@ class Ban(Entity):
 		return self.expiration <= time.time()
 
 class BanNick(Entity):
-	nick = Column(String(15), index=True)
-	reason = Column(String(50))
+	nick = Field(String(15), index=True)
+	reason = Field(String(50))
 	def __init__(self, nick, reason):
 		self.nick = nick
 		self.reason = reason
