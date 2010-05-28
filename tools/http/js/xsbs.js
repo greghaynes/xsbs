@@ -83,9 +83,24 @@ function enableTopNav(hostname, username, password)
 	$('#topnav_logout').click(function() { window.location.reload(); });
 }
 
+function configPluginSelected(hostname, username, password, plugin_name) {
+	if($("#plugin_config_" + plugin_name).html() != "")
+		$("#plugin_config_" + plugin_name).empty();
+	else
+	{
+		$.getJSON('http://' + hostname + '/json/admin/config/' + plugin_name + '?username=' + username + '&password=' + password, function(data) {
+			sections = $("<ul class=\"config_sections\"><h4>Sections</h4></ul>");
+			$.each(data.sections, function(i, section) {
+				sections.append("<li><a href=\"#\">" + section + "</a></li>");
+			});
+			$("#plugin_config_" + plugin_name).html(sections);
+		});
+	}
+}
+
 function configPageAddPlugin(hostname, username, password, plugin_name) {
-	$("<h3><a href=\"#\">" + plugin_name + "</a></h3>").appendTo("#config-plugins-accordion");
-	$("<div>Content about " + plugin_name + "</div>").appendTo("#config-plugins-accordion");
+	$("<h3 class=\"head\"><a href=\"#\" id=\"a_config_plugin_" + plugin_name + "\">" + plugin_name + "</a></h3><div id=\"plugin_config_" + plugin_name + "\"></div>").appendTo("#config_plugins");
+	$("#a_config_plugin_" + plugin_name).click(function() { configPluginSelected(hostname, username, password, plugin_name); });
 }
 
 function configPage(hostname, username, password) {
@@ -95,7 +110,6 @@ function configPage(hostname, username, password) {
 			$.each(data.plugins, function(i, plugin_name) {
 				configPageAddPlugin(hostname, username, password, plugin_name);
 			});
-			$("#config-plugins-accordion").accordion();
 		}
 		else
 			alert("Error");
@@ -103,7 +117,6 @@ function configPage(hostname, username, password) {
 }
 
 function configPageInvalidLogin() {
-	$('#config-plugins-list').html('<font color=\"red\">Invalid login</font>');
 }
 
 function adminPageNoLogin(hostname) {

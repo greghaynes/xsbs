@@ -54,3 +54,8 @@ h1
 	color: red;
 }
 
+.config_sections
+{
+	list-style-type: none;
+}
+
