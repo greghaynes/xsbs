@@ -10,6 +10,8 @@ class ConfigPluginSite(JsonAdminSite):
 	def __init__(self, plugin_name):
 		JsonAdminSite.__init__(self)
 		self.plugin_name = plugin_name
+		for section in pluginSections(plugin_name):
+			self.putChild(section, ConfigSectionSite(plugin_name, section))
 	def render_admin_JSON(self, request, user):
 		return json.dumps({
 			'plugin': self.plugin_name,
@@ -34,11 +36,8 @@ class ConfigSite(JsonAdminSite):
 		self.plugin_names = []
 		for name in pluginNames():
 			pluginConfigSite = ConfigPluginSite(name)
-			for section in pluginSections(name):
-				pluginConfigSite.putChild(section, ConfigSectionSite(name, section))
 			self.putChild(name, pluginConfigSite)
-			if name not in self.plugin_names:
-				self.plugin_names.append(name)
+			self.plugin_names.append(name)
 	def render_admin_JSON(self, request, user):
 		return json.dumps({
 			'plugins': self.plugin_names

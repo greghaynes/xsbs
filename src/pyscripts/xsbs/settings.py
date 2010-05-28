@@ -40,14 +40,22 @@ def strip_arr(l):
 		s_l.append(item[0])
 	return s_l
 
+def remove_dups(l):
+	d_l = []
+	for item in l:
+		if item not in d_l:
+			d_l.append(item)
+	return d_l
+
 def pluginNames():
-	return strip_arr(session.query(ConfigOption.plugin))
+	return remove_dups(strip_arr(session.query(ConfigOption.plugin)))
 
 def pluginSections(plugin_name):
-	return strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name))
+	return remove_dups(strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name)))
 
 def sectionOptions(plugin_name, section):
-	return strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name).filter_by(section=section))
+	
+	return remove_dups(strip_arr(session.query(ConfigOption.section).filter_by(plugin=plugin_name).filter_by(section=section)))
 
 def setOption(plugin_name, section, option, value):
 	pass
