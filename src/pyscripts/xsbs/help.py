@@ -88,16 +88,16 @@ def onPlayerCommands(cn, args):
 			msg += '#' + command + ' '
 		sbserver.playerMessage(cn, orange(msg))
 
-def listCommands(cn, args):
+def listCommands(p, args):
 	'''@description Display all commands available to a user
 	   @usage
 	   @public'''
-	if isAdmin(cn):
-		listAdminCommands(cn, args)
-	elif isMaster(cn):
-		listMasterCommands(cn, args)
+	if isAdmin(p.cn):
+		listAdminCommands(p.cn, args)
+	elif isMaster(p.cn):
+		listMasterCommands(p.cn, args)
 	else:
-		listPublicCommands(cn, args)
+		listPublicCommands(p.cn, args)
 		
 def listPublicCommands(cn, args):
 	str = 'Public commands: '
