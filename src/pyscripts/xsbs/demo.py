@@ -38,8 +38,8 @@ def permissions_ok(cn):
 	
 
 @eventHandler('player_record_demo')
-def playerRecordNextMatch(cn, val):
-	if permissions_ok(cn):
+def playerRecordNextMatch(p, val):
+	if permissions_ok(p.cn):
 		if val == sbserver.nextMatchRecorded():
 			return
 		if val:
@@ -47,9 +47,9 @@ def playerRecordNextMatch(cn, val):
 		else:
 			act = 'disabled'
 		sbserver.setRecordNextMatch(val)
-		sbserver.message(notice(action_temp.substitute(colordict, action=act, user=sbserver.playerName(cn))))
+		sbserver.message(notice(action_temp.substitute(colordict, action=act, user=p.name)))
 	else:
-		insufficientPermissions(cn)
+		insufficientPermissions(p.cn)
 
 @eventHandler('map_changed')
 def persistRecordNextMatch(themap, themode):
@@ -57,16 +57,16 @@ def persistRecordNextMatch(themap, themode):
 
 @commandHandler('persistdemo')
 @adminRequired
-def setPersistantDemoRecord(cn, args):
+def setPersistantDemoRecord(p, args):
 	'''@description Enable/disable persistant demo recording
 	   @usage enable/disable'''
 	if args == 'enable':
-		player(cn).message(info('Enabling persistant demo recording'))
+		p.message(info('Enabling persistant demo recording'))
 		persistent_recording = True
 		sbserver.setRecordNextMatch(persistent_recording)
 		
 	elif args == 'disable':
-		player(cn).message(info('Disabling persistant demo recording'))
+		p.message(info('Disabling persistant demo recording'))
 		persistent_recording = False
 		sbserver.setRecordNextMatch(persistent_recording)
 	else:
