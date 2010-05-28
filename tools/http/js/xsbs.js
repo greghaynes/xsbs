@@ -1,10 +1,9 @@
-function kickClient(hostname, username, password, cn, callback) {
-	displayAlert('Kicking client...');
-	$.getJSON('http://' + hostname + '/json/admin/kick?username=' + username + '&password=' + password + '&cn=' + cn, callback);
+function authReqPath(hostname, path, username, password) {
+	return 'http://' + hostname + path + '?username=' + username + '&password=' + password;
 }
 
 function tryLogin(hostname, username, password, error_callback, success_callback) {
-	$.getJSON('http://' + hostname + '/json/account?username=' + username + '&password=' + password, function(data) {
+	$.getJSON(authReqPath(hostname, '/json/account', username, password), function(data) {
 		if(data.hasOwnProperty('user'))
 			success_callback(data);
 		else
@@ -31,7 +30,7 @@ function configPluginSelected(hostname, username, password, plugin_name) {
 		$("#plugin_config_" + plugin_name).empty();
 	else
 	{
-		$.getJSON('http://' + hostname + '/json/admin/config/' + plugin_name + '?username=' + username + '&password=' + password, function(data) {
+		$.getJSON(authReqPath(hostname, '/json/admin/config/' + plugin_name, username, password), function(data) {
 			sections = $("<ul class=\"config_sections\"><h4>Sections</h4></ul>");
 			$.each(data.sections, function(i, section) {
 				sections.append("<li><a href=\"#\">" + section + "</a></li>");
@@ -47,7 +46,7 @@ function configPageAddPlugin(hostname, username, password, plugin_name) {
 }
 
 function configPage(hostname, username, password) {
-	$.getJSON('http://' + hostname + '/json/admin/config?username=' + username + '&password=' + password, function(data) {
+	$.getJSON(authReqPath(hostname, '/json/admin/config', username, password), function(data) {
 		if(data.hasOwnProperty('plugins'))
 		{
 			$.each(data.plugins, function(i, plugin_name) {
