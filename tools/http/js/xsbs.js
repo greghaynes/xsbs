@@ -150,7 +150,7 @@ function adminLoginDialog(hostname, callback) {
 						function(data) {
 								$('#login_status').empty();
 								$('#login_status').html('Success.');
-								$(this).dialog('close');
+								$("#dialog").dialog('close');
 								callback(username, password);
 							});
 					}
