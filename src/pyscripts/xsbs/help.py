@@ -53,11 +53,11 @@ def loadCommandInfo(command, handler):
 	else:
 	     logging.warn('No help info for command: ' + command)
 
-def msgHelpText(cn, cmd):
+def msgHelpText(p, cmd):
 	try:
 		helpinfo = command_info[cmd]
 	except KeyError:
-		sbserver.playerMessage(cn, error('Command not found'))
+		p.message(error('Command not found'))
 	else:
 		msgs = []
 		try:
@@ -67,57 +67,57 @@ def msgHelpText(cn, cmd):
 		for usage in helpinfo.usages:
 			msgs.append(usage)
 		for msg in msgs:
-			sbserver.playerMessage(cn, info(msg))
+			p.message(info(msg))
 
-def onHelpCommand(cn, args):
+def onHelpCommand(p, args):
 	'''@description Display help information about a command
 	   @usage (command)
 	   @public'''
 	if args == '':
-		msgHelpText(cn, 'help')
+		msgHelpText(p, 'help')
 	else:
 		args = args.split(' ')
-		msgHelpText(cn, args[0])
+		msgHelpText(p, args[0])
 
-def onPlayerCommands(cn, args):
+def onPlayerCommands(p, args):
 	if args != '':
-		sbserver.playerMessage(cn, error('Usage: #playercommands'))
+		p.message(error('Usage: #playercommands'))
 	else:
 		msg = blue('Available commands: ')
 		for command in command_info.keys():
 			msg += '#' + command + ' '
-		sbserver.playerMessage(cn, orange(msg))
+		p.message(orange(msg))
 
 def listCommands(p, args):
 	'''@description Display all commands available to a user
 	   @usage
 	   @public'''
-	if isAdmin(p.cn):
-		listAdminCommands(p.cn, args)
-	elif isMaster(p.cn):
-		listMasterCommands(p.cn, args)
+	if p.isAdmin():
+		listAdminCommands(p, args)
+	elif p.isMaster():
+		listMasterCommands(p, args)
 	else:
-		listPublicCommands(p.cn, args)
+		listPublicCommands(p, args)
 		
-def listPublicCommands(cn, args):
+def listPublicCommands(p, args):
 	str = 'Public commands: '
 	for cmd in command_info.items():
 		if cmd[1].public:
 			str += cmd[1].command + ' '
-	sbserver.playerMessage(cn, info(str))
+	p.message(info(str))
 	
-def listMasterCommands(cn, args):
+def listMasterCommands(p, args):
 	str = 'Master commands: '
 	for cmd in command_info.items():
 		if cmd[1].public:
 			str += cmd[1].command + ' '
 		elif cmd[1].master:
 			str += cmd[1].command + ' '
-	sbserver.playerMessage(cn, info(str))
+	p.message(info(str))
 	
-def listAdminCommands(cn, args):
+def listAdminCommands(p, args):
 	str = 'Admin commands: '
 	for cmd in command_info.items():
 		str += cmd[1].command + ' '
-	sbserver.playerMessage(cn, info(str))
-
+	p.message(info(str))
+	
