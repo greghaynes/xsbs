@@ -38,3 +38,5 @@ def getmap(cn):
 def onUploadMap(cn):
 	p = player(cn)
 	serverMessage(info(config['Templates']['map_uploaded'].substitute(colordict, name=p.name())))
+	
+init()
