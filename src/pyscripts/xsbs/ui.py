@@ -1,32 +1,45 @@
 import sbserver
 from xsbs.colors import colordict
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 import string
 
-config = PluginConfig('ui')
-notice_pre = config.getOption('Prefixes', 'notice', '${blue}Notice:')
-info_pre = config.getOption('Prefixes', 'info', '${yellow}Info:')
-warning_pre = config.getOption('Prefixes', 'warning', '${red}Warning:')
-error_pre = config.getOption('Prefixes', 'error', '${red}Error:')
-del config
+config = {
+	'Templates':
+		{
+			'notice': '${blue}Notice:',
+			'info': '${yellow}Info:',
+			'warning': '${red}Warning:',
+			'error': '${red}Error:',
+		}
+	}
 
-notice_pre = string.Template(notice_pre).substitute(colordict) + ' '
-info_pre = string.Template(info_pre).substitute(colordict) + ' '
-warning_pre = string.Template(warning_pre).substitute(colordict) + ' '
-error_pre = string.Template(error_pre).substitute(colordict) + ' '
+def init():
+	loadPluginConfig(config, 'UI
+	config['Templates']['notice'] = 	string.Template(config['Templates']['notice'])
+	config['Templates']['info'] = 		string.Template(config['Templates']['info'])
+	config['Templates']['warning'] = 	string.Template(config['Templates']['warning'])
+	config['Templates']['error'] = 		string.Template(config['Templates']['error'])
+
+
+	config['Templates']['notice'] = 	config['Templates']['notice'].substitute(colordict) + ' '
+	config['Templates']['info'] = 		config['Templates']['info'].substitute(colordict) + ' '
+	config['Templates']['warning'] = 	config['Templates']['warning'].substitute(colordict) + ' '
+	config['Templates']['error'] = 		config['Templates']['error'].substitute(colordict) + ' '
 
 def notice(message):
-	return notice_pre + message
+	return config['Templates']['notice'] + message
 
 def info(message):
-	return info_pre + message
+	return config['Templates']['info'] + message
 
 def warning(message):
-	return warning_pre + message
+	return config['Templates']['warning'] + message
 
 def error(message):
-	return error_pre + message
+	return config['Templates']['error'] + message
 
 def insufficientPermissions(cn):
 	sbserver.playerMessage(cn, error('Insufficient permissions'))
+	
+init()
 
