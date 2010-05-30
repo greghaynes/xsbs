@@ -1,45 +1,57 @@
 from xsbs.events import eventHandler
 from xsbs.players import player, all as allPlayers
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.colors import colordict
 from xsbs.server import message as serverMessage
 
 import string
 
-config = PluginConfig('gameawards')
-awards_prefix = config.getOption('Config', 'awards_prefix', '${blue}Awards: ${white}')
-mftemp = config.getOption('Config', 'most_frags', 'Most Frags: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-mtktemp = config.getOption('Config', 'most_teamkills', 'Most TeamKills: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-mdtemp = config.getOption('Config', 'most_deaths', 'Most Deaths: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-matemp = config.getOption('Config', 'most_accurate', 'Most Accurate: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
 
-newawards_enabled = config.getOption('Config', 'Multikill_awards', 'enabled') == 'enabled'
-most_doublekillstemp = config.getOption('Config', 'most_doublekills', 'Most Double Kills: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-most_triplekillstemp = config.getOption('Config', 'most_triplekills', 'Most Triple Kills: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-most_overkillstemp = config.getOption('Config', 'most_overkills', 'Most Overkills: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-most_killtacularstemp = config.getOption('Config', 'most_killtaculars', 'Most Killtacular: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-most_killotrocitiestemp = config.getOption('Config', 'most_killotrocities', 'Most Killotrocities: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-most_killtastrophestemp = config.getOption('Config', 'most_killtastrophes', 'Most Killtastrophic: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-most_killapocalypsestemp = config.getOption('Config', 'most_killapocalypses', 'Most Killapocalyptic: ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
-most_killionairestemp = config.getOption('Config', 'most_killionaires', 'Best Killionaire ${orange}${name} ${blue}(${green}${count}${blue})${white} ')
+config = {
+	'Main':
+		{
+			'Multikill_awards': 'enabled',
+		},
+	'Templates':
+		{
+			'awards_prefix': '${blue}Awards: ${white}',
+			'most_frags': 'Most Frags: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_teamkills': 'Most TeamKills: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_deaths': 'Most Deaths: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_accurate': 'Most Accurate: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+
+			'most_doublekills': 'Most Double Kills: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_triplekills': 'Most Triple Kills: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_overkills': 'Most Overkills: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_killtaculars': 'Most Killtacular: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_killotrocities': 'Most Killotrocities: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_killtastrophes': 'Most Killtastrophic: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_killapocalypses': 'Most Killapocalyptic: ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+			'most_killionaires': 'Best Killionaire ${orange}${name} ${blue}(${green}${count}${blue})${white} ',
+		}
+	}
 
 
+def init():
+	loadPluginConfig(config, 'GameAwards')
+	
+	config['Templates']['awards_prefix'] = string.Template(config['Templates']['awards_prefix']).substitute(colordict)
+	
+	config['Templates']['most_frags'] = string.Template(config['Templates']['most_frags'])
+	config['Templates']['most_teamkills'] = string.Template(config['Templates']['most_teamkills'])
+	config['Templates']['most_deaths'] = string.Template(config['Templates']['most_deaths'])
+	config['Templates']['most_accurate'] = string.Template(config['Templates']['most_accurate'])
+	
+	config['Main']['Multikill_awards'] = config['Main']['Multikill_awards'] == 'enabled'
 
-del config
-awards_prefix = string.Template(awards_prefix).substitute(colordict)
-mftemp = string.Template(mftemp)
-mtktemp = string.Template(mtktemp)
-mdtemp = string.Template(mdtemp)
-matemp = string.Template(matemp)
-
-most_doublekillstemp = string.Template(most_doublekillstemp)
-most_triplekillstemp = string.Template(most_triplekillstemp)
-most_overkillstemp = string.Template(most_overkillstemp)
-most_killtacularstemp = string.Template(most_killtacularstemp)
-most_killotrocitiestemp = string.Template(most_killotrocitiestemp)
-most_killtastrophestemp = string.Template(most_killtastrophestemp)
-most_killapocalypsestemp = string.Template(most_killapocalypsestemp)
-most_killionairestemp = string.Template(most_killionairestemp)
+	config['Templates']['most_doublekills'] = string.Template(config['Templates']['most_doublekills'])
+	config['Templates']['most_triplekills'] = string.Template(config['Templates']['most_triplekills'])
+	config['Templates']['most_overkills'] = string.Template(config['Templates']['most_overkills'])
+	config['Templates']['most_killtaculars'] = string.Template(config['Templates']['most_killtaculars'])
+	config['Templates']['most_killotrocities'] = string.Template(config['Templates']['most_killotrocities'])
+	config['Templates']['most_killtastrophes'] = string.Template(config['Templates']['most_killtastrophes'])
+	config['Templates']['most_killapocalypses'] = string.Template(config['Templates']['most_killapocalypses'])
+	config['Templates']['most_killionaires'] = string.Template(config['Templates']['most_killionaires'])
 
 
 @eventHandler('intermission_begin')
@@ -54,7 +66,7 @@ def onIntermission():
 	most_accuracy = 0
 	most_accurate_cn = -1
 
-	if newawards_enabled:
+	if config['Main']['Multikill_awards']:
 		most_doublekills = 0
 		most_doublekills_cn = -1
 		most_triplekills = 0
@@ -93,7 +105,7 @@ def onIntermission():
 		except ValueError:
 			continue
 			
-		if newawards_enabled:
+		if config['Main']['Multikill_awards']:
 			try:
 				try:
 					doublekills	= p.ownagedata.multikill_counts[2]
@@ -137,7 +149,7 @@ def onIntermission():
 				
 				
 				
-				if newawards_enabled:
+				if config['Main']['Multikill_awards']:
 					if doublekills > most_doublekills or most_doublekills_cn == -1:
 						most_doublekills = doublekills
 						most_doublekills_cn = p.cn
@@ -167,44 +179,46 @@ def onIntermission():
 	
 	msg = ''
 	if most_frags > 0:
-		msg += mftemp.substitute(colordict, name=player(most_frags_cn).name(), count=most_frags)
+		msg += config['Templates']['most_frags'].substitute(colordict, name=player(most_frags_cn).name(), count=most_frags)
 		msg += ' '
 	if most_tks > 0:
-		msg += mtktemp.substitute(colordict, name=player(most_tks_cn).name(), count=most_tks)
+		msg += config['Templates']['most_teamkills'].substitute(colordict, name=player(most_tks_cn).name(), count=most_tks)
 		msg += ' '
 	if most_deaths > 0:
-		msg += mdtemp.substitute(colordict, name=player(most_deaths_cn).name(), count=most_deaths)
+		msg += config['Templates']['most_deaths'].substitute(colordict, name=player(most_deaths_cn).name(), count=most_deaths)
 		msg += ' '
 	if most_accuracy > 0:
-		msg += matemp.substitute(colordict, name=player(most_accurate_cn).name(), count=most_accuracy)
+		msg += config['Templates']['most_accurate'].substitute(colordict, name=player(most_accurate_cn).name(), count=most_accuracy)
 
 		
-	if newawards_enabled:
+	if config['Main']['Multikill_awards']:
 		if most_doublekills > 0:
-			msg += most_doublekillstemp.substitute(colordict, name=player(most_doublekills_cn).name(), count=most_doublekills)
+			msg += config['Templates']['most_doublekills'].substitute(colordict, name=player(most_doublekills_cn).name(), count=most_doublekills)
 			msg += ' '
 		if most_triplekills > 0:
-			msg += most_triplekillstemp.substitute(colordict, name=player(most_triplekills_cn).name(), count=most_triplekills)
+			msg += config['Templates']['most_triplekills'].substitute(colordict, name=player(most_triplekills_cn).name(), count=most_triplekills)
 			msg += ' '
 		if most_overkills > 0:
-			msg += most_overkillstemp.substitute(colordict, name=player(most_overkills_cn).name(), count=most_overkills)
+			msg += config['Templates']['most_overkills'].substitute(colordict, name=player(most_overkills_cn).name(), count=most_overkills)
 			msg += ' '
 		if most_killtaculars > 0:
-			msg += most_killtacularstemp.substitute(colordict, name=player(most_killtaculars_cn).name(), count=most_killtaculars)
+			msg += config['Templates']['most_killtaculars'].substitute(colordict, name=player(most_killtaculars_cn).name(), count=most_killtaculars)
 			msg += ' '
 		if most_killotrocities > 0:
-			msg += most_killotrocitiestemp.substitute(colordict, name=player(most_killotrocities_cn).name(), count=most_killotrocities)
+			msg += config['Templates']['most_killotrocities'].substitute(colordict, name=player(most_killotrocities_cn).name(), count=most_killotrocities)
 			msg += ' '
 		if most_killtastrophes > 0:
-			msg += most_killtastrophestemp.substitute(colordict, name=player(most_killtastrophes_cn).name(), count=most_killtastrophes)
+			msg += config['Templates']['most_killtastrophes'].substitute(colordict, name=player(most_killtastrophes_cn).name(), count=most_killtastrophes)
 			msg += ' '
 		if most_killapocalypses > 0:
-			msg += most_killapocalypsestemp.substitute(colordict, name=player(most_killapocalypses_cn).name(), count=most_killapocalypses)
+			msg += config['Templates']['most_killapocalypses'].substitute(colordict, name=player(most_killapocalypses_cn).name(), count=most_killapocalypses)
 			msg += ' '
 		if most_killionaires > 0:
-			msg += most_killionairestemp.substitute(colordict, name=player(most_killionaires_cn).name(), count=most_killionaires)
+			msg += config['Templates']['most_killionaires'].substitute(colordict, name=player(most_killionaires_cn).name(), count=most_killionaires)
 			msg += ' '
 	
 	if msg != '':
-		msg = awards_prefix + msg
+		msg = config['Templates']['awards_prefix'] + msg
 		serverMessage(msg)
+		
+init()

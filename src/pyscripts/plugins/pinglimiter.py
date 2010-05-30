@@ -1,19 +1,27 @@
 import sbserver
 from xsbs.timers import addTimer
 from xsbs.ban import ban
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.ui import warning, notice
 from xsbs.commands import commandHandler, UsageError
 from xsbs import players
 from xsbs.players import adminRequired
 
-config = PluginConfig('pinglimiter')
-enable = config.getOption('Config', 'enable', 'yes') == 'yes'
-max_ping = config.getOption('Config', 'max_ping', '500')
-action_interval = config.getOption('Config', 'action_interval', '5')
-del config
-max_ping = int(max_ping)
-action_interval = int(action_interval)
+config = {
+	'Main':
+		{
+			'ping_limiter': 'yes',
+			'max_ping': 500,
+			'action_interval': 5
+		}
+	}
+
+
+loadPluginConfig(config, 'PingLimiter')
+
+enable = config['Main']['ping_limiter'] == 'yes'
+max_ping = int(config['Main']['max_ping'])
+action_interval = int(config['Main']['action_interval'])
 
 class PingLimiter:
 	def __init__(self, max_ping, action_interval):
@@ -78,4 +86,5 @@ def pingLimiterCmd(p, args):
 		p.message(notice('Ping limiter disabled'))
 	else:
 		raise UsageError('enable/disable')
+		
 

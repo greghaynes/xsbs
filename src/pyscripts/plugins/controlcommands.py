@@ -62,7 +62,7 @@ def onResumeCmd(p, args):
 	if args != '':
 		raise ExtraArgumentError()
 		return
-	if resume_timeout > 0:
+	if config['Main']['resume_timeout'] > 0:
 		resumeTimer(config['Main']['resume_timeout'], p.cn)
 	else:
 		setPaused(False, p.cn)
@@ -308,4 +308,4 @@ def onSmiteCommand(p, args):
 	sendServerMessage(info(config['Templates']['smite'].substitute(colordict, smiter=p.name(), smited=t.name())))
 	t.suicide()
 
-
+init()
