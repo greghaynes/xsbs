@@ -14,7 +14,7 @@ config = {
 	}
 
 def init():
-	loadPluginConfig(config, 'UI
+	loadPluginConfig(config, 'UI')
 	config['Templates']['notice'] = 	string.Template(config['Templates']['notice'])
 	config['Templates']['info'] = 		string.Template(config['Templates']['info'])
 	config['Templates']['warning'] = 	string.Template(config['Templates']['warning'])
