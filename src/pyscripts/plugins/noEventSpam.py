@@ -15,5 +15,8 @@ def onListRegEvents(p, args):
 	   @admin'''
 	for event in EventHandler.events.keys():
 		sbserver.message(event)
-		for function in EventHandler.events[event]:
-			sbserver.message(dis.dis(function))
+		try:
+			for function in EventHandler.events[event]:
+				sbserver.message(dis.dis(function))
+		except:
+			pass
