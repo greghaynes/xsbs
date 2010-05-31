@@ -97,6 +97,9 @@ def triggerExecQueue():
 			logging.warn(traceback.format_exc())
 			logging.warn(traceback.extract_tb(exceptionTraceback))
 	del exec_queue[:]
+	
+def returnEventHandler():
+	return server_events
 
 @eventHandler('reload')
 def onReload():
