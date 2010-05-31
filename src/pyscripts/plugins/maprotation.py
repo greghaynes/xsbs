@@ -108,8 +108,8 @@ def onConnect(cn):
 
 if config['Main']['use_preset_rotation']:
 	modeMapLists = {}
-	for mode in config['Maps']:
-		modeMapLists[mode[0]] = mode[1].replace(' ', '').split(',')
+	for mode in config['Maps'].keys():
+		modeMapLists[mode] = config['Maps'][mode].replace(' ', '').split(',')
 	rotate_on_join = [False]
 	mn = modes.index(config['Main']['start_mode'])
 	sbserver.setMap(modeMapLists[config['Main']['start_mode']][0], mn)
