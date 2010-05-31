@@ -20,14 +20,6 @@ config = {
 		}
 	}
 
-def init():
-	loadPluginConfig(config, 'UserPrivilege')
-	config['Templates']['authenticated'] = string.Template(config['Templates']['authenticated'])
-	config['Templates']['gain_master'] = string.Template(config['Templates']['gain_master'])
-	config['Templates']['gain_admin'] = string.Template(config['Templates']['gain_admin'])
-	config['Templates']['release_master'] = string.Template(config['Templates']['release_master'])
-	config['Templates']['release_admin'] = string.Template(config['Templates']['release_admin'])
-
 USER = 0
 MASTER = 1
 ADMIN = 2
@@ -87,6 +79,13 @@ def onRelAdmin(cn):
 	sbserver.message(info(config['Templates']['release_admin'].substitute(colordict, name=sbserver.playerName(cn))))
 
 def init():
+	loadPluginConfig(config, 'UserPrivilege')
+	config['Templates']['authenticated'] = string.Template(config['Templates']['authenticated'])
+	config['Templates']['gain_master'] = string.Template(config['Templates']['gain_master'])
+	config['Templates']['gain_admin'] = string.Template(config['Templates']['gain_admin'])
+	config['Templates']['release_master'] = string.Template(config['Templates']['release_master'])
+	config['Templates']['release_admin'] = string.Template(config['Templates']['release_admin'])
+	
 	registerServerEventHandler('player_setmaster', onSetMaster)
 	registerServerEventHandler('player_setmaster_off', onSetMasterOff)
 	registerServerEventHandler('player_claimed_master', onGainMaster)
