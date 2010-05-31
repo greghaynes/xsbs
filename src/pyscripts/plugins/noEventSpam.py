@@ -1,11 +1,9 @@
-from xsbs.events import returnEventHandler
+from xsbs.events import returnEventHandler, eventHandler
 from xsbs.commands import commandHandler
 from xsbs.players import masterRequired
 import sbserver
-import dis
 
 EventHandler = returnEventHandler()
-EventHandler.events
 
 @commandHandler('liregevents')
 @masterRequired
@@ -14,9 +12,7 @@ def onListRegEvents(p, args):
 	   @usage
 	   @admin'''
 	for event in EventHandler.events.keys():
-		sbserver.message(event)
-		try:
-			for function in EventHandler.events[event]:
-				sbserver.message(dis.dis(function))
-		except:
-			pass
+		#sbserver.message(event)
+		@eventHandler(event)
+		def onEvent(*args):
+			sbserver.message(args)
