@@ -2,7 +2,7 @@ from xsbs.events import returnEventHandler
 from xsbs.commands import commandHandler
 from xsbs.players import masterRequired
 import sbserver
-
+import dis
 
 EventHandler = returnEventHandler()
 EventHandler.events
@@ -15,4 +15,4 @@ def onListRegEvents(p, args):
 	   @admin'''
 	for event in EventHandler.events.keys():
 		for function in EventHandler.events[event]:
-			sbserver.message(function)
+			sbserver.message(dis.dis(function))
