@@ -18,7 +18,7 @@ config = {
 		{
 			'nextmap_response': 'The next map is ${blue}${mapname}',
 		},
-	'Maps'
+	'Maps':
 		{
 			'capture': 'urban_c, nevil_c, fb_capture, nmp9, c_valley, lostinspace, fc3, face-capture, nmp4, nmp8, hallo, monastery, ph-capture, hades, fc4, relic, frostbyte, venice, paradigm, corruption, asteroids, ogrosupply, reissen, akroseum, duomo, capture_night, c_egypt, tejen, dust2, campo, killcore3, damnation, arabic, cwcastle, river_c, serenity'
 			'instactf': 'hallo, reissen, flagstone, face-capture, shipwreck, dust2, urban_c, berlin_wall, akroseum, valhalla, damnation, mach2, redemption, tejen, europium, capture_night, l_ctf, forge, campo, wdcd, sacrifice, core_transfer, recovery'
