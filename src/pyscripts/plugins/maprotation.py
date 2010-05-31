@@ -97,9 +97,9 @@ def onNextMapCmd(p, args):
 		p.message(error('Usage: #nextmap'))
 	else:
 		try:
-			p.messageinfo(config['Templates']['nextmap_response'].substitute(colordict, mapname=getSuccessor(sbserver.gameMode(), sbserver.mapName()))))
+			p.message(info(config['Templates']['nextmap_response'].substitute(colordict, mapname=getSuccessor(sbserver.gameMode(), sbserver.mapName()))))
 		except (KeyError, ValueError):
-			sbserver.playerMessage(cn, error('Could not determine next map'))
+			p.message(error('Could not determine next map'))
 
 def onConnect(cn):
 	if rotate_on_join[0]:
