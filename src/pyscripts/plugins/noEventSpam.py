@@ -12,7 +12,7 @@ def onListRegEvents(p, args):
 	   @usage
 	   @admin'''
 	for event in EventHandler.events.keys():
-		#sbserver.message(event)
+		sbserver.message(type(event))
 		@eventHandler(event)
 		def onEvent(*args):
 			sbserver.message(args)
