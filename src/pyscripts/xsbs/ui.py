@@ -6,10 +6,10 @@ import string
 config = {
 	'Templates':
 		{
-			'notice': '${blue}Notice:',
-			'info': '${yellow}Info:',
-			'warning': '${red}Warning:',
-			'error': '${red}Error:',
+			'notice': '${blue}Notice:${white}',
+			'info': '${yellow}Info:${white}',
+			'warning': '${red}Warning:${white}',
+			'error': '${red}Error:${white}',
 		}
 	}
 

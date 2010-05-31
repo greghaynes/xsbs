@@ -19,17 +19,17 @@ config = {
 		},
 	'SpreeMessages':
 		{
-			5:  '${green}${name} is on a ${orange}KILLING SPREE!',
-			10: '${green}${name} is ${orange}UNSTOPPABLE!',
-			15: '${green}${name} is ${orange}GODLIKE!',
-			'killed': '${orange}${victimname}s killing spree ended by ${green}${killername}',
-			'suicide': '${orange}${victimname} has ended their own killing spree'
+			5:  '${green}${name}${white} is on a ${orange}KILLING SPREE!',
+			10: '${green}${name}${white} is ${orange}UNSTOPPABLE!',
+			15: '${green}${name}${white} is ${orange}GODLIKE!',
+			'killed': '${orange}${victimname}\'s${white} killing spree ended by ${green}${killername}',
+			'suicide': '${orange}${victimname}${white} has ended their own killing spree'
 		},
 	'NeoMessages':
 		{
 			2:  '${orange}DOUBLE KILL!',
 			3:  '${orange}TRIPLE KILL!',
-			4:  '${orange}Quadrupal Kill!',
+			4:  '${orange}QUADRUPAL Kill!',
 			5:  '${orange}OVERKILL!',
 			7:  '${orange}KILLTACULAR!',
 			10: '${orange}KILLOTROCITY!',
@@ -39,8 +39,8 @@ config = {
 		},
 	'DomMessages':
 		{
-			10: '${green}${killername} is ${orange}DOMINATING ${green}${victimname}',
-			25: '${green}${killername} is ${orange}BRUTILIZING ${green}${victimname}'
+			10: '${green}${killername}${white} is ${orange}DOMINATING ${green}${victimname}',
+			25: '${green}${killername}${white} is ${orange}BRUTILIZING ${green}${victimname}'
 		}
 	}
 
