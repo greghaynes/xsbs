@@ -1,5 +1,6 @@
 from xsbs.events import returnEventHandler
 from xsbs.commands import commandHandler
+from xsbs.players import masterRequired
 import sbserver
 
 
