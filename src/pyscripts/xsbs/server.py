@@ -46,7 +46,7 @@ def setPaused(val, cn=-1):
 		name = 'Unknown'
 	else:
 		name = p.name()
-	sbserver.message(notice(pause_message.substitute(
+	sbserver.message(notice(config['Templates']['action_message'].substitute(
 		colordict,
 		action=action,
 		name=name)))
