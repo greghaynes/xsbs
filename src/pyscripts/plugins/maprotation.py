@@ -89,15 +89,15 @@ def presetRotate():
 		rotate_on_join[0] = True
 		sbserver.setPaused(True)
 
-def onNextMapCmd(cn, args):
+def onNextMapCmd(p, args):
 	'''@description Display next map
 	   @usage
 	   @public'''
 	if args != '':
-		sbserver.playerMessage(cn, error('Usage: #nextmap'))
+		p.message(error('Usage: #nextmap'))
 	else:
 		try:
-			sbserver.playerMessage(cn, info(config['Templates']['nextmap_response'].substitute(colordict, mapname=getSuccessor(sbserver.gameMode(), sbserver.mapName()))))
+			p.messageinfo(config['Templates']['nextmap_response'].substitute(colordict, mapname=getSuccessor(sbserver.gameMode(), sbserver.mapName()))))
 		except (KeyError, ValueError):
 			sbserver.playerMessage(cn, error('Could not determine next map'))
 
