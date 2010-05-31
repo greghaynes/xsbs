@@ -1,7 +1,7 @@
 from elixir import Entity, Field, Integer, String, Boolean, ManyToOne, OneToMany, session
 from sqlalchemy.orm.exc import NoResultFound
 
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.events import eventHandler
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.commands import commandHandler, UsageError
@@ -9,9 +9,15 @@ from xsbs.players import isAtLeastMaster
 
 import sbserver
 
-config = PluginConfig('namesdb')
-master_required = config.getOption('Config', 'master_required', 'no') == 'yes'
-del config
+config = {
+	'Main':
+		{
+			'master_required': 'no',
+		}
+	}
+
+loadPluginConfig(config, 'NamesDB')
+master_required = config['Main']['master_required'] == 'yes'
 
 class IpToNick(Entity):
 	ip = Field(Integer, index=True)

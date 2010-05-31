@@ -3,15 +3,21 @@ from xsbs.commands import commandHandler
 from xsbs.players import player, all as allPlayers
 from xsbs.ui import error, info
 from xsbs.colors import colordict
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.ban import ban
 import sbserver
 import string
 
-config = PluginConfig('votekick')
-vktemp = config.getOption('Config', 'vote_message', '${green}${voter}${white} voted to ${red}kick ${orange}${victim}')
-del config
-vktemp = string.Template(vktemp)
+config = {
+	'Templates':
+		{
+			'vote_message': '${green}${voter}${white} voted to ${red}kick ${orange}${victim}',
+		}
+	}
+
+def init():
+	loadPluginConfig(config, 'VoteKick')
+	config['Templates']['vote_message'] = string.Template(config['Templates']['vote_message'])
 
 def checkVotes(cn):
 	players = allPlayers()
@@ -45,7 +51,9 @@ def onVoteKick(p, args):
 		except AttributeError:
 			allow_vote = True
 		if allow_vote:
-			sbserver.message(info(vktemp.substitute(colordict, voter=p.name(), victim=sbserver.playerName(tcn))))
+			sbserver.message(info(config['Templates']['vote_message'].substitute(colordict, voter=p.name(), victim=sbserver.playerName(tcn))))
 			p.votekick = int(args)
 			checkVotes(int(args))
+			
+init()
 

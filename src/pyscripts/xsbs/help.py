@@ -2,7 +2,6 @@ import sbserver
 from xsbs.events import registerServerEventHandler
 from xsbs.colors import blue, red, orange, colordict
 from xsbs.ui import error, info
-from xsbs.settings import PluginConfig
 from xsbs.players import isMaster, isAdmin
 import logging
 

@@ -3,15 +3,21 @@ from xsbs.events import eventHandler
 from xsbs.commands import commandHandler, StateError
 from xsbs.ui import notice
 from xsbs.colors import colordict
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 
 import string
 import sbserver
 
-config = PluginConfig('server')
-pause_message = config.getOption('Templates', 'pause_message', 'The game has been ${action} by ${orange}${name}')
-del config
-pause_message = string.Template(pause_message)
+config = {
+	'Templates':
+		{
+			'action_message': 'The game has been ${action} by ${orange}${name}',
+		}
+	}
+
+def init():
+	loadPluginConfig(config, 'ServerCmds')
+	config['Templates']['action_message'] = string.Template(config['Templates']['action_message'])
 
 mastermodes = [
 	'open',
@@ -122,3 +128,5 @@ def csevalfile(file):
 	except: pass
 	finally:
 		f.close()
+		
+init()

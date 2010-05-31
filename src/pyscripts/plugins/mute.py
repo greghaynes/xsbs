@@ -3,16 +3,28 @@ from xsbs.colors import colordict
 from xsbs.ui import info, notice, error
 from xsbs.events import registerPolicyEventHandler, registerServerEventHandler
 from xsbs.players import player, masterRequired
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
 import string
 
-config = PluginConfig('mute')
-muted_temp = config.getOption('Messages', 'muted_message', '${green}${muted_name}${white} has been ${red}muted ${white}(by ${blue}${muter}${white})')
-unmuted_temp = config.getOption('Messages', 'unmuted_message', '${green}${muted_name}${white} has been ${red}unmuted ${white}(by ${blue}${muter}${white})')
-del config
-muted_temp = string.Template(muted_temp)
-unmuted_temp = string.Template(unmuted_temp)
+config = {
+	'Main':
+		{
+			'allow_mode_vote': 'no',
+			'lock_game_mode': 'no',
+		},
+	'Templates':
+		{
+			'muted_message': '${green}${muted_name}${white} has been ${red}muted ${white}(by ${blue}${muter}${white})',
+			'unmuted_message': '${green}${muted_name}${white} has been ${red}unmuted ${white}(by ${blue}${muter}${white})',
+		}
+	}
+
+def init():
+	loadPluginConfig(config, 'Mute')
+	config['Templates']['muted_message'] = string.Template(config['Templates']['muted_message'])
+	config['Templates']['unmuted_message'] = string.Template(config['Templates']['unmuted_message'])
+
 mute_spectators = [False]
 
 def allowMsg(cn, text):
@@ -81,7 +93,7 @@ def onMuteCommand(sender, args):
 				p.is_muted = True
 				name = p.name()
 				muter = player(sender.cn).name()
-				sbserver.message(info(muted_temp.substitute(colordict, muted_name=name, muter=muter)))
+				sbserver.message(info(config['Templates']['muted_message'].substitute(colordict, muted_name=name, muter=muter)))
 	except KeyError:
 		raise UsageError()
 			
@@ -100,7 +112,7 @@ def onUnmuteCommand(sender, args):
 			if p.is_muted:
 				p.is_muted = False
 				muter = player(sender.cn).name()
-				sbserver.message(info(unmuted_temp.substitute(colordict, muted_name=p.name(), muter=muter)))
+				sbserver.message(info(config['Templates']['unmuted_message'].substitute(colordict, muted_name=p.name(), muter=muter)))
 			else:
 				raise StateError('Specified player is not crrently muted')
 		except AttributeError:
@@ -111,4 +123,6 @@ def onUnmuteCommand(sender, args):
 		raise ArgumentValueError('Invalid player cn')
 
 registerPolicyEventHandler('allow_message', allowMsg)
+
+init()
 

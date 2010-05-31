@@ -19,6 +19,7 @@ config = {
 		}
 	}
 
+loadPluginConfig(config, 'UserManager')
 config['Main']['blocked_reserved_names'] = config['Main']['blocked_reserved_names'].strip(' ').split(',')
 
 class NickAccount(Entity):

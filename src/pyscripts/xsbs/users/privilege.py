@@ -6,21 +6,27 @@ from sqlalchemy.orm.exc import NoResultFound
 from xsbs.events import registerServerEventHandler
 from xsbs.ui import error, info, insufficientPermissions
 from xsbs.colors import colordict
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 import string
 
-config = PluginConfig('userprivilege')
-authtemp = config.getOption('Messages', 'authenticated', '${green}${name}${white} authenticated as ${magenta}${authname}')
-gmtemp = config.getOption('Messages', 'gain_master', '${green}${name}${white} claimed ${red}master')
-gatemp = config.getOption('Messages', 'gain_admin', '${green}${name}${white} claimed ${red}admin')
-rmtemp = config.getOption('Messages', 'release_master', '${green}${name}${white} relinquished ${red}master')
-ratemp = config.getOption('Messages', 'release_admin', '${green}${name}${white} relinquished ${red}admin')
-del config
-authtemp = string.Template(authtemp)
-gmtemp = string.Template(gmtemp)
-gatemp = string.Template(gatemp)
-rmtemp = string.Template(rmtemp)
-ratemp = string.Template(ratemp)
+config = {
+	'Templates':
+		{
+			'authenticated': '${green}${name}${white} authenticated as ${magenta}${authname}',
+			'gain_master': '${green}${name}${white} claimed ${red}master',
+			'gain_admin': '${green}${name}${white} claimed ${red}admin',
+			'release_master': '${green}${name}${white} relinquished ${red}master',
+			'release_admin': '${green}${name}${white} relinquished ${red}admin',
+		}
+	}
+
+def init():
+	loadPluginConfig(config, 'UserPrivilege')
+	config['Templates']['authenticated'] = string.Template(config['Templates']['authenticated'])
+	config['Templates']['gain_master'] = string.Template(config['Templates']['gain_master'])
+	config['Templates']['gain_admin'] = string.Template(config['Templates']['gain_admin'])
+	config['Templates']['release_master'] = string.Template(config['Templates']['release_master'])
+	config['Templates']['release_admin'] = string.Template(config['Templates']['release_admin'])
 
 USER = 0
 MASTER = 1
@@ -63,22 +69,22 @@ def onSetMaster(cn, hash):
 		sbserver.setAdmin(cn)
 
 def onAuthSuccess(cn, name):
-	sbserver.message(info(authtemp.substitute(colordict, name=sbserver.playerName(cn), authname=name)))
+	sbserver.message(info(config['Templates']['authenticated'].substitute(colordict, name=sbserver.playerName(cn), authname=name)))
 
 def onSetMasterOff(cn):
 	sbserver.resetPrivilege(cn)
 
 def onGainMaster(cn):
-	sbserver.message(info(gmtemp.substitute(colordict, name=sbserver.playerName(cn))))
+	sbserver.message(info(config['Templates']['gain_master'].substitute(colordict, name=sbserver.playerName(cn))))
 
 def onGainAdmin(cn):
-	sbserver.message(info(gatemp.substitute(colordict, name=sbserver.playerName(cn))))
+	sbserver.message(info(config['Templates']['gain_admin'].substitute(colordict, name=sbserver.playerName(cn))))
 
 def onRelMaster(cn):
-	sbserver.message(info(rmtemp.substitute(colordict, name=sbserver.playerName(cn))))
+	sbserver.message(info(config['Templates']['release_master'].substitute(colordict, name=sbserver.playerName(cn))))
 
 def onRelAdmin(cn):
-	sbserver.message(info(ratemp.substitute(colordict, name=sbserver.playerName(cn))))
+	sbserver.message(info(config['Templates']['release_admin'].substitute(colordict, name=sbserver.playerName(cn))))
 
 def init():
 	registerServerEventHandler('player_setmaster', onSetMaster)
