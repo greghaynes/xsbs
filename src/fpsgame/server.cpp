@@ -1602,7 +1602,7 @@ namespace server
 	    	ci->recentpacketcount++;
 	    	//formatstring(msg)("a packet within 1000 millis of last. current count %d", ci->recentpacketcount );
 		//sendservmsg(msg);
-		if (ci->recentpacketcount > 10)
+		if (ci->recentpacketcount > 5)
 		{
 			disconnect_client(ci->clientnum, DISC_KICK);
 		}
