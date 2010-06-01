@@ -1604,7 +1604,9 @@ namespace server
 		//sendservmsg(msg);
 		if (ci->recentpacketcount > 5)
 		{
-			disconnect_client(ci->clientnum, DISC_KICK);
+			//disconnect_client(ci->clientnum, DISC_KICK);
+			//instead of kicking the player from here lets add a ban to the db
+			SbPy::triggerEventIntInt("player_kick", -1, ci->clientnum);
 		}
     	}
     	else
