@@ -1595,16 +1595,16 @@ namespace server
     {
         //int recentpacketcount;
         //enet_uint32 lastpackettime;
-        string msg;
+        //string msg;
     
     	if (ci->lastpackettime - curtime < 1)
     	{
 	    	ci->recentpacketcount++;
 	    	formatstring(msg)("a packet within 1000 millis of last. current count %d", ci->recentpacketcount );
 		sendservmsg(msg);
-		if (ci->recentpacketcount > 5)
+		if (ci->recentpacketcount > 10)
 		{
-			sendservmsg("More than five packets in a second; bad client, Sit!.");
+			disconnect_client(ci->clientnum, DISC_KICK);
 		}
     	}
     	else
@@ -1810,7 +1810,6 @@ namespace server
 
             case SV_GUNSELECT:
             {
-	        incrementrecentpacketcount(ci);
                 int gunselect = getint(p);
                 if(!cq || cq->state.state!=CS_ALIVE) break;
                 cq->state.gunselect = gunselect;
@@ -1935,7 +1934,7 @@ namespace server
 
             case SV_SWITCHNAME:
             {
-            	incrementrecentpacketcount(cq);
+            	incrementrecentpacketcount(ci);
                 QUEUE_MSG;
                 getstring(text, p);
                 char *oldname = (char*)malloc(strlen(ci->name)+1);
@@ -1950,6 +1949,7 @@ namespace server
 
             case SV_SWITCHMODEL:
             {
+            	incrementrecentpacketcount(ci);
                 ci->playermodel = getint(p);
                 QUEUE_MSG;
                 break;
@@ -1957,7 +1957,7 @@ namespace server
 
             case SV_SWITCHTEAM:
             {
-            	incrementrecentpacketcount(cq);
+            	incrementrecentpacketcount(ci);
                 getstring(text, p);
                 filtertext(text, text, false, MAXTEAMLEN);
                 SbPy::triggerEventIntString("player_switch_team", sender, text);
@@ -1984,6 +1984,7 @@ namespace server
             case SV_MAPVOTE:
             case SV_MAPCHANGE:
             {
+            	incrementrecentpacketcount(ci);
                 getstring(text, p);
                 filtertext(text, text);
                 int reqmode = getint(p);
@@ -2093,6 +2094,7 @@ namespace server
 
             case SV_SPECTATOR:
             {
+            	incrementrecentpacketcount(ci);
                 int spectator = getint(p), val = getint(p);
                // if(!ci->privilege && !ci->local && (spectator!=sender || (ci->state.state==CS_SPECTATOR && mastermode>=MM_LOCKED))) break;
                 clientinfo *spinfo = (clientinfo *)getclientinfo(spectator); // no bots
@@ -2107,6 +2109,7 @@ namespace server
 
             case SV_SETTEAM:
             {
+            	incrementrecentpacketcount(ci);
                 int who = getint(p);
                 getstring(text, p);
                 filtertext(text, text, false, MAXTEAMLEN);
@@ -2153,6 +2156,7 @@ namespace server
 
             case SV_CLEARDEMOS:
             {
+            	incrementrecentpacketcount(ci);
                 int demo = getint(p);
                 if(ci->privilege<PRIV_ADMIN && !ci->local) break;
                 cleardemos(demo);
@@ -2160,12 +2164,14 @@ namespace server
             }
 
             case SV_LISTDEMOS:
+            	incrementrecentpacketcount(ci);
                 if(!ci->privilege && !ci->local && ci->state.state==CS_SPECTATOR) break;
                 listdemos(sender);
                 break;
 
             case SV_GETDEMO:
             {
+            	incrementrecentpacketcount(ci);
                 int n = getint(p);
                 if(!ci->privilege  && !ci->local && ci->state.state==CS_SPECTATOR) break;
                 senddemo(sender, n);
@@ -2173,6 +2179,7 @@ namespace server
             }
 
             case SV_GETMAP:
+            	incrementrecentpacketcount(ci);
                 if(mapdata)
                 {
                     sendfile(sender, 2, mapdata, "ri", SV_SENDMAP);
@@ -2183,6 +2190,7 @@ namespace server
 
             case SV_NEWMAP:
             {
+            	incrementrecentpacketcount(ci);
                 int size = getint(p);
                 if(!ci->privilege && !ci->local && ci->state.state==CS_SPECTATOR) break;
                 if(size>=0)
@@ -2198,6 +2206,7 @@ namespace server
 
             case SV_SETMASTER:
             {
+            	incrementrecentpacketcount(ci);
                 int val = getint(p);
                 getstring(text, p);
                 if(val!=0)
@@ -2210,6 +2219,7 @@ namespace server
 
             case SV_ADDBOT:
             {
+            	incrementrecentpacketcount(ci);
                 aiman::reqadd(ci, getint(p));
                 //Triggered in aiman::addai
                 //SbPy::triggerEventInt("game_bot_added", ci->clientnum);
@@ -2218,6 +2228,7 @@ namespace server
 
             case SV_DELBOT:
             {
+            	incrementrecentpacketcount(ci);
                 aiman::reqdel(ci);
                 //Triggered in aiman::deleteai
                 //SbPy::triggerEventInt("game_bot_removed", ci->clientnum);
@@ -2240,6 +2251,7 @@ namespace server
 
             case SV_AUTHTRY:
             {
+            	incrementrecentpacketcount(ci);
                 string desc, name;
                 getstring(desc, p, sizeof(desc)); // unused for now
                 getstring(name, p, sizeof(name));
@@ -2259,6 +2271,7 @@ namespace server
 
             case SV_PAUSEGAME:
             {
+            	incrementrecentpacketcount(ci);
                 int val = getint(p);
 				SbPy::triggerEventIntBool("player_pause", ci->clientnum, val != 0);
                 break;
