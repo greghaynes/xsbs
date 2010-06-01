@@ -1590,6 +1590,31 @@ namespace server
         mapdata->write(data, len);
         SbPy::triggerEventInt("player_uploaded_map", sender);
     }
+    
+    void incrementrecentpacketcount(clientinfo *ci)
+    {
+        //int recentpacketcount;
+        //enet_uint32 lastpackettime;
+    
+    	if (ci->lastpackettime - curtime < 1000)
+    	{
+	    	ci->recentpacketcount++;
+	    	formatstring(msg)("a packet within 1000 millis of last. current count %d", ci->recentpacketcount );
+		sendservmsg(msg);
+		if (ci->recentpacketcount > 5)
+		{
+			sendservmsg("More than five packets in a second; bad client, Sit!.");
+		}
+    	}
+    	else
+    	{
+    		ci->recentpacketcount = 1;
+    		ci->lastpackettime = curtime;
+    	
+    	}
+    	//curtime
+    	
+    }
 
     void parsepacket(int sender, int chan, packetbuf &p)     // has to parse exactly each byte of the packet
     {
@@ -1666,9 +1691,11 @@ namespace server
         #define QUEUE_INT(n) QUEUE_BUF(5, putint(buf, n))
         #define QUEUE_UINT(n) QUEUE_BUF(4, putuint(buf, n))
         #define QUEUE_STR(text) QUEUE_BUF(2*strlen(text)+1, sendstring(text, buf))
+        
         int curmsg;
         while((curmsg = p.length()) < p.maxlen) switch(type = checktype(getint(p), ci))
         {
+        
             case SV_POS:
             {
                 int pcn = getint(p);

@@ -219,6 +219,8 @@ namespace server
         int ping, aireinit;
         string clientmap;
         int mapcrc;
+        int recentpacketcount;
+        enet_uint32 lastpackettime;
         bool warned, gameclip, active;
 		
         clientinfo() { reset(); }
