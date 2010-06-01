@@ -2094,7 +2094,7 @@ namespace server
 
             case SV_SPECTATOR:
             {
-            	incrementrecentpacketcount(cq);
+            	incrementrecentpacketcount(ci);
                 int spectator = getint(p), val = getint(p);
                // if(!ci->privilege && !ci->local && (spectator!=sender || (ci->state.state==CS_SPECTATOR && mastermode>=MM_LOCKED))) break;
                 clientinfo *spinfo = (clientinfo *)getclientinfo(spectator); // no bots
@@ -2135,7 +2135,7 @@ namespace server
 
             case SV_RECORDDEMO:
             {
-            	incrementrecentpacketcount(cq);
+            	incrementrecentpacketcount(ci);
                 int val = getint(p);
                 SbPy::triggerEventIntBool("player_record_demo", ci->clientnum, val != 0);
 /*
