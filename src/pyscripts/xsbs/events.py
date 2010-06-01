@@ -63,7 +63,7 @@ class eventHandler(object):
 def triggerServerEvent(event, args):
 	'''Trigger event with arguments.'''
 	server_events.trigger(event, args)
-	server_events.trigger_cs(event, args)
+	#server_events.trigger_cs(event, args)
 
 def registerPolicyEventHandler(event, func):
 	'''Call function when policy event has been executed.'''
