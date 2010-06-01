@@ -1597,7 +1597,7 @@ namespace server
         //enet_uint32 lastpackettime;
         string msg;
     
-    	if (ci->lastpackettime - curtime < 1000)
+    	if (ci->lastpackettime - curtime < 1)
     	{
 	    	ci->recentpacketcount++;
 	    	formatstring(msg)("a packet within 1000 millis of last. current count %d", ci->recentpacketcount );
@@ -1847,7 +1847,6 @@ namespace server
 
             case SV_SHOOT:
             {
-		incrementrecentpacketcount(cq);
                 shotevent *shot = new shotevent;
                 shot->id = getint(p);
                 shot->millis = cq ? cq->geteventmillis(gamemillis, shot->id) : 0;
@@ -1935,6 +1934,7 @@ namespace server
 
             case SV_SWITCHNAME:
             {
+            	incrementrecentpacketcount(cq);
                 QUEUE_MSG;
                 getstring(text, p);
                 char *oldname = (char*)malloc(strlen(ci->name)+1);
@@ -1956,6 +1956,7 @@ namespace server
 
             case SV_SWITCHTEAM:
             {
+            	incrementrecentpacketcount(cq);
                 getstring(text, p);
                 filtertext(text, text, false, MAXTEAMLEN);
                 SbPy::triggerEventIntString("player_switch_team", sender, text);
@@ -1982,6 +1983,7 @@ namespace server
             case SV_MAPVOTE:
             case SV_MAPCHANGE:
             {
+            	incrementrecentpacketcount(cq);
                 getstring(text, p);
                 filtertext(text, text);
                 int reqmode = getint(p);
@@ -2074,6 +2076,7 @@ namespace server
 
             case SV_CLEARBANS:
             {
+            	incrementrecentpacketcount(cq);
                 SbPy::triggerEventInt("server_clear_bans", ci->clientnum);
                 break;
             }
@@ -2091,6 +2094,7 @@ namespace server
 
             case SV_SPECTATOR:
             {
+            	incrementrecentpacketcount(cq);
                 int spectator = getint(p), val = getint(p);
                // if(!ci->privilege && !ci->local && (spectator!=sender || (ci->state.state==CS_SPECTATOR && mastermode>=MM_LOCKED))) break;
                 clientinfo *spinfo = (clientinfo *)getclientinfo(spectator); // no bots
@@ -2131,6 +2135,7 @@ namespace server
 
             case SV_RECORDDEMO:
             {
+            	incrementrecentpacketcount(cq);
                 int val = getint(p);
                 SbPy::triggerEventIntBool("player_record_demo", ci->clientnum, val != 0);
 /*
