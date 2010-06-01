@@ -1847,6 +1847,7 @@ namespace server
 
             case SV_SHOOT:
             {
+		incrementrecentpacketcount(cq);
                 shotevent *shot = new shotevent;
                 shot->id = getint(p);
                 shot->millis = cq ? cq->geteventmillis(gamemillis, shot->id) : 0;
