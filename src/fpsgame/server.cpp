@@ -1810,6 +1810,7 @@ namespace server
 
             case SV_GUNSELECT:
             {
+	        incrementrecentpacketcount(ci);
                 int gunselect = getint(p);
                 if(!cq || cq->state.state!=CS_ALIVE) break;
                 cq->state.gunselect = gunselect;
@@ -1847,7 +1848,6 @@ namespace server
 
             case SV_SHOOT:
             {
-            	incrementrecentpacketcount(ci);
                 shotevent *shot = new shotevent;
                 shot->id = getint(p);
                 shot->millis = cq ? cq->geteventmillis(gamemillis, shot->id) : 0;
