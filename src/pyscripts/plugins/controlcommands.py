@@ -10,7 +10,7 @@ from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
 from xsbs.users.privilege import isUserMaster, isUserAdmin, UserPrivilege
 from xsbs.players import masterRequired, adminRequired, player, currentAdmin
-from xsbs.server import setPaused, message as sendServerMessage
+from xsbs.server import setPaused, isPaused, message as sendServerMessage
 from xsbs.timers import addTimer
 
 import string
@@ -43,7 +43,8 @@ def onPauseCmd(p, args):
 	if args != '':
 		raise ExtraArgumentError()
 		return
-	setPaused(True, p.cn)
+	elif not isPaused():
+		setPaused(True, p.cn)
 
 
 def resumeTimer(count, cn):
@@ -62,10 +63,11 @@ def onResumeCmd(p, args):
 	if args != '':
 		raise ExtraArgumentError()
 		return
-	if resume_timeout > 0:
-		resumeTimer(config['Main']['resume_timeout'], p.cn)
-	else:
-		setPaused(False, p.cn)
+	if isPaused():
+		if config['Main']['resume_timeout'] > 0:
+			resumeTimer(config['Main']['resume_timeout'], p.cn)
+		else:
+			setPaused(False, p.cn)
 
 @commandHandler('givemaster')
 @masterRequired
@@ -308,4 +310,4 @@ def onSmiteCommand(p, args):
 	sendServerMessage(info(config['Templates']['smite'].substitute(colordict, smiter=p.name(), smited=t.name())))
 	t.suicide()
 
-
+init()

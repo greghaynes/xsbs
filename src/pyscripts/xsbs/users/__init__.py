@@ -19,6 +19,7 @@ config = {
 		}
 	}
 
+loadPluginConfig(config, 'UserManager')
 config['Main']['blocked_reserved_names'] = config['Main']['blocked_reserved_names'].strip(' ').split(',')
 
 class NickAccount(Entity):
@@ -169,7 +170,7 @@ def onSetMaster(cn, givenhash):
 	p = player(cn)
 	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
 	try:
-		NickAccount.query.filter(NickAccount.nick==p.name()).one()
+		na = NickAccount.query.filter(NickAccount.nick==p.name()).one()
 	except NoResultFound:
 		if givenhash != adminhash:
 			setSimpleMaster(cn)

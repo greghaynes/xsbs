@@ -1,19 +1,24 @@
 from xsbs.events import eventHandler
 from xsbs.players import player, playerCount, spectatorCount
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.server import maxClients, setMaxClients
 import logging
 
-config = PluginConfig('dynamicresize')
-# For every n spectators add one to maxclients
-spectatorsAddClient = config.getOption('Config', 'spectators_addclient_rate', '2')
-del config
+config = {
+	'Main':
+		{
+			# For every n spectators add one to maxclients
+			'spectators_addclient_rate': 2
+		}
+	}
 
-try:
-	spectatorsAddClient = int(spectatorsAddClient)
-except TypeError:
-	logging.error('Non int value for spectator addclient rate.  Setting to 0')
-	spectatorsAddClient = 0
+def init():
+	loadPluginConfig(config, 'DynamicResize')
+	try:
+		config['Main']['spectators_addclient_rate'] = int(config['Main']['spectators_addclient_rate'])
+	except TypeError:
+		logging.error('Non int value for spectator addclient rate.  Setting to 0')
+		config['Main']['spectators_addclient_rate'] = 0
 
 adjsize = [0]
 
@@ -22,9 +27,9 @@ adjsize = [0]
 @eventHandler('player_disconnect')
 @eventHandler('player_unspectated')
 def checkSize(cn):
-	if spectatorsAddClient == 0:
+	if config['Main']['spectators_addclient_rate'] == 0:
 		return
-	newadj = spectatorCount() / spectatorsAddClient
+	newadj = spectatorCount() / config['Main']['spectators_addclient_rate']
 	newsize = 0
 	if adjsize[0] == newadj:
 		return
@@ -36,4 +41,6 @@ def checkSize(cn):
 		adjsize[0] = newadj
 	logging.debug('Adjusting server size to %i due to new spectator', newsize)
 	setMaxClients(newsize)
+	
+init()
 

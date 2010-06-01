@@ -113,7 +113,7 @@ class IrcBot(irc.IRCClient):
 		self.joined_channels = []
 	def signedOn(self):
 		for channel in self.factory.channels:
-			self.join(channel)
+			self.join(channel.encode('iso-8859-5'))
 		self.factory.signedOn(self)
 	def connectionLost(self, reason):
 		self.factory.signedOut(self)
@@ -125,7 +125,7 @@ class IrcBot(irc.IRCClient):
 			self.joined_channels.remove(channel)
 	def broadcast(self, message):
 		for channel in self.joined_channels:
-			self.say(channel, message)
+			self.say(channel, message.encode('iso-8859-5'))
 	def privmsg(self, user, channel, msg):
 		if channel == config['Connection']['channel']:
 			user = user.split('!', 1)[0]
@@ -134,7 +134,7 @@ class IrcBot(irc.IRCClient):
 class IrcBotFactory(protocol.ClientFactory):
 	protocol = IrcBot
 	def __init__(self, nickname, channels):
-		self.nickname = nickname
+		self.nickname = nickname.encode('iso-8859-5')
 		self.channels = channels
 		self.bots = []
 		self.reconnect_count = 0
@@ -184,6 +184,8 @@ factory = IrcBotFactory(config['Connection']['nickname'], [config['Connection'][
 
 def init():
 	loadPluginConfig(config, 'IrcBot')
+	global factory
+	factory = IrcBotFactory(config['Connection']['nickname'], [config['Connection']['channel']])
 	config['Templates']['irc_message'] = string.Template(config['Templates']['irc_message'])
 	if config['Main']['enable'] == 'yes':
 		factory.doConnect()

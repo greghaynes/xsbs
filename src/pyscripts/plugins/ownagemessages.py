@@ -1,5 +1,5 @@
 from xsbs.events import eventHandler
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.ui import error, notice, warning, info
 from xsbs.colors import colordict, green, orange
 from xsbs.players import player, all as allPlayers, playerByName, playerByIpString
@@ -7,36 +7,59 @@ import sbserver
 import time
 import string
 
-config = PluginConfig('ownage')
-spreemessagesenable = config.getOption('Config', 'spreemessages', 'yes') == 'yes'
-neomessagesenable = config.getOption('Config', 'neomessages', 'yes') == 'yes'
-dommessagesenable = config.getOption('Config', 'dommessages', 'yes') == 'yes'
-interval = int(config.getOption('Config', 'max_time_btwn_kills', '2'))
-del config
 
-spreemessages = { 
-	5: string.Template(green('$name') + ' is on a ' + orange('KILLING SPREE!')),
-	10: string.Template(green('$name') + ' is ' + orange('UNSTOPPABLE!')),
-	15: string.Template(green('$name') + ' is ' + orange('GODLIKE!')) 
+config = {
+	'Main':
+		{
+			'spree_messages': 'yes',
+			'multikill_messages': 'yes',
+			'domination_messages': 'yes',
+			
+			'max_time_btwn_kills': 2
+		},
+	'SpreeMessages':
+		{
+			5:  '${green}${name}${white} is on a ${orange}KILLING SPREE!',
+			10: '${green}${name}${white} is ${orange}UNSTOPPABLE!',
+			15: '${green}${name}${white} is ${orange}GODLIKE!',
+			'killed': '${orange}${victimname}\'s${white} killing spree ended by ${green}${killername}',
+			'suicide': '${orange}${victimname}${white} has ended their own killing spree'
+		},
+	'NeoMessages':
+		{
+			2:  '${orange}DOUBLE KILL!',
+			3:  '${orange}TRIPLE KILL!',
+			4:  '${orange}QUADRUPAL Kill!',
+			5:  '${orange}OVERKILL!',
+			7:  '${orange}KILLTACULAR!',
+			10: '${orange}KILLOTROCITY!',
+			15: '${orange}KILLTASTROPHE!',
+			20: '${orange}KILLAPOCALYPSE!',
+			25: '${orange}KILLIONAIRE!'
+		},
+	'DomMessages':
+		{
+			10: '${green}${killername}${white} is ${orange}DOMINATING ${green}${victimname}',
+			25: '${green}${killername}${white} is ${orange}BRUTILIZING ${green}${victimname}'
+		}
 	}
-endmsg = string.Template(orange('$victimname') + '\'s killing spree ended by ' + green('$killername'))
-suicideendmsg = string.Template(orange('$victimname') + ' has ended his own killing spree!')
 
-neomessages = { 
-	2: string.Template(orange('DOUBLE KILL!')),
-	3: string.Template(orange('TRIPLE KILL!')),
-	5: string.Template(orange('OVERKILL!')),
-	7: string.Template(orange('KILLTACULAR!')),
-	10: string.Template(orange('KILLOTROCITY!')),
-	15: string.Template(orange('KILLTASTROPHE!')),
-	20: string.Template(orange('KILLAPOCALYPSE!')),
-	25: string.Template(orange('KILLIONAIRE!'))
-	}
+def init():
+	loadPluginConfig(config, 'OwnageMessages')
 	
-dommessages = {
-	10: string.Template(green('$killername') + ' is ' + orange('DOMINATING ') + green('$victimname')),
-	25: string.Template(green('$killername') + ' is ' + orange('BRUTILIZING ') + green('$victimname'))
-	}
+	config['Main']['spree_messages'] = config['Main']['spree_messages'] == 'yes'
+	config['Main']['multikill_messages'] = config['Main']['multikill_messages'] == 'yes'
+	config['Main']['domination_messages'] = config['Main']['domination_messages'] == 'yes'
+	
+	for index in config['SpreeMessages'].keys():
+		config['SpreeMessages'][index] = string.Template(config['SpreeMessages'][index])
+	for index in config['NeoMessages'].keys():
+		config['NeoMessages'][index] = string.Template(config['NeoMessages'][index])
+	for index in config['DomMessages'].keys():
+		config['DomMessages'][index] = string.Template(config['DomMessages'][index])		
+
+
+interval = config['Main']['max_time_btwn_kills']
 
 class ownageData:
 	def __init__(self, cn):
@@ -50,7 +73,7 @@ class ownageData:
 		self.domination_count = 0
 
 		self.multikill_counts = {}
-		for key in neomessages.keys():
+		for key in config['NeoMessages'].keys():
 			self.multikill_counts[key] = 0
 		
 	#######public#######	
@@ -60,11 +83,11 @@ class ownageData:
 		self.current_victim = victimcn
 		self.current_kill_time = time.time()
 		
-		if spreemessagesenable:
+		if config['Main']['spree_messages']:
 			self.check_sprees()
-		if neomessagesenable:
+		if config['Main']['multikill_messages']:
 			self.check_ownage()
-		if dommessagesenable:
+		if config['Main']['domination_messages']:
 			self.check_domination()
 
 		self.last_kill_time = self.current_kill_time	
@@ -89,15 +112,15 @@ class ownageData:
 	######private#######
 	#implement traditional killing spree messages
 	def check_sprees(self):
-		if self.kills_since_death in spreemessages.keys():
-			sbserver.message(info(spreemessages[self.kills_since_death].substitute(name=player(self.playercn).name())))
+		if self.kills_since_death in config['SpreeMessages'].keys():
+			sbserver.message(info(config['SpreeMessages'][self.kills_since_death].substitute(colordict, name=player(self.playercn).name())))
 			
 	def check_if_ending_spree(self, killercn):
 		if self.kills_since_death >= 5:
 			if killercn == -2:
-				sbserver.message(info(suicideendmsg.substitute(victimname=player(self.playercn).name())))
+				sbserver.message(info(config['SpreeMessages']['suicide'].substitute(colordict, victimname=player(self.playercn).name())))
 			else:
-				sbserver.message(info(endmsg.substitute(victimname=player(self.playercn).name(), killername=player(killercn).name())))
+				sbserver.message(info(config['SpreeMessages']['killed'].substitute(colordict, victimname=player(self.playercn).name(), killername=player(killercn).name())))
 			
 
 	#implement halo-like multi-kill messages
@@ -106,9 +129,9 @@ class ownageData:
 			self.ownage_count += 1
 			
 			#check whether this level of multikill warrants a message
-			if self.ownage_count in neomessages.keys():
+			if self.ownage_count in config['NeoMessages'].keys():
 				try:
-					player(self.playercn).message(info(neomessages[self.ownage_count].substitute()))
+					player(self.playercn).message(info(config['NeoMessages'][self.ownage_count].substitute(colordict)))
 				except ValueError:
 					pass
 				self.last_ownage_count = self.ownage_count
@@ -125,8 +148,8 @@ class ownageData:
 			self.domination_count += 1
 		else:
 			self.domination_count = 0
-		if self.domination_count in dommessages.keys():
-			sbserver.message(info(dommessages[self.domination_count].substitute(killername=player(self.playercn).name(), victimname=player(self.last_victim).name())))
+		if self.domination_count in config['DomMessages'].keys():
+			sbserver.message(info(config['DomMessages'][self.domination_count].substitute(colordict, killername=player(self.playercn).name(), victimname=player(self.last_victim).name())))
 
 class ownageManager:
 	def __init__(self):
@@ -181,4 +204,6 @@ def onDisconnect(cn):
 @eventHandler('player_suicide')
 def onSuicide(cn):
 	ownagemanager.suicide(cn)
+	
+init()
 	

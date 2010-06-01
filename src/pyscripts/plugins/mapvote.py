@@ -2,7 +2,7 @@ from xsbs.events import eventHandler
 from xsbs.colors import colordict
 from xsbs.ui import error, info
 from xsbs.players import player, all as allPlayers, isAtLeastMaster
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.server import message as serverMessage
 from xsbs.game import setMap
 
@@ -10,12 +10,23 @@ import sbserver
 import logging
 import string
 
-config = PluginConfig('mapvote')
-allow_modevote = config.getOption('Config', 'allow_mode_vote', 'no') == 'yes'
-lock_mode = config.getOption('Config', 'lock_game_mode', 'no') == 'yes'
-request_temp = config.getOption('Config', 'request_string', '${green}${user}${white} requested ${modename} on ${mapname}')
-del config
-request_temp = string.Template(request_temp)
+config = {
+	'Main':
+		{
+			'allow_mode_vote': 'no',
+			'lock_game_mode': 'no',
+		},
+	'Templates':
+		{
+			'request_string': '${green}${user}${white} requested ${modename} on ${mapname}',
+		}
+	}
+
+def init():
+	loadPluginConfig(config, 'MapVote')
+	config['Main']['allow_mode_vote'] = config['Main']['allow_mode_vote'] == 'yes'
+	config['Main']['lock_game_mode'] = config['Main']['lock_game_mode'] == 'yes'
+	config['Templates']['request_string'] = string.Template(config['Templates']['request_string'])
 
 def vote(candidates, vote):
 	for cand in candidates:
@@ -58,7 +69,7 @@ def onMapSet(cn, mapname, mapmode):
 		mapreload[0] = False
 	elif isAtLeastMaster(cn) and sbserver.masterMode() > 0:
 		sbserver.setMap(mapname, mapmode)
-	elif mapmode != sbserver.gameMode() and (lock_mode or not allow_modevote):
+	elif mapmode != sbserver.gameMode() and (config['Main']['lock_game_mode'] or not config['Main']['allow_mode_vote']):
 		p.message(error('You cannot request a new game mode'))
 
 @eventHandler('player_map_vote')
@@ -68,7 +79,7 @@ def onMapVote(cn, mapname, mapmode):
 		setMap(mapname, mapmode)
 	elif isAtLeastMaster(cn) and sbserver.masterMode() > 0:
 		setMap(mapname, mapmode)
-	elif mapmode != sbserver.gameMode() and (lock_mode or not allow_modevote):
+	elif mapmode != sbserver.gameMode() and (config['Main']['lock_game_mode'] or not config['Main']['allow_mode_vote']):
 		p.message(error('You cannot vote for a new game mode'))
 	else:
 		try:
@@ -77,7 +88,7 @@ def onMapVote(cn, mapname, mapmode):
 		except KeyError:
 			allow_vote = True
 		if allow_vote:
-			sbserver.message(info(request_temp.substitute(colordict,
+			sbserver.message(info(config['Templates']['request_string'].substitute(colordict,
 				user=p.name(),
 				modename=sbserver.modeName(mapmode),
 				mapname=mapname)))
@@ -90,3 +101,4 @@ def onMapVote(cn, mapname, mapmode):
 def onIntermEnd():
 	mapreload[0] = True
 
+init()

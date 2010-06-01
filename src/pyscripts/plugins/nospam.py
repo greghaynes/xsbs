@@ -1,6 +1,6 @@
 from xsbs.events import eventHandler
 from xsbs.timers import addTimer
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.ui import error, notice, warning
 from xsbs.ban import ban
 from xsbs.colors import colordict
@@ -9,15 +9,33 @@ import sbserver
 import time
 import string
 
-config = PluginConfig('nospam')
-interval = 			int(config.getOption('Config', 'action_interval', '5'))
-max_per_interval = 	int(config.getOption('Config', 'max_msgs', '6'))
-max_per_second = 	int(config.getOption('Config', 'max_msgs_per_sec', '3'))
-ban_duration = 		int(config.getOption('Config', 'ban_time', '3600'))
-warnings = 			int(config.getOption('Config', 'warnings', '2'))
-warn_spam_message = config.getOption('Config', 'warn_spam_message', 'Warning do not spam. This server is ${red}spam intolerant!${white} ')
-del config
-warn_spam_message = string.Template(warn_spam_message)
+import copy
+
+config = {
+	'Main':
+		{
+			'enabled': 'yes',
+			'action_interval': 5,
+			'max_msgs': 6,
+			'max_msgs_per_sec': 3,
+			'ban_time': 3600,
+			'warnings': 2,
+		},
+	'Templates':
+		{
+			'message': 'Warning do not spam. This server is ${red}spam intolerant!${white} ',
+		}
+	}
+
+def init():
+	loadPluginConfig(config, 'NoSpam')
+	config['Templates']['message'] = string.Template(config['Templates']['message'])
+	config['Main']['action_interval'] = int(config['Main']['action_interval'])
+	config['Main']['max_msgs'] = int(config['Main']['max_msgs'])
+	config['Main']['max_msgs_per_sec'] = int(config['Main']['max_msgs_per_sec'])
+	config['Main']['ban_time'] = int(config['Main']['ban_time'])
+	config['Main']['warnings'] = int(config['Main']['warnings'])
+	
 
 class ChatLog:
 	def __init__(self):
@@ -30,7 +48,7 @@ class ChatLog:
 		
 	def clean_chat(self):
 		for timekey in self.log.keys():
-			if (time.time() - timekey) > interval:
+			if (time.time() - timekey) > config['Main']['action_interval']:
 				del self.log[timekey]
 			
 	def get_log(self):
@@ -43,34 +61,27 @@ class SpammerManager:
 	def add_spamming_case(self, ip):
 		if ip in self.spammerlist.keys():
 			self.spammerlist[ip] += 1
-			if self.spammerlist[ip] > warnings:
+			if self.spammerlist[ip] > config['Main']['warnings']:
 				self.dealwithspammer(ip)
 				del self.spammerlist[ip]
 			else:
-				playerByIpString(ip).message(warning(warn_spam_message.substitute(colordict)))
+				playerByIpString(ip).message(warning(config['Templates']['message'].substitute(colordict)))
 		else:
 			self.spammerlist[ip] = 1
-			playerByIpString(ip).message(warning(warn_spam_message.substitute(colordict)))
+			playerByIpString(ip).message(warning(config['Templates']['message'].substitute(colordict)))
 
 	def dealwithspammer(self, ip):
 		try:
 			playercn = playerByIpString(ip).cn
-			ban(playercn, ban_duration, 'spamming server', -1)
+			ban(playercn, config['Main']['ban_time'], 'spamming server', -1)
 		except ValueError:
 			print "Error while banning spamming player by IP"
-
+			
 chatlog = ChatLog()
 spammermanager = SpammerManager()
-
-
-@eventHandler('player_message')
-def onMessage(cn, text):
-	chatlog.add_chat(cn, text)
-	chatlog.clean_chat()
-
+			
 	
 def CheckForSpammers():
-	#sbserver.message("Check for spammers ran")
 	log = chatlog.get_log()
 	
 	cn_occurs_1sec = {}
@@ -90,15 +101,23 @@ def CheckForSpammers():
 
 	
 	for occur in cn_occurs_1sec.keys():
-		if cn_occurs_1sec[occur] > max_per_second:
+		if cn_occurs_1sec[occur] > config['Main']['max_msgs_per_sec']:
 			spammermanager.add_spamming_case(player(occur).ipString())
 		else:
 			for occur in cn_occurs_interval.keys():
-				if cn_occurs_interval[occur] > max_per_interval:
+				if cn_occurs_interval[occur] > config['Main']['max_msgs']:
 					spammermanager.add_spamming_case(player(occur).ipString())
+
 
 def checkforspammerstimer():
 	CheckForSpammers()
 	addTimer(1000, checkforspammerstimer, ())
-	
+
+init()
+
 addTimer(1000, checkforspammerstimer, ())
+
+@eventHandler('player_message')
+def onMessage(cn, text):
+	chatlog.add_chat(cn, text)
+	chatlog.clean_chat()

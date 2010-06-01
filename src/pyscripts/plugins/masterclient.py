@@ -2,7 +2,7 @@ from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor, protocol
 from twisted.internet.task import LoopingCall
 
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.events import triggerServerEvent, eventHandler
 from xsbs.net import ipLongToString
 
@@ -10,13 +10,24 @@ import sbserver
 import time
 import logging
 
-config = PluginConfig('masterclient')
-claimstr = config.getOption('Config', 'auth_message', '${green}${name}${white} has authenticated as ${magenta}${authname}')
-master_host = config.getOption('Config', 'master_host', 'sauerbraten.org')
-master_port = config.getOption('Config', 'master_port', '28787')
-allow_auth = config.getOption('Config', 'allow_auth', 'yes') == 'yes'
-register_interval = config.getOption('Config', 'register_interval', '3600')
-del config
+
+config = {
+	'Main':
+		{
+			'master_host': 'sauerbraten.org',
+			'master_port': 28787,
+			'allow_auth': 'yes',
+			'register_interval': 3600,
+		}
+	}
+
+def init():
+	loadPluginConfig(config, 'MasterClient')
+	config['Main']['allow_auth'] = config['Main']['allow_auth'] == 'yes'
+	config['Main']['master_port'] = int(config['Main']['master_port'])
+	config['Main']['register_interval'] = int(config['Main']['register_interval'])
+
+init()
 
 class AuthRequest(object):
 	def __init__(self, id, cn, name):
@@ -130,9 +141,9 @@ class MasterClientFactory(protocol.ClientFactory):
 		if self.client == None:
 			ip = sbserver.ip()
 			if ip != None:
-				reactor.connectTCP(master_host, int(master_port), self, 30, (sbserver.ip(), sbserver.port()))
+				reactor.connectTCP(config['Main']['master_host'], int(config['Main']['master_port']), self, 30, (sbserver.ip(), sbserver.port()))
 			else:
-				reactor.connectTCP(master_host, int(master_port), self)
+				reactor.connectTCP(config['Main']['master_host'], int(config['Main']['master_port']), self)
 			self.send_buffer.append(data)
 		else:
 			self.client.sendLine(data)
@@ -144,14 +155,15 @@ def registerServer():
 	factory.send('regserv %i' % sbserver.port())
 
 registerRepeater = LoopingCall(registerServer)
-registerRepeater.start(3600)
+registerRepeater.start(config['Main']['register_interval'])
 
 @eventHandler('player_auth_request')
 def authRequest(cn, name):
-	factory.response_handler.responses_needed += 1
-	req = AuthRequest(factory.response_handler.nextAuthId(), cn, name)
-	factory.response_handler.auth_id_map[req.id] = req
-	factory.send('reqauth %i %s' % (req.id, req.name))
+	if config['Main']['allow_auth']:
+		factory.response_handler.responses_needed += 1
+		req = AuthRequest(factory.response_handler.nextAuthId(), cn, name)
+		factory.response_handler.auth_id_map[req.id] = req
+		factory.send('reqauth %i %s' % (req.id, req.name))
 
 @eventHandler('player_auth_challenge_response')
 def authChallengeResponse(cn, id, response):
