@@ -1606,7 +1606,7 @@ namespace server
 		{
 			//disconnect_client(ci->clientnum, DISC_KICK);
 			//instead of kicking the player from here lets add a ban to the db
-			SbPy::triggerEventIntInt("player_kick", -1, ci->clientnum);
+			SbPy::triggerEventIntInt("server_kick", ci->clientnum);
 		}
     	}
     	else
