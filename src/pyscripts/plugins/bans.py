@@ -74,7 +74,6 @@ def onKick(cn, tcn):
 	ban(tcn, 14500, config['Main']['default_reason'], cn)
 	
 @eventHandler('server_kick')
-@masterRequired
 def onKick(cn):
 	ban(cn, 14500, config['Main']['default_reason'], -1)
 
