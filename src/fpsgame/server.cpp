@@ -1595,7 +1595,7 @@ namespace server
     {
         //int recentpacketcount;
         //enet_uint32 lastpackettime;
-        //string msg;
+        string msg;
     
     	if (ci->lastpackettime - curtime < 1)
     	{
