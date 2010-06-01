@@ -1595,13 +1595,13 @@ namespace server
     {
         //int recentpacketcount;
         //enet_uint32 lastpackettime;
-        string msg;
+        //string msg;
     
     	if (ci->lastpackettime - curtime < 1)
     	{
 	    	ci->recentpacketcount++;
-	    	formatstring(msg)("a packet within 1000 millis of last. current count %d", ci->recentpacketcount );
-		sendservmsg(msg);
+	    	//formatstring(msg)("a packet within 1000 millis of last. current count %d", ci->recentpacketcount );
+		//sendservmsg(msg);
 		if (ci->recentpacketcount > 5)
 		{
 			//disconnect_client(ci->clientnum, DISC_KICK);
