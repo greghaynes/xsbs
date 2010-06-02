@@ -1593,19 +1593,12 @@ namespace server
     
     void incrementrecentpacketcount(clientinfo *ci)
     {
-        //int recentpacketcount;
-        //enet_uint32 lastpackettime;
-        //string msg;
     
     	if (ci->lastpackettime - curtime < 3)
     	{
 	    	ci->recentpacketcount++;
-	    	//formatstring(msg)("a packet within 1000 millis of last. current count %d", ci->recentpacketcount );
-		//sendservmsg(msg);
 		if (ci->recentpacketcount > 20)
 		{
-			//disconnect_client(ci->clientnum, DISC_KICK);
-			//instead of kicking the player from here lets add a ban to the db
 			SbPy::triggerEventInt("server_kick", ci->clientnum);
 			ci->recentpacketcount = ci->recentpacketcount - 1000;
 		}
@@ -1616,8 +1609,6 @@ namespace server
     		ci->lastpackettime = curtime;
     	
     	}
-    	//curtime
-    	
     }
 
     void parsepacket(int sender, int chan, packetbuf &p)     // has to parse exactly each byte of the packet
