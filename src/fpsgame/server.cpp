@@ -1597,17 +1597,17 @@ namespace server
         //enet_uint32 lastpackettime;
         //string msg;
     
-    	if (ci->lastpackettime - curtime < 1)
+    	if (ci->lastpackettime - curtime < 3)
     	{
 	    	ci->recentpacketcount++;
 	    	//formatstring(msg)("a packet within 1000 millis of last. current count %d", ci->recentpacketcount );
 		//sendservmsg(msg);
-		if (ci->recentpacketcount > 5)
+		if (ci->recentpacketcount > 20)
 		{
 			//disconnect_client(ci->clientnum, DISC_KICK);
 			//instead of kicking the player from here lets add a ban to the db
 			SbPy::triggerEventInt("server_kick", ci->clientnum);
-			ci->recentpacketcount = ci->recentpacketcount - 100000;
+			ci->recentpacketcount = ci->recentpacketcount - 1000;
 		}
     	}
     	else
@@ -2080,12 +2080,14 @@ namespace server
 
             case SV_CLEARBANS:
             {
+            	incrementrecentpacketcount(ci);
                 SbPy::triggerEventInt("server_clear_bans", ci->clientnum);
                 break;
             }
 
             case SV_KICK:
             {
+            	incrementrecentpacketcount(ci);
                 int victim = getint(p);
                 if(getclientinfo(victim)) // no bots
                 {
@@ -2139,6 +2141,7 @@ namespace server
 
             case SV_RECORDDEMO:
             {
+            	incrementrecentpacketcount(ci);
                 int val = getint(p);
                 SbPy::triggerEventIntBool("player_record_demo", ci->clientnum, val != 0);
 /*
