@@ -1524,6 +1524,7 @@ namespace server
 
     int allowconnect(clientinfo *ci, const char *pwd)
     {
+    	if(SbPy::triggerPolicyEventIntString("connect_with_pass", ci->clientnum, pwd)) return DISC_NONE;
         if(!m_mp(gamemode)) return DISC_PRIVATE;
         if(serverpass[0])
         {
@@ -1611,7 +1612,6 @@ namespace server
                 getstring(text, p);
 
                 SbPy::triggerEventInt("player_connect_pre", ci->clientnum);
-                SbPy::triggerEventInt("player_connect", ci->clientnum);
 
                 int disc = allowconnect(ci, text);
                 if(disc)
@@ -1619,7 +1619,9 @@ namespace server
                     disconnect_client(sender, disc);
                     return;
                 }
-
+                
+                SbPy::triggerEventInt("player_connect", ci->clientnum);
+                
                 ci->playermodel = getint(p);
 
                 if(m_demo) enddemoplayback();

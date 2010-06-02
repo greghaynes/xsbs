@@ -1,7 +1,7 @@
 from elixir import Entity, Field, String, ManyToOne, OneToMany, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-
-from xsbs.events import eventHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
+from privilege import isUserAtLeastMaster
+from xsbs.events import eventHandler, policyHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
 from xsbs.colors import red, green, orange
 from xsbs.ui import info, error, warning
@@ -240,6 +240,27 @@ def onPlayerActive(cn):
 	p.warning_for_login = True
 	p.warn_nickacct = nickacct
 	warnNickReserved(cn, 0, sbserver.playerSessionId(cn))
+	
+@policyHandler('connect_with_pass')
+def connectWithPass(cn, args):
+	p = player(cn)
+	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
+	try:
+		na = NickAccount.query.filter(NickAccount.nick==p.name()).one()
+	except NoResultFound:
+		return False
+	except MultipleResultsFound:
+		p.message(error('Multiple names linked to this account.  Contact the system administrator.'))
+		return False
+	else:
+		nickhash = sbserver.hashPassword(cn, na.user.password)
+		if args == nickhash:
+			login(cn, na.user)
+			user_id = p.user.id
+			if isUserAtLeastMaster:
+				return True
+		else:
+			return False
 
 @eventHandler('player_name_changed')
 def onPlayerNameChanged(cn, old_name, new_name):
