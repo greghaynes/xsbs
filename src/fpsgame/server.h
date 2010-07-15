@@ -220,9 +220,12 @@ namespace server
         string clientmap;
         int mapcrc;
         bool warned, gameclip, active;
+
+	ENetPacket *clipboard;
+	int lastclipboard;
 		
-        clientinfo() { reset(); }
-        ~clientinfo() { events.deletecontentsp(); }
+        clientinfo() : clipboard(NULL) { reset(); }
+        ~clientinfo() { events.deletecontentsp(); cleanclipboard(); }
 		
         void addevent(gameevent *e)
         {
@@ -243,7 +246,7 @@ namespace server
             warned = false;
             gameclip = false;
         }
-		
+
         void reassign()
         {
             state.reassign();
@@ -251,7 +254,13 @@ namespace server
             timesync = false;
             lastevent = 0;
         }
-		
+
+	void cleanclipboard(bool fullclean = true)
+	{
+		if(clipboard) { if(--clipboard->referenceCount <= 0) enet_packet_destroy(clipboard); clipboard = NULL; }
+		if(fullclean) lastclipboard = 0;
+	}
+
         void reset()
         {
             name[0] = team[0] = 0;
@@ -263,6 +272,7 @@ namespace server
             messages.setsizenodelete(0);
             ping = 0;
             aireinit = 0;
+	    cleanclipboard();
             active = false;
             mapchange();
         }
@@ -277,6 +287,7 @@ namespace server
             }
             else return gameoffset + clientmillis;
         }
+
     };
 	
     struct worldstate

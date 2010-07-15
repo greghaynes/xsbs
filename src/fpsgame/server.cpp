@@ -791,11 +791,11 @@ namespace server
         }
     }
 
-    bool sendpackets()
+    bool sendpackets(bool force)
     {
         if(clients.empty() || (!hasnonlocalclients() && !demorecord)) return false;
         enet_uint32 curtime = enet_time_get()-lastsend;
-        if(curtime<33) return false;
+        if(curtime<33 && !force) return false;
         bool flush = buildworldstate();
         lastsend += curtime - (curtime%33);
         return flush;
@@ -1591,6 +1591,21 @@ namespace server
         SbPy::triggerEventInt("player_uploaded_map", sender);
     }
 
+    void sendclipboard(clientinfo *ci)
+    {
+        if(!ci->lastclipboard || !ci->clipboard) return;
+        bool flushed = false;
+        loopv(clients)
+        {
+            clientinfo &e = *clients[i];
+            if(e.clientnum != ci->clientnum && e.connectmillis >= ci->lastclipboard) 
+            {
+                if(!flushed) { flushserver(true); flushed = true; }
+                sendpacket(e.clientnum, 1, ci->clipboard);
+            }
+        }
+    }
+
     void parsepacket(int sender, int chan, packetbuf &p)     // has to parse exactly each byte of the packet
     {
         if(sender<0) return;
@@ -1628,6 +1643,7 @@ namespace server
                 clients.add(ci);
 
                 ci->connected = true;
+		ci->connectmillis = totalmillis;
                 if(mastermode>=MM_LOCKED) ci->state.state = CS_SPECTATOR;
                 if(currentmaster>=0) masterupdate = true;
                 ci->state.lasttimeplayed = lastmillis;
@@ -2146,6 +2162,7 @@ namespace server
                 {
                     sendfile(sender, 2, mapdata, "ri", SV_SENDMAP);
                     SbPy::triggerEventInt("player_get_map", ci->clientnum);
+		    ci->connectmillis = totalmillis;
                 }
                 else sendf(sender, 1, "ris", SV_SERVMSG, "no map to send");
                 break;
@@ -2232,13 +2249,46 @@ namespace server
 				SbPy::triggerEventIntBool("player_pause", ci->clientnum, val != 0);
                 break;
             }
+             case SV_COPY:
+                ci->cleanclipboard();
+                ci->lastclipboard = totalmillis;
+                goto genericmsg;
+
+            case SV_PASTE:
+                if(ci->state.state!=CS_SPECTATOR) sendclipboard(ci);
+                goto genericmsg;
+    
+            case SV_CLIPBOARD:
+            {
+                int unpacklen = getint(p), packlen = getint(p); 
+                ci->cleanclipboard(false);
+                if(ci->state.state==CS_SPECTATOR)
+                {
+                    if(packlen > 0) p.subbuf(packlen);
+                    break;
+                }
+                if(packlen <= 0 || packlen > (1<<16) || unpacklen <= 0) 
+                {
+                    if(packlen > 0) p.subbuf(packlen);
+                    packlen = unpacklen = 0;
+                }
+                packetbuf q(32 + packlen, ENET_PACKET_FLAG_RELIABLE);
+                putint(q, SV_CLIPBOARD);
+                putint(q, ci->clientnum);
+                putint(q, unpacklen);
+                putint(q, packlen); 
+                if(packlen > 0) p.get(q.subbuf(packlen).buf, packlen);
+                ci->clipboard = q.finalize();
+                ci->clipboard->referenceCount++;
+                break;
+            } 
 
             #define PARSEMESSAGES 1
             #include "capture.h"
             #include "ctf.h"
             #undef PARSEMESSAGES
 
-            default:
+            default: genericmsg:
             {
                 int size = server::msgsizelookup(type);
                 if(size==-1) { disconnect_client(sender, DISC_TAGT); return; }
