@@ -487,12 +487,11 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
        
     // below is network only
 
-    if(dedicated) 
-    {
-        int millis = (int)enet_time_get();
-        curtime = millis - totalmillis;
-        lastmillis = totalmillis = millis;
-    }
+    int millis = (int)enet_time_get();
+    curtime = server::ispaused() ? 0 : millis - totalmillis;
+    totalmillis = millis;
+    lastmillis += curtime;
+        
     server::serverupdate();
 
     //flushmasteroutput();
