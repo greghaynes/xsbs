@@ -39,6 +39,7 @@ void conoutfv(int type, const char *fmt, va_list args)
     string sf, sp;
     vformatstring(sf, fmt, args);
     filtertext(sp, sf);
+    puts(sp);
 
     if(Py_IsInitialized())
     {
@@ -210,7 +211,6 @@ struct client                   // server side version of "dynent" type
 vector<client *> clients;
 
 ENetHost *serverhost = NULL;
-size_t bsend = 0, brec = 0;
 int laststatus = 0;
 ENetSocket pongsock = ENET_SOCKET_NULL, lansock = ENET_SOCKET_NULL;
 
@@ -245,7 +245,6 @@ void sendpacket(int n, int chan, ENetPacket *packet, int exclude)
         case ST_TCPIP:
         {
             enet_peer_send(clients[n]->peer, chan, packet);
-            bsend += packet->dataLength;
             break;
         }
 
@@ -262,8 +261,7 @@ void sendf(int cn, int chan, const char *format, ...)
     int exclude = -1;
     bool reliable = false;
     if(*format=='r') { reliable = true; ++format; }
-    ENetPacket *packet = enet_packet_create(NULL, MAXTRANS, reliable ? ENET_PACKET_FLAG_RELIABLE : 0);
-    ucharbuf p(packet->data, packet->dataLength);
+    packetbuf p(MAXTRANS, reliable ? ENET_PACKET_FLAG_RELIABLE : 0);
     va_list args;
     va_start(args, format);
     while(*format) switch(*format++)
@@ -296,17 +294,12 @@ void sendf(int cn, int chan, const char *format, ...)
         case 'm':
         {
             int n = va_arg(args, int);
-            enet_packet_resize(packet, packet->dataLength+n);
-            p.buf = packet->data;
-            p.maxlen += n;
             p.put(va_arg(args, uchar *), n);
             break;
         }
     }
     va_end(args);
-    enet_packet_resize(packet, p.length());
-    sendpacket(cn, chan, packet, exclude);
-    if(packet->referenceCount==0) enet_packet_destroy(packet);
+    sendpacket(cn, chan, p.finalize(), exclude);
 }
 
 void sendfile(int cn, int chan, stream *file, const char *format, ...)
@@ -322,11 +315,7 @@ void sendfile(int cn, int chan, stream *file, const char *format, ...)
     int len = file->size();
     if(len <= 0) return;
 
-    bool reliable = false;
-    if(*format=='r') { reliable = true; ++format; }
-    ENetPacket *packet = enet_packet_create(NULL, MAXTRANS+len, ENET_PACKET_FLAG_RELIABLE);
-
-    ucharbuf p(packet->data, packet->dataLength);
+    packetbuf p(MAXTRANS+len, ENET_PACKET_FLAG_RELIABLE);
     va_list args;
     va_start(args, format);
     while(*format) switch(*format++)
@@ -341,24 +330,21 @@ void sendfile(int cn, int chan, stream *file, const char *format, ...)
         case 'l': putint(p, len); break;
     }
     va_end(args);
-    enet_packet_resize(packet, p.length()+len);
 
     file->seek(0, SEEK_SET);
-    file->read(&packet->data[p.length()], len);
-    enet_packet_resize(packet, p.length()+len);
+    file->read(p.subbuf(len).buf, len);
 
+    ENetPacket *packet = p.finalize();
     if(cn >= 0) sendpacket(cn, chan, packet, -1);
 #ifndef STANDALONE
     else sendclientpacket(packet, chan);
 #endif
-    if(!packet->referenceCount) enet_packet_destroy(packet);
 }
-
-const char *disc_reasons[] = { "normal", "end of packet", "client num", "kicked/banned", "tag type", "ip is banned", "server is in private mode", "server FULL (maxclients)", "connection timed out", "overflow" };
+const char *disc_reasons[] = { "normal", "end of packet", "client num", "kicked/banned", "tag type", "ip is banned", "server is in private mode", "server FULL", "connection timed out", "overflow" };
 
 void disconnect_client(int n, int reason)
 {
-    if(clients[n]->type!=ST_TCPIP) return;
+    if(!clients.inrange(n) || clients[n]->type!=ST_TCPIP) return;
     //SbPy::triggerEventInt("player_disconnect", n);
     //SbPy::triggerEventInt("player_disconnect_post", n);
     enet_peer_disconnect(clients[n]->peer, reason);
@@ -548,6 +534,7 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
                 c.peer->data = &c;
                 char hn[1024];
                 copystring(c.hostname, (enet_address_get_host_ip(&c.peer->address, hn, sizeof(hn))==0) ? hn : "unknown");
+                printf("client connected (%s)\n", c.hostname);
                 int reason = server::clientconnect(c.num, c.peer->address.host);
                 if(!reason) nonlocalclients++;
                 else disconnect_client(c.num, reason);
@@ -555,16 +542,16 @@ void serverslice(bool dedicated, uint timeout)   // main server update, called f
             }
             case ENET_EVENT_TYPE_RECEIVE:
             {
-                brec += event.packet->dataLength;
                 client *c = (client *)event.peer->data;
                 if(c) process(event.packet, c->num, event.channelID);
                 if(event.packet->referenceCount==0) enet_packet_destroy(event.packet);
                 break;
             }
-            case ENET_EVENT_TYPE_DISCONNECT: 
+            case ENET_EVENT_TYPE_DISCONNECT:
             {
                 client *c = (client *)event.peer->data;
                 if(!c) break;
+                printf("disconnected client (%s)\n", c->hostname);
                 server::clientdisconnect(c->num);
                 nonlocalclients--;
                 c->type = ST_EMPTY;
