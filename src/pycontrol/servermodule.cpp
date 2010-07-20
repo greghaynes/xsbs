@@ -197,7 +197,7 @@ static PyObject *playerMessage(PyObject *self, PyObject *args)
 		PyErr_SetString(PyExc_ValueError, "Cannot send message to AI client");
 		return 0;
 	}
-	sendf(cn, 1, "ris", SV_SERVMSG, text);
+	sendf(cn, 1, "ris", N_SERVMSG, text);
 	Py_INCREF(Py_None);
 	return Py_None;
 }
@@ -520,7 +520,7 @@ static PyObject *setBotLimit(PyObject *self, PyObject *args)
 		return 0;
 	}
 	if(!ci->local && ci->privilege < PRIV_ADMIN)
-		sendf(cn, 1, "ris", SV_SERVMSG, "Insufficient permissions to add bot.");
+		sendf(cn, 1, "ris", N_SERVMSG, "Insufficient permissions to add bot.");
 	else
 		server::aiman::setbotlimit(ci, limit);
 	Py_INCREF(Py_None);
