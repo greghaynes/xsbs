@@ -32,7 +32,7 @@ namespace server
 
     bool notgotitems = true;        // true when map has changed and waiting for clients to send item
     int gamemode = 0;
-    int gamemillis = 0, gamelimit = 0;
+    int gamemillis = 0, gamelimit = 0, nextexceeded = 0;
     bool gamepaused = false;
 
     string smapname = "";
@@ -130,7 +130,7 @@ namespace server
 
     void resetitems()
     {
-        sents.setsize(0);
+        sents.shrink(0);
         //cps.reset();
     }
 
@@ -207,12 +207,28 @@ namespace server
             case I_CARTRIDGES: sec = np*4; break;
             case I_HEALTH: sec = np*5; break;
             case I_GREENARMOUR:
-            case I_YELLOWARMOUR: sec = 20; break;
+            case I_YELLOWARMOUR: sec = 20+rnd(10); break;
             case I_BOOST:
             case I_QUAD: sec = 40+rnd(40); break;
         }
         return sec*1000;
     }
+
+    bool delayspawn(int type)
+    {
+        switch(type)
+        {
+            case I_GREENARMOUR:
+            case I_YELLOWARMOUR:
+                return !m_classicsp;
+            case I_BOOST:
+            case I_QUAD:
+                return true;
+            default:
+                return false;
+        }
+    }
+
 
     bool pickup(int i, int sender)         // server side item pickup, acknowledge first client that gets it
     {
@@ -670,7 +686,7 @@ namespace server
         // only allow edit messages in coop-edit mode
         if(type>=N_EDITENT && type<=N_EDITVAR && !m_edit) return -1;
         // server only messages
-        static int servtypes[] = { N_SERVINFO, N_INITCLIENT, N_WELCOME, N_MAPRELOAD, N_SERVMSG, N_DAMAGE, N_HITPUSH, N_SHOTFX, N_DIED, N_SPAWNSTATE, N_FORCEDEATH, N_ITEMACC, N_ITEMSPAWN, N_TIMEUP, N_CDIS, N_CURRENTMASTER, N_PONG, N_RESUME, N_BASESCORE, N_BASEINFO, N_BASEREGEN, N_ANNOUNCE, N_SENDDEMOLIST, N_SENDDEMO, N_DEMOPLAYBACK, N_SENDMAP, N_DROPFLAG, N_SCOREFLAG, N_RETURNFLAG, N_RESETFLAG, N_INVISFLAG, N_CLIENT, N_AUTHCHAL, N_INITAI };
+        static const int servtypes[] = { N_SERVINFO, N_INITCLIENT, N_WELCOME, N_MAPRELOAD, N_SERVMSG, N_DAMAGE, N_HITPUSH, N_SHOTFX, N_EXPLODEFX, N_DIED, N_SPAWNSTATE, N_FORCEDEATH, N_ITEMACC, N_ITEMSPAWN, N_TIMEUP, N_CDIS, N_CURRENTMASTER, N_PONG, N_RESUME, N_BASESCORE, N_BASEINFO, N_BASEREGEN, N_ANNOUNCE, N_SENDDEMOLIST, N_SENDDEMO, N_DEMOPLAYBACK, N_SENDMAP, N_DROPFLAG, N_SCOREFLAG, N_RETURNFLAG, N_RESETFLAG, N_INVISFLAG, N_CLIENT, N_AUTHCHAL, N_INITAI };
         if(ci)
         {
              loopi(sizeof(servtypes)/sizeof(int)) if(type == servtypes[i]) return -1;
@@ -706,7 +722,7 @@ namespace server
             ci.posoff = ws.positions.length();
             loopvj(ci.position) ws.positions.add(ci.position[j]);
             ci.poslen = ws.positions.length() - ci.posoff;
-            ci.position.setsizenodelete(0);
+            ci.position.setsize(0);
         }
         if(ci.messages.empty()) ci.msgoff = -1;
         else
@@ -719,7 +735,7 @@ namespace server
             ws.messages.addbuf(p);
             loopvj(ci.messages) ws.messages.add(ci.messages[j]);
             ci.msglen = ws.messages.length() - ci.msgoff;
-            ci.messages.setsizenodelete(0);
+            ci.messages.setsize(0);
         }
     }
 
@@ -918,6 +934,7 @@ namespace server
             putint(p, N_SETTEAM);
             putint(p, ci->clientnum);
             sendstring(ci->team, p);
+            putint(p, -1);
         }
         if(ci && (m_demo || m_mp(gamemode)) && ci->state.state!=CS_SPECTATOR)
         {
@@ -955,6 +972,7 @@ namespace server
                 putint(p, oi->clientnum);
                 putint(p, oi->state.state);
                 putint(p, oi->state.frags);
+                putint(p, oi->state.flags);
                 putint(p, oi->state.quadmillis);
                 sendstate(oi->state, p);
             }
@@ -1133,7 +1151,7 @@ namespace server
                 actor->state.effectiveness += fragvalue*friends/float(max(enemies, 1));
             }
             sendf(-1, 1, "ri4", N_DIED, target->clientnum, actor->clientnum, actor->state.frags);
-            target->position.setsizenodelete(0);
+            target->position.setsize(0);
             if(smode) smode->died(target, actor);
             ts.state = CS_DEAD;
             ts.lastdeath = gamemillis;
@@ -1150,7 +1168,7 @@ namespace server
         ci->state.frags += smode ? smode->fragvalue(ci, ci) : -1;
         ci->state.deaths++;
         sendf(-1, 1, "ri4", N_DIED, ci->clientnum, ci->clientnum, gs.frags);
-        ci->position.setsizenodelete(0);
+        ci->position.setsize(0);
         if(smode) smode->died(ci, NULL);
         gs.state = CS_DEAD;
         gs.respawn();
@@ -1709,7 +1727,7 @@ namespace server
                 {
                     if((!ci->local || demorecord || hasnonlocalclients()) && (cp->state.state==CS_ALIVE || cp->state.state==CS_EDITING))
                     {
-                        cp->position.setsizenodelete(0);
+                        cp->position.setsize(0);
                         while(curmsg<p.length()) cp->position.add(p.buf[curmsg++]);
                     }
                     if(cp->state.state == CS_ALIVE)
@@ -1753,7 +1771,7 @@ namespace server
                 {
                     ci->state.editstate = ci->state.state;
                     ci->state.state = CS_EDITING;
-                    ci->events.setsizenodelete(0);
+                    ci->events.setsize(0);
                     ci->state.rockets.reset();
                     ci->state.grenades.reset();
                 }
@@ -1997,7 +2015,7 @@ namespace server
                     sents[n].type = getint(p);
                     if(canspawnitem(sents[n].type))
                     {
-                        if(m_mp(gamemode) && (sents[n].type==I_QUAD || sents[n].type==I_BOOST)) sents[n].spawntime = spawntime(sents[n].type);
+                        if(m_mp(gamemode) && delayspawn(sents[n].type)) sents[n].spawntime = spawntime(sents[n].type);
                         else sents[n].spawned = true;
                     }
                 }
