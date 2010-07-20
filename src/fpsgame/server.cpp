@@ -161,10 +161,14 @@ namespace server
         return true;
     }
 
-    int numclients(int exclude, bool nospec, bool noai)
+    int numclients(int exclude, bool nospec, bool noai, bool priv)
     {
         int n = 0;
-        loopv(clients) if(i!=exclude && (!nospec || clients[i]->state.state!=CS_SPECTATOR) && (!noai || clients[i]->state.aitype == AI_NONE)) n++;
+        loopv(clients)
+        {
+           clientinfo *ci = clients[i];
+           if(i!=exclude && (!nospec || ci->state.state!=CS_SPECTATOR || (priv && (ci->privilege || ci->local))) && (!noai || ci->state.aitype == AI_NONE)) n++;
+        }
         return n;
     }
 
@@ -872,7 +876,7 @@ namespace server
 
     int welcomepacket(packetbuf &p, clientinfo *ci)
     {
-        int hasmap = (m_edit && (clients.length()>1 || (ci && ci->local))) || (smapname[0] && (gamemillis<gamelimit || (ci && ci->state.state==CS_SPECTATOR) || numclients(ci && ci->local ? ci->clientnum : -1)));
+        int hasmap = (m_edit && (clients.length()>1 || (ci && ci->local))) || (smapname[0] && (gamemillis<gamelimit || (ci && ci->state.state==CS_SPECTATOR && !ci->privilege && !ci->local) || numclients(ci ? ci->clientnum : -1, true, true, true)));
         putint(p, N_WELCOME);
         putint(p, hasmap);
         if(hasmap)
@@ -1451,6 +1455,7 @@ namespace server
          else
              return false;
          sendf(-1, 1, "ri3", N_SPECTATOR, spectator, val);
+         if(!val && mapreload && !spinfo->privilege && !spinfo->local) sendf(spectator, 1, "ri", N_MAPRELOAD);
 	 if(spectated)
             SbPy::triggerEventInt("player_spectated", spinfo->clientnum);
 	 else if(unspectated)
