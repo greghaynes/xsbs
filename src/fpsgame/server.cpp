@@ -1911,6 +1911,7 @@ namespace server
                     hitinfo &hit = shot->hits.add();
                     hit.target = getint(p);
                     hit.lifesequence = getint(p);
+                    hit.dist = getint(p)/DMF;
                     hit.rays = getint(p);
                     loopk(3) hit.dir[k] = getint(p)/DNF;
                 }
