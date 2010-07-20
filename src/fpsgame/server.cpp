@@ -1250,7 +1250,6 @@ namespace server
                 int(to.x*DMF), int(to.y*DMF), int(to.z*DMF),
                 ci->ownernum);
         gs.shotdamage += guns[gun].damage*(gs.quadmillis ? 4 : 1)*(gun==GUN_SG ? SGRAYS : 1);
-        gs.shots++;
         switch(gun)
         {
             case GUN_RL: gs.rockets.add(id); break;
@@ -1263,8 +1262,6 @@ namespace server
                     hitinfo &h = hits[i];
                     clientinfo *target = getinfo(h.target);
                     if(!target || target->state.state!=CS_ALIVE || h.lifesequence!=target->state.lifesequence || h.rays<1 || h.dist > guns[gun].range + 1) continue;
-
-                    gs.hits += (ci != target ? 1 : 0);
 
                     totalrays += h.rays;
                     if(totalrays>maxrays) continue;
@@ -1346,6 +1343,8 @@ namespace server
         while(ci->events.length() > keep) delete ci->events.pop();
         ci->timesync = false;
     }
+
+    bool ispaused() { return gamepaused; }
 
     void serverupdate()
     {
@@ -1959,15 +1958,11 @@ namespace server
 
             case N_TEXT:
             {
+                QUEUE_AI;
+                QUEUE_MSG;
                 getstring(text, p);
                 filtertext(text, text);
-                if(SbPy::triggerPolicyEventIntString("allow_message", ci->clientnum, text))
-                {
-                    SbPy::triggerEventIntString("player_message", ci->clientnum, text);
-                    QUEUE_AI;
-                    QUEUE_MSG;
-                    QUEUE_STR(text);
-                }
+                QUEUE_STR(text);
                 break;
             }
 
