@@ -1720,8 +1720,8 @@ namespace server
         {
             case N_POS:
             {
-                int pcn = getuint(p); 
-                p.get(); 
+                int pcn = getuint(p);
+                p.get();
                 uint flags = getuint(p);
                 clientinfo *cp = getinfo(pcn);
                 if(cp && pcn != sender && cp->ownernum != sender) cp = NULL;
@@ -1742,20 +1742,14 @@ namespace server
                 }
                 if(cp)
                 {
+                    if(!ci->local && !m_edit && max(vel.magnitude2(), (float)fabs(vel.z)) >= 180)
+                        cp->setexceeded();
                     if((!ci->local || demorecord || hasnonlocalclients()) && (cp->state.state==CS_ALIVE || cp->state.state==CS_EDITING))
                     {
                         cp->position.setsize(0);
                         while(curmsg<p.length()) cp->position.add(p.buf[curmsg++]);
                     }
-                    if(cp->state.state == CS_ALIVE)
-                    {
-                        if(!cp->active)
-                        {
-                            cp->active = true;
-                            SbPy::triggerEventInt("player_active", cp->clientnum);
-                        }
-                        if(smode) smode->moved(cp, cp->state.o, cp->gameclip, pos, (flags&0x80)!=0);
-                    }
+                    if(smode && cp->state.state==CS_ALIVE) smode->moved(cp, cp->state.o, cp->gameclip, pos, (flags&0x80)!=0);
                     cp->state.o = pos;
                     cp->gameclip = (flags&0x80)!=0;
                 }
@@ -1882,6 +1876,7 @@ namespace server
                 cq->state.lastspawn = -1;
                 cq->state.state = CS_ALIVE;
                 cq->state.gunselect = gunselect;
+                cq->exceeded = 0;
                 if(smode) smode->spawned(cq);
                 QUEUE_AI;
                 QUEUE_BUF({
@@ -1943,6 +1938,7 @@ namespace server
                     hit.target = getint(p);
                     hit.lifesequence = getint(p);
                     hit.dist = getint(p)/DMF;
+                    hit.rays = getint(p);
                     loopk(3) hit.dir[k] = getint(p)/DNF;
                 }
                 if(cq) cq->addevent(exp);
@@ -2038,7 +2034,7 @@ namespace server
             case N_MAPCHANGE:
             {
                 getstring(text, p);
-                filtertext(text, text);
+                filtertext(text, text, false);
                 int reqmode = getint(p);
                 if(type==N_MAPVOTE)
                     SbPy::triggerEventIntStringInt("player_map_vote", sender, text, reqmode);
