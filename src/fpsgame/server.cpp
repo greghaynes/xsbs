@@ -1061,6 +1061,7 @@ namespace server
         {
             loopv(clients) allowedips.add(getclientip(clients[i]->clientnum));
         }
+        sendf(-1, 1, "rii", N_MASTERMODE, mastermode);
         SbPy::triggerEventInt("server_mastermode_changed", mastermode);
     }
 
