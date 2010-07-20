@@ -1958,11 +1958,15 @@ namespace server
 
             case N_TEXT:
             {
-                QUEUE_AI;
-                QUEUE_MSG;
                 getstring(text, p);
                 filtertext(text, text);
-                QUEUE_STR(text);
+                if(SbPy::triggerPolicyEventIntString("allow_message", ci->clientnum, text))
+                {  
+                   QUEUE_AI;
+                   QUEUE_INT(N_TEXT);
+                   QUEUE_STR(text);
+                   SbPy::triggerEventIntString("player_message", ci->clientnum, text);
+                }
                 break;
             }
 
