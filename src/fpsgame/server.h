@@ -11,6 +11,7 @@
 
 namespace server
 {
+    extern int nextexceeded, gamemillis;
 
     struct server_entity            // server side version of "entity" type
     {
@@ -199,7 +200,7 @@ namespace server
             gs.effectiveness = effectiveness;
         }
     };
-	
+
     struct clientinfo
     {
         int clientnum, ownernum, connectmillis, sessionid, overflow;
@@ -207,8 +208,8 @@ namespace server
         int playermodel;
         int modevote;
         int privilege;
-        bool connected, local, timesync;
-        int gameoffset, lastevent;
+        bool connected, local, timesync, active;
+        int gameoffset, lastevent, pushed, exceeded;
         gamestate state;
         vector<gameevent *> events;
         vector<uchar> position, messages;
@@ -219,20 +220,59 @@ namespace server
         int ping, aireinit;
         string clientmap;
         int mapcrc;
-        bool warned, gameclip, active;
+        bool warned, gameclip;
+        ENetPacket *clipboard;
+        int lastclipboard, needclipboard;
 
-	ENetPacket *clipboard;
-	int lastclipboard;
-		
         clientinfo() : clipboard(NULL) { reset(); }
         ~clientinfo() { events.deletecontents(); cleanclipboard(); }
-		
+
         void addevent(gameevent *e)
         {
             if(state.state==CS_SPECTATOR || events.length()>100) delete e;
             else events.add(e);
         }
-		
+
+        enum
+        {
+            PUSHMILLIS = 2500
+        };
+
+        int calcpushrange()
+        {
+            ENetPeer *peer = getclientpeer(ownernum);
+            return PUSHMILLIS + (peer ? peer->roundTripTime + peer->roundTripTimeVariance : ENET_PEER_DEFAULT_ROUND_TRIP_TIME);
+        }
+
+        bool checkpushed(int millis, int range)
+        {
+            return millis >= pushed - range && millis <= pushed + range;
+        }
+
+        void scheduleexceeded()
+        {
+            if(state.state!=CS_ALIVE || !exceeded) return;
+            int range = calcpushrange();
+            if(!nextexceeded || exceeded + range < nextexceeded) nextexceeded = exceeded + range;
+        }
+
+        void setexceeded()
+        {
+            if(state.state==CS_ALIVE && !exceeded && !checkpushed(gamemillis, calcpushrange())) exceeded = gamemillis;
+            scheduleexceeded(); 
+        }
+            
+        void setpushed()
+        {
+            pushed = max(pushed, gamemillis);
+            if(exceeded && checkpushed(exceeded, calcpushrange())) exceeded = 0;
+        }
+        
+        bool checkexceeded()
+        {
+            return state.state==CS_ALIVE && exceeded && gamemillis > exceeded + calcpushrange();
+        }
+
         void mapchange()
         {
             mapvote[0] = 0;
@@ -241,6 +281,8 @@ namespace server
             overflow = 0;
             timesync = false;
             lastevent = 0;
+            exceeded = 0;
+            pushed = 0;
             clientmap[0] = '\0';
             mapcrc = 0;
             warned = false;
@@ -255,11 +297,11 @@ namespace server
             lastevent = 0;
         }
 
-	void cleanclipboard(bool fullclean = true)
-	{
-		if(clipboard) { if(--clipboard->referenceCount <= 0) enet_packet_destroy(clipboard); clipboard = NULL; }
-		if(fullclean) lastclipboard = 0;
-	}
+        void cleanclipboard(bool fullclean = true)
+        {
+            if(clipboard) { if(--clipboard->referenceCount <= 0) enet_packet_destroy(clipboard); clipboard = NULL; }
+            if(fullclean) lastclipboard = 0;
+        }
 
         void reset()
         {
@@ -272,11 +314,11 @@ namespace server
             messages.setsize(0);
             ping = 0;
             aireinit = 0;
-	    cleanclipboard();
-            active = false;
+            needclipboard = 0;
+            cleanclipboard();
             mapchange();
         }
-		
+
         int geteventmillis(int servmillis, int clientmillis)
         {
             if(!timesync || (events.empty() && state.waitexpired(servmillis)))
@@ -287,9 +329,8 @@ namespace server
             }
             else return gameoffset + clientmillis;
         }
-
     };
-	
+
     struct worldstate
     {
         int uses;
@@ -343,6 +384,7 @@ namespace server
 
 	extern int gamelimit;
 	extern int gamemillis;
+	extern int nextexceeded;
 	extern vector<clientinfo *> connects, clients, bots;
 	extern int mastermode;
 	extern int mastermask;

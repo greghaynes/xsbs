@@ -1853,7 +1853,7 @@ namespace server
                 QUEUE_BUF(100,
                 {
                     putint(buf, N_SPAWN);
-                    sendstate(cq->state, buf);
+                    sendstate(cq->state, cm->messages);
                 });
                 break;
             }
@@ -1886,7 +1886,11 @@ namespace server
                     hit.rays = getint(p);
                     loopk(3) hit.dir[k] = getint(p)/DNF;
                 }
-                if(cq) cq->addevent(shot);
+                if(cq)
+                {
+                    cq->addevent(shot);
+                    cq->setpushed();
+                }
                 else delete shot;
                 break;
             }
@@ -2326,9 +2330,8 @@ namespace server
             default: genericmsg:
             {
                 int size = server::msgsizelookup(type);
-                if(size==-1) { disconnect_client(sender, DISC_TAGT); return; }
-                if(size==-2) { disconnect_client(sender, DISC_OVERFLOW); return; }
-                if(size>0) loopi(size-1) getint(p);
+                if(size<=0) { disconnect_client(sender, DISC_TAGT); return; }
+                loopi(size-1) getint(p);
                 if(ci && cq && (ci != cq || ci->state.state!=CS_SPECTATOR)) { QUEUE_AI; QUEUE_MSG; }
                 break;
             }
