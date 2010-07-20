@@ -58,6 +58,7 @@ static inline void putint_(T &p, int n)
 }
 void putint(ucharbuf &p, int n) { putint_(p, n); }
 void putint(packetbuf &p, int n) { putint_(p, n); }
+void putint(vector<uchar> &p, int n) { putint_(p, n); }
 
 int getint(ucharbuf &p)
 {
@@ -93,6 +94,7 @@ static inline void putuint_(T &p, int n)
 }
 void putuint(ucharbuf &p, int n) { putuint_(p, n); }
 void putuint(packetbuf &p, int n) { putuint_(p, n); }
+void putuint(vector<uchar> &p, int n) { putuint_(p, n); }
 
 int getuint(ucharbuf &p)
 {
