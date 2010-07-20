@@ -745,7 +745,7 @@ struct captureservmode : servmode
 
     void movebases(const char *team, const vec &oldpos, bool oldclip, const vec &newpos, bool newclip)
     {
-        if(!team[0] || minremain<=0) return;
+        if(!team[0] || gamemillis>=gamelimit) return;
         loopv(bases)
         {
             baseinfo &b = bases[i];
@@ -810,7 +810,7 @@ struct captureservmode : servmode
 
     void update()
     {
-        if(minremain<=0) return;
+        if(gamemillis>=gamelimit) return;
         endcheck();
         int t = gamemillis/1000 - (gamemillis-curtime)/1000;
         if(t<1) return;

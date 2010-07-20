@@ -341,6 +341,7 @@ namespace server
 		int len;
 	};
 
+	extern int gamelimit;
 	extern int gamemillis;
 	extern vector<clientinfo *> connects, clients, bots;
 	extern int mastermode;
@@ -352,7 +353,6 @@ namespace server
 	extern int gamemode;
 	extern bool gamepaused;
 	extern bool allow_modevote;
-	extern int minremain;
 	extern int port;
 	extern bool demonextmatch;
 	extern vector<demofile> demos;

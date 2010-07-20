@@ -783,7 +783,7 @@ static PyObject *serverPassword(PyObject *self, PyObject *args)
 
 static PyObject *minRemain(PyObject *self, PyObject *args)
 {
-	return Py_BuildValue("i", server::minremain);
+	return Py_BuildValue("i", max((server::gamelimit - server::gamemillis)/1000, 0));
 }
 
 static PyObject *setTeam(PyObject *self, PyObject *args)

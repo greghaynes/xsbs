@@ -37,7 +37,7 @@ namespace server
     bool gamepaused = false;
 
     string smapname = "";
-    int interm = 0, minremain = 0;
+    int interm = 0;
     bool mapreload = false;
     enet_uint32 lastsend = 0;
     int mastermode = MM_OPEN, mastermask = MM_PRIVSERV;
@@ -213,7 +213,7 @@ namespace server
 
     bool pickup(int i, int sender)         // server side item pickup, acknowledge first client that gets it
     {
-        if(minremain<=0 || !sents.inrange(i) || !sents[i].spawned) return false;
+        if(gamemillis>=gamelimit || !sents.inrange(i) || !sents[i].spawned) return false;
         clientinfo *ci = getinfo(sender);
         if(!ci || (!ci->local && !ci->state.canpickup(sents[i].type))) return false;
         sents[i].spawned = false;
@@ -872,7 +872,7 @@ namespace server
 
     int welcomepacket(packetbuf &p, clientinfo *ci)
     {
-        int hasmap = (m_edit && (clients.length()>1 || (ci && ci->local))) || (smapname[0] && (minremain>0 || (ci && ci->state.state==CS_SPECTATOR) || numclients(ci && ci->local ? ci->clientnum : -1)));
+        int hasmap = (m_edit && (clients.length()>1 || (ci && ci->local))) || (smapname[0] && (gamemillis<gamelimit || (ci && ci->state.state==CS_SPECTATOR) || numclients(ci && ci->local ? ci->clientnum : -1)));
         putint(p, N_WELCOME);
         putint(p, hasmap);
         if(hasmap)
@@ -884,7 +884,7 @@ namespace server
             if(!ci || (m_timed && smapname[0]))
             {
                 putint(p, N_TIMEUP);
-                putint(p, minremain);
+                putint(p, max((gamelimit - gamemillis)/1000, 0));
             }
             if(!notgotitems)
             {
@@ -1002,8 +1002,7 @@ namespace server
         mapreload = false;
         gamemode = mode;
         gamemillis = 0;
-        minremain = m_overtime ? 15 : 10;
-        gamelimit = minremain*60000;
+        gamelimit = (m_overtime ? 15 : 10)*60000;
         interm = 0;
         copystring(smapname, s);
         resetitems();
@@ -1024,7 +1023,7 @@ namespace server
         else smode = NULL;
         if(smode) smode->reset(false);
 
-        if(m_timed && smapname[0]) sendf(-1, 1, "ri2", N_TIMEUP, minremain);
+        if(m_timed && smapname[0]) sendf(-1, 1, "ri2", N_TIMEUP, max((gamelimit - gamemillis)/1000, 0));
         loopv(clients)
         {
             clientinfo *ci = clients[i];
@@ -1089,16 +1088,11 @@ namespace server
 
     void checkintermission()
     {
-        if(minremain>0)
+        if(gamemillis >= gamelimit && !interm)
         {
-            minremain = gamemillis>=gamelimit ? 0 : (gamelimit - gamemillis + 60000 - 1)/60000;
-            sendf(-1, 1, "ri2", N_TIMEUP, minremain);
-            if(!minremain && smode) smode->intermission();
-        }
-        if(!interm && minremain<=0)
-        {
-            SbPy::triggerEvent("intermission_begin", 0);
-            interm = gamemillis+10000;
+            sendf(-1, 1, "ri2", N_TIMEUP, 0);
+            if(smode) smode->intermission();
+            interm = gamemillis + 10000;
         }
     }
 
@@ -1318,7 +1312,7 @@ namespace server
         if(!gamepaused) gamemillis += curtime;
 
         if(m_demo) readdemo();
-        else if(!gamepaused && minremain>0)
+        else if(!gamepaused && gamemillis < gamelimit)
         {
             processevents();
             if(curtime)
@@ -2329,9 +2323,9 @@ namespace server
 
         putint(p, numclients(-1, false, true));
         putint(p, 5);                   // number of attrs following
-        putint(p, PROTOCOL_VERSION);    // a // generic attributes, passed back below
-        putint(p, gamemode);            // b
-        putint(p, minremain);           // c
+        putint(p, PROTOCOL_VERSION);    // generic attributes, passed back below
+        putint(p, gamemode);
+        putint(p, max((gamelimit - gamemillis)/1000, 0));
         putint(p, maxclients);
         putint(p, serverpass[0] ? MM_PASSWORD : (!m_mp(gamemode) ? MM_PRIVATE : (mastermode || mastermask&MM_AUTOAPPROVE ? mastermode : MM_AUTH)));
         sendstring(smapname, p);
