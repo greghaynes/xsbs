@@ -225,7 +225,7 @@ namespace server
 	int lastclipboard;
 		
         clientinfo() : clipboard(NULL) { reset(); }
-        ~clientinfo() { events.deletecontentsp(); cleanclipboard(); }
+        ~clientinfo() { events.deletecontents(); cleanclipboard(); }
 		
         void addevent(gameevent *e)
         {
@@ -237,7 +237,7 @@ namespace server
         {
             mapvote[0] = 0;
             state.reset();
-            events.deletecontentsp();
+            events.deletecontents();
             overflow = 0;
             timesync = false;
             lastevent = 0;
@@ -250,7 +250,7 @@ namespace server
         void reassign()
         {
             state.reassign();
-            events.deletecontentsp();
+            events.deletecontents();
             timesync = false;
             lastevent = 0;
         }
@@ -268,8 +268,8 @@ namespace server
             privilege = PRIV_NONE;
             connected = local = false;
             authreq = 0;
-            position.setsizenodelete(0);
-            messages.setsizenodelete(0);
+            position.setsize(0);
+            messages.setsize(0);
             ping = 0;
             aireinit = 0;
 	    cleanclipboard();

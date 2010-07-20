@@ -304,7 +304,7 @@ void parsemacro(const char *&p, int level, vector<char> &wordbuf)
         return;
     }
     static vector<char> ident;
-    ident.setsizenodelete(0);
+    ident.setsize(0);
     while(isalnum(*p) || *p=='_') ident.add(*p++);
     ident.add(0);
     const char *alias = getalias(ident.getbuf());
