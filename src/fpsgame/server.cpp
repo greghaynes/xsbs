@@ -338,7 +338,7 @@ namespace server
                 clientinfo *ci = team[i][j];
                 if(!strcmp(ci->team, teamnames[i])) continue;
                 copystring(ci->team, teamnames[i], MAXTEAMLEN+1);
-                sendf(-1, 1, "riis", N_SETTEAM, ci->clientnum, teamnames[i]);
+                sendf(-1, 1, "riisi", N_SETTEAM, ci->clientnum, teamnames[i], -1);
             }
         }
     }
@@ -471,7 +471,7 @@ namespace server
         if(!n)
         {
             loopv(demos) delete[] demos[i].data;
-            demos.setsize(0);
+            demos.shrink(0);
             sendservmsg("cleared all demos");
         }
         else if(demos.inrange(n-1))
@@ -690,11 +690,11 @@ namespace server
         static const int servtypes[] = { N_SERVINFO, N_INITCLIENT, N_WELCOME, N_MAPRELOAD, N_SERVMSG, N_DAMAGE, N_HITPUSH, N_SHOTFX, N_EXPLODEFX, N_DIED, N_SPAWNSTATE, N_FORCEDEATH, N_ITEMACC, N_ITEMSPAWN, N_TIMEUP, N_CDIS, N_CURRENTMASTER, N_PONG, N_RESUME, N_BASESCORE, N_BASEINFO, N_BASEREGEN, N_ANNOUNCE, N_SENDDEMOLIST, N_SENDDEMO, N_DEMOPLAYBACK, N_SENDMAP, N_DROPFLAG, N_SCOREFLAG, N_RETURNFLAG, N_RESETFLAG, N_INVISFLAG, N_CLIENT, N_AUTHCHAL, N_INITAI };
         if(ci)
         {
-             loopi(sizeof(servtypes)/sizeof(int)) if(type == servtypes[i]) return -1;
-             if(type < N_EDITENT || type > N_EDITVAR || !m_edit)
-             {
-                 if(type != N_POS && ++ci->overflow >= 200) return -2;
-             }
+            loopi(sizeof(servtypes)/sizeof(int)) if(type == servtypes[i]) return -1;
+            if(type < N_EDITENT || type > N_EDITVAR || !m_edit)
+            {
+                if(type != N_POS && ++ci->overflow >= 200) return -2;
+            }
         }
         return type;
     }
@@ -713,6 +713,15 @@ namespace server
             }
             break;
         }
+    }
+
+    void flushclientposition(clientinfo &ci)
+    {
+        if(ci.position.empty() || (!hasnonlocalclients() && !demorecord)) return;
+        packetbuf p(ci.position.length(), 0);
+        p.put(ci.position.getbuf(), ci.position.length());
+        ci.position.setsize(0);
+        sendpacket(-1, 0, p.finalize(), ci.ownernum);
     }
 
     void addclientstate(worldstate &ws, clientinfo &ci)
@@ -1007,8 +1016,8 @@ namespace server
     void sendresume(clientinfo *ci)
     {
         gamestate &gs = ci->state;
-        sendf(-1, 1, "ri2i9vi", N_RESUME, ci->clientnum,
-            gs.state, gs.frags, gs.quadmillis,
+        sendf(-1, 1, "ri3i9vi", N_RESUME, ci->clientnum,
+            gs.state, gs.frags, gs.flags, gs.quadmillis,
             gs.lifesequence,
             gs.health, gs.maxhealth,
             gs.armour, gs.armourtype,
@@ -1135,7 +1144,8 @@ namespace server
         actor->state.damage += damage;
         target->state.damage_rec += damage;
         sendf(-1, 1, "ri6", N_DAMAGE, target->clientnum, actor->clientnum, damage, ts.armour, ts.health);
-        if(target!=actor && !hitpush.iszero())
+        if(target==actor) target->setpushed();
+        else if(target!=actor && !hitpush.iszero())
         {
             ivec v = vec(hitpush).rescale(DNF);
             sendf(ts.health<=0 ? -1 : target->ownernum, 1, "ri7", N_HITPUSH, target->clientnum, gun, damage, v.x, v.y, v.z);
@@ -1235,7 +1245,7 @@ namespace server
         if(gun!=GUN_FIST) gs.ammo[gun]--;
         gs.lastshot = millis;
         gs.gunwait = guns[gun].attackdelay;
-        sendf(-1, 1, "rii9x", N_SHOTFX, ci->clientnum, gun,
+        sendf(-1, 1, "rii9x", N_SHOTFX, ci->clientnum, gun, id,
                 int(from.x*DMF), int(from.y*DMF), int(from.z*DMF),
                 int(to.x*DMF), int(to.y*DMF), int(to.z*DMF),
                 ci->ownernum);
@@ -1252,7 +1262,7 @@ namespace server
                 {
                     hitinfo &h = hits[i];
                     clientinfo *target = getinfo(h.target);
-                    if(!target || target->state.state!=CS_ALIVE || h.lifesequence!=target->state.lifesequence || h.rays<1) continue;
+                    if(!target || target->state.state!=CS_ALIVE || h.lifesequence!=target->state.lifesequence || h.rays<1 || h.dist > guns[gun].range + 1) continue;
 
                     gs.hits += (ci != target ? 1 : 0);
 
@@ -1624,7 +1634,7 @@ namespace server
         loopv(clients)
         {
             clientinfo &e = *clients[i];
-            if(e.clientnum != ci->clientnum && e.connectmillis >= ci->lastclipboard) 
+            if(e.clientnum != ci->clientnum && e.needclipboard >= ci->lastclipboard)
             {
                 if(!flushed) { flushserver(true); flushed = true; }
                 sendpacket(e.clientnum, 1, ci->clipboard);
@@ -1670,7 +1680,7 @@ namespace server
                 clients.add(ci);
 
                 ci->connected = true;
-		ci->connectmillis = totalmillis;
+                ci->connectmillis = totalmillis;
                 if(mastermode>=MM_LOCKED) ci->state.state = CS_SPECTATOR;
                 ci->state.lasttimeplayed = lastmillis;
 
@@ -1696,18 +1706,17 @@ namespace server
         if(p.packet->flags&ENET_PACKET_FLAG_RELIABLE) reliablemessages = true;
         #define QUEUE_AI clientinfo *cm = cq;
         #define QUEUE_MSG { if(cm && (!cm->local || demorecord || hasnonlocalclients())) while(curmsg<p.length()) cm->messages.add(p.buf[curmsg++]); }
-        #define QUEUE_BUF(size, body) { \
+        #define QUEUE_BUF(body) { \
             if(cm && (!cm->local || demorecord || hasnonlocalclients())) \
             { \
                 curmsg = p.length(); \
-                ucharbuf buf = cm->messages.reserve(size); \
                 { body; } \
-                cm->messages.addbuf(buf); \
             } \
         }
-        #define QUEUE_INT(n) QUEUE_BUF(5, putint(buf, n))
-        #define QUEUE_UINT(n) QUEUE_BUF(4, putuint(buf, n))
-        #define QUEUE_STR(text) QUEUE_BUF(2*strlen(text)+1, sendstring(text, buf))
+
+        #define QUEUE_INT(n) QUEUE_BUF(putint(cm->messages, n))
+        #define QUEUE_UINT(n) QUEUE_BUF(putuint(cm->messages, n))
+        #define QUEUE_STR(text) QUEUE_BUF(sendstring(text, cm->messages))
         int curmsg;
         while((curmsg = p.length()) < p.maxlen) switch(type = checktype(getint(p), ci))
         {
@@ -1751,6 +1760,33 @@ namespace server
                     }
                     cp->state.o = pos;
                     cp->gameclip = (flags&0x80)!=0;
+                }
+                break;
+            }
+
+            case N_TELEPORT:
+            {
+                int pcn = getint(p), teleport = getint(p), teledest = getint(p);
+                clientinfo *cp = getinfo(pcn);
+                if(cp && pcn != sender && cp->ownernum != sender) cp = NULL;
+                if(cp && (!ci->local || demorecord || hasnonlocalclients()) && (cp->state.state==CS_ALIVE || cp->state.state==CS_EDITING))
+                {
+                    flushclientposition(*cp);
+                    sendf(-1, 0, "ri4x", N_TELEPORT, pcn, teleport, teledest, cp->ownernum);
+                }
+                break;
+            }
+
+            case N_JUMPPAD:
+            {
+                int pcn = getint(p), jumppad = getint(p);
+                clientinfo *cp = getinfo(pcn);
+                if(cp && pcn != sender && cp->ownernum != sender) cp = NULL;
+                if(cp && (!ci->local || demorecord || hasnonlocalclients()) && (cp->state.state==CS_ALIVE || cp->state.state==CS_EDITING))
+                {
+                    cp->setpushed();
+                    flushclientposition(*cp);
+                    sendf(-1, 0, "ri3x", N_JUMPPAD, pcn, jumppad, cp->ownernum);
                 }
                 break;
             }
@@ -1850,9 +1886,8 @@ namespace server
                 cq->state.gunselect = gunselect;
                 if(smode) smode->spawned(cq);
                 QUEUE_AI;
-                QUEUE_BUF(100,
-                {
-                    putint(buf, N_SPAWN);
+                QUEUE_BUF({
+                    putint(cm->messages, N_SPAWN);
                     sendstate(cq->state, cm->messages);
                 });
                 break;
@@ -1929,15 +1964,11 @@ namespace server
 
             case N_TEXT:
             {
+                QUEUE_AI;
+                QUEUE_MSG;
                 getstring(text, p);
                 filtertext(text, text);
-                if(SbPy::triggerPolicyEventIntString("allow_message", ci->clientnum, text))
-                {
-                    SbPy::triggerEventIntString("player_message", ci->clientnum, text);
-                    QUEUE_AI;
-                    QUEUE_INT(N_TEXT);
-                    QUEUE_STR(text);
-                }
+                QUEUE_STR(text);
                 break;
             }
 
@@ -2287,8 +2318,9 @@ namespace server
                 int val = getint(p);
 				SbPy::triggerEventIntBool("player_pause", ci->clientnum, val != 0);
                 break;
+
             }
-             case N_COPY:
+            case N_COPY:
                 ci->cleanclipboard();
                 ci->lastclipboard = totalmillis;
                 goto genericmsg;
@@ -2326,6 +2358,14 @@ namespace server
             #include "capture.h"
             #include "ctf.h"
             #undef PARSEMESSAGES
+
+            case -1:
+                disconnect_client(sender, DISC_TAGT);
+                return;
+
+            case -2:
+                disconnect_client(sender, DISC_OVERFLOW);
+                return;
 
             default: genericmsg:
             {
