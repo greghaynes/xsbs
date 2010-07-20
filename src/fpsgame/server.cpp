@@ -42,7 +42,6 @@ namespace server
     enet_uint32 lastsend = 0;
     int mastermode = MM_OPEN, mastermask = MM_PRIVSERV;
     int currentmaster = -1;
-    bool masterupdate = false;
     stream *mapdata = NULL;
 
     vector<uint> allowedips;
@@ -602,7 +601,7 @@ namespace server
         {
             currentmaster = -1;
         }
-        masterupdate = true;
+        sendf(-1, 1, "ri4", N_CURRENTMASTER, currentmaster, currentmaster >= 0 ? ci->privilege : 0, mastermode);
     }
 
     void setciadmin(clientinfo *ci)
@@ -611,7 +610,6 @@ namespace server
         loopv(clients) if(ci!=clients[i] && clients[i]->privilege<=PRIV_MASTER) revokemaster(clients[i]);
         ci->privilege = PRIV_ADMIN;
         currentmaster = ci->clientnum;
-        masterupdate = true;
         SbPy::triggerEventInt("player_claimed_admin", ci->clientnum);
     }
 
@@ -623,7 +621,6 @@ namespace server
         else
             SbPy::triggerEventInt("player_released_admin", ci->clientnum);
         ci->privilege = PRIV_NONE;
-        masterupdate = true;
         currentmaster = -1; 
     }
 
@@ -899,6 +896,14 @@ namespace server
                 }
                 putint(p, -1);
             }
+        }
+        if(currentmaster >= 0 || mastermode != MM_OPEN)
+        {
+            putint(p, N_CURRENTMASTER);
+            putint(p, currentmaster);
+            clientinfo *m = currentmaster >= 0 ? getinfo(currentmaster) : NULL;
+            putint(p, m ? m->privilege : 0);
+            putint(p, mastermode);
         }
         if(gamepaused)
         {
@@ -1339,13 +1344,6 @@ namespace server
 
         loopv(connects) if(totalmillis-connects[i]->connectmillis>15000) disconnect_client(connects[i]->clientnum, DISC_TIMEOUT);
 
-        if(masterupdate)
-        {
-            clientinfo *m = currentmaster>=0 ? getinfo(currentmaster) : NULL;
-            sendf(-1, 1, "ri3", N_CURRENTMASTER, currentmaster, m ? m->privilege : 0);
-            masterupdate = false;
-        }
-
         SbPy::update();
 
         if(!gamepaused && m_timed && smapname[0] && gamemillis-curtime>0 && gamemillis/60000!=(gamemillis-curtime)/60000) checkintermission();
@@ -1648,7 +1646,6 @@ namespace server
                 ci->connected = true;
 		ci->connectmillis = totalmillis;
                 if(mastermode>=MM_LOCKED) ci->state.state = CS_SPECTATOR;
-                if(currentmaster>=0) masterupdate = true;
                 ci->state.lasttimeplayed = lastmillis;
 
                 const char *worst = m_teammode ? chooseworstteam(text, ci) : NULL;
