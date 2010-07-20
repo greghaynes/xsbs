@@ -407,6 +407,7 @@ namespace server
 	void sendmapreload();
 	void senddemo(int cn, int num);
 	void suicide(clientinfo *ci);
+	int numchannels();
 }
 
 extern void server_sigint(int);
