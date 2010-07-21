@@ -81,7 +81,10 @@ if preset_rotation:
 	for mode in map_modes:
 		modeMapLists[mode[0]] = mode[1].split()
 	rotate_on_join = [False]
-	mn = modes.index(start_mode)
+	try:
+		mn = modes.index(start_mode)
+	except ValueError:
+		raise ValueError('Invalid mode specified for start mode in maprotation.conf')
 	sbserver.setMap(modeMapLists[start_mode][0], mn)
 	registerServerEventHandler('intermission_ended', presetRotate)
 	registerCommandHandler('nextmap', onNextMapCmd)
