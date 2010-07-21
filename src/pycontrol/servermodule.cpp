@@ -691,13 +691,6 @@ static PyObject *setGameMins(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
-static PyObject *endGame(PyObject *self, PyObject *args)
-{
-	server::endgame();
-	Py_INCREF(Py_None);
-	return Py_None;
-}
-
 static PyObject *adminPass(PyObject *self, PyObject *args)
 {
 	return Py_BuildValue("s", server::adminpass);
@@ -901,7 +894,6 @@ static PyMethodDef ModuleMethods[] = {
 	{"port", port, METH_VARARGS, "Current server port."},
 	{"authChallenge", authChal, METH_VARARGS, "Send auth challenge to client."},
 	{"setMinsRemaining", setGameMins, METH_VARARGS, "Set the minutes remanining in current game."},
-	{"endGame", endGame, METH_VARARGS, "End the current game."},
 	{"adminPassword", adminPass, METH_VARARGS, "Get the administrator password."},
 	{"publicServer", publicServer, METH_VARARGS, "Decides how masters are chosen and what privileges they have."},
 	{"sendMapReload", sendMapReload, METH_VARARGS, "Causes all users to send vote on next map."},
@@ -913,10 +905,10 @@ static PyMethodDef ModuleMethods[] = {
 	{"nextMatchRecorded", nextMatchRecorded, METH_VARARGS, "Is next match being recorded."},
 	{"setRecordNextMatch", setRecordNextMatch, METH_VARARGS, "Set to record demo of next match."},
 	{"demoSize", demoSize, METH_VARARGS, "Size of demo in bytes."},
-    {"demoData", demoData, METH_VARARGS, "Demo data."},
+	{"demoData", demoData, METH_VARARGS, "Demo data."},
 	{"sendDemo", sendDemo, METH_VARARGS, "Send demo to client."},
 	{"suicide", suicide, METH_VARARGS, "Force client to commit suicide."},
-    {"configdir", configdir, METH_VARARGS, "Python config dir."},
+	{"configdir", configdir, METH_VARARGS, "Python config dir."},
 	{NULL, NULL, 0, NULL}
 };
 
