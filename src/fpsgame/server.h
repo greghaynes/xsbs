@@ -439,7 +439,6 @@ namespace server
 	bool pregame_setteam(clientinfo *, char *);
 	bool spectate(clientinfo *, bool, int);
 	void setgamemins(int mins);
-	void endgame();
 	void resetpriv(clientinfo *ci);
 	void sendmapreload();
 	void senddemo(int cn, int num);

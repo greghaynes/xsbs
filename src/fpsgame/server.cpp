@@ -1120,11 +1120,6 @@ namespace server
         gamelimit = gamemillis + (mins * 60000) + 1;
     }
 
-    void endgame()
-    {
-		setgamemins(0);
-    }
-
     void checkintermission()
     {
         if(gamemillis >= gamelimit && !interm)
@@ -1216,6 +1211,7 @@ namespace server
                 return;
         }
         sendf(-1, 1, "ri4x", N_EXPLODEFX, ci->clientnum, gun, id, ci->ownernum);
+        gs.shots++;
         loopv(hits)
         {
             hitinfo &h = hits[i];
@@ -1226,6 +1222,7 @@ namespace server
             loopj(i) if(hits[j].target==h.target) { dup = true; break; }
             if(dup) continue;
 
+            gs.hits++;
             int damage = guns[gun].damage;
             if(gs.quadmillis) damage *= 4;
             damage = int(damage*(1-h.dist/RL_DISTSCALE/RL_DAMRAD));
@@ -1251,6 +1248,7 @@ namespace server
                 int(to.x*DMF), int(to.y*DMF), int(to.z*DMF),
                 ci->ownernum);
         gs.shotdamage += guns[gun].damage*(gs.quadmillis ? 4 : 1)*(gun==GUN_SG ? SGRAYS : 1);
+        gs.shots++;
         switch(gun)
         {
             case GUN_RL: gs.rockets.add(id); break;
@@ -1264,6 +1262,7 @@ namespace server
                     clientinfo *target = getinfo(h.target);
                     if(!target || target->state.state!=CS_ALIVE || h.lifesequence!=target->state.lifesequence || h.rays<1 || h.dist > guns[gun].range + 1) continue;
 
+                    gs.hits++;
                     totalrays += h.rays;
                     if(totalrays>maxrays) continue;
                     int damage = h.rays*guns[gun].damage;
