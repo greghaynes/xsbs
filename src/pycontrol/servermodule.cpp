@@ -966,7 +966,6 @@ static PyMethodDef ModuleMethods[] = {
 	{"demoData", demoData, METH_VARARGS, "Demo data."},
 	{"sendDemo", sendDemo, METH_VARARGS, "Send demo to client."},
 	{"suicide", suicide, METH_VARARGS, "Force client to commit suicide."},
-	{"configdir", configdir, METH_VARARGS, "Python config dir."},
 	{NULL, NULL, 0, NULL}
 };
 

@@ -138,7 +138,7 @@ namespace SbCs
 			return;
 		}
 
-		sendf(*cn, 1, "ris", SV_SERVMSG, msg);
+		sendf(*cn, 1, "ris", N_SERVMSG, msg);
 	}
 
 	void playersessionid(int *cn)
