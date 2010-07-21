@@ -20,7 +20,12 @@ modes = [
 	'ctf',
 	'instactf',
 	'protect',
-	'instaprotect'
+	'instaprotect',
+	'hold',
+	'instahold',
+	'efficctf',
+	'efficprotect',
+	'effichold',
 ]
 
 def modeName(modenum):
