@@ -1129,6 +1129,7 @@ namespace server
     {
         if(gamemillis >= gamelimit && !interm)
         {
+            SbPy::triggerEvent("intermission_begin", 0);
             sendf(-1, 1, "ri2", N_TIMEUP, 0);
             if(smode) smode->intermission();
             interm = gamemillis + 10000;
