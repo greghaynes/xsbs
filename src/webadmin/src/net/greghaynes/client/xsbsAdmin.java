@@ -5,13 +5,18 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.HTML;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class testWebApp implements EntryPoint {
+public class xsbsAdmin implements EntryPoint {
+
+	private SelectServerView selectServerView;
+	private AdminServerView adminServerView;
+
 	/**
 	* The message displayed to the user when the server cannot be reached or
 	* returns an error.
@@ -24,22 +29,19 @@ public class testWebApp implements EntryPoint {
 	* This is the entry point method.
 	*/
 	public void onModuleLoad() {
-		RootPanel rootPanel = RootPanel.get();
+		this.selectServerView = new SelectServerView(this);
+		this.selectServerView.center();
+	}
 
-		DockPanel basePanel = new DockPanel();
-		basePanel.setWidth("100%");
+	public void serverSelected(String url) {
+		this.selectServerView.hide();
+		this.adminServerView = new AdminServerView(this, url);
+		this.adminServerView.setVisible(true);
+	}
 
-		HTML topTextBar = new HTML("Top text");
-		topTextBar.setHorizontalAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
-		topTextBar.setStyleName("topTextBar");
-		basePanel.add(topTextBar, DockPanel.NORTH);
-
-		rootPanel.add(basePanel);
-
-		LoginManager m = new LoginManager("localhost:8081");
-
-		LoginDialog ld = new LoginDialog(m);
-		ld.center();
+	public void serverDeselected() {
+		this.adminServerView.hide();
+		this.selectServerView.center();
 	}
 
 }

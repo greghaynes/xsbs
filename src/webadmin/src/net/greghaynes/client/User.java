@@ -1,3 +1,5 @@
+package net.greghaynes.client;
+
 public class User {
 
 	private int id;

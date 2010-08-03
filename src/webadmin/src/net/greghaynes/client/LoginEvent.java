@@ -9,12 +9,12 @@ public class LoginEvent {
 
 	private int event;
 	private String username;
-	private LoginManager loginManager;
 
-	public LoginEvent(LoginManager loginManager, User user,
-	                  int event);
+	public LoginEvent(String username, String key,
+	                  int event) {
+	}
 
-	public LoginEvent(LoginManager loginManager) {
+	public LoginEvent() {
 		this.event = event;
 	}
 
@@ -24,10 +24,6 @@ public class LoginEvent {
 
 	public String getUsername() {
 		return this.username;
-	}
-
-	public LoginManager getLoginManager() {
-		return this.loginManager;
 	}
 
 }

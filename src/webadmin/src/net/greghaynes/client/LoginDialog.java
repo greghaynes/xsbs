@@ -2,7 +2,7 @@ package net.greghaynes.client;
 
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.DeckPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
@@ -10,18 +10,17 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 
-public class LoginDialog extends PopupPanel implements LoginListener, ClickHandler {
+public class LoginDialog extends DialogBox implements LoginListener, ClickHandler {
 
-	private LoginManager loginManager;
 	private DeckPanel deckPanel;
 	private TextBox usernameBox;
 	private TextBox passwordBox;
 	private PushButton loginButton;
 	private PushButton retryButton;
 
-	public LoginDialog(LoginManager manager) {
-		this.loginManager = manager;
-		this.loginManager.addLoginListener(this);
+	public LoginDialog() {
+		super();
+		this.setHTML("Please login");
 
 		this.usernameBox = new TextBox();
 		this.passwordBox = new TextBox();
@@ -43,11 +42,11 @@ public class LoginDialog extends PopupPanel implements LoginListener, ClickHandl
 		HorizontalPanel loginHorizPanel = new HorizontalPanel();
 		loginHorizPanel.add(this.loginButton);
 
-		VerticalPanel inputVertPanel = new VerticalPanel();
-		inputVertPanel.add(new HTML("<h3>Please login</h3>"));
-		inputVertPanel.add(usernameHorizPanel);
-		inputVertPanel.add(passwordHorizPanel);
-		inputVertPanel.add(loginHorizPanel);
+		VerticalPanel loginVertPanel = new VerticalPanel();
+		loginVertPanel.add(new HTML("<h3>Please login</h3>"));
+		loginVertPanel.add(usernameHorizPanel);
+		loginVertPanel.add(passwordHorizPanel);
+		loginVertPanel.add(loginHorizPanel);
 
 		HorizontalPanel retryHorizPanel = new HorizontalPanel();
 		retryHorizPanel.add(this.retryButton);
@@ -59,7 +58,7 @@ public class LoginDialog extends PopupPanel implements LoginListener, ClickHandl
 		this.deckPanel = new DeckPanel();
 		this.deckPanel.add(new HTML("Logging in..."));
 		this.deckPanel.add(loginErrorPanel);
-		this.deckPanel.add(inputVertPanel);
+		this.deckPanel.add(loginVertPanel);
 		this.deckPanel.showWidget(2);
 
 		this.add(deckPanel);
@@ -87,8 +86,6 @@ public class LoginDialog extends PopupPanel implements LoginListener, ClickHandl
 	public void onClick(ClickEvent e) {
 		Object o = e.getSource();
 		if(o == this.loginButton) {
-			this.loginManager.tryLogin(this.usernameBox.getText(),
-						   this.passwordBox.getText());
 		}
 		else if(o == retryButton) {
 			this.deckPanel.showWidget(2);
