@@ -48,6 +48,15 @@ class jsonAPI(object):
 class JsonSite(resource.Resource):
 	def render_GET(self, request):
 		setJsonHeaders(request)
+		try:
+			sesskey = request.args['sessionkey'][0]
+		except KeyError:
+			pass
+		else:
+			try:
+				request.session = httpServer.sessionManager.sessions[sesskey]
+			except KeyError:
+				pass
 		return self.render_JSON(request)
 	def render_OPTIONS(self, request):
 		setJsonHeaders(request)
