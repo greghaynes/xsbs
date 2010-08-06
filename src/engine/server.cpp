@@ -605,6 +605,7 @@ static bool rundedicated = true;
 void quit()
 {
     rundedicated = false;
+    exit(1);
 }
 
 void server_sigint(int signal)
