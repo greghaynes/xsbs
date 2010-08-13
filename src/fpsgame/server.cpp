@@ -158,6 +158,7 @@ namespace server
         // Initialize python modules
         if(!SbPy::init("sauer_server", pyscriptspath, "sbserver"))
             return false;
+        signal(SIGINT, server_sigint);
         return true;
     }
 
