@@ -4,13 +4,14 @@ from xsbs.http import server as httpServer
 from xsbs.users import userAuth
 from xsbs.users.privilege import isUserAtLeastMaster, isUserMaster, isUserAdmin
 
+
 try:
 	import json
 except ImportError:
 	import simplejson as json
 
 def setJsonHeaders(request):
-	request.setHeader('Content-Type', 'application/json')
+	#request.setHeader('Content-Type', 'application/json')
 	request.setHeader('Access-Control-Allow-Origin', '*')
 	request.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
 	request.setHeader('Access-Control-Allow-Headers', 'X-PINGOTHER, X-Requested-With, Accept')
@@ -70,7 +71,7 @@ class JsonSite(resource.Resource):
 	def render_JSON(self, request):
 		return ''
 
-class JsonSessionSite(resource.Resource):
+class JsonSessionSite(JsonSite):
 	def render_JSON(self, request):
 		try:
 			session = request.session

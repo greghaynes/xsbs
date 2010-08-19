@@ -3,6 +3,7 @@ from twisted.web import resource
 from xsbs.http.jsonapi import JsonSite, JsonUserSite, site as jsonSite
 from plugins.JSONAPI.admin import setup as setupAdmin
 from plugins.JSONAPI.accounts import setup as setupAccounts
+from plugins.JSONAPI.sessions import setup as setupSessions
 
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.users import userAuth
@@ -74,6 +75,7 @@ def setup():
 	jsonSite.putChild('server', ServerSite())
 	setupAdmin(jsonSite)
 	setupAccounts(jsonSite)
+	setupSessions(jsonSite)
 
 setup()
 

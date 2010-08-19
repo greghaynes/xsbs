@@ -4,7 +4,7 @@ from twisted.internet import reactor
 from xsbs.settings import PluginConfig
 from xsbs.events import eventHandler
 
-from sessionmanager import SessionManager
+from session import SessionManager
 
 config = PluginConfig('httpserver')
 port = config.getOption('Config', 'port', '8081')
@@ -21,7 +21,7 @@ class HttpServer(object):
 		self.port = port
 		self.root_site = RootSite()
 		self.server_site = server.Site(self.root_site)
-		self.sessionManager = SessionManager()
+		self.session_manager = SessionManager()
 	def start(self):
 		self.connection = reactor.listenTCP(port, self.server_site)
 	def stop(self):
