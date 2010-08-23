@@ -11,7 +11,7 @@ except ImportError:
 	import simplejson as json
 
 def setJsonHeaders(request):
-	#request.setHeader('Content-Type', 'application/json')
+	request.setHeader('Content-Type', 'application/json')
 	request.setHeader('Access-Control-Allow-Origin', '*')
 	request.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
 	request.setHeader('Access-Control-Allow-Headers', 'X-PINGOTHER, X-Requested-With, Accept')
@@ -56,15 +56,19 @@ class JsonSite(resource.Resource):
 		# Grab the session if it exists
 		try:
 			sesskey = request.args['sessionkey'][0]
-		except KeyError:
+		except (KeyError, IndexError):
 			pass
 		else:
 			try:
 				request.session = httpServer.sessionManager.sessions[sesskey]
 			except KeyError:
 				pass
-		
-		return self.render_JSON(request)
+		try:
+			callback_name = request.args['callback'][0]
+		except (KeyError, IndexError):
+			return self.render_JSON(request)
+		else:
+			return callback_name + '(' + self.render_JSON(request) + ');'
 	def render_OPTIONS(self, request):
 		setJsonHeaders(request)
 		return None
