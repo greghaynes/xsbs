@@ -10,14 +10,19 @@ class UserLoginSite(JsonSessionSite):
 			email = request.args['email']
 			password = request.args['password']
 		except (KeyError, IndexError):
-			return 'error'
+			return json.dumps({'response_type': 'Error',
+				'code': 2,
+				'description': 'Username and password not specified'})
 		else:
 			user = userAuth(email, password)
 			if user:
 				session['user_id'] = user.id
-				return 'success'
+				return json.dumps({'response_type': 'Success',
+					'user_id': user.id})
 			else:
-				return 'invalid username/password'
+				return json.dumps({'response_type': 'Error',
+					'code': 1,
+					'description': 'Invalid credentials'})
 			
 
 def setup(jsonSite):

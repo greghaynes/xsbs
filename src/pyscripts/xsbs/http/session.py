@@ -20,12 +20,9 @@ class SessionManager(object):
 		addTimer(2000, self.removeStales, (), True)
 	def removeStales(self):
 		cur_time = time.time()
-		print 'checking sessions'
 		for session in self.sessions.values():
-			print session.key
 			if (session.touch_time + self.stale_secs) < cur_time:
 				del self.sessions[session.key]
-		print ''
 
 	def createSession(self):
 		'''Create a session with a unique key
