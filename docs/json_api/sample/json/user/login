@@ -1,0 +1,8 @@
+Pass via GET email=,password=
+
+Valid credentials:
+callback({ response_type: Success, user_id: 1, privilege_level: Admin})
+
+Invalid credentials:
+callback({ response_type: Error, code: 1, description: 'Invalid Credentials' });
+
