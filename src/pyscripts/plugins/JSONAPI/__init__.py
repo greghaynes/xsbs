@@ -4,6 +4,7 @@ from xsbs.http.jsonapi import JsonSite, JsonUserSite, site as jsonSite
 from plugins.JSONAPI.admin import setup as setupAdmin
 from plugins.JSONAPI.accounts import setup as setupAccounts
 from plugins.JSONAPI.sessions import setup as setupSessions
+from plugins.JSONAPI.user import setup as setupUser
 
 from xsbs.players import all as allClients, player, playerCount, spectatorCount
 from xsbs.users import userAuth
@@ -76,6 +77,7 @@ def setup():
 	setupAdmin(jsonSite)
 	setupAccounts(jsonSite)
 	setupSessions(jsonSite)
+	setupUser(jsonSite)
 
 setup()
 
