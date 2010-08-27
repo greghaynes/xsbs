@@ -220,7 +220,8 @@ namespace server
         bool warned, gameclip;
         ENetPacket *clipboard;
         int lastclipboard, needclipboard;
-
+		bool editmuted;
+		
         clientinfo() : clipboard(NULL) { reset(); }
         ~clientinfo() { events.deletecontents(); cleanclipboard(); }
 

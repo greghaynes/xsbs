@@ -155,6 +155,12 @@ class Player:
 	def score(self):
 		'''Flags the player has scored'''
 		return sbserver.playerScore(self.cn)
+	def editMute(self):
+		'''Mute the edits of a client'''
+		sbserver.editMute(self.cn)
+	def editUnmute(self):
+		'''Unute the edits of a client'''
+		sbserver.editUnmute(self.cn)
 
 players = {}
 

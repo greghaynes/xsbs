@@ -309,5 +309,29 @@ def onSmiteCommand(p, args):
 	t = player(int(args))
 	sendServerMessage(info(config['Templates']['smite'].substitute(colordict, smiter=p.name(), smited=t.name())))
 	t.suicide()
+	
+@commandHandler('editmute')
+@masterRequired
+def onEditMuteCommand(p, args):
+	'''@description edit mute a player
+	   @usage <cn>
+	   @master'''
+	if args == '':
+		raise UsageError()
+	p = player(int(args))
+	p.editMute()
+	p.message(info('Your edits have been muted.'))
+	
+@commandHandler('editunmute')
+@masterRequired
+def onEditMuteCommand(p, args):
+	'''@description edit unmute a player
+	   @usage <cn>
+	   @master'''
+	if args == '':
+		raise UsageError()
+	p = player(int(args))
+	p.editUnmute()
+	p.message(info('Your edits have been unmuted.'))
 
 init()
