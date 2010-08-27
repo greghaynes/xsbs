@@ -1,0 +1,5 @@
+State between json requests is maintained via sessions.  A request to
+json/session/create to create a new session and obtain a new session key.
+All requests can be made with the sessionkey= GET parameter to maintain the
+session.
+
