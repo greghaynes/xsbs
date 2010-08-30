@@ -147,6 +147,18 @@ class Player:
 	def score(self):
 		'''Flags the player has scored'''
 		return sbserver.playerScore(self.cn)
+	def isLoggedIn(self):
+		try:
+			u = self.user
+			return True
+		except AttributeError:
+			return False
+	def login(self, user):
+		if self.isLoggedIn():
+			raise StateError('You are already logged in')
+		self.user = user
+		triggerServerEvent('player_logged_in', (self.cn,))
+		sbserver.message(info(green(self.name() + ' is verified')))
 
 players = {}
 

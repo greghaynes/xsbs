@@ -57,20 +57,6 @@ def isUserIdAdmin(user_id):
 	user = userFromId(user_id)
 	return user.privilege == 2
 
-def isLoggedIn(cn):
-	try:
-		return player(cn).logged_in
-	except (AttributeError, ValueError):
-		return False
-
-def login(cn, user):
-	if isLoggedIn(cn):
-		raise StateError('You are already logged in')
-	player(cn).user = user
-	player(cn).logged_in = True
-	triggerServerEvent('player_logged_in', (cn,))
-	sbserver.message(info(green(sbserver.playerName(cn)) + ' is verified'))
-
 def userAuth(email, password):
 	try:
 		user = User.query.filter(User.email==email).filter(User.password==password).one()
