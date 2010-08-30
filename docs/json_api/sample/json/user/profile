@@ -1,0 +1,6 @@
+If logged in:
+callback({ response_type: Success, id: 0, username: testuser, privilege: 1 });
+
+If not logged in:
+callback({ response_type: Error, code: NOT_LOGGED_IN, description: 'User is not logged in' });
+

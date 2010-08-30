@@ -90,7 +90,7 @@ class JsonUserSite(JsonSessionSite):
 			user_id = session['user_id']
 		except KeyError:
 			return response('not_logged_in', 'Not currently logged in')
-		return self.render_user_JSON(request, user_id)
+		return self.render_user_JSON(request, session, user_id)
 
 class JsonAtLeastMasterSite(JsonUserSite):
 	def render_user_JSON(self, request, user_id):
