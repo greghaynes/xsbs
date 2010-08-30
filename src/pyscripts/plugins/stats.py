@@ -3,7 +3,7 @@ from xsbs.commands import commandHandler
 from xsbs.colors import colordict
 from xsbs.settings import loadPluginConfig
 from xsbs.ui import insufficientPermissions, error
-from xsbs.players import player, isAtLeastMaster
+from xsbs.players import player
 
 config = {
 	'Main':
@@ -27,7 +27,7 @@ def onCommand(cp, args):
 	   @usage (cn)
 	   @public'''
 	if args != '':
-		if require_master and not isPlayerMaster(cp.cn):
+		if require_master and not cp.isMaster():
 			insufficientPermissions(cp.cn)
 			return
 		try:

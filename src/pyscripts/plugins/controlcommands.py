@@ -7,8 +7,7 @@ from xsbs.settings import loadPluginConfig
 from xsbs.colors import red, yellow, blue, green, white, colordict
 from xsbs.ui import error, info, notice, insufficientPermissions
 from xsbs.net import ipLongToString
-from xsbs.users import loggedInAs
-from xsbs.users.privilege import isUserMaster, isUserAdmin, UserPrivilege
+from xsbs.users import isUserIdMaster, isUserIdAdmin
 from xsbs.players import masterRequired, adminRequired, player, currentAdmin
 from xsbs.server import setPaused, isPaused, message as sendServerMessage
 from xsbs.timers import addTimer
@@ -194,7 +193,9 @@ def unsetMaster(p, args):
 		sbserver.setMaster(-1)
 
 def userPrivSetCmd(cn, tcn, args):
-	user_id = player(tcn).user.id
+	p = player(tcn)
+	user = p.user
+	user_id = user.id
 	if args == 'user':
 		try:
 			if isUser(player(tcn).user.id):

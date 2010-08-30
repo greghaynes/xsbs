@@ -16,7 +16,7 @@ def onLoginCommand(p, args):
 	user = userAuth(args[0], args[1])
 	if user:
 		p.login(user)
-	else
+	else:
 		p.message(error('Invalid login.'))
 
 @commandHandler('register')

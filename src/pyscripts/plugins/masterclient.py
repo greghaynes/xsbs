@@ -18,7 +18,7 @@ config = {
 			'master_port': 28787,
 			'allow_auth': 'yes',
 			'register_interval': 3600,
-		}
+		},
 	'Templates':
 		{
 			'authenticated': '${green}${name}${white} authenticated as ${magenta}${authname}',

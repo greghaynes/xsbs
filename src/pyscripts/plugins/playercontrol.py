@@ -1,12 +1,12 @@
 from xsbs.events import eventHandler
-from xsbs.players import isAtLeastMaster
+from xsbs.players import isMaster
 from xsbs.ui import insufficientPermissions, error
 import sbserver
 
 @eventHandler('player_request_spectate')
 def onReqSpectate(cn, tcn):
 	if tcn != cn:
-		if isAtLeastMaster(cn):
+		if isMaster(cn):
 			sbserver.spectate(tcn)
 		else:
 			insufficientPermissions(cn)
@@ -16,7 +16,7 @@ def onReqSpectate(cn, tcn):
 @eventHandler('player_request_unspectate')
 def onReqUnspectate(cn, tcn):
 	if tcn != cn:
-		if isAtLeastMaster(cn):
+		if isMaster(cn):
 			sbserver.unspectate(tcn)
 		else:
 			insufficientPermissions(cn)

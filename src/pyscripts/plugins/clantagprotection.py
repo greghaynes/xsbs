@@ -4,7 +4,7 @@ from xsbs.ui import warning
 from xsbs.colors import red
 from xsbs.timers import addTimer
 from xsbs.ban import ban
-from xsbs.users import User, Group, isLoggedIn
+from xsbs.users import User, Group
 
 from elixir import Entity, Field, String, Integer, ManyToOne, OneToMany, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound
@@ -85,10 +85,10 @@ def onLogin(cn):
 		return
 
 def initCheck(cn):
-	if isLoggedIn(cn):
+	p = player(cn)
+	if p.isLoggedIn():
 		onLogin(cn)
 		return
-	p = player(cn)
 	try:
 		if p.warning_for_login:
 			return
