@@ -2,7 +2,7 @@ from xsbs.events import eventHandler, triggerServerEvent, execLater
 from xsbs.timers import addTimer
 from xsbs.net import ipLongToString, ipStringToLong
 from xsbs.ui import insufficientPermissions, error
-from xsbs.users.privilege import isUserMaster, isUserAdmin, isUserAtLeastMaster
+from xsbs.users import isUserIdMaster, isUserIdAdmin
 import sbserver
 import logging
 import math
@@ -11,15 +11,7 @@ def isMaster(cn):
 	if sbserver.playerPrivilege(cn) == 1:
 		return True
 	try:
-		return isUserMaster(player(cn).user.id)
-	except AttributeError, ValueError:
-		return False
-
-def isAtLeastMaster(cn):
-	if sbserver.playerPrivilege(cn) > 0:
-		return True
-	try:
-		return isUserAtLeastMaster(player(cn).user.id)
+		return isUserIdMaster(player(cn).user.id)
 	except AttributeError, ValueError:
 		return False
 
@@ -27,7 +19,7 @@ def isAdmin(cn):
 	if sbserver.playerPrivilege(cn) == 2:
 		return True
 	try:
-		return isUserAdmin(player(cn).user.id)
+		return isUserIdAdmin(player(cn).user.id)
 	except AttributeError, ValueError:
 		return False
 
@@ -41,7 +33,7 @@ class masterRequired(object):
 			cn = args[0].cn
 		except AttributeError:
 			cn = args[0]
-		if not isAtLeastMaster(cn):
+		if not isMaster(cn):
 			insufficientPermissions(cn)
 		else:
 			self.func(*args)

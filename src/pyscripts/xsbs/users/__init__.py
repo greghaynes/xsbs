@@ -57,9 +57,6 @@ def isUserIdAdmin(user_id):
 	user = userFromId(user_id)
 	return user.privilege == 2
 
-def loggedInAs(cn):
-	return player(cn).user
-
 def isLoggedIn(cn):
 	try:
 		return player(cn).logged_in
