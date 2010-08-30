@@ -116,20 +116,23 @@ def setSimpleMaster(cn):
 def onSetMaster(cn, givenhash):
 	p = player(cn)
 	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
-	try:
-		na = NickAccount.query.filter(NickAccount.nick==p.name()).one()
-	except NoResultFound:
-		if givenhash != adminhash:
-			setSimpleMaster(cn)
-	except MultipleResultsFound:
-		p.message(error(' This name is linked to multiple accounts.  Contact the system administrator.'))
+	if givenhash == adminhash:
+		sbserver.setAdmin(cn)
 	else:
-		nickhash = sbserver.hashPassword(cn, na.user.password)
-		if givenhash == nickhash:
-			p.login(na.user)
-		else:
+		try:
+			na = NickAccount.query.filter(NickAccount.nick==p.name()).one()
+		except NoResultFound:
 			if givenhash != adminhash:
 				setSimpleMaster(cn)
+		except MultipleResultsFound:
+			p.message(error(' This name is linked to multiple accounts.  Contact the system administrator.'))
+		else:
+			nickhash = sbserver.hashPassword(cn, na.user.password)
+			if givenhash == nickhash:
+				p.login(na.user)
+			else:
+				if givenhash != adminhash:
+					setSimpleMaster(cn)
 
 @eventHandler('player_setmaster_off')
 def onSetMasterOff(cn):
