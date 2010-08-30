@@ -1,6 +1,9 @@
 from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
 from xsbs.ui import info, error, warning
 from xsbs.users import User, NickAccount, config as userConfig
+from xsbs.events import eventHandler
+from xsbs.players import player, currentAdmin, currentMaster
+import sbserver
 
 from elixir import session
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
@@ -95,4 +98,40 @@ def onChangepass(p, args):
 		User.query.filter(User.id==p.user.id).update({ 'password': args[1] })
 		session.commit()
 		return
+
+def setSimpleMaster(cn):
+	p = player(cn)
+	if sbserver.publicServer() == 1:
+		p.message(error('This is not an open server, you need auth or master privileges to get master.'))
+		return
+	if currentAdmin() != None:
+		p.message(error('Admin is present'))
+		return
+	if currentMaster() != None:
+		p.message(error('Master is present'))
+		return
+	sbserver.setMaster(cn)
+
+@eventHandler('player_setmaster')
+def onSetMaster(cn, givenhash):
+	p = player(cn)
+	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
+	try:
+		na = NickAccount.query.filter(NickAccount.nick==p.name()).one()
+	except NoResultFound:
+		if givenhash != adminhash:
+			setSimpleMaster(cn)
+	except MultipleResultsFound:
+		p.message(error(' This name is linked to multiple accounts.  Contact the system administrator.'))
+	else:
+		nickhash = sbserver.hashPassword(cn, na.user.password)
+		if givenhash == nickhash:
+			p.login(na.user)
+		else:
+			if givenhash != adminhash:
+				setSimpleMaster(cn)
+
+@eventHandler('player_setmaster_off')
+def onSetMasterOff(cn):
+	sbserver.resetPrivilege(cn)
 

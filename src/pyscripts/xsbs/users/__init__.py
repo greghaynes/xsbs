@@ -66,38 +66,6 @@ def isValidEmail(email):
 			return True
 	return False
 
-#@eventHandler('player_setmaster')
-def onSetMaster(cn, givenhash):
-	p = player(cn)
-	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
-	try:
-		na = NickAccount.query.filter(NickAccount.nick==p.name()).one()
-	except NoResultFound:
-		if givenhash != adminhash:
-			setSimpleMaster(cn)
-	except MultipleResultsFound:
-		p.message(error(' This name is linked to multiple accounts.  Contact the system administrator.'))
-	else:
-		nickhash = sbserver.hashPassword(cn, na.user.password)
-		if givenhash == nickhash:
-			login(cn, na.user)
-		else:
-			if givenhash != adminhash:
-				setSimpleMaster(cn)
-
-def setSimpleMaster(cn):
-	p = player(cn)
-	if sbserver.publicServer() == 1:
-		sbserver.playerMessage(cn, error('This is not an open server, you need auth or master privileges to get master.'))
-		return
-	if currentAdmin() != None:
-		sbserver.playerMessage(cn, error('Admin is present'))
-		return
-	if currentMaster() != None:
-		sbserver.playerMessage(cn, error('Master is present'))
-		return
-	sbserver.setMaster(cn)
-
 def warnNickReserved(cn, count, sessid):
 	try:
 		p = player(cn)

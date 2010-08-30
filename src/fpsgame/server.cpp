@@ -632,6 +632,7 @@ namespace server
         ci->privilege = PRIV_ADMIN;
         currentmaster = ci->clientnum;
         SbPy::triggerEventInt("player_claimed_admin", ci->clientnum);
+        sendf(-1, 1, "ri4", N_CURRENTMASTER, currentmaster, currentmaster >= 0 ? ci->privilege : 0, mastermode);
     }
 
     void resetpriv(clientinfo *ci)
@@ -643,6 +644,7 @@ namespace server
             SbPy::triggerEventInt("player_released_admin", ci->clientnum);
         ci->privilege = PRIV_NONE;
         currentmaster = -1; 
+        sendf(-1, 1, "ri4", N_CURRENTMASTER, currentmaster, currentmaster >= 0 ? ci->privilege : 0, mastermode);
     }
 
     savedscore &findscore(clientinfo *ci, bool insert)
