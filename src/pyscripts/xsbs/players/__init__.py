@@ -153,9 +153,15 @@ class Player:
 			return True
 		except AttributeError:
 			return False
+	def logout(self):
+		try:
+			del self.user
+		except AttributeError:
+			pass
+		triggerServerEvent('player_logged_out', (self.cn,))
 	def login(self, user):
 		if self.isLoggedIn():
-			raise StateError('You are already logged in')
+			self.logout()
 		self.user = user
 		triggerServerEvent('player_logged_in', (self.cn,))
 		sbserver.message(info(green(self.name() + ' is verified')))
