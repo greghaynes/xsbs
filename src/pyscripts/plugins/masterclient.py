@@ -9,7 +9,7 @@ from xsbs.net import ipLongToString
 import sbserver
 import time
 import logging
-
+import string
 
 config = {
 	'Main':
@@ -19,6 +19,10 @@ config = {
 			'allow_auth': 'yes',
 			'register_interval': 3600,
 		}
+	'Templates':
+		{
+			'authenticated': '${green}${name}${white} authenticated as ${magenta}${authname}',
+		}
 	}
 
 def init():
@@ -26,7 +30,7 @@ def init():
 	config['Main']['allow_auth'] = config['Main']['allow_auth'] == 'yes'
 	config['Main']['master_port'] = int(config['Main']['master_port'])
 	config['Main']['register_interval'] = int(config['Main']['register_interval'])
-
+	config['Templates']['authenticated'] = string.Template(config['Templates']['authenticated'])
 init()
 
 class AuthRequest(object):
@@ -168,4 +172,8 @@ def authRequest(cn, name):
 @eventHandler('player_auth_challenge_response')
 def authChallengeResponse(cn, id, response):
 	factory.send('confauth %i %s' % (id, response))
+
+@eventHandler('player_auth_succeed')
+def playerAuthSuccess(cn, name):
+	sbserver.message(info(config['Templates']['authenticated'].substitute(colordict, name=sbserver.playerName(cn), authname=name)))
 

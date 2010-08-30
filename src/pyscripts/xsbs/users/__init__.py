@@ -1,6 +1,5 @@
-from elixir import Entity, Field, String, ManyToOne, OneToMany, setup_all, session
+from elixir import Entity, Field, String, Integer, ManyToOne, OneToMany, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from privilege import isUserAtLeastMaster
 from xsbs.events import eventHandler, policyHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
 from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
 from xsbs.colors import red, green, orange
@@ -38,11 +37,25 @@ class Group(Entity):
 class User(Entity):
 	email = Field(String(50))
 	password = Field(String(20))
+	privilege = Field(Integer)
 	nickaccounts = OneToMany('NickAccount')
 	groups = ManyToOne('Group')
-	def __init__(self, email, password):
+	def __init__(self, email, password, privilege=0):
 		self.email = email
 		self.password = password
+		self.privilege = privilege
+
+def userFromId(user_id):
+	user = User.query.filter(id==User.id).one()
+	return user
+
+def isUserIdMaster(user_id):
+	user = userFromId(user_id)
+	return user.privilege >= 1
+
+def isUserIdAdmin(user_id):
+	user = userFromId(user_id)
+	return user.privilege == 2
 
 def loggedInAs(cn):
 	return player(cn).user
@@ -257,7 +270,7 @@ def connectWithPass(cn, args):
 		if args == nickhash:
 			login(cn, na.user)
 			user_id = p.user.id
-			if isUserAtLeastMaster:
+			if isUserMaster(user_id):
 				return True
 		else:
 			return False
