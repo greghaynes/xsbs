@@ -1,42 +1,51 @@
 import sbserver
 from xsbs.colors import colordict
 from xsbs.settings import loadPluginConfig
+
 import string
+import logging
 
 config = {
-	'Templates':
+	'MessageTypes':
 		{
-			'notice': '${blue}Notice:${white}',
-			'info': '${yellow}Info:${white}',
-			'warning': '${red}Warning:${white}',
-			'error': '${red}Error:${white}',
+			'notice': '${blue}Notice:${text}',
+			'info': '${yellow}Info:${text}',
+			'warning': '${red}Warning:${text}',
+			'error': '${red}Error:${text}',
+		},
+	'Theme':
+		{
+			'priv_master': 'blue',
+			'priv_admin': 'red',
+			'client_name': 'green',
+			'text': 'white',
 		}
 	}
 
+themedict = dict(**colordict)
+
 def init():
 	loadPluginConfig(config, 'UI')
-	config['Templates']['notice'] = 	string.Template(config['Templates']['notice'])
-	config['Templates']['info'] = 		string.Template(config['Templates']['info'])
-	config['Templates']['warning'] = 	string.Template(config['Templates']['warning'])
-	config['Templates']['error'] = 		string.Template(config['Templates']['error'])
+	for name, colorname in config['Theme'].items():
+		try:
+			themedict[name] = colordict[colorname]
+		except KeyError:
+			logging.error('Invalid color \'%s\' specified for \'%s\'' % (colorname, name))
 
-
-	config['Templates']['notice'] = 	config['Templates']['notice'].substitute(colordict) + ' '
-	config['Templates']['info'] = 		config['Templates']['info'].substitute(colordict) + ' '
-	config['Templates']['warning'] = 	config['Templates']['warning'].substitute(colordict) + ' '
-	config['Templates']['error'] = 		config['Templates']['error'].substitute(colordict) + ' '
+	for msgtype, theme in config['MessageTypes'].items():
+		config['MessageTypes'][msgtype] = string.Template(config['MessageTypes'][msgtype]).substitute(themedict) + ' '
 
 def notice(message):
-	return config['Templates']['notice'] + message
+	return config['MessageTypes']['notice'] + message
 
 def info(message):
-	return config['Templates']['info'] + message
+	return config['MessageTypes']['info'] + message
 
 def warning(message):
-	return config['Templates']['warning'] + message
+	return config['MessageTypes']['warning'] + message
 
 def error(message):
-	return config['Templates']['error'] + message
+	return config['MessageTypes']['error'] + message
 
 def insufficientPermissions(cn):
 	sbserver.playerMessage(cn, error('Insufficient permissions'))
