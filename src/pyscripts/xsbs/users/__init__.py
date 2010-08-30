@@ -1,11 +1,8 @@
 from elixir import Entity, Field, String, Integer, ManyToOne, OneToMany, setup_all, session
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-from xsbs.events import eventHandler, policyHandler, triggerServerEvent, registerServerEventHandler, registerPolicyEventHandler
-from xsbs.commands import commandHandler, UsageError, StateError, ArgumentValueError
 from xsbs.colors import red, green, orange
 from xsbs.ui import info, error, warning
 from xsbs.settings import loadPluginConfig
-from xsbs.ban import ban
 from xsbs.timers import addTimer
 
 import sbserver
@@ -69,7 +66,7 @@ def isValidEmail(email):
 			return True
 	return False
 
-@eventHandler('player_setmaster')
+#@eventHandler('player_setmaster')
 def onSetMaster(cn, givenhash):
 	p = player(cn)
 	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
@@ -131,7 +128,7 @@ def warnNickReserved(cn, count, sessid):
 def nickReserver(nick):
 	return NickAccount.query.filter(NickAccount.nick==nick).one()
 
-@eventHandler('player_connect')
+#@eventHandler('player_connect')
 def onPlayerActive(cn):
 	nick = sbserver.playerName(cn)
 	p = player(cn)
@@ -145,7 +142,7 @@ def onPlayerActive(cn):
 	p.warn_nickacct = nickacct
 	warnNickReserved(cn, 0, sbserver.playerSessionId(cn))
 	
-@policyHandler('connect_with_pass')
+#@policyHandler('connect_with_pass')
 def connectWithPass(cn, args):
 	p = player(cn)
 	adminhash = sbserver.hashPassword(cn, sbserver.adminPassword())
@@ -166,7 +163,7 @@ def connectWithPass(cn, args):
 		else:
 			return False
 
-@eventHandler('player_name_changed')
+#@eventHandler('player_name_changed')
 def onPlayerNameChanged(cn, old_name, new_name):
 	onPlayerActive(cn)
 

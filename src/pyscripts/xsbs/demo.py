@@ -4,7 +4,7 @@ from xsbs.events import eventHandler
 from xsbs.ui import info, notice
 from xsbs.settings import loadPluginConfig
 from xsbs.colors import colordict
-from xsbs.players import player, masterRequired, adminRequired, isUserAdmin, isUserAtLeastMaster
+from xsbs.players import player, masterRequired, adminRequired
 from xsbs.ui import insufficientPermissions
 import string
 import logging
@@ -30,7 +30,7 @@ def permissions_ok(p):
 	if required_permissions == 0:
 		return True
 	if required_permissions == 1:
-		return p.isAtLeastMaster()
+		return p.isMaster()
 	if required_permissions == 2:
 		return p.isAdmin()
 	logging.error('required_permissions not a valid int!')

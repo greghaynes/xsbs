@@ -1,5 +1,5 @@
 from xsbs.events import eventHandler, execLater
-from xsbs.players import isAtLeastMaster, player
+from xsbs.players import player
 from xsbs.ui import error, insufficientPermissions
 from xsbs.game import currentMode, modeName
 import sbserver
@@ -50,7 +50,7 @@ def onSwitchTeam(cn, team):
 def onSetTeam(tcn, cn, team):
 	p = player(cn)
 	r = player(tcn)
-	if cn != tcn and not isAtLeastMaster(tcn):
+	if cn != tcn and not r.isMaster():
 		insufficientPermissions(tcn)
 		return
 	mode = currentMode()

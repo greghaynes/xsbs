@@ -1,8 +1,7 @@
 from twisted.web import resource
 
 from xsbs.http import server as httpServer
-from xsbs.users import userAuth
-from xsbs.users.privilege import isUserAtLeastMaster, isUserMaster, isUserAdmin
+from xsbs.users import userAuth, isUserIdMaster, isUserIdAdmin
 
 
 try:
@@ -92,21 +91,15 @@ class JsonUserSite(JsonSessionSite):
 			return response('not_logged_in', 'Not currently logged in')
 		return self.render_user_JSON(request, session, user_id)
 
-class JsonAtLeastMasterSite(JsonUserSite):
-	def render_user_JSON(self, request, user_id):
-		if not isUserAtLeastMaster(user_id):
-			return response('insufficient_permissions', 'User does not have master permissions')
-		return self.render_master_JSON(request, user)		
-
 class JsonMasterSite(JsonUserSite):
 	def render_user_JSON(self, request, user_id):
-		if not isUserMaster(user_id):
+		if not isUserIdMaster(user_id):
 			return response('insufficient_permissions', 'User does not have master permissions')
 		return self.render_master_JSON(request, user)		
 
 class JsonAdminSite(JsonUserSite):
 	def render_user_JSON(self, request, user_id):
-		if not isUserAdmin(user_id):
+		if not isUserIdAdmin(user_id):
 			return response('insufficient_permissions', 'User does not have admin permissions')
 		return self.render_admin_JSON(request, user)		
 

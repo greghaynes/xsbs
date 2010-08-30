@@ -1,7 +1,7 @@
 from xsbs.events import eventHandler
 from xsbs.colors import colordict
 from xsbs.ui import error, info
-from xsbs.players import player, all as allPlayers, isAtLeastMaster
+from xsbs.players import player, all as allPlayers
 from xsbs.settings import loadPluginConfig
 from xsbs.server import message as serverMessage
 from xsbs.game import setMap
@@ -67,7 +67,7 @@ def onMapSet(cn, mapname, mapmode):
 	elif mapreload[0]:
 		setMap(mapname, mapmode)
 		mapreload[0] = False
-	elif isAtLeastMaster(cn) and sbserver.masterMode() > 0:
+	elif p.isMaster() and sbserver.masterMode() > 0:
 		sbserver.setMap(mapname, mapmode)
 	elif mapmode != sbserver.gameMode() and (config['Main']['lock_game_mode'] or not config['Main']['allow_mode_vote']):
 		p.message(error('You cannot request a new game mode'))
@@ -77,7 +77,7 @@ def onMapVote(cn, mapname, mapmode):
 	p = player(cn)
 	if sbserver.mapName() == '':
 		setMap(mapname, mapmode)
-	elif isAtLeastMaster(cn) and sbserver.masterMode() > 0:
+	elif p.isMaster() and sbserver.masterMode() > 0:
 		setMap(mapname, mapmode)
 	elif mapmode != sbserver.gameMode() and (config['Main']['lock_game_mode'] or not config['Main']['allow_mode_vote']):
 		p.message(error('You cannot vote for a new game mode'))
