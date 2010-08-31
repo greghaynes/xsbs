@@ -1,16 +1,21 @@
 from twisted.web import server, resource
 from twisted.internet import reactor
 
-from xsbs.settings import PluginConfig
+from xsbs.settings import loadPluginConfig
 from xsbs.events import eventHandler
 
 from session import SessionManager
 
-config = PluginConfig('httpserver')
-port = config.getOption('Config', 'port', '8081')
-enable = config.getOption('Config', 'enable', 'yes') == 'yes'
-port = int(port)
-del config
+config = {
+	'Main': {
+			'port': '8081',
+		}
+	}
+
+loadPluginConfig(config, 'http')
+enable = True
+port = int(config['Main']['port'])
+
 
 class RootSite(resource.Resource):
 		pass
