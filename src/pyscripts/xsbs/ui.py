@@ -40,6 +40,6 @@ def error(message):
 
 def insufficientPermissions(cn):
 	sbserver.playerMessage(cn, error('Insufficient permissions'))
-	
+
 init()
 

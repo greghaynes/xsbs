@@ -388,6 +388,9 @@ namespace server
 	extern int publicserver;
 	extern char *adminpass;
 	extern char *serverpass;
+	extern char *dburi;
+	extern char *logpath;
+	extern char *loglevel;
 	extern int gamemode;
 	extern bool gamepaused;
 	extern bool allow_modevote;

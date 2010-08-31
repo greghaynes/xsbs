@@ -1,11 +1,10 @@
 from xsbs.settings import PluginConfig
+import sbserver
 import logging
 import string
 
-config = PluginConfig('logging')
-path = config.getOption('Config', 'path', 'xsbs.log')
-level = config.getOption('Config', 'level', 'error')
-del config
+path = sbserver.logPath()
+level = sbserver.logLevel()
 
 LEVELS = {'debug': logging.DEBUG,
 	'info': logging.INFO,

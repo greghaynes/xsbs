@@ -71,6 +71,9 @@ namespace server
     SVAR(serverpass, "");
     SVAR(adminpass, "");
     SVAR(pyscriptspath, "");
+    SVAR(dburi, "sqlite:///xsbs.db");
+	SVAR(logpath, "xsbs.log");
+	SVAR(loglevel, "error");
     VARF(publicserver, 0, 0, 2, {
         switch(publicserver)
         {

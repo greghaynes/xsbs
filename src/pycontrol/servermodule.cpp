@@ -903,6 +903,21 @@ static PyObject *suicide(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *getDbUri(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("s", server::dburi);
+}
+
+static PyObject *getLogPath(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("s", server::logpath);
+}
+
+static PyObject *getLogLevel(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("s", server::loglevel);
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"cseval", cseval, METH_VARARGS, "Execute a string containing CubeScript"},
 	{"triggercsevent", triggercsevent, METH_VARARGS, "Trigger a CubeScript event"},
@@ -966,6 +981,9 @@ static PyMethodDef ModuleMethods[] = {
 	{"demoData", demoData, METH_VARARGS, "Demo data."},
 	{"sendDemo", sendDemo, METH_VARARGS, "Send demo to client."},
 	{"suicide", suicide, METH_VARARGS, "Force client to commit suicide."},
+	{"dbUri", getDbUri, METH_VARARGS, "Retrieve the db uri."},
+	{"logPath", getLogPath, METH_VARARGS, "Retrieve the log path."},
+	{"logLevel", getLogLevel, METH_VARARGS, "Retrieve the log level."},
 	{NULL, NULL, 0, NULL}
 };
 
