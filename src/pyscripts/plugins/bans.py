@@ -1,7 +1,6 @@
 from elixir import session
 
 from xsbs.settings import loadPluginConfig
-from xsbs.colors import red
 from xsbs.ui import insufficientPermissions, error, info, themedict
 from xsbs.commands import commandHandler, UsageError, ArgumentValueError
 from xsbs.events import triggerServerEvent, eventHandler, policyHandler, execLater

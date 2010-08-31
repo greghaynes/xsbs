@@ -2,8 +2,7 @@ from xsbs.ban import ban
 from xsbs.settings import loadPluginConfig
 from xsbs.events import eventHandler
 from xsbs.players import player
-from xsbs.ui import warning
-from xsbs.colors import colordict
+from xsbs.ui import warning, themedict
 import string
 
 config = {
@@ -15,7 +14,7 @@ config = {
 		},
 	'Templates':
 		{
-			'warn_tk_message': 'This server does not allow more than ${red}${limit}${white} teamkills per game',
+			'warn_tk_message': 'This server does not allow more than ${severe_action}${limit}${text} teamkills per game',
 		}
 	}
 
@@ -32,7 +31,7 @@ def onTeamkill(cn, tcn):
 		if player(cn).teamkills() >= config['Main']['teamkill_limit']:
 			ban(cn, config['Main']['ban_time'], 'killing teammates', -1)
 		elif config['Main']['warn_tk_limit'] and player(cn).teamkills() == 1:	
-			player(cn).message(warning(config['Templates']['warn_tk_message'].substitute(colordict, limit=config['Main']['teamkill_limit'])))
+			player(cn).message(warning(config['Templates']['warn_tk_message'].substitute(themedict, limit=config['Main']['teamkill_limit'])))
 	except KeyError:
 		pass
 		

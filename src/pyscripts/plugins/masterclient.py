@@ -5,7 +5,7 @@ from twisted.internet.task import LoopingCall
 from xsbs.settings import loadPluginConfig
 from xsbs.events import triggerServerEvent, eventHandler
 from xsbs.net import ipLongToString
-
+from xsbs.ui import themedict
 import sbserver
 import time
 import logging
@@ -21,7 +21,7 @@ config = {
 		},
 	'Templates':
 		{
-			'authenticated': '${green}${name}${white} authenticated as ${magenta}${authname}',
+			'authenticated': '${client_name}${name}${text} authenticated as ${auth}${authname}',
 		}
 	}
 
@@ -175,5 +175,5 @@ def authChallengeResponse(cn, id, response):
 
 @eventHandler('player_auth_succeed')
 def playerAuthSuccess(cn, name):
-	sbserver.message(info(config['Templates']['authenticated'].substitute(colordict, name=sbserver.playerName(cn), authname=name)))
+	sbserver.message(info(config['Templates']['authenticated'].substitute(themedict, name=sbserver.playerName(cn), authname=name)))
 

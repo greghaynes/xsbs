@@ -1,8 +1,7 @@
 from xsbs.events import registerServerEventHandler, triggerServerEvent
 from xsbs.settings import loadPluginConfig
 from xsbs.game import modes
-from xsbs.ui import error, info
-from xsbs.colors import colordict
+from xsbs.ui import error, info, themedict
 from xsbs.commands import registerCommandHandler
 import logging
 import sbserver
@@ -16,7 +15,7 @@ config = {
 		},
 	'Templates':
 		{
-			'nextmap_response': 'The next map is ${blue}${mapname}',
+			'nextmap_response': 'The next map is ${emphasis}${mapname}',
 		},
 	'Maps':
 		{
@@ -97,7 +96,7 @@ def onNextMapCmd(p, args):
 		p.message(error('Usage: #nextmap'))
 	else:
 		try:
-			p.message(info(config['Templates']['nextmap_response'].substitute(colordict, mapname=getSuccessor(sbserver.gameMode(), sbserver.mapName()))))
+			p.message(info(config['Templates']['nextmap_response'].substitute(themedict, mapname=getSuccessor(sbserver.gameMode(), sbserver.mapName()))))
 		except (KeyError, ValueError):
 			p.message(error('Could not determine next map'))
 

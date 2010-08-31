@@ -1,6 +1,5 @@
 import sbserver
-from xsbs.colors import colordict
-from xsbs.ui import info, notice, error
+from xsbs.ui import info, notice, error, themedict
 from xsbs.events import registerPolicyEventHandler, registerServerEventHandler
 from xsbs.players import player, masterRequired
 from xsbs.settings import loadPluginConfig
@@ -15,8 +14,8 @@ config = {
 		},
 	'Templates':
 		{
-			'muted_message': '${green}${muted_name}${white} has been ${red}muted ${white}(by ${blue}${muter}${white})',
-			'unmuted_message': '${green}${muted_name}${white} has been ${red}unmuted ${white}(by ${blue}${muter}${white})',
+			'muted_message': '${client_name}${muted_name}${text} has been ${severe_action}muted ${text}(by ${secondary_client_name}${muter}${text})',
+			'unmuted_message': '${client_name}${muted_name}${text} has been ${severe_action}unmuted ${text}(by ${secondary_client_name}${muter}${text})',
 		}
 	}
 
@@ -93,7 +92,7 @@ def onMuteCommand(sender, args):
 				p.is_muted = True
 				name = p.name()
 				muter = player(sender.cn).name()
-				sbserver.message(info(config['Templates']['muted_message'].substitute(colordict, muted_name=name, muter=muter)))
+				sbserver.message(info(config['Templates']['muted_message'].substitute(themedict, muted_name=name, muter=muter)))
 	except KeyError:
 		raise UsageError()
 			
@@ -112,7 +111,7 @@ def onUnmuteCommand(sender, args):
 			if p.is_muted:
 				p.is_muted = False
 				muter = player(sender.cn).name()
-				sbserver.message(info(config['Templates']['unmuted_message'].substitute(colordict, muted_name=p.name(), muter=muter)))
+				sbserver.message(info(config['Templates']['unmuted_message'].substitute(themedict, muted_name=p.name(), muter=muter)))
 			else:
 				raise StateError('Specified player is not crrently muted')
 		except AttributeError:

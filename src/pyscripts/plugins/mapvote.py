@@ -1,6 +1,5 @@
 from xsbs.events import eventHandler
-from xsbs.colors import colordict
-from xsbs.ui import error, info
+from xsbs.ui import error, info, themedict
 from xsbs.players import player, all as allPlayers
 from xsbs.settings import loadPluginConfig
 from xsbs.server import message as serverMessage
@@ -18,7 +17,7 @@ config = {
 		},
 	'Templates':
 		{
-			'request_string': '${green}${user}${white} requested ${modename} on ${mapname}',
+			'request_string': '${client_name}${user}${text} requested ${modename} on ${mapname}',
 		}
 	}
 
@@ -88,9 +87,7 @@ def onMapVote(cn, mapname, mapmode):
 		except KeyError:
 			allow_vote = True
 		if allow_vote:
-			sbserver.message(info(config['Templates']['request_string'].substitute(colordict,
-				user=p.name(),
-				modename=sbserver.modeName(mapmode),
+			sbserver.message(info(config['Templates']['request_string'].substitute(themedict, user=p.name(), modename=sbserver.modeName(mapmode),
 				mapname=mapname)))
 			p.gamevars['mapvote'] = (mapname, mapmode)
 		else:

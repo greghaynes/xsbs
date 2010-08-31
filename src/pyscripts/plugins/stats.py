@@ -1,8 +1,7 @@
 import string
 from xsbs.commands import commandHandler
-from xsbs.colors import colordict
 from xsbs.settings import loadPluginConfig
-from xsbs.ui import insufficientPermissions, error
+from xsbs.ui import insufficientPermissions, error, themedict
 from xsbs.players import player
 
 config = {
@@ -12,7 +11,7 @@ config = {
 		},
 	'Templates':
 		{
-			'stats_message': '${white}Stats for ${orange}${name}\n${white}Frags: ${green}${frags} ${white}Deaths: ${red}${deaths} ${white}Teamkills: ${magenta}${teamkills} ${white}Accuracy: ${yellow}${accuracy}% ${white}KpD: ${orange}${ktd} ${white}Scores: ${blue}${score}'
+			'stats_message': '${text}Stats for ${client_name}${name}\n${text}Frags: ${green}${frags} ${text}Deaths: ${red}${deaths} ${text}Teamkills: ${magenta}${teamkills} ${text}Accuracy: ${yellow}${accuracy}% ${text}KpD: ${orange}${ktd} ${text}Scores: ${blue}${score}'
 		}
 	}
 
@@ -41,7 +40,7 @@ def onCommand(cp, args):
 		cp.message(error('You must use a valid cn'))
 		return
 
-	msg = template.substitute(colordict, name=p.name(), frags=p.frags(), deaths=p.deaths(), teamkills=p.teamkills(), shots=p.shots(), hits=p.hits(), accuracy=p.accuracy(), ktd=p.kpd(), score=p.score())
+	msg = template.substitute(themedict, name=p.name(), frags=p.frags(), deaths=p.deaths(), teamkills=p.teamkills(), shots=p.shots(), hits=p.hits(), accuracy=p.accuracy(), ktd=p.kpd(), score=p.score())
 	cp.message(msg)
 	
 init()

@@ -4,8 +4,7 @@ from elixir import session
 from xsbs.events import triggerServerEvent
 from xsbs.commands import commandHandler, UsageError, ExtraArgumentError, StateError
 from xsbs.settings import loadPluginConfig
-from xsbs.colors import red, yellow, blue, green, white, colordict
-from xsbs.ui import error, info, notice, insufficientPermissions
+from xsbs.ui import error, info, notice, insufficientPermissions, themedict
 from xsbs.net import ipLongToString
 from xsbs.users import isUserIdMaster, isUserIdAdmin
 from xsbs.players import masterRequired, adminRequired, player, currentAdmin
@@ -21,9 +20,9 @@ config = {
 		},
 	'Templates':
 		{
-			'server_message': '${orange}${sender}${white}: ${message}',
-			'pm': '${orange}${sender}${white}: ${message}',
-			'smite': '${green}${smited}${white} has been smited by ${orange}${smiter}'
+			'server_message': '${emphasis}${sender}${text}: ${message}',
+			'pm': '${emphasis}${sender}${text}: ${message}',
+			'smite': '${client_name}${smited}${text} has been smited by ${secondary_client_name}${smiter}'
 		}
 	}
 
@@ -48,7 +47,7 @@ def onPauseCmd(p, args):
 
 def resumeTimer(count, cn):
 	if count > 0:
-		sendServerMessage(notice('Resuming in ' + green(str(count)) + white('...')))
+		sendServerMessage(notice('Resuming in ' + str(count) + '...'))
 		addTimer(1000, resumeTimer, (count-1, cn))
 	else:
 		setPaused(False, cn)
@@ -141,7 +140,7 @@ def serverMessage(p, args):
 	if args == '':
 		raise UsageError()
 	else:
-		msg = config['Templates']['server_message'].substitute(colordict, sender=p.name(), message=args)
+		msg = config['Templates']['server_message'].substitute(themedict, sender=p.name(), message=args)
 		sbserver.message(msg)
 
 @commandHandler('ip')
@@ -297,7 +296,7 @@ def onPmCommand(p, args):
 		if i > 1:
 			args[1] += (" " + str(key))
 		i += 1
-	player(int(args[0])).message(config['Templates']['pm'].substitute(colordict, sender=p.name(), message=args[1]))
+	player(int(args[0])).message(config['Templates']['pm'].substitute(themedict, sender=p.name(), message=args[1]))
 	
 @commandHandler('smite')
 @masterRequired
@@ -308,7 +307,7 @@ def onSmiteCommand(p, args):
 	if args == '':
 		raise UsageError()
 	t = player(int(args))
-	sendServerMessage(info(config['Templates']['smite'].substitute(colordict, smiter=p.name(), smited=t.name())))
+	sendServerMessage(info(config['Templates']['smite'].substitute(themedict, smiter=p.name(), smited=t.name())))
 	t.suicide()
 
 init()

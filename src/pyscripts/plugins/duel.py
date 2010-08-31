@@ -1,6 +1,5 @@
 from xsbs.commands import commandHandler, UsageError, ArgumentValueError
 from xsbs.ui import error, notice
-from xsbs.colors import green
 from xsbs.timers import addTimer
 from xsbs.game import modeNumber, currentMode, setMap, currentMap
 from xsbs.server import setPaused
@@ -12,7 +11,7 @@ import sbserver
 
 def duelTimer(count, cn):
 	if count > 0:
-		message(notice('Duel starts in ' + green(str(count))))
+		message(notice('Duel starts in ' + str(count)))
 		addTimer(1000, duelTimer, (count-1, cn))
 	else:
 		message(notice('Duel!'))

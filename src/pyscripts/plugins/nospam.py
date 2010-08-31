@@ -1,9 +1,8 @@
 from xsbs.events import eventHandler
 from xsbs.timers import addTimer
 from xsbs.settings import loadPluginConfig
-from xsbs.ui import error, notice, warning
+from xsbs.ui import error, notice, warning, themedict
 from xsbs.ban import ban
-from xsbs.colors import colordict
 from xsbs.players import player, all as allPlayers, playerByName, playerByIpString
 import sbserver
 import time
@@ -23,7 +22,7 @@ config = {
 		},
 	'Templates':
 		{
-			'message': 'Warning do not spam. This server is ${red}spam intolerant!${white} ',
+			'message': 'Warning do not spam. This server is ${severe_action}spam intolerant!${text} ',
 		}
 	}
 
@@ -65,10 +64,10 @@ class SpammerManager:
 				self.dealwithspammer(ip)
 				del self.spammerlist[ip]
 			else:
-				playerByIpString(ip).message(warning(config['Templates']['message'].substitute(colordict)))
+				playerByIpString(ip).message(warning(config['Templates']['message'].substitute(themedict)))
 		else:
 			self.spammerlist[ip] = 1
-			playerByIpString(ip).message(warning(config['Templates']['message'].substitute(colordict)))
+			playerByIpString(ip).message(warning(config['Templates']['message'].substitute(themedict)))
 
 	def dealwithspammer(self, ip):
 		try:

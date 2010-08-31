@@ -1,7 +1,6 @@
 from xsbs.events import eventHandler, execLater, registerServerEventHandler
 from xsbs.players import player
 from xsbs.ui import warning
-from xsbs.colors import red
 from xsbs.timers import addTimer
 from xsbs.ban import ban
 from xsbs.users import User, Group
@@ -35,7 +34,7 @@ def warnTagReserved(cn, count, sessid, nick):
 		p.warning_for_login = False
 		return
 	remaining = 25-(count*5)
-	p.message(warning('Your are using a reserved clan tag. You have ' + red('%i') + ' seconds to login or be kicked.') % remaining)
+	p.message(warning('Your are using a reserved clan tag. You have %i seconds to login or be kicked.') % remaining)
 	addTimer(5000, warnTagReserved, (cn, count+1, sessid, nick))
 
 def tagId(tag):

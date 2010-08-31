@@ -1,8 +1,7 @@
 from xsbs.events import registerServerEventHandler
 from xsbs.commands import commandHandler
 from xsbs.players import player, all as allPlayers
-from xsbs.ui import error, info
-from xsbs.colors import colordict
+from xsbs.ui import error, info, themedict
 from xsbs.settings import loadPluginConfig
 from xsbs.ban import ban
 import sbserver
@@ -11,7 +10,7 @@ import string
 config = {
 	'Templates':
 		{
-			'vote_message': '${green}${voter}${white} voted to ${red}kick ${orange}${victim}',
+			'vote_message': '${client_name}${voter}${text} voted to ${severe_action}kick ${emphasis}${victim}',
 		}
 	}
 
@@ -51,7 +50,7 @@ def onVoteKick(p, args):
 		except AttributeError:
 			allow_vote = True
 		if allow_vote:
-			sbserver.message(info(config['Templates']['vote_message'].substitute(colordict, voter=p.name(), victim=sbserver.playerName(tcn))))
+			sbserver.message(info(config['Templates']['vote_message'].substitute(themedict, voter=p.name(), victim=sbserver.playerName(tcn))))
 			p.votekick = int(args)
 			checkVotes(int(args))
 			
