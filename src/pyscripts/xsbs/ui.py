@@ -21,6 +21,7 @@ config = {
 			'secondary_client_name': 'blue',
 			'text': 'white',
 			'severe_action': 'red',
+			'emphasis': 'orange'
 		}
 	}
 
