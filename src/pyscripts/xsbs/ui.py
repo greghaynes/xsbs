@@ -18,7 +18,9 @@ config = {
 			'priv_master': 'blue',
 			'priv_admin': 'red',
 			'client_name': 'green',
+			'secondary_client_name': 'blue',
 			'text': 'white',
+			'severe_action': 'red',
 		}
 	}
 

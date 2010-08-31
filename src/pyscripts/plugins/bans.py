@@ -1,8 +1,8 @@
 from elixir import session
 
 from xsbs.settings import loadPluginConfig
-from xsbs.colors import red, colordict
-from xsbs.ui import insufficientPermissions, error, info
+from xsbs.colors import red
+from xsbs.ui import insufficientPermissions, error, info, themedict
 from xsbs.commands import commandHandler, UsageError, ArgumentValueError
 from xsbs.events import triggerServerEvent, eventHandler, policyHandler, execLater
 from xsbs.ban import ban, isIpBanned, isNickBanned, Ban
@@ -18,7 +18,7 @@ config = {
 		'command': 'ban',
 		'default_length': '3600',
 		'default_reason': 'unspecified reason',
-		'kick_message': '${green}${name}${white} was ${red}kicked${white} from server',
+		'kick_message': '${client_name}${name}${text} was ${severe_action}kicked${text} from server',
 		}
 	}
 def init():
@@ -80,7 +80,7 @@ def onKickCommand(p, args):
 	   @usage <cn>'''
 	tcn = int(args)
 	t = player(tcn)
-	serverMessage(info(config['Main']['kick_message'].substitute(colordict, name=t.name())))
+	serverMessage(info(config['Main']['kick_message'].substitute(themedict, name=t.name())))
 	t.kick()
 
 @commandHandler('insertban')
