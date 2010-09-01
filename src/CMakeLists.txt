@@ -10,9 +10,9 @@ set(xsbs_srcs
 
 	fpsgame/server.cpp
 
-	pycontrol/sbpy.cpp
-	pycontrol/sbcs.cpp
-	pycontrol/servermodule.cpp)
+	xsbs/sbpy.cpp
+	xsbs/sbcs.cpp
+	xsbs/servermodule.cpp)
 
 set(XSBS_LIBS
 	enet
@@ -47,7 +47,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src/engine
 	${CMAKE_SOURCE_DIR}/src/fpsgame
 	${CMAKE_SOURCE_DIR}/src/shared
 	${CMAKE_SOURCE_DIR}/src/tools
-	${CMAKE_SOURCE_DIR}/src/pycontrol
+	${CMAKE_SOURCE_DIR}/src/xsbs
 	${CMAKE_SOURCE_DIR}/src/enet/include
 	${PYTHON_INCLUDE_PATH}
 	${ZLIB_INCLUDE_PATH})
