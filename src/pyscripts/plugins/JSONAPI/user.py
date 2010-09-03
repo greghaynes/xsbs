@@ -9,7 +9,7 @@ import json
 class LoginSite(JsonSessionSite):
 	def render_session_JSON(self, request, session):
 		try:
-			email = request.args['email']
+			email = request.args['username']
 			password = request.args['password']
 		except (KeyError, IndexError):
 			return json.dumps({'response_type': 'Error',
