@@ -23,6 +23,7 @@ config = {
 			'severe_action': 'red',
 			'emphasis': 'orange',
 			'auth': 'magenta'
+			'countdown':'blue'
 		}
 	}
 
