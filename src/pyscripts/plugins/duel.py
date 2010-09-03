@@ -8,10 +8,15 @@ from xsbs.persistteam import persistentTeams
 from xsbs.server import message, setMasterMode, setFrozen
 
 import sbserver
+import string
+config = {
+		'message':'Duel starts in ${countdowm}${time}${text} seconds.'
+	}
+config['message'] = string.Template(config['message'])
 
 def duelTimer(count, cn):
 	if count > 0:
-		message(notice('Duel starts in ' + str(count)))
+		message(notice(config['message'].substitute(themedict, time=count)))
 		addTimer(1000, duelTimer, (count-1, cn))
 	else:
 		message(notice('Duel!'))

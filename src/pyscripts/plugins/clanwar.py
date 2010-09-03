@@ -1,15 +1,21 @@
 from xsbs.commands import commandHandler, UsageError, ArgumentValueError
-from xsbs.ui import error, notice
+from xsbs.ui import error, notice, themedict
 from xsbs.timers import addTimer
 from xsbs.game import modeNumber, currentMode, setMap
 from xsbs.server import setPaused
 from xsbs.players import player, masterRequired
 from xsbs.persistteam import persistentTeams
 from xsbs.server import message, setMasterMode, setFrozen
+import string
+
+config = {
+		'message':'Clan war starts in ${countdowm}${time}${text} seconds.'
+	}
+config['message'] = string.Template(config['message'])
 
 def clanWarTimer(count, cn):
 	if count > 0:
-		message(notice('Clan war starts in ' + str(count)))
+		message(notice(config['message'].substitute(themedict, time=count)))
 		addTimer(1000, clanWarTimer, (count-1, cn))
 	else:
 		message(notice('Fight!'))

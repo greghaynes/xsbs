@@ -1,6 +1,6 @@
 from xsbs.events import eventHandler, execLater, registerServerEventHandler
 from xsbs.players import player
-from xsbs.ui import warning
+from xsbs.ui import warning, themedict
 from xsbs.timers import addTimer
 from xsbs.ban import ban
 from xsbs.users import User, Group
@@ -10,9 +10,15 @@ from sqlalchemy.orm.exc import NoResultFound
 
 import re
 import logging
+import string
 
 regex = '\[.{1,5}\]|<.{1,5}>|\{.{1,5}\}|\}.{1,5}\{|.{1,5}\||\|.{1,5}\|'
 regex = re.compile(regex)
+config = {
+		'message':'Your are using a reserved clan tag. You have ${severe_action}${time}${text} seconds to login or be kicked.'
+	}
+	
+config['message'] = string.Template(config['message'])
 
 class ClanTag(Entity):
 	tag = Field(String, index=True)
@@ -34,7 +40,7 @@ def warnTagReserved(cn, count, sessid, nick):
 		p.warning_for_login = False
 		return
 	remaining = 25-(count*5)
-	p.message(warning('Your are using a reserved clan tag. You have %i seconds to login or be kicked.') % remaining)
+	p.message(warning(config['message'].substitute(themedict, time=remaining)))
 	addTimer(5000, warnTagReserved, (cn, count+1, sessid, nick))
 
 def tagId(tag):
