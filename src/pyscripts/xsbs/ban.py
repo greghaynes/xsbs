@@ -5,8 +5,7 @@ from xsbs.settings import loadPluginConfig
 from xsbs.net import ipLongToString, ipStringToLong
 from xsbs.timers import addTimer
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from xsbs.ui import info, notice
-from xsbs.colors import colordict
+from xsbs.ui import info, notice, themedict
 from xsbs.events import eventHandler, policyHandler
 
 import time, string
@@ -15,7 +14,7 @@ import sbserver
 
 config = {
 	'Main': {
-		'message': 'Banning ${orange}${name}${white} for $seconds seconds for ${red}${reason}',
+		'message': 'Banning ${emphasis}${name}${text} for ${seconds} seconds for ${severe_action}${reason}',
 		}
 	}
 
@@ -94,5 +93,5 @@ def ban(cn, seconds, reason, banner_cn, sticky=False):
 		reason,
 		banner_nick,
 		ipLongToString(banner_ip))
-	sbserver.message(info(string.Template(config['Main']['message']).substitute(colordict, name=nick, seconds=seconds, reason=reason)))
+	sbserver.message(info(string.Template(config['Main']['message']).substitute(themedict, name=nick, seconds=seconds, reason=reason)))
 

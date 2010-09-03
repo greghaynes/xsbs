@@ -3,9 +3,8 @@ from xsbs.commands import commandHandler, UsageError
 from xsbs.events import eventHandler
 from xsbs.ui import info, notice
 from xsbs.settings import loadPluginConfig
-from xsbs.colors import colordict
 from xsbs.players import player, masterRequired, adminRequired
-from xsbs.ui import insufficientPermissions
+from xsbs.ui import insufficientPermissions, themedict
 import string
 import logging
 
@@ -15,7 +14,7 @@ config = {
 		'required_permissions': 1
 		},
 	'Templates': {
-		'record_next_message': 'Demo recording is ${action} for next match (by ${orange}${user}${white}${white}${white}${white})'
+		'record_next_message': 'Demo recording is ${action} for next match (by ${client_name}${user}${text})'
 		}
 	}
 	
@@ -47,7 +46,7 @@ def playerRecordNextMatch(p, val):
 		else:
 			act = 'disabled'
 		sbserver.setRecordNextMatch(val)
-		sbserver.message(notice(action_temp.substitute(colordict, action=act, user=p.name())))
+		sbserver.message(notice(action_temp.substitute(themedict, action=act, user=p.name())))
 	else:
 		insufficientPermissions(p.cn)
 

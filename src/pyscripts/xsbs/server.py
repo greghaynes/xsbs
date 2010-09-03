@@ -1,8 +1,7 @@
 from xsbs.players import masterRequired, player
 from xsbs.events import eventHandler
 from xsbs.commands import commandHandler, StateError
-from xsbs.ui import notice
-from xsbs.colors import colordict
+from xsbs.ui import notice, themedict
 from xsbs.settings import loadPluginConfig
 
 import string
@@ -11,7 +10,7 @@ import sbserver
 config = {
 	'Templates':
 		{
-			'action_message': 'The game has been ${action} by ${orange}${name}',
+			'action_message': 'The game has been ${action} by ${emphasis}${name}',
 		}
 	}
 
@@ -47,7 +46,7 @@ def setPaused(val, cn=-1):
 	else:
 		name = p.name()
 	sbserver.message(notice(config['Templates']['action_message'].substitute(
-		colordict,
+		themedict,
 		action=action,
 		name=name)))
 	sbserver.setPaused(val)

@@ -22,7 +22,7 @@ config = {
 			'text': 'white',
 			'severe_action': 'red',
 			'emphasis': 'orange',
-			'auth': 'magenta'
+			'auth': 'magenta',
 			'countdown':'blue'
 		}
 	}
