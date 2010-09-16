@@ -4,12 +4,12 @@ from elixir import session
 from xsbs.events import triggerServerEvent
 from xsbs.commands import commandHandler, UsageError, ExtraArgumentError, StateError
 from xsbs.settings import loadPluginConfig
-from xsbs.colors import red, yellow, blue, green, white, colordict
+from xsbs.colors import red, yellow, blue, green, white, colordict, orange
 from xsbs.ui import error, info, notice, insufficientPermissions
 from xsbs.net import ipLongToString
 from xsbs.users import loggedInAs
 from xsbs.users.privilege import isUserMaster, isUserAdmin, UserPrivilege
-from xsbs.players import masterRequired, adminRequired, player, currentAdmin
+from xsbs.players import masterRequired, adminRequired, player, currentAdmin, all as AllPlayers
 from xsbs.server import setPaused, isPaused, message as sendServerMessage
 from xsbs.timers import addTimer
 
@@ -310,28 +310,70 @@ def onSmiteCommand(p, args):
 	sendServerMessage(info(config['Templates']['smite'].substitute(colordict, smiter=p.name(), smited=t.name())))
 	t.suicide()
 	
-@commandHandler('editmute')
+@commandHandler('editlockall')
 @masterRequired
 def onEditMuteCommand(p, args):
-	'''@description edit mute a player
+	'''@description locks all players from editing
+	   @usage
+	   @master'''
+	playerslist = AllPlayers()
+	for player in playerslist:
+		player.editMute()
+	sendServerMessage(notice('All players have been ' + orange('locked') + white(' from editing')))
+	
+@commandHandler('editunlockall')
+@masterRequired
+def onEditMuteCommand(p, args):
+	'''@description unlocks all players from editing
+	   @usage
+	   @master'''
+	playerslist = AllPlayers()
+	for player in playerslist:
+		player.editMute()
+	sendServerMessage(notice('All players have been ' + orange('unlocked') + white(' from editing')))
+	
+@commandHandler('editlock')
+@masterRequired
+def onEditMuteCommand(p, args):
+	'''@description locks a player from editing
 	   @usage <cn>
 	   @master'''
 	if args == '':
 		raise UsageError()
 	p = player(int(args))
 	p.editMute()
-	p.message(info('Your edits have been muted.'))
+	p.message(info('You have been locked from editing.'))
 	
-@commandHandler('editunmute')
+@commandHandler('editunlock')
 @masterRequired
 def onEditMuteCommand(p, args):
-	'''@description edit unmute a player
+	'''@description unlocks editting for a player
 	   @usage <cn>
 	   @master'''
 	if args == '':
 		raise UsageError()
 	p = player(int(args))
 	p.editUnmute()
-	p.message(info('Your edits have been unmuted.'))
+	p.message(info('You are now permitted to edit.'))
+
+@commandHandler('editlockserver')
+@masterRequired
+def onEditMuteCommand(p, args):
+	'''@description Lock editing
+	   @usage
+	   @master'''
+	sbserver.editLock()
+	sendServerMessage(notice('Editing has been ' + orange('locked') + white('')))
+	sendServerMessage(notice('All players entering server following this message will not be able to edit'))
+	
+@commandHandler('editunlockserver')
+@masterRequired
+def onEditMuteCommand(p, args):
+	'''@description unlock editing
+	   @usage
+	   @master'''
+	sbserver.editUnlock()
+	sendServerMessage(notice('Editing has been ' + orange('unlocked') + white('')))
+	sendServerMessage(notice('All players entering server following this message will be able to edit'))
 
 init()

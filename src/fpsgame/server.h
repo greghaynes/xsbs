@@ -220,7 +220,7 @@ namespace server
         bool warned, gameclip;
         ENetPacket *clipboard;
         int lastclipboard, needclipboard;
-		bool editmuted;
+	bool editmuted;
 		
         clientinfo() : clipboard(NULL) { reset(); }
         ~clientinfo() { events.deletecontents(); cleanclipboard(); }
@@ -315,6 +315,7 @@ namespace server
             needclipboard = 0;
             cleanclipboard();
             mapchange();
+
         }
 
         int geteventmillis(int servmillis, int clientmillis)
@@ -391,6 +392,7 @@ namespace server
 	extern char *serverpass;
 	extern int gamemode;
 	extern bool gamepaused;
+	extern bool editlocked;
 	extern bool allow_modevote;
 	extern int port;
 	extern bool demonextmatch;

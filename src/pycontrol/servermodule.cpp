@@ -937,6 +937,25 @@ static PyObject *editUnmute(PyObject *self, PyObject *args)
 	return Py_None;
 }
 
+static PyObject *editLock(PyObject *self, PyObject *args)
+{
+    server::editlocked = true;
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *editUnlock(PyObject *self, PyObject *args)
+{
+    server::editlocked = false;
+	Py_INCREF(Py_None);
+	return Py_None;
+}
+
+static PyObject *isEditLocked(PyObject *self, PyObject *args)
+{
+	return Py_BuildValue("b", server::editlocked);
+}
+
 static PyMethodDef ModuleMethods[] = {
 	{"cseval", cseval, METH_VARARGS, "Execute a string containing CubeScript"},
 	{"triggercsevent", triggercsevent, METH_VARARGS, "Trigger a CubeScript event"},
@@ -1000,8 +1019,11 @@ static PyMethodDef ModuleMethods[] = {
 	{"demoData", demoData, METH_VARARGS, "Demo data."},
 	{"sendDemo", sendDemo, METH_VARARGS, "Send demo to client."},
 	{"suicide", suicide, METH_VARARGS, "Force client to commit suicide."},
+	{"editLock", editLock, METH_VARARGS, "Set edit lock state true."},
+	{"editUnlock", editUnlock, METH_VARARGS, "Set edit lock state false."},
+	{"isEditLocked", isEditLocked, METH_VARARGS, "Returns edit lock state."},
 	{"editMute", editMute, METH_VARARGS, "Edit mute a player."},
-	{"editUnute", editUnute, METH_VARARGS, "Edit unmute a player."},
+	{"editUnmute", editUnmute, METH_VARARGS, "Edit unmute a player."},
 	{NULL, NULL, 0, NULL}
 };
 

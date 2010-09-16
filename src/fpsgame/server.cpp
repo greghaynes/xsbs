@@ -35,6 +35,7 @@ namespace server
     int gamemode = 0;
     int gamemillis = 0, gamelimit = 0, nextexceeded = 0;
     bool gamepaused = false;
+    bool editlocked = false;
 
     string smapname = "";
     int interm = 0;
@@ -1529,6 +1530,14 @@ namespace server
         ci->clientnum = ci->ownernum = n;
         ci->connectmillis = totalmillis;
         ci->sessionid = (rnd(0x1000000)*((totalmillis%10000)+1))&0xFFFFFF;
+        if (server::editlocked)
+        {
+        	ci->editmuted = true;
+        }
+        else
+        {
+        	ci->editmuted = false;
+        }
 
         connects.add(ci);
         if(!m_mp(gamemode)) return DISC_PRIVATE;
@@ -1801,11 +1810,11 @@ namespace server
             {
                 int val = getint(p);
                 if(!ci->local && !m_edit) break;
-                if(ci->editmuted)
-                {
-                    sendf(ci->clientnum, 1, "ris", N_SERVMSG, "You are edit muted.");
-                    break;
-                }
+	        if(ci->editmuted)
+	        {
+	            sendf(ci->clientnum, 1, "ris", N_SERVMSG, "You are edit muted.");
+	            break;
+	        }
                 if(val ? ci->state.state!=CS_ALIVE && ci->state.state!=CS_DEAD : ci->state.state!=CS_EDITING) break;
                 if(smode)
                 {
@@ -2261,7 +2270,7 @@ namespace server
                 {
                     sendf(ci->clientnum, 1, "ris", N_SERVMSG, "You are edit muted.");
                     break;
-                }d
+                }
                 if(size>=0)
                 {
                     smapname[0] = '\0';
