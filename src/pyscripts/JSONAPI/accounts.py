@@ -1,6 +1,7 @@
 from twisted.web import resource
 
 from xsbs.http.jsonapi import JsonSite, JsonUserSite, response
+from xsbs.users.privilege import isUserAdmin, isUserMaster
 
 try:
 	import json
