@@ -71,7 +71,7 @@ def all_dialects():
     for name in d.__all__:
         mod = getattr(__import__('sqlalchemy.databases.%s' % name).databases, name)
         yield mod.dialect()
-        
+
 class ReconnectFixture(object):
     def __init__(self, dbapi):
         self.dbapi = dbapi
@@ -110,7 +110,7 @@ def testing_engine(url=None, options=None):
     options = options or config.db_opts
 
     options.setdefault('proxy', asserter)
-    
+
     listeners = options.setdefault('listeners', [])
     listeners.append(testing_reaper)
 
@@ -141,9 +141,9 @@ def utf8_engine(url=None, options=None):
 
 def mock_engine(db=None):
     """Provides a mocking engine based on the current testing.db."""
-    
+
     from sqlalchemy import create_engine
-    
+
     dbi = db or config.db
     buffer = []
     def executor(sql, *a, **kw):

@@ -1,7 +1,7 @@
 /*
 
  This is a modified version of the original Sauerbraten source code.
- 
+
 */
 
 #include "sbpy.h"
@@ -623,7 +623,7 @@ namespace server
             SbPy::triggerEventInt("player_released_admin", ci->clientnum);
         ci->privilege = PRIV_NONE;
         masterupdate = true;
-        currentmaster = -1; 
+        currentmaster = -1;
     }
 
     savedscore &findscore(clientinfo *ci, bool insert)

@@ -55,13 +55,13 @@ struct ident
     };
     union
     {
-        void *self;           // ID_COMMAND, ID_CCOMMAND 
+        void *self;           // ID_COMMAND, ID_CCOMMAND
         char *isexecuting;    // ID_ALIAS
         identval overrideval; // ID_VAR, ID_FVAR, ID_SVAR
     };
     identvalptr storage; // ID_VAR, ID_FVAR, ID_SVAR
     int flags;
-    
+
     ident() {}
     // ID_VAR
     ident(int t, const char *n, int m, int c, int x, int *s, void *f = NULL, int flags = 0)
@@ -82,10 +82,10 @@ struct ident
     ident(int t, const char *n, const char *narg, void *f = NULL, void *s = NULL, int flags = 0)
         : type(t), name(n), fun((void (__cdecl *)(void))f), narg(narg), self(s), flags(flags) {}
 
-    virtual ~ident() {}        
+    virtual ~ident() {}
 
     ident &operator=(const ident &o) { memcpy(this, &o, sizeof(ident)); return *this; }        // force vtable copy, ugh
-    
+
     virtual void changed() { if(fun) fun(); }
 };
 
@@ -168,7 +168,7 @@ extern void result(const char *s);
     { b; }
 #define ICOMMANDNAME(name) _icmd_##name
 #define ICOMMAND(name, nargs, proto, b) _ICOMMAND(ICOMMANDNAME(name), name, nargs, proto, b)
- 
+
 #define _IVAR(n, m, c, x, b, p) \
     struct var_##n : ident \
     { \

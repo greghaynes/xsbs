@@ -447,14 +447,14 @@ def _selectable_name(selectable):
 def class_for_table(selectable, **mapper_kwargs):
     selectable = expression._clause_element_as_expr(selectable)
     mapname = 'Mapped' + _selectable_name(selectable)
-    if isinstance(mapname, unicode): 
-        engine_encoding = selectable.metadata.bind.dialect.encoding 
+    if isinstance(mapname, unicode):
+        engine_encoding = selectable.metadata.bind.dialect.encoding
         mapname = mapname.encode(engine_encoding)
     if isinstance(selectable, Table):
         klass = TableClassType(mapname, (object,), {})
     else:
         klass = SelectableClassType(mapname, (object,), {})
-    
+
     def __cmp__(self, o):
         L = self.__class__.c.keys()
         L.sort()
@@ -479,7 +479,7 @@ def class_for_table(selectable, **mapper_kwargs):
                    extension=Session.extension,
                    allow_null_pks=_is_outer_join(selectable),
                    **mapper_kwargs)
-                   
+
     for k in mappr.iterate_properties:
         klass.c[k.key] = k.columns[0]
 
@@ -553,7 +553,7 @@ class SqlSoup:
                 t = None
             self._cache[attr] = t
         return t
-    
+
     def __getattr__(self, attr):
         return self.entity(attr)
 

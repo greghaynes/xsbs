@@ -462,7 +462,7 @@ def case(whens, value=None, else_=None):
           })
 
     """
-    
+
     return _Case(whens, value=value, else_=else_)
 
 def cast(clause, totype, **kwargs):
@@ -491,8 +491,8 @@ def collate(expression, collation):
 
     expr = _literal_as_binds(expression)
     return _BinaryExpression(
-        expr, 
-        _literal_as_text(collation), 
+        expr,
+        _literal_as_text(collation),
         operators.collate, type_=expr.type)
 
 def exists(*args, **kwargs):
@@ -856,7 +856,7 @@ def _escape_for_generated(x):
         return x
     else:
         return x.replace('%', '%%')
-        
+
 def _clone(element):
     return element._clone()
 
@@ -896,7 +896,7 @@ def _column_as_key(element):
     if hasattr(element, '__clause_element__'):
         element = element.__clause_element__()
     return element.key
-    
+
 def _literal_as_text(element):
     if hasattr(element, '__clause_element__'):
         return element.__clause_element__()
@@ -910,7 +910,7 @@ def _clause_element_as_expr(element):
         return element.__clause_element__()
     else:
         return element
-        
+
 def _literal_as_column(element):
     if hasattr(element, '__clause_element__'):
         return element.__clause_element__()
@@ -1248,7 +1248,7 @@ class ColumnOperators(Operators):
         return self.operate(operators.le, other)
 
     __hash__ = Operators.__hash__
-    
+
     def __eq__(self, other):
         return self.operate(operators.eq, other)
 
@@ -1391,7 +1391,7 @@ class _CompareMixin(ColumnOperators):
 
     def _in_impl(self, op, negate_op, seq_or_selectable):
         seq_or_selectable = _clause_element_as_expr(seq_or_selectable)
-            
+
         if isinstance(seq_or_selectable, _ScalarSelect):
             return self.__compare( op, seq_or_selectable, negate=negate_op)
 
@@ -1409,7 +1409,7 @@ class _CompareMixin(ColumnOperators):
         for o in seq_or_selectable:
             if not _is_literal(o):
                 if not isinstance( o, _CompareMixin):
-                    raise exc.InvalidRequestError( 
+                    raise exc.InvalidRequestError(
                         "in() function accepts either a list of non-selectable values, or a selectable: %r" % o)
             else:
                 o = self._bind_param(o)
@@ -1566,7 +1566,7 @@ class ColumnElement(ClauseElement, _CompareMixin):
     foreign_keys = []
     quote = None
     _label = None
-    
+
     @property
     def _select_iterable(self):
         return (self, )
@@ -1688,7 +1688,7 @@ class ColumnCollection(util.OrderedProperties):
             self.add(c)
 
     __hash__ = None
-    
+
     def __eq__(self, other):
         l = []
         for c in other:
@@ -1769,19 +1769,19 @@ class FromClause(Selectable):
 
     def alias(self, name=None):
         """return an alias of this ``FromClause``.
-        
+
         For table objects, this has the effect of the table being rendered
-        as ``tablename AS aliasname`` in a SELECT statement.  
+        as ``tablename AS aliasname`` in a SELECT statement.
         For select objects, the effect is that of creating a named
         subquery, i.e. ``(select ...) AS aliasname``.
         The ``alias()`` method is the general way to create
         a "subquery" out of an existing SELECT.
-        
-        The ``name`` parameter is optional, and if left blank an 
+
+        The ``name`` parameter is optional, and if left blank an
         "anonymous" name will be generated at compile time, guaranteed
         to be unique against other anonymous constructs used in the
         same statement.
-        
+
         """
 
         return Alias(self, name)
@@ -1805,7 +1805,7 @@ class FromClause(Selectable):
     def correspond_on_equivalents(self, column, equivalents):
         """Return corresponding_column for the given column, or if None
         search for a match in the given dictionary.
-        
+
         """
         col = self.corresponding_column(column, require_embedded=True)
         if col is None and col in equivalents:
@@ -1841,26 +1841,26 @@ class FromClause(Selectable):
             i = c.proxy_set.intersection(target_set)
             if i and \
                 (not require_embedded or c.proxy_set.issuperset(target_set)):
-                
+
                 if col is None:
                     # no corresponding column yet, pick this one.
                     col, intersect = c, i
                 elif len(i) > len(intersect):
                     # 'c' has a larger field of correspondence than 'col'.
-                    # i.e. selectable.c.a1_x->a1.c.x->table.c.x matches a1.c.x->table.c.x better than 
+                    # i.e. selectable.c.a1_x->a1.c.x->table.c.x matches a1.c.x->table.c.x better than
                     # selectable.c.x->table.c.x does.
                     col, intersect = c, i
                 elif i == intersect:
                     # they have the same field of correspondence.
                     # see which proxy_set has fewer columns in it, which indicates a
-                    # closer relationship with the root column.  Also take into account the 
+                    # closer relationship with the root column.  Also take into account the
                     # "weight" attribute which CompoundSelect() uses to give higher precedence to
                     # columns based on vertical position in the compound statement, and discard columns
                     # that have no reference to the target column (also occurs with CompoundSelect)
-                    col_distance = util.reduce(operator.add, 
+                    col_distance = util.reduce(operator.add,
                                         [sc._annotations.get('weight', 1) for sc in col.proxy_set if sc.shares_lineage(column)]
                                     )
-                    c_distance = util.reduce(operator.add, 
+                    c_distance = util.reduce(operator.add,
                                         [sc._annotations.get('weight', 1) for sc in c.proxy_set if sc.shares_lineage(column)]
                                     )
                     if \
@@ -2077,7 +2077,7 @@ class _TextClause(ClauseElement):
         if bindparams is not None:
             for b in bindparams:
                 self.bindparams[b.key] = b
-                
+
     @property
     def type(self):
         if self.typemap is not None and len(self.typemap) == 1:
@@ -2236,7 +2236,7 @@ class _Case(ColumnElement):
             yield x
             yield y
         if self.else_:
-            yield self.else_ 
+            yield self.else_
 
     @property
     def _from_objects(self):
@@ -2266,19 +2266,19 @@ class Function(ColumnElement, FromClause):
     @util.memoized_property
     def clauses(self):
         return self.clause_expr.element
-        
+
     @property
     def _from_objects(self):
         return self.clauses._from_objects
 
     def get_children(self, **kwargs):
-        return self.clause_expr, 
+        return self.clause_expr,
 
     def _copy_internals(self, clone=_clone):
         self.clause_expr = clone(self.clause_expr)
         self._reset_exported()
         util.reset_memoized(self, 'clauses')
-        
+
     def _bind_param(self, obj):
         return _BindParamClause(self.name, obj, type_=self.type, unique=True)
 
@@ -2554,10 +2554,10 @@ class Join(FromClause):
     def select(self, whereclause=None, fold_equivalents=False, **kwargs):
         """Create a :class:`Select` from this :class:`Join`.
 
-        :param whereclause: the WHERE criterion that will be sent to 
+        :param whereclause: the WHERE criterion that will be sent to
           the :func:`select()` function
 
-        :param fold_equivalents: based on the join criterion of this 
+        :param fold_equivalents: based on the join criterion of this
           :class:`Join`, do not include
           repeat column names in the column list of the resulting
           select, for columns that are calculated to be "equivalent"
@@ -2566,7 +2566,7 @@ class Join(FromClause):
           as well.  This flag is specific to a particular use case
           by the ORM and will be deprecated in 0.6.
 
-        :param \**kwargs: all other kwargs are sent to the 
+        :param \**kwargs: all other kwargs are sent to the
           underlying :func:`select()` function.
 
         """
@@ -2643,7 +2643,7 @@ class Alias(FromClause):
             return self.element.as_scalar()
         except AttributeError:
             raise AttributeError("Element %s does not support 'as_scalar()'" % self.element)
-        
+
     def is_derived_from(self, fromclause):
         if fromclause in self._cloned_set:
             return True
@@ -3143,7 +3143,7 @@ class CompoundSelect(_SelectBaseMixin, FromClause):
         # some DBs do not like ORDER BY in the inner queries of a UNION, etc.
         for n, s in enumerate(selects):
             s = _clause_element_as_expr(s)
-            
+
             if not numcols:
                 numcols = len(s.c)
             elif len(s.c) != numcols:
@@ -3173,12 +3173,12 @@ class CompoundSelect(_SelectBaseMixin, FromClause):
     def _populate_column_collection(self):
         for cols in zip(*[s.c for s in self.selects]):
             proxy = cols[0]._make_proxy(self, name=self.use_labels and cols[0]._label or None)
-            
+
             # place a 'weight' annotation corresponding to how low in the list of select()s
             # the column occurs, so that the corresponding_column() operation
             # can resolve conflicts
             proxy.proxies = [c._annotate({'weight':i + 1}) for i, c in enumerate(cols)]
-            
+
     def _copy_internals(self, clone=_clone):
         self._reset_exported()
         self.selects = [clone(s) for s in self.selects]

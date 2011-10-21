@@ -20,7 +20,7 @@ class EventManager:
 				try:
 					event(*args)
 				except:
-					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
+					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
 					logging.error('Uncaught exception occured in event handler.')
 					logging.error(traceback.format_exc())
 		except KeyError:
@@ -88,7 +88,7 @@ def triggerExecQueue():
 		try:
 			event[0](*event[1])
 		except:
-			exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
+			exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
 			logging.warn('Uncaught exception execLater queue.')
 			logging.warn(traceback.format_exc())
 			logging.warn(traceback.extract_tb(exceptionTraceback))

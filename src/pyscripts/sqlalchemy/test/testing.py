@@ -81,7 +81,7 @@ def future(fn):
     return function_named(decorated, fn_name)
 
 def fails_on(dbs, reason):
-    """Mark a test as expected to fail on the specified database 
+    """Mark a test as expected to fail on the specified database
     implementation.
 
     Unlike ``crashes``, tests marked as ``fails_on`` will be run
@@ -375,7 +375,7 @@ def resetwarnings():
     """Reset warning behavior to testing defaults."""
 
     warnings.filterwarnings('ignore',
-                            category=sa_exc.SAPendingDeprecationWarning) 
+                            category=sa_exc.SAPendingDeprecationWarning)
     warnings.filterwarnings('error', category=sa_exc.SADeprecationWarning)
     warnings.filterwarnings('error', category=sa_exc.SAWarning)
 
@@ -467,7 +467,7 @@ def assert_raises_message(except_cls, msg, callable_, *args, **kwargs):
 
 def fail(msg):
     assert False, msg
-    
+
 def fixture(table, columns, *rows):
     """Insert data into table after creation."""
     def onload(event, schema_item, connection):
@@ -539,7 +539,7 @@ class TestBase(object):
 
     def assert_(self, val, msg=None):
         assert val, msg
-        
+
 class AssertsCompiledSQL(object):
     def assert_compile(self, clause, result, params=None, checkparams=None, dialect=None):
         if dialect is None:
@@ -676,13 +676,13 @@ class AssertsExecutionResults(object):
             assertsql.asserter.statement_complete()
         finally:
             assertsql.asserter.clear_rules()
-            
+
     def assert_sql(self, db, callable_, list_, with_sequences=None):
         if with_sequences is not None and config.db.name in ('firebird', 'oracle', 'postgres'):
             rules = with_sequences
         else:
             rules = list_
-        
+
         newrules = []
         for rule in rules:
             if isinstance(rule, dict):
@@ -692,7 +692,7 @@ class AssertsExecutionResults(object):
             else:
                 newrule = assertsql.ExactSQL(*rule)
             newrules.append(newrule)
-            
+
         self.assert_sql_execution(db, callable_, *newrules)
 
     def assert_sql_count(self, db, callable_, count):

@@ -9,8 +9,8 @@ struct vec
     };
 
     vec() {}
-    explicit vec(int a) : x(a), y(a), z(a) {} 
-    explicit vec(float a) : x(a), y(a), z(a) {} 
+    explicit vec(int a) : x(a), y(a), z(a) {}
+    explicit vec(float a) : x(a), y(a), z(a) {}
     vec(float a, float b, float c) : x(a), y(b), z(c) {}
     vec(int v[3]) : x(v[0]), y(v[1]), z(v[2]) {}
     vec(float *v) : x(v[0]), y(v[1]), z(v[2]) {}
@@ -20,7 +20,7 @@ struct vec
 
     float &operator[](int i)       { return v[i]; }
     float  operator[](int i) const { return v[i]; }
-    
+
     vec &set(int i, float f) { v[i] = f; return *this; }
 
     bool operator==(const vec &o) const { return x == o.x && y == o.y && z == o.z; }
@@ -92,7 +92,7 @@ struct vec
 
     void orthogonal(const vec &d)
     {
-        int i = fabs(d.x) > fabs(d.y) ? (fabs(d.x) > fabs(d.z) ? 0 : 2) : (fabs(d.y) > fabs(d.z) ? 1 : 2); 
+        int i = fabs(d.x) > fabs(d.y) ? (fabs(d.x) > fabs(d.z) ? 0 : 2) : (fabs(d.y) > fabs(d.z) ? 1 : 2);
         v[i] = d[(i+1)%3];
         v[(i+1)%3] = -d[i];
         v[(i+2)%3] = 0;
@@ -158,10 +158,10 @@ struct vec4
     float magnitude3() const { return sqrtf(dot3(*this)); }
     vec4 &normalize() { mul(1/magnitude()); return *this; }
 
-    void lerp(const vec4 &a, const vec4 &b, float t) 
-    { 
-        x = a.x+(b.x-a.x)*t; 
-        y = a.y+(b.y-a.y)*t; 
+    void lerp(const vec4 &a, const vec4 &b, float t)
+    {
+        x = a.x+(b.x-a.x)*t;
+        y = a.y+(b.y-a.y)*t;
         z = a.z+(b.z-a.z)*t;
         w = a.w+(b.w-b.w)*t;
     }
@@ -199,7 +199,7 @@ struct quat : vec4
     explicit quat(const matrix3x4 &m) { convertmatrix(m); }
 
     void restorew() { w = 1.0f-x*x-y*y-z*z; w = w<0 ? 0 : -sqrtf(w); }
-    
+
     void add(const vec4 &o) { vec4::add(o); }
     void sub(const vec4 &o) { vec4::sub(o); }
     void mul(float k) { vec4::mul(k); }
@@ -230,7 +230,7 @@ struct quat : vec4
         if(rr>0)
         {
             angle = 2*acosf(w);
-            axis = vec(x, y, z).mul(1/rr); 
+            axis = vec(x, y, z).mul(1/rr);
         }
         else { angle = 0; axis = vec(0, 0, 1); }
     }
@@ -313,7 +313,7 @@ struct dualquat
     quat real, dual;
 
     dualquat() {}
-    dualquat(const quat &q, const vec &p) 
+    dualquat(const quat &q, const vec &p)
         : real(q),
           dual(0.5f*( p.x*q.w + p.y*q.z - p.z*q.y),
                0.5f*(-p.x*q.z + p.y*q.w + p.z*q.x),
@@ -358,7 +358,7 @@ struct dualquat
         else { real = dual = quat(0, 0, 0, 0); }
         return *this;
     }
-    
+
     void mul(const dualquat &p, const dualquat &o)
     {
         real.mul(p.real, o.real);
@@ -366,9 +366,9 @@ struct dualquat
         quat tmp;
         tmp.mul(p.dual, o.real);
         dual.add(tmp);
-    }       
-    void mul(const dualquat &o) { mul(dualquat(*this), o); }    
-  
+    }
+    void mul(const dualquat &o) { mul(dualquat(*this), o); }
+
     void mulorient(const quat &q)
     {
         real.mul(q, quat(real));
@@ -536,7 +536,7 @@ struct matrix3x3
 struct matrix3x4
 {
     vec4 a, b, c;
-    
+
     matrix3x4() {}
     matrix3x4(const vec4 &x, const vec4 &y, const vec4 &z) : a(x), b(y), c(z) {}
     matrix3x4(const matrix3x3 &rot, const vec &trans)
@@ -544,7 +544,7 @@ struct matrix3x4
     {}
     matrix3x4(const dualquat &d)
     {
-        float x = d.real.x, y = d.real.y, z = d.real.z, w = d.real.w, 
+        float x = d.real.x, y = d.real.y, z = d.real.z, w = d.real.w,
               ww = w*w, xx = x*x, yy = y*y, zz = z*z,
               xy = x*y, xz = x*z, yz = y*z,
               wx = w*x, wy = w*y, wz = w*z;
@@ -636,7 +636,7 @@ struct matrix3x4
         a = vec4(o.a).mul(rot.a.x).add(vec4(o.b).mul(rot.b.x)).add(vec4(o.c).mul(rot.c.x)).addw(trans.x);
         b = vec4(o.a).mul(rot.a.y).add(vec4(o.b).mul(rot.b.y)).add(vec4(o.c).mul(rot.c.y)).addw(trans.y);
         c = vec4(o.a).mul(rot.a.z).add(vec4(o.b).mul(rot.b.z)).add(vec4(o.c).mul(rot.c.z)).addw(trans.z);
-    } 
+    }
 
     void transposemul(const matrix3x4 &m, const matrix3x4 &n)
     {
@@ -733,7 +733,7 @@ struct plane : vec
     bool operator!=(const plane &p) const { return x!=p.x || y!=p.y || z!=p.z || offset!=p.offset; }
 
     plane() {}
-    plane(const vec &c, float off) : vec(c), offset(off) {} 
+    plane(const vec &c, float off) : vec(c), offset(off) {}
     plane(int d, float off)
     {
         x = y = z = 0.0f;
@@ -875,12 +875,12 @@ struct ivec
 static inline bool htcmp(const ivec &x, const ivec &y)
 {
     return x == y;
-}  
+}
 
 static inline uint hthash(const ivec &k)
 {
     return k.x^k.y^k.z;
-}  
+}
 
 struct svec
 {
@@ -1070,7 +1070,7 @@ struct glmatrixf
 
     void projective(float zscale = 0.5f, float zoffset = 0.5f)
     {
-        loopi(2) loopj(4) v[i + j*4] = 0.5f*(v[i + j*4] + v[3 + j*4]); 
+        loopi(2) loopj(4) v[i + j*4] = 0.5f*(v[i + j*4] + v[3 + j*4]);
         loopj(4) v[2 + j*4] = zscale*v[2 + j*4] + zoffset*v[3 + j*4];
     }
 
@@ -1108,7 +1108,7 @@ struct glmatrixf
         v[10] = p.z*scale + 1.0f;
         v[14] = p.offset*scale;
     }
-            
+
     void invertnormal(vec &dir) const
     {
         vec n(dir);

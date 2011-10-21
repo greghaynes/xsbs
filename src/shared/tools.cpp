@@ -4,17 +4,17 @@
 
 ////////////////////////// rnd numbers ////////////////////////////////////////
 
-#define N              (624)             
-#define M              (397)                
-#define K              (0x9908B0DFU)       
-#define hiBit(u)       ((u) & 0x80000000U)  
-#define loBit(u)       ((u) & 0x00000001U)  
-#define loBits(u)      ((u) & 0x7FFFFFFFU)  
-#define mixBits(u, v)  (hiBit(u)|loBits(v)) 
+#define N              (624)
+#define M              (397)
+#define K              (0x9908B0DFU)
+#define hiBit(u)       ((u) & 0x80000000U)
+#define loBit(u)       ((u) & 0x00000001U)
+#define loBits(u)      ((u) & 0x7FFFFFFFU)
+#define mixBits(u, v)  (hiBit(u)|loBits(v))
 
-static uint state[N+1];     
-static uint *next;          
-static int left = -1;     
+static uint state[N+1];
+static uint *next;
+static int left = -1;
 
 void seedMT(uint seed)
 {

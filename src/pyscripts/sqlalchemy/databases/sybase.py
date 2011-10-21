@@ -456,7 +456,7 @@ class SybaseSQLDialect(default.DefaultDialect):
     supports_sane_rowcount = False
     supports_sane_multi_rowcount = False
     execution_ctx_cls = SybaseSQLExecutionContext
-    
+
     def __new__(cls, dbapi=None, *args, **kwargs):
         if cls != SybaseSQLDialect:
             return super(SybaseSQLDialect, cls).__new__(cls, *args, **kwargs)
@@ -627,7 +627,7 @@ class SybaseSQLDialect(default.DefaultDialect):
 
 class SybaseSQLDialect_mxodbc(SybaseSQLDialect):
     execution_ctx_cls = SybaseSQLExecutionContext_mxodbc
-    
+
     def __init__(self, **params):
         super(SybaseSQLDialect_mxodbc, self).__init__(**params)
 
@@ -673,7 +673,7 @@ class SybaseSQLDialect_mxodbc(SybaseSQLDialect):
 
 class SybaseSQLDialect_pyodbc(SybaseSQLDialect):
     execution_ctx_cls = SybaseSQLExecutionContext_pyodbc
-    
+
     def __init__(self, **params):
         super(SybaseSQLDialect_pyodbc, self).__init__(**params)
         self.dbapi_type_map = {'getdate' : SybaseDate_pyodbc()}

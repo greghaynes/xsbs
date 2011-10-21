@@ -22,24 +22,24 @@ warn_spam_message = string.Template(warn_spam_message)
 class ChatLog:
 	def __init__(self):
 		self.log = {}
-	
+
 	def add_chat(self, cn, text):
 		speakin = player(cn)
 		ip = speakin.ipString()
 		self.log[time.time()] = (cn, ip, text)
-		
+
 	def clean_chat(self):
 		for timekey in self.log.keys():
 			if (time.time() - timekey) > interval:
 				del self.log[timekey]
-			
+
 	def get_log(self):
 		return self.log
-		
+
 class SpammerManager:
 	def __init__(self):
 		self.spammerlist = {}
-		
+
 	def add_spamming_case(self, ip):
 		if ip in self.spammerlist.keys():
 			self.spammerlist[ip] += 1
@@ -68,11 +68,11 @@ def onMessage(cn, text):
 	chatlog.add_chat(cn, text)
 	chatlog.clean_chat()
 
-	
+
 def CheckForSpammers():
 	#sbserver.message("Check for spammers ran")
 	log = chatlog.get_log()
-	
+
 	cn_occurs_1sec = {}
 	cn_occurs_interval = {}
 	for timekey in log.keys():
@@ -82,13 +82,13 @@ def CheckForSpammers():
 				cn_occurs_1sec[chatcn] = 1
 			else:
 				cn_occurs_1sec[chatcn] += 1
-				
+
 		if not chatcn in cn_occurs_interval.keys():
 			cn_occurs_interval[chatcn] = 1
 		else:
 			cn_occurs_interval[chatcn] += 1
 
-	
+
 	for occur in cn_occurs_1sec.keys():
 		if cn_occurs_1sec[occur] > max_per_second:
 			spammermanager.add_spamming_case(player(occur).ipString())
@@ -100,5 +100,5 @@ def CheckForSpammers():
 def checkforspammerstimer():
 	CheckForSpammers()
 	addTimer(1000, checkforspammerstimer, ())
-	
+
 addTimer(1000, checkforspammerstimer, ())

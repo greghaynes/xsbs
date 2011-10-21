@@ -803,7 +803,7 @@ void *genchallenge(void *pubkey, const void *seed, int seedlen, vector<char> &ch
 
     secret.print(challengestr);
     challengestr.add('\0');
-   
+
     return new gfield(answer.x);
 }
 

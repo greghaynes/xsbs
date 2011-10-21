@@ -66,7 +66,7 @@ def onMuteCommand(cn, args):
 		tcn = int(args[0])
 		if len(args) > 1:
 			raise KeyError
-		try:	
+		try:
 			p = player(tcn)
 		except ValueError:
 			raise StateError('Invalid player cn')
@@ -84,7 +84,7 @@ def onMuteCommand(cn, args):
 				sbserver.message(info(muted_temp.substitute(colordict, muted_name=name, muter=muter)))
 	except KeyError:
 		raise UsageError()
-			
+
 @commandHandler('unmute')
 @masterRequired
 def onUnmuteCommand(cn, args):

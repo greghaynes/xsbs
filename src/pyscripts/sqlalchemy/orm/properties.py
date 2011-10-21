@@ -69,19 +69,19 @@ class ColumnProperty(StrategizedProperty):
             self.strategy_class = strategies.DeferredColumnLoader
         else:
             self.strategy_class = strategies.ColumnLoader
-    
+
     def instrument_class(self, mapper):
         if self.no_instrument:
             return
-        
+
         attributes.register_descriptor(
-            mapper.class_, 
-            self.key, 
-            comparator=self.comparator_factory(self, mapper), 
+            mapper.class_,
+            self.key,
+            comparator=self.comparator_factory(self, mapper),
             parententity=mapper,
             property_=self
             )
-        
+
     def do_init(self):
         super(ColumnProperty, self).do_init()
         if len(self.columns) > 1 and self.parent.primary_key.issuperset(self.columns):
@@ -122,17 +122,17 @@ class ColumnProperty(StrategizedProperty):
                 return self.adapter(self.prop.columns[0])
             else:
                 return self.prop.columns[0]._annotate({"parententity": self.mapper, "parentmapper":self.mapper})
-                
+
         def operate(self, op, *other, **kwargs):
             return op(self.__clause_element__(), *other, **kwargs)
 
         def reverse_operate(self, op, other, **kwargs):
             col = self.__clause_element__()
             return op(col._bind_param(other), col, **kwargs)
-    
+
     # TODO: legacy..do we need this ? (0.5)
     ColumnComparator = Comparator
-    
+
     def __str__(self):
         return str(self.parent.class_.__name__) + "." + self.key
 
@@ -140,7 +140,7 @@ log.class_logger(ColumnProperty)
 
 class CompositeProperty(ColumnProperty):
     """subclasses ColumnProperty to provide composite type support."""
-    
+
     def __init__(self, class_, *columns, **kwargs):
         if 'comparator' in kwargs:
             util.warn_deprecated("The 'comparator' argument to CompositeProperty is deprecated.  Use comparator_factory.")
@@ -179,7 +179,7 @@ class CompositeProperty(ColumnProperty):
             obj.__set_composite_values__(*values)
         else:
             setattr(obj, column.key, value)
-            
+
     def get_col_value(self, column, value):
         if value is None:
             return None
@@ -194,16 +194,16 @@ class CompositeProperty(ColumnProperty):
                 return expression.ClauseList(*[self.adapter(x) for x in self.prop.columns])
             else:
                 return expression.ClauseList(*self.prop.columns)
-        
+
         __hash__ = None
-        
+
         def __eq__(self, other):
             if other is None:
                 values = [None] * len(self.prop.columns)
             else:
                 values = other.__composite_values__()
             return sql.and_(*[a==b for a, b in zip(self.prop.columns, values)])
-            
+
         def __ne__(self, other):
             return sql.not_(self.__eq__(other))
 
@@ -222,7 +222,7 @@ class ConcreteInheritedProperty(MapperProperty):
     def instrument_class(self, mapper):
         def warn():
             raise AttributeError("Concrete %s does not implement attribute %r at "
-                "the instance level.  Add this property explicitly to %s." % 
+                "the instance level.  Add this property explicitly to %s." %
                 (self.parent, self.key, self.parent))
 
         class NoninheritedConcreteProp(object):
@@ -242,9 +242,9 @@ class ConcreteInheritedProperty(MapperProperty):
                 break
 
         attributes.register_descriptor(
-            mapper.class_, 
-            self.key, 
-            comparator=comparator_callable(self, mapper), 
+            mapper.class_,
+            self.key,
+            comparator=comparator_callable(self, mapper),
             parententity=mapper,
             property_=self,
             proxy_property=NoninheritedConcreteProp()
@@ -294,9 +294,9 @@ class SynonymProperty(MapperProperty):
             return comparator
 
         attributes.register_descriptor(
-            mapper.class_, 
-            self.key, 
-            comparator=comparator_callable(self, mapper), 
+            mapper.class_,
+            self.key,
+            comparator=comparator_callable(self, mapper),
             parententity=mapper,
             property_=self,
             proxy_property=self.descriptor
@@ -304,14 +304,14 @@ class SynonymProperty(MapperProperty):
 
     def merge(self, session, source, dest, dont_load, _recursive):
         pass
-        
+
 log.class_logger(SynonymProperty)
 
 class ComparableProperty(MapperProperty):
     """Instruments a Python property for use in query expressions."""
 
     extension = None
-    
+
     def __init__(self, comparator_factory, descriptor=None):
         self.descriptor = descriptor
         self.comparator_factory = comparator_factory
@@ -321,9 +321,9 @@ class ComparableProperty(MapperProperty):
         """Set up a proxy to the unmanaged descriptor."""
 
         attributes.register_descriptor(
-            mapper.class_, 
-            self.key, 
-            comparator=self.comparator_factory(self, mapper), 
+            mapper.class_,
+            self.key,
+            comparator=self.comparator_factory(self, mapper),
             parententity=mapper,
             property_=self,
             proxy_property=self.descriptor
@@ -346,7 +346,7 @@ class RelationProperty(StrategizedProperty):
 
     def __init__(self, argument,
         secondary=None, primaryjoin=None,
-        secondaryjoin=None, 
+        secondaryjoin=None,
         foreign_keys=None,
         uselist=None,
         order_by=False,
@@ -422,19 +422,19 @@ class RelationProperty(StrategizedProperty):
             # just a string was sent
             if secondary is not None:
                 # reverse primary/secondary in case of a many-to-many
-                self.backref = BackRef(backref, primaryjoin=secondaryjoin, 
+                self.backref = BackRef(backref, primaryjoin=secondaryjoin,
                                     secondaryjoin=primaryjoin, passive_updates=self.passive_updates)
             else:
-                self.backref = BackRef(backref, primaryjoin=primaryjoin, 
+                self.backref = BackRef(backref, primaryjoin=primaryjoin,
                                     secondaryjoin=secondaryjoin, passive_updates=self.passive_updates)
         else:
             self.backref = backref
 
     def instrument_class(self, mapper):
         attributes.register_descriptor(
-            mapper.class_, 
-            self.key, 
-            comparator=self.comparator_factory(self, mapper), 
+            mapper.class_,
+            self.key,
+            comparator=self.comparator_factory(self, mapper),
             parententity=mapper,
             property_=self
             )
@@ -453,7 +453,7 @@ class RelationProperty(StrategizedProperty):
 
             """
             return self.__class__(self.property, self.mapper, getattr(self, '_of_type', None), adapter)
-        
+
         @property
         def parententity(self):
             return self.property.parent
@@ -477,9 +477,9 @@ class RelationProperty(StrategizedProperty):
         def in_(self, other):
             raise NotImplementedError("in_() not yet supported for relations.  For a "
                     "simple many-to-one, use in_() against the set of foreign key values.")
-            
+
         __hash__ = None
-        
+
         def __eq__(self, other):
             if other is None:
                 if self.property.direction in [ONETOMANY, MANYTOMANY]:
@@ -511,7 +511,7 @@ class RelationProperty(StrategizedProperty):
                 source_selectable = self.__clause_element__()
             else:
                 source_selectable = None
-            
+
             pj, sj, source, dest, secondary, target_adapter = \
                 self.property._create_joins(dest_polymorphic=True, dest_selectable=to_selectable, source_selectable=source_selectable)
 
@@ -521,15 +521,15 @@ class RelationProperty(StrategizedProperty):
                     criterion = crit
                 else:
                     criterion = criterion & crit
-            
+
             # annotate the *local* side of the join condition, in the case of pj + sj this
             # is the full primaryjoin, in the case of just pj its the local side of
-            # the primaryjoin.  
+            # the primaryjoin.
             if sj:
                 j = _orm_annotate(pj) & sj
             else:
                 j = _orm_annotate(pj, exclude=self.property.remote_side)
-            
+
             if criterion and target_adapter:
                 # limit this adapter to annotated only?
                 criterion = target_adapter.traverse(criterion)
@@ -539,9 +539,9 @@ class RelationProperty(StrategizedProperty):
             # to anything in the enclosing query.
             if criterion:
                 criterion = criterion._annotate({'_halt_adapt': True})
-            
+
             crit = j & criterion
-            
+
             return sql.exists([1], crit, from_obj=dest).correlate(source)
 
         def any(self, criterion=None, **kwargs):
@@ -569,24 +569,24 @@ class RelationProperty(StrategizedProperty):
             if self.property.direction == MANYTOONE:
                 state = attributes.instance_state(other)
                 strategy = self.property._get_strategy(strategies.LazyLoader)
-                
+
                 def state_bindparam(state, col):
                     o = state.obj() # strong ref
                     return lambda: self.property.mapper._get_committed_attr_by_column(o, col)
-                
+
                 def adapt(col):
                     if self.adapter:
                         return self.adapter(col)
                     else:
                         return col
-                        
+
                 if strategy.use_get:
                     return sql.and_(*[
                         sql.or_(
                         adapt(x) != state_bindparam(state, y),
                         adapt(x) == None)
                         for (x, y) in self.property.local_remote_pairs])
-                    
+
             criterion = sql.and_(*[x==y for (x, y) in zip(self.property.mapper.primary_key, self.property.mapper.primary_key_from_instance(other))])
             return ~self._criterion_exists(criterion)
 
@@ -698,15 +698,15 @@ class RelationProperty(StrategizedProperty):
         other = self.mapper._get_property(key)
         self._reverse_property.add(other)
         other._reverse_property.add(self)
-        
+
         if not other._get_target().common_parent(self.parent):
             raise sa_exc.ArgumentError("reverse_property %r on relation %s references "
                     "relation %s, which does not reference mapper %s" % (key, self, other, self.parent))
-        
+
         if self.direction in (ONETOMANY, MANYTOONE) and self.direction == other.direction:
             raise sa_exc.ArgumentError("%s and back-reference %s are both of the same direction %r."
                 "  Did you mean to set remote_side on the many-to-one side ?" % (self, other, self.direction))
-        
+
     def do_init(self):
         self._get_target()
         self._process_dependent_arguments()
@@ -730,7 +730,7 @@ class RelationProperty(StrategizedProperty):
                 raise sa_exc.ArgumentError("relation '%s' expects a class or a mapper argument (received: %s)" % (self.key, type(self.argument)))
             assert isinstance(self.mapper, mapper.Mapper), self.mapper
         return self.mapper
-        
+
     def _process_dependent_arguments(self):
 
         # accept callables for other attributes which may require deferred initialization
@@ -746,10 +746,10 @@ class RelationProperty(StrategizedProperty):
             if val is not None:
                 util.assert_arg_type(val, sql.ClauseElement, attr)
                 setattr(self, attr, _orm_deannotate(val))
-        
+
         if self.order_by:
             self.order_by = [expression._literal_as_column(x) for x in util.to_list(self.order_by)]
-        
+
         self._foreign_keys = util.column_set(expression._literal_as_column(x) for x in util.to_column_set(self._foreign_keys))
         self.remote_side = util.column_set(expression._literal_as_column(x) for x in util.to_column_set(self.remote_side))
 
@@ -826,14 +826,14 @@ class RelationProperty(StrategizedProperty):
                     self.synchronize_pairs.append((r, l))
         else:
             eq_pairs = criterion_as_pairs(
-                            self.primaryjoin, 
-                            consider_as_foreign_keys=self._foreign_keys, 
+                            self.primaryjoin,
+                            consider_as_foreign_keys=self._foreign_keys,
                             any_operator=self.viewonly
                         )
             eq_pairs = [
-                            (l, r) for l, r in eq_pairs if 
-                            (self._col_is_part_of_mappings(l) and 
-                                self._col_is_part_of_mappings(r)) 
+                            (l, r) for l, r in eq_pairs if
+                            (self._col_is_part_of_mappings(l) and
+                                self._col_is_part_of_mappings(r))
                                 or self.viewonly and r in self._foreign_keys
                         ]
 
@@ -915,14 +915,14 @@ class RelationProperty(StrategizedProperty):
 
             # fk collection which suggests MANYTOONE.
             manytoone_fk = parentcols.intersection(foreign_keys)
-            
+
             if not onetomany_fk and not manytoone_fk:
                 raise sa_exc.ArgumentError(
                     "Can't determine relation direction for relationship '%s' "
                     "- foreign key columns are present in neither the "
                     "parent nor the child's mapped tables" % self )
 
-            elif onetomany_fk and manytoone_fk: 
+            elif onetomany_fk and manytoone_fk:
                 # fks on both sides.  do the same
                 # test only based on the local side.
                 referents = [c for c, f in self.synchronize_pairs]
@@ -937,20 +937,20 @@ class RelationProperty(StrategizedProperty):
                 self.direction = ONETOMANY
             elif manytoone_fk:
                 self.direction = MANYTOONE
-                
+
             if not self.direction:
                 raise sa_exc.ArgumentError(
                     "Can't determine relation direction for relationship '%s' "
                     "- foreign key columns are present in both the parent and "
                     "the child's mapped tables.  Specify 'foreign_keys' "
                     "argument." % self)
-        
+
         if self.cascade.delete_orphan and not self.single_parent and \
             (self.direction is MANYTOMANY or self.direction is MANYTOONE):
             util.warn("On %s, delete-orphan cascade is not supported on a "
                     "many-to-many or many-to-one relationship when single_parent is not set.  "
                     " Set single_parent=True on the relation()." % self)
-        
+
     def _determine_local_remote_pairs(self):
         if not self.local_remote_pairs:
             if self.remote_side:
@@ -982,7 +982,7 @@ class RelationProperty(StrategizedProperty):
                     self.local_remote_pairs = eq_pairs
         elif self.remote_side:
             raise sa_exc.ArgumentError("remote_side argument is redundant against more detailed _local_remote_side argument.")
-        
+
         for l, r in self.local_remote_pairs:
 
             if self.direction is ONETOMANY and not self._col_is_part_of_mappings(l):
@@ -1022,7 +1022,7 @@ class RelationProperty(StrategizedProperty):
                 self.extension = util.to_list(self.extension) or []
                 self.extension.append(attributes.GenericBackrefExtension(self.back_populates))
                 self._add_reverse_property(self.back_populates)
-            
+
             if self.backref is not None:
                 self.backref.compile(self)
         elif not mapper.class_mapper(self.parent.class_, compile=False)._get_property(self.key, raiseerr=False):
@@ -1030,7 +1030,7 @@ class RelationProperty(StrategizedProperty):
                 "a non-primary mapper on class '%s'.  New relations can only be "
                 "added to the primary mapper, i.e. the very first "
                 "mapper created for class '%s' " % (self.key, self.parent.class_.__name__, self.parent.class_.__name__))
-        
+
 
     def _refers_to_parent_table(self):
         for c, f in self.synchronize_pairs:
@@ -1064,21 +1064,21 @@ class RelationProperty(StrategizedProperty):
         aliased = aliased or bool(source_selectable)
 
         primaryjoin, secondaryjoin, secondary = self.primaryjoin, self.secondaryjoin, self.secondary
-        
+
         # adjust the join condition for single table inheritance,
         # in the case that the join is to a subclass
         # this is analgous to the "_adjust_for_single_table_inheritance()"
         # method in Query.
 
         dest_mapper = of_type or self.mapper
-        
+
         single_crit = dest_mapper._single_table_criterion
         if single_crit:
             if secondaryjoin:
                 secondaryjoin = secondaryjoin & single_crit
             else:
                 primaryjoin = primaryjoin & single_crit
-            
+
 
         if aliased:
             if secondary:
@@ -1109,8 +1109,8 @@ class RelationProperty(StrategizedProperty):
         else:
             target_adapter = None
 
-        return (primaryjoin, secondaryjoin, 
-                (source_selectable or self.parent.local_table), 
+        return (primaryjoin, secondaryjoin,
+                (source_selectable or self.parent.local_table),
                 (dest_selectable or self.mapper.local_table), secondary, target_adapter)
 
     def _get_join(self, parent, primary=True, secondary=True, polymorphic_parent=True):
@@ -1142,10 +1142,10 @@ class BackRef(object):
     """Attached to a RelationProperty to indicate a complementary reverse relationship.
 
     Handles the job of creating the opposite RelationProperty according to configuration.
-    
+
     Alternatively, two explicit RelationProperty objects can be associated bidirectionally
     using the back_populates keyword argument on each.
-    
+
     """
 
     def __init__(self, key, _prop=None, **kwargs):
@@ -1172,9 +1172,9 @@ class BackRef(object):
                     raise sa_exc.InvalidRequestError(
                         "Can't assign 'secondaryjoin' on a backref against "
                         "a non-secondary relation.")
-            
+
             foreign_keys = self.kwargs.pop('foreign_keys', prop._foreign_keys)
-            
+
             parent = prop.parent.primary_mapper()
             self.kwargs.setdefault('viewonly', prop.viewonly)
             self.kwargs.setdefault('post_update', prop.post_update)

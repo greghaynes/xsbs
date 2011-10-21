@@ -65,7 +65,7 @@ class NoSuchColumnError(KeyError, InvalidRequestError):
 
 class NoReferenceError(InvalidRequestError):
     """Raised by ``ForeignKey`` to indicate a reference cannot be resolved."""
-    
+
 class NoReferencedTableError(NoReferenceError):
     """Raised by ``ForeignKey`` when the referred ``Table`` cannot be located."""
 

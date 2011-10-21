@@ -49,14 +49,14 @@ class DependencyProcessor(object):
     def _get_instrumented_attribute(self):
         """Return the ``InstrumentedAttribute`` handled by this
         ``DependencyProecssor``.
-        
+
         """
         return self.parent.class_manager.get_impl(self.key)
 
     def hasparent(self, state):
         """return True if the given object instance has a parent,
         according to the ``InstrumentedAttribute`` handled by this ``DependencyProcessor``.
-        
+
         """
         # TODO: use correct API for this
         return self._get_instrumented_attribute().hasparent(state)
@@ -75,10 +75,10 @@ class DependencyProcessor(object):
         which will be executed after that mapper's objects have been
         saved or before they've been deleted.  The process operation
         manages attributes and dependent operations between two mappers.
-        
+
         """
         raise NotImplementedError()
-        
+
     def whose_dependent_on_who(self, state1, state2):
         """Given an object pair assuming `obj2` is a child of `obj1`,
         return a tuple with the dependent object second, or None if
@@ -123,36 +123,36 @@ class DependencyProcessor(object):
             else:
                 raise exc.FlushError("Attempting to flush an item of type %s on collection '%s', "
                                 "whose mapper does not inherit from that of %s." % (state.class_, self.prop, self.mapper.class_))
-            
+
     def _synchronize(self, state, child, associationrow, clearkeys, uowcommit):
         """Called during a flush to synchronize primary key identifier
         values between a parent/child object, as well as to an
         associationrow in the case of many-to-many.
-        
+
         """
         raise NotImplementedError()
 
     def _check_reverse_action(self, uowcommit, parent, child, action):
         """Determine if an action has been performed by the 'reverse' property of this property.
-        
+
         this is used to ensure that only one side of a bidirectional relation
         issues a certain operation for a parent/child pair.
-        
+
         """
         for r in self.prop._reverse_property:
             if (r._dependency_processor, action, parent, child) in uowcommit.attributes:
                 return True
         return False
-    
+
     def _performed_action(self, uowcommit, parent, child, action):
         """Establish that an action has been performed for a certain parent/child pair.
-        
+
         Used only for actions that are sensitive to bidirectional double-action,
         i.e. manytomany, post_update.
-        
+
         """
         uowcommit.attributes[(self, action, parent, child)] = True
-        
+
     def _conditional_post_update(self, state, uowcommit, related):
         """Execute a post_update call.
 
@@ -165,7 +165,7 @@ class DependencyProcessor(object):
         particular relationship, and given a target object and list of
         one or more related objects, and execute the ``UPDATE`` if the
         given related object list contains ``INSERT``s or ``DELETE``s.
-        
+
         """
         if state is not None and self.post_update:
             for x in related:
@@ -324,7 +324,7 @@ class DetectKeySwitch(DependencyProcessor):
             for s in [elem for elem in uowcommit.session.identity_map.all_states()
                 if issubclass(elem.class_, self.parent.class_) and
                     self.key in elem.dict and
-                    elem.dict[self.key] is not None and 
+                    elem.dict[self.key] is not None and
                     attributes.instance_state(elem.dict[self.key]) in switchers
                 ]:
                 uowcommit.register_object(s)
@@ -344,7 +344,7 @@ class ManyToOneDP(DependencyProcessor):
             uowcommit.register_dependency(self.parent, self.dependency_marker)
         else:
             uowcommit.register_dependency(self.mapper, self.parent)
-    
+
     def register_processors(self, uowcommit):
         if self.post_update:
             uowcommit.register_processor(self.dependency_marker, self, self.parent)
@@ -426,7 +426,7 @@ class ManyToManyDP(DependencyProcessor):
 
     def register_processors(self, uowcommit):
         uowcommit.register_processor(self.dependency_marker, self, self.parent)
-        
+
     def process_dependencies(self, task, deplist, uowcommit, delete = False):
         connection = uowcommit.transaction.connection(self.mapper)
         secondary_delete = []
@@ -466,7 +466,7 @@ class ManyToManyDP(DependencyProcessor):
                 if not self.passive_updates and self._pks_changed(uowcommit, state):
                     if not history:
                         history = uowcommit.get_attribute_history(state, self.key, passive=False)
-                    
+
                     for child in history.unchanged:
                         associationrow = {}
                         sync.update(state, self.parent, associationrow, "old_", self.prop.synchronize_pairs)
@@ -482,7 +482,7 @@ class ManyToManyDP(DependencyProcessor):
             result = connection.execute(statement, secondary_delete)
             if result.supports_sane_multi_rowcount() and result.rowcount != len(secondary_delete):
                 raise exc.ConcurrentModificationError("Deleted rowcount %d does not match number of "
-                            "secondary table rows deleted from table '%s': %d" % 
+                            "secondary table rows deleted from table '%s': %d" %
                             (result.rowcount, self.secondary.description, len(secondary_delete)))
 
         if secondary_update:
@@ -492,7 +492,7 @@ class ManyToManyDP(DependencyProcessor):
             result = connection.execute(statement, secondary_update)
             if result.supports_sane_multi_rowcount() and result.rowcount != len(secondary_update):
                 raise exc.ConcurrentModificationError("Updated rowcount %d does not match number of "
-                            "secondary table rows updated from table '%s': %d" % 
+                            "secondary table rows updated from table '%s': %d" %
                             (result.rowcount, self.secondary.description, len(secondary_update)))
 
         if secondary_insert:
@@ -515,7 +515,7 @@ class ManyToManyDP(DependencyProcessor):
         if associationrow is None:
             return
         self._verify_canload(child)
-        
+
         sync.populate_dict(state, self.parent, associationrow, self.prop.synchronize_pairs)
         sync.populate_dict(child, self.mapper, associationrow, self.prop.secondary_synchronize_pairs)
 
@@ -523,15 +523,15 @@ class ManyToManyDP(DependencyProcessor):
         return sync.source_modified(uowcommit, state, self.parent, self.prop.synchronize_pairs)
 
 class MapperStub(object):
-    """Represent a many-to-many dependency within a flush 
-    context. 
-     
-    The UOWTransaction corresponds dependencies to mappers.   
-    MapperStub takes the place of the "association table" 
+    """Represent a many-to-many dependency within a flush
+    context.
+
+    The UOWTransaction corresponds dependencies to mappers.
+    MapperStub takes the place of the "association table"
     so that a depedendency can be corresponded to it.
 
     """
-    
+
     def __init__(self, parent, mapper, key):
         self.mapper = mapper
         self.base_mapper = self

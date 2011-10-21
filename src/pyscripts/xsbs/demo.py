@@ -35,7 +35,7 @@ def permissions_ok(cn):
 		return p.isAdmin()
 	logging.error('required_permissions not an int!')
 	return False
-	
+
 
 @eventHandler('player_record_demo')
 def playerRecordNextMatch(cn, val):
@@ -64,7 +64,7 @@ def setPersistantDemoRecord(cn, args):
 		player(cn).message(info('Enabling persistant demo recording'))
 		persistent_recording = True
 		sbserver.setRecordNextMatch(persistent_recording)
-		
+
 	elif args == 'disable':
 		player(cn).message(info('Disabling persistant demo recording'))
 		persistent_recording = False

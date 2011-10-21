@@ -429,7 +429,7 @@ class MapperProperty(object):
         calling the ``Mapper``'s register_dependencies operation.
         Establishes a topological dependency between two mappers
         which will affect the order in which mappers persist data.
-        
+
         """
 
         pass
@@ -439,11 +439,11 @@ class MapperProperty(object):
         calling the ``Mapper``'s register_processors operation.
         Establishes a processor object between two mappers which
         will link data and state between parent/child objects.
-        
+
         """
 
         pass
-        
+
     def is_primary(self):
         """Return True if this ``MapperProperty``'s mapper is the
         primary mapper for its class.
@@ -682,13 +682,13 @@ class PropertyOption(MapperOption):
             searchfor = mapper
         else:
             searchfor = _class_to_mapper(mapper).base_mapper
-        
+
         for ent in query._mapper_entities:
             if ent.path_entity is searchfor:
                 return ent
         else:
             if raiseerr:
-                raise sa_exc.ArgumentError("Can't find entity %s in Query.  Current list: %r" 
+                raise sa_exc.ArgumentError("Can't find entity %s in Query.  Current list: %r"
                     % (searchfor, [str(m.path_entity) for m in query._entities]))
             else:
                 return None
@@ -722,7 +722,7 @@ class PropertyOption(MapperOption):
         # _current_path implies we're in a secondary load
         # with an existing path
         current_path = list(query._current_path)
-            
+
         if self.mapper:
             entity = self.__find_entity(query, self.mapper, raiseerr)
             mapper = entity.mapper
@@ -755,7 +755,7 @@ class PropertyOption(MapperOption):
                 if current_path and key == current_path[1]:
                     current_path = current_path[2:]
                     continue
-                    
+
                 if prop is None:
                     return []
 
@@ -767,12 +767,12 @@ class PropertyOption(MapperOption):
                     path_element = mapper = getattr(prop, 'mapper', None)
                 if path_element:
                     path_element = path_element.base_mapper
-        
+
         # if current_path tokens remain, then
         # we didn't have an exact path match.
         if current_path:
             return []
-            
+
         return l
 
 class AttributeExtension(object):
@@ -895,10 +895,10 @@ class LoaderStrategy(object):
 
 class InstrumentationManager(object):
     """User-defined class instrumentation extension.
-    
+
     The API for this class should be considered as semi-stable,
     and may change slightly with new releases.
-    
+
     """
 
     # r4361 added a mandatory (cls) constructor to this interface.
@@ -960,4 +960,3 @@ class InstrumentationManager(object):
 
     def dict_getter(self, class_):
         return lambda inst: self.get_instance_dict(class_, inst)
-        

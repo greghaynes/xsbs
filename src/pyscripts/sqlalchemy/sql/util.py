@@ -6,7 +6,7 @@ from itertools import chain
 
 def sort_tables(tables):
     """sort a collection of Table objects in order of their foreign-key dependency."""
-    
+
     tables = list(tables)
     tuples = []
     def visit_foreign_key(fkey):
@@ -18,26 +18,26 @@ def sort_tables(tables):
             tuples.append( ( parent_table, child_table ) )
 
     for table in tables:
-        visitors.traverse(table, {'schema_visitor':True}, {'foreign_key':visit_foreign_key})    
+        visitors.traverse(table, {'schema_visitor':True}, {'foreign_key':visit_foreign_key})
     return topological.sort(tuples, tables)
 
 def find_join_source(clauses, join_to):
-    """Given a list of FROM clauses and a selectable, 
-    return the first index and element from the list of 
-    clauses which can be joined against the selectable.  returns 
+    """Given a list of FROM clauses and a selectable,
+    return the first index and element from the list of
+    clauses which can be joined against the selectable.  returns
     None, None if no match is found.
-    
+
     e.g.::
-    
+
         clause1 = table1.join(table2)
         clause2 = table4.join(table5)
-        
+
         join_to = table2.join(table3)
-        
+
         find_join_source([clause1, clause2], join_to) == clause1
-    
+
     """
-    
+
     selectables = list(expression._from_objects(join_to))
     for i, f in enumerate(clauses):
         for s in selectables:
@@ -46,22 +46,22 @@ def find_join_source(clauses, join_to):
     else:
         return None, None
 
-    
+
 def find_tables(clause, check_columns=False, include_aliases=False, include_joins=False, include_selects=False):
     """locate Table objects within the given expression."""
-    
+
     tables = []
     _visitors = {}
-    
+
     def visit_something(elem):
         tables.append(elem)
-        
+
     if include_selects:
         _visitors['select'] = _visitors['compound_select'] = visit_something
-    
+
     if include_joins:
         _visitors['join'] = visit_something
-        
+
     if include_aliases:
         _visitors['alias']  = visit_something
 
@@ -77,7 +77,7 @@ def find_tables(clause, check_columns=False, include_aliases=False, include_join
 
 def find_columns(clause):
     """locate Column objects within the given expression."""
-    
+
     cols = util.column_set()
     def visit_column(col):
         cols.add(col)
@@ -86,14 +86,14 @@ def find_columns(clause):
 
 def join_condition(a, b, ignore_nonexistent_tables=False):
     """create a join condition between two tables.
-    
+
     ignore_nonexistent_tables=True allows a join condition to be
     determined between two tables which may contain references to
     other not-yet-defined tables.  In general the NoSuchTableError
     raised is only required if the user is trying to join selectables
-    across multiple MetaData objects (which is an extremely rare use 
+    across multiple MetaData objects (which is an extremely rare use
     case).
-    
+
     """
     crit = []
     constraints = set()
@@ -105,7 +105,7 @@ def join_condition(a, b, ignore_nonexistent_tables=False):
                 continue
             else:
                 raise
-                
+
         if col:
             crit.append(col == fk.parent)
             constraints.add(fk.constraint)
@@ -142,17 +142,17 @@ def join_condition(a, b, ignore_nonexistent_tables=False):
 
 class Annotated(object):
     """clones a ClauseElement and applies an 'annotations' dictionary.
-    
-    Unlike regular clones, this clone also mimics __hash__() and 
+
+    Unlike regular clones, this clone also mimics __hash__() and
     __cmp__() of the original element so that it takes its place
     in hashed collections.
-    
+
     A reference to the original element is maintained, for the important
-    reason of keeping its hash value current.  When GC'ed, the 
+    reason of keeping its hash value current.  When GC'ed, the
     hash value may be reused, causing conflicts.
 
     """
-    
+
     def __new__(cls, *args):
         if not args:
             # clone constructor
@@ -164,17 +164,17 @@ class Annotated(object):
             try:
                 cls = annotated_classes[element.__class__]
             except KeyError:
-                cls = annotated_classes[element.__class__] = type.__new__(type, 
-                        "Annotated%s" % element.__class__.__name__, 
+                cls = annotated_classes[element.__class__] = type.__new__(type,
+                        "Annotated%s" % element.__class__.__name__,
                         (Annotated, element.__class__), {})
             return object.__new__(cls)
 
     def __init__(self, element, values):
-        # force FromClause to generate their internal 
+        # force FromClause to generate their internal
         # collections into __dict__
         if isinstance(element, expression.FromClause):
             element.c
-        
+
         self.__dict__ = element.__dict__.copy()
         self.__element = element
         self._annotations = values
@@ -186,10 +186,10 @@ class Annotated(object):
         clone.__dict__ = self.__dict__.copy()
         clone._annotations = _values
         return clone
-    
+
     def _deannotate(self):
         return self.__element
-        
+
     def _clone(self):
         clone = self.__element._clone()
         if clone is self.__element:
@@ -200,7 +200,7 @@ class Annotated(object):
             # to this object's __dict__.
             clone.__dict__.update(self.__dict__)
             return Annotated(clone, self._annotations)
-    
+
     def __hash__(self):
         return hash(self.__element)
 
@@ -256,7 +256,7 @@ def _deep_deannotate(element):
 def splice_joins(left, right, stop_on=None):
     if left is None:
         return right
-        
+
     stack = [(right, None)]
 
     adapter = ClauseAdapter(left)
@@ -276,7 +276,7 @@ def splice_joins(left, right, stop_on=None):
             ret = right
 
     return ret
-    
+
 def reduce_columns(columns, *clauses, **kw):
     """given a list of columns, return a 'reduced' set based on natural equivalents.
 
@@ -289,14 +289,14 @@ def reduce_columns(columns, *clauses, **kw):
 
     \**kw may specify 'ignore_nonexistent_tables' to ignore foreign keys
     whose tables are not yet configured.
-    
+
     This function is primarily used to determine the most minimal "primary key"
     from a selectable, by reducing the set of primary key columns present
     in the the selectable to just those that are not repeated.
 
     """
     ignore_nonexistent_tables = kw.pop('ignore_nonexistent_tables', False)
-    
+
     columns = util.ordered_column_set(columns)
 
     omit = util.column_set()
@@ -332,10 +332,10 @@ def reduce_columns(columns, *clauses, **kw):
 
 def criterion_as_pairs(expression, consider_as_foreign_keys=None, consider_as_referenced_keys=None, any_operator=False):
     """traverse an expression and locate binary criterion pairs."""
-    
+
     if consider_as_foreign_keys and consider_as_referenced_keys:
         raise exc.ArgumentError("Can only specify one of 'consider_as_foreign_keys' or 'consider_as_referenced_keys'")
-        
+
     def visit_binary(binary):
         if not any_operator and binary.operator is not operators.eq:
             return
@@ -364,18 +364,18 @@ def criterion_as_pairs(expression, consider_as_foreign_keys=None, consider_as_re
 
 def folded_equivalents(join, equivs=None):
     """Return a list of uniquely named columns.
-    
-    The column list of the given Join will be narrowed 
+
+    The column list of the given Join will be narrowed
     down to a list of all equivalently-named,
     equated columns folded into one column, where 'equated' means they are
     equated to each other in the ON clause of this join.
 
     This function is used by Join.select(fold_equivalents=True).
-    
-    Deprecated.   This function is used for a certain kind of 
+
+    Deprecated.   This function is used for a certain kind of
     "polymorphic_union" which is designed to achieve joined
     table inheritance where the base table has no "discriminator"
-    column; [ticket:1131] will provide a better way to 
+    column; [ticket:1131] will provide a better way to
     achieve this.
 
     """
@@ -407,10 +407,10 @@ def folded_equivalents(join, equivs=None):
 
 class AliasedRow(object):
     """Wrap a RowProxy with a translation map.
-    
+
     This object allows a set of keys to be translated
     to those present in a RowProxy.
-    
+
     """
     def __init__(self, row, map):
         # AliasedRow objects don't nest, so un-nest
@@ -420,7 +420,7 @@ class AliasedRow(object):
         else:
             self.row = row
         self.map = map
-        
+
     def __contains__(self, key):
         return self.map[key] in self.row
 
@@ -436,7 +436,7 @@ class AliasedRow(object):
 
 class ClauseAdapter(visitors.ReplacingCloningVisitor):
     """Clones and modifies clauses based on column correspondence.
-    
+
     E.g.::
 
       table1 = Table('sometable', metadata,
@@ -466,7 +466,7 @@ class ClauseAdapter(visitors.ReplacingCloningVisitor):
         self.include = include
         self.exclude = exclude
         self.equivalents = util.column_dict(equivalents or {})
-        
+
     def _corresponding_column(self, col, require_embedded, _seen=util.EMPTY_SET):
         newcol = self.selectable.corresponding_column(col, require_embedded=require_embedded)
 
@@ -494,12 +494,12 @@ class ClauseAdapter(visitors.ReplacingCloningVisitor):
 
 class ColumnAdapter(ClauseAdapter):
     """Extends ClauseAdapter with extra utility functions.
-    
-    Provides the ability to "wrap" this ClauseAdapter 
+
+    Provides the ability to "wrap" this ClauseAdapter
     around another, a columns dictionary which returns
-    cached, adapted elements given an original, and an 
+    cached, adapted elements given an original, and an
     adapted_row() factory.
-    
+
     """
     def __init__(self, selectable, equivalents=None, chain_to=None, include=None, exclude=None):
         ClauseAdapter.__init__(self, selectable, equivalents, include, exclude)
@@ -529,20 +529,20 @@ class ColumnAdapter(ClauseAdapter):
         c = self._corresponding_column(col, False)
         if not c:
             c = self.adapt_clause(col)
-            
+
             # anonymize labels in case they have a hardcoded name
             if isinstance(c, expression._Label):
                 c = c.label(None)
-        return c    
+        return c
 
     def adapted_row(self, row):
         return AliasedRow(row, self.columns)
-    
+
     def __getstate__(self):
         d = self.__dict__.copy()
         del d['columns']
         return d
-        
+
     def __setstate__(self, state):
         self.__dict__.update(state)
         self.columns = util.PopulateDict(self._locate_col)

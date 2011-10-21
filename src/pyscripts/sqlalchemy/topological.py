@@ -25,34 +25,34 @@ __all__ = ['sort', 'sort_with_cycles', 'sort_as_tree']
 
 def sort(tuples, allitems):
     """sort the given list of items by dependency.
-    
+
     'tuples' is a list of tuples representing a partial ordering.
     """
-    
+
     return [n.item for n in _sort(tuples, allitems, allow_cycles=False, ignore_self_cycles=True)]
 
 def sort_with_cycles(tuples, allitems):
     """sort the given list of items by dependency, cutting out cycles.
-    
+
     returns results as an iterable of 2-tuples, containing the item,
     and a list containing items involved in a cycle with this item, if any.
-    
+
     'tuples' is a list of tuples representing a partial ordering.
     """
-    
+
     return [(n.item, [n.item for n in n.cycles or []]) for n in _sort(tuples, allitems, allow_cycles=True)]
-    
+
 def sort_as_tree(tuples, allitems, with_cycles=False):
     """sort the given list of items by dependency, and return results
     as a hierarchical tree structure.
-    
+
     returns results as an iterable of 3-tuples, containing the item,
     a list containing items involved in a cycle with this item, if any,
-    and a list of child tuples.  
-    
+    and a list of child tuples.
+
     if with_cycles is False, the returned structure is of the same form
     but the second element of each tuple, i.e. the 'cycles', is an empty list.
-    
+
     'tuples' is a list of tuples representing a partial ordering.
     """
 
@@ -70,7 +70,7 @@ class _Node(object):
 
     def __str__(self):
         return self.safestr()
-    
+
     def safestr(self, indent=0):
         return (' ' * indent * 2) + \
             str(self.item) + \
@@ -219,7 +219,7 @@ def _organize_as_tree(nodes):
     """Given a list of nodes from a topological sort, organize the
     nodes into a tree structure, with as many non-dependent nodes
     set as siblings to each other as possible.
-    
+
     returns nodes as 3-tuples (item, cycles, children).
     """
 
