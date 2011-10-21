@@ -98,14 +98,14 @@ def listCommands(cn, args):
 		listMasterCommands(cn, args)
 	else:
 		listPublicCommands(cn, args)
-		
+
 def listPublicCommands(cn, args):
 	str = 'Public commands: '
 	for cmd in command_info.items():
 		if cmd[1].public:
 			str += cmd[1].command + ' '
 	sbserver.playerMessage(cn, info(str))
-	
+
 def listMasterCommands(cn, args):
 	str = 'Master commands: '
 	for cmd in command_info.items():
@@ -114,7 +114,7 @@ def listMasterCommands(cn, args):
 		elif cmd[1].master:
 			str += cmd[1].command + ' '
 	sbserver.playerMessage(cn, info(str))
-	
+
 def listAdminCommands(cn, args):
 	str = 'Admin commands: '
 	for cmd in command_info.items():

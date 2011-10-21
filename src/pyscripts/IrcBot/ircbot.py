@@ -77,7 +77,7 @@ class IrcBotFactory(protocol.ClientFactory):
 	def broadcast(self, message):
 		for bot in self.bots:
 			bot.broadcast(message)
-	
+
 event_abilities = {
 	'player_active': ('player_connect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Connected\x03' % (sbserver.playerName(x), x))),
 	'player_disconnect': ('player_disconnect', lambda x: factory.broadcast('%s (\x037 %i \x03) \x032Disconnected\x03' % (sbserver.playerName(x), x))),

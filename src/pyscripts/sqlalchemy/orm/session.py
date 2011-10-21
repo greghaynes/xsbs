@@ -526,7 +526,7 @@ class Session(object):
     public_methods = (
         '__contains__', '__iter__', 'add', 'add_all', 'begin', 'begin_nested',
         'clear', 'close', 'commit', 'connection', 'delete', 'execute', 'expire',
-        'expire_all', 'expunge', 'expunge_all', 'flush', 'get_bind', 'is_modified', 
+        'expire_all', 'expunge', 'expunge_all', 'flush', 'get_bind', 'is_modified',
         'merge', 'query', 'refresh', 'rollback', 'save',
         'save_or_update', 'scalar', 'update')
 
@@ -540,7 +540,7 @@ class Session(object):
         :func:`~sqlalchemy.orm.sessionmaker` function.
 
         """
-        
+
         if echo_uow is not None:
             util.warn_deprecated(
                 "echo_uow is deprecated. "
@@ -745,7 +745,7 @@ class Session(object):
           Additional keyword arguments are sent to :meth:`get_bind()`
           which locates a connectable to use for the execution.
           Subclasses of :class:`Session` may override this.
-          
+
         """
         clause = expression._literal_as_text(clause)
 
@@ -756,7 +756,7 @@ class Session(object):
 
     def scalar(self, clause, params=None, mapper=None, **kw):
         """Like execute() but return a scalar result."""
-        
+
         return self.execute(clause, params=params, mapper=mapper, **kw).scalar()
 
     def close(self):
@@ -1020,10 +1020,10 @@ class Session(object):
                 # primary key switch
                 self.identity_map.remove(state)
                 state.key = instance_key
-            
+
             self.identity_map.replace(state)
             state.commit_all(state.dict, self.identity_map)
-            
+
         # remove from new last, might be the last strong ref
         if state in self._new:
             if self._enable_transaction_accounting and self.transaction:
@@ -1123,8 +1123,8 @@ class Session(object):
 
         if state in self._deleted:
             return
-            
-        # ensure object is attached to allow the 
+
+        # ensure object is attached to allow the
         # cascade operation to load deferred attributes
         # and collections
         self._attach(state)
@@ -1162,7 +1162,7 @@ class Session(object):
             return self._merge(instance, dont_load=dont_load, _recursive=_recursive)
         finally:
             self.autoflush = autoflush
-        
+
     def _merge(self, instance, dont_load=False, _recursive=None):
         mapper = _object_mapper(instance)
         if instance in _recursive:
@@ -1238,7 +1238,7 @@ class Session(object):
             raise sa_exc.InvalidRequestError(
                 "Object '%s' already has an identity - it can't be registered "
                 "as pending" % mapperutil.state_str(state))
-                
+
         self._attach(state)
         if state not in self._new:
             self._new[state] = state.obj()
@@ -1248,7 +1248,7 @@ class Session(object):
         if (self.identity_map.contains_state(state) and
             state not in self._deleted):
             return
-            
+
         if state.key is None:
             raise sa_exc.InvalidRequestError(
                 "Instance '%s' is not persisted" %
@@ -1270,26 +1270,26 @@ class Session(object):
 
         if state.key is None:
             return
-                    
+
         self._attach(state)
         self._deleted[state] = state.obj()
         self.identity_map.add(state)
-    
+
     def _attach(self, state):
         if state.key and \
             state.key in self.identity_map and \
             not self.identity_map.contains_state(state):
             raise sa_exc.InvalidRequestError(
-                "Can't attach instance %s; another instance with key %s is already present in this session." % 
+                "Can't attach instance %s; another instance with key %s is already present in this session." %
                     (mapperutil.state_str(state), state.key)
                 )
-                
+
         if state.session_id and state.session_id is not self.hash_key:
             raise sa_exc.InvalidRequestError(
                 "Object '%s' is already attached to session '%s' "
                 "(this is '%s')" % (mapperutil.state_str(state),
                                     state.session_id, self.hash_key))
-                                    
+
         if state.session_id != self.hash_key:
             state.session_id = self.hash_key
             for ext in self.extensions:
@@ -1345,16 +1345,16 @@ class Session(object):
             util.warn_deprecated(
                 "The 'objects' argument to session.flush() is deprecated; "
                 "Please do not add objects to the session which should not yet be persisted.")
-        
+
         if self._flushing:
             raise sa_exc.InvalidRequestError("Session is already flushing")
-            
+
         try:
             self._flushing = True
             self._flush(objects)
         finally:
             self._flushing = False
-            
+
     def _flush(self, objects=None):
         if (not self.identity_map.check_modified() and
             not self._deleted and not self._new):
@@ -1371,7 +1371,7 @@ class Session(object):
             for ext in self.extensions:
                 ext.before_flush(self, flush_context, objects)
             dirty = self._dirty_states
-            
+
         deleted = set(self._deleted)
         new = set(self._new)
 
@@ -1399,7 +1399,7 @@ class Session(object):
             proc = new.union(dirty).intersection(objset).difference(deleted)
         else:
             proc = new.union(dirty).difference(deleted)
-            
+
         for state in proc:
             is_orphan = _state_mapper(state)._is_orphan(state)
             if is_orphan and not _state_has_identity(state):
@@ -1437,7 +1437,7 @@ class Session(object):
         except:
             transaction.rollback()
             raise
-        
+
         flush_context.finalize_flush_changes()
 
         # useful assertions:
@@ -1446,7 +1446,7 @@ class Session(object):
         #else:
         #    assert self.identity_map._modified == self.identity_map._modified.difference(objects)
         #self.identity_map._modified.clear()
-        
+
         for ext in self.extensions:
             ext.after_flush_postexec(self, flush_context)
 
@@ -1477,14 +1477,14 @@ class Session(object):
         for attr in state.manager.attributes:
             if \
                 (
-                    not include_collections and 
+                    not include_collections and
                     hasattr(attr.impl, 'get_collection')
                 ) or not hasattr(attr.impl, 'get_history'):
                 continue
-                
+
             (added, unchanged, deleted) = \
                     attr.impl.get_history(state, dict_, passive=passive)
-                                            
+
             if added or deleted:
                 return True
         return False
@@ -1543,7 +1543,7 @@ class Session(object):
         return util.IdentitySet(self._new.values())
 
 _expire_state = state.InstanceState.expire_attributes
-    
+
 UOWEventHandler = unitofwork.UOWEventHandler
 
 _sessions = weakref.WeakValueDictionary()

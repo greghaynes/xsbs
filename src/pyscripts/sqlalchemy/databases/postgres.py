@@ -10,7 +10,7 @@ Driver
 ------
 
 The psycopg2 driver is supported, available at http://pypi.python.org/pypi/psycopg2/ .
-The dialect has several behaviors  which are specifically tailored towards compatibility 
+The dialect has several behaviors  which are specifically tailored towards compatibility
 with this module.
 
 Note that psycopg1 is **not** supported.
@@ -23,51 +23,51 @@ URLs are of the form `postgres://user:password@host:port/dbname[?key=value&key=v
 PostgreSQL-specific keyword arguments which are accepted by :func:`~sqlalchemy.create_engine()` are:
 
 * *server_side_cursors* - Enable the usage of "server side cursors" for SQL statements which support
-  this feature.  What this essentially means from a psycopg2 point of view is that the cursor is 
+  this feature.  What this essentially means from a psycopg2 point of view is that the cursor is
   created using a name, e.g. `connection.cursor('some name')`, which has the effect that result rows
-  are not immediately pre-fetched and buffered after statement execution, but are instead left 
+  are not immediately pre-fetched and buffered after statement execution, but are instead left
   on the server and only retrieved as needed.    SQLAlchemy's :class:`~sqlalchemy.engine.base.ResultProxy`
-  uses special row-buffering behavior when this feature is enabled, such that groups of 100 rows 
+  uses special row-buffering behavior when this feature is enabled, such that groups of 100 rows
   at a time are fetched over the wire to reduce conversational overhead.
 
 Sequences/SERIAL
 ----------------
 
 PostgreSQL supports sequences, and SQLAlchemy uses these as the default means of creating
-new primary key values for integer-based primary key columns.   When creating tables, 
-SQLAlchemy will issue the ``SERIAL`` datatype for integer-based primary key columns, 
+new primary key values for integer-based primary key columns.   When creating tables,
+SQLAlchemy will issue the ``SERIAL`` datatype for integer-based primary key columns,
 which generates a sequence corresponding to the column and associated with it based on
 a naming convention.
 
 To specify a specific named sequence to be used for primary key generation, use the
 :func:`~sqlalchemy.schema.Sequence` construct::
 
-    Table('sometable', metadata, 
+    Table('sometable', metadata,
             Column('id', Integer, Sequence('some_id_seq'), primary_key=True)
         )
 
 Currently, when SQLAlchemy issues a single insert statement, to fulfill the contract of
 having the "last insert identifier" available, the sequence is executed independently
 beforehand and the new value is retrieved, to be used in the subsequent insert.  Note
-that when an :func:`~sqlalchemy.sql.expression.insert()` construct is executed using 
+that when an :func:`~sqlalchemy.sql.expression.insert()` construct is executed using
 "executemany" semantics, the sequence is not pre-executed and normal PG SERIAL behavior
 is used.
 
-PostgreSQL 8.3 supports an ``INSERT...RETURNING`` syntax which SQLAlchemy supports 
-as well.  A future release of SQLA will use this feature by default in lieu of 
+PostgreSQL 8.3 supports an ``INSERT...RETURNING`` syntax which SQLAlchemy supports
+as well.  A future release of SQLA will use this feature by default in lieu of
 sequence pre-execution in order to retrieve new primary key values, when available.
 
 INSERT/UPDATE...RETURNING
 -------------------------
 
-The dialect supports PG 8.3's ``INSERT..RETURNING`` and ``UPDATE..RETURNING`` syntaxes, 
+The dialect supports PG 8.3's ``INSERT..RETURNING`` and ``UPDATE..RETURNING`` syntaxes,
 but must be explicitly enabled on a per-statement basis::
 
     # INSERT..RETURNING
     result = table.insert(postgres_returning=[table.c.col1, table.c.col2]).\\
         values(name='foo')
     print result.fetchall()
-    
+
     # UPDATE..RETURNING
     result = table.update(postgres_returning=[table.c.col1, table.c.col2]).\\
         where(table.c.name=='foo').values(name='bar')
@@ -196,11 +196,11 @@ class PGBoolean(sqltypes.Boolean):
 class PGBit(sqltypes.TypeEngine):
     def get_col_spec(self):
         return "BIT"
-        
+
 class PGUuid(sqltypes.TypeEngine):
     def get_col_spec(self):
         return "UUID"
-    
+
 class PGArray(sqltypes.MutableType, sqltypes.Concatenable, sqltypes.TypeEngine):
     def __init__(self, item_type, mutable=True):
         if isinstance(item_type, type):
@@ -317,11 +317,11 @@ class PGExecutionContext(default.DefaultExecutionContext):
         # TODO: coverage for server side cursors + select.for_update()
         is_server_side = \
             self.dialect.server_side_cursors and \
-            ((self.compiled and isinstance(self.compiled.statement, expression.Selectable) 
+            ((self.compiled and isinstance(self.compiled.statement, expression.Selectable)
                 and not getattr(self.compiled.statement, 'for_update', False)) \
             or \
             (
-                (not self.compiled or isinstance(self.compiled.statement, expression._TextClause)) 
+                (not self.compiled or isinstance(self.compiled.statement, expression._TextClause))
                 and self.statement and SERVER_SIDE_CURSOR_RE.match(self.statement))
             )
 
@@ -333,7 +333,7 @@ class PGExecutionContext(default.DefaultExecutionContext):
             return self._connection.connection.cursor(ident)
         else:
             return self._connection.connection.cursor()
-    
+
     def get_result_proxy(self):
         if self.__is_server_side:
             return base.BufferedRowResultProxy(self)
@@ -352,7 +352,7 @@ class PGDialect(default.DefaultDialect):
     default_paramstyle = 'pyformat'
     supports_default_values = True
     supports_empty_insert = False
-    
+
     def __init__(self, server_side_cursors=False, **kwargs):
         default.DefaultDialect.__init__(self, **kwargs)
         self.server_side_cursors = server_side_cursors
@@ -631,7 +631,7 @@ class PGDialect(default.DefaultDialect):
 
             table.append_constraint(schema.ForeignKeyConstraint(constrained_columns, refspec, conname, link_to_name=True))
 
-        # Indexes 
+        # Indexes
         IDX_SQL = """
           SELECT c.relname, i.indisunique, i.indexprs, i.indpred,
             a.attname
@@ -665,9 +665,9 @@ class PGDialect(default.DefaultDialect):
             indexes[idx_name][1].append(col)
 
         for name, (unique, columns) in indexes.items():
-            schema.Index(name, *[table.columns[c] for c in columns], 
+            schema.Index(name, *[table.columns[c] for c in columns],
                          **dict(unique=unique))
- 
+
 
 
     def _load_domains(self, connection):
@@ -849,7 +849,7 @@ class PGDefaultRunner(base.DefaultRunner):
         base.DefaultRunner.__init__(self, context)
         # craete cursor which won't conflict with a server-side cursor
         self.cursor = context._connection.connection.cursor()
-    
+
     def get_column_default(self, column, isinsert=True):
         if column.primary_key:
             # pre-execute passive defaults on primary keys

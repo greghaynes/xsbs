@@ -563,4 +563,3 @@ class GeoIP:
         """
         addr = socket.gethostbyname(hostname)
         return self.region_by_addr(addr)
-    

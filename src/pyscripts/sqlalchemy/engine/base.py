@@ -13,8 +13,8 @@ and result contexts.
 
 """
 
-__all__ = ['BufferedColumnResultProxy', 'BufferedColumnRow', 'BufferedRowResultProxy', 'Compiled', 'Connectable', 
-        'Connection', 'DefaultRunner', 'Dialect', 'Engine', 'ExecutionContext', 'NestedTransaction', 'ResultProxy', 
+__all__ = ['BufferedColumnResultProxy', 'BufferedColumnRow', 'BufferedRowResultProxy', 'Compiled', 'Connectable',
+        'Connection', 'DefaultRunner', 'Dialect', 'Engine', 'ExecutionContext', 'NestedTransaction', 'ResultProxy',
         'RootTransaction', 'RowProxy', 'SchemaIterator', 'StringIO', 'Transaction', 'TwoPhaseTransaction', 'connection_memoize']
 
 import inspect, StringIO
@@ -32,10 +32,10 @@ class Dialect(object):
     ExecutionContext, Compiled, DefaultGenerator, and TypeEngine.
 
     All Dialects implement the following attributes:
-    
+
     name
       identifying name for the dialect (i.e. 'sqlite')
-      
+
     positional
       True if the paramstyle for this Dialect is positional.
 
@@ -357,9 +357,9 @@ class ExecutionContext(object):
 
     def handle_dbapi_exception(self, e):
         """Receive a DBAPI exception which occured upon execute, result fetch, etc."""
-        
+
         raise NotImplementedError()
-        
+
     def should_autocommit_text(self, statement):
         """Parse the given textual statement and return True if it refers to a "committable" statement"""
 
@@ -428,7 +428,7 @@ class Compiled(object):
 
         bind
           Optional Engine or Connection to compile this statement against.
-          
+
         """
         self.dialect = dialect
         self.statement = statement
@@ -476,10 +476,10 @@ class Compiled(object):
 
 class Connectable(object):
     """Interface for an object which supports execution of SQL constructs.
-    
+
     The two implementations of ``Connectable`` are :class:`Connection` and
     :class:`Engine`.
-    
+
     """
 
     def contextual_connect(self):
@@ -524,7 +524,7 @@ class Connection(Connectable):
         Connection objects are typically constructed by an
         :class:`~sqlalchemy.engine.Engine`, see the ``connect()`` and
         ``contextual_connect()`` methods of Engine.
-        
+
         """
 
         self.engine = engine
@@ -534,7 +534,7 @@ class Connection(Connectable):
         self.__savepoint_seq = 0
         self.__branch = _branch
         self.__invalid = False
-        
+
     def _branch(self):
         """Return a new Connection which references this Connection's
         engine and connection; but does not have close_with_result enabled,
@@ -542,7 +542,7 @@ class Connection(Connectable):
 
         This is used to execute "sub" statements within a single execution,
         usually an INSERT statement.
-        
+
         """
         return self.engine.Connection(self.engine, self.__connection, _branch=True)
 
@@ -583,7 +583,7 @@ class Connection(Connectable):
     def should_close_with_result(self):
         """Indicates if this Connection should be closed when a corresponding
         ResultProxy is closed; this is essentially an auto-release mode.
-        
+
         """
         return self.__close_with_result
 
@@ -868,7 +868,7 @@ class Connection(Connectable):
             keys = []
 
         context = self.__create_execution_context(
-                        compiled=elem.compile(dialect=self.dialect, column_keys=keys, inline=len(params) > 1), 
+                        compiled=elem.compile(dialect=self.dialect, column_keys=keys, inline=len(params) > 1),
                         parameters=params
                     )
         return self.__execute_context(context)
@@ -877,7 +877,7 @@ class Connection(Connectable):
         """Execute a sql.Compiled object."""
 
         context = self.__create_execution_context(
-                    compiled=compiled, 
+                    compiled=compiled,
                     parameters=self.__distill_params(multiparams, params)
                 )
         return self.__execute_context(context)
@@ -886,7 +886,7 @@ class Connection(Connectable):
         parameters = self.__distill_params(multiparams, params)
         context = self.__create_execution_context(statement=statement, parameters=parameters)
         return self.__execute_context(context)
-    
+
     def __execute_context(self, context):
         if context.compiled:
             context.pre_exec()
@@ -899,7 +899,7 @@ class Connection(Connectable):
         if context.should_autocommit and not self.in_transaction():
             self._commit_impl()
         return context.get_result_proxy()
-        
+
     def _execute_ddl(self, ddl, params, multiparams):
         if params:
             schema_item, params = params[0], params[1:]
@@ -914,10 +914,10 @@ class Connection(Connectable):
         try:
             if not isinstance(e, self.dialect.dbapi.Error):
                 return
-                
+
             if context:
                 context.handle_dbapi_exception(e)
-                
+
             is_disconnect = self.dialect.is_disconnect(e)
             if is_disconnect:
                 self.invalidate(e)
@@ -1005,7 +1005,7 @@ class Transaction(object):
         self.connection = connection
         self._parent = parent or self
         self.is_active = True
-    
+
     def close(self):
         """Close this transaction.
 
@@ -1091,7 +1091,7 @@ class TwoPhaseTransaction(Transaction):
 
 class Engine(Connectable):
     """
-    Connects a :class:`~sqlalchemy.pool.Pool` and :class:`~sqlalchemy.engine.base.Dialect` 
+    Connects a :class:`~sqlalchemy.pool.Pool` and :class:`~sqlalchemy.engine.base.Dialect`
     together to provide a source of database connectivity and behavior.
 
     """
@@ -1111,7 +1111,7 @@ class Engine(Connectable):
     @property
     def name(self):
         "String name of the :class:`~sqlalchemy.engine.Dialect` in use by this ``Engine``."
-        
+
         return self.dialect.name
 
     echo = log.echo_property()
@@ -1279,13 +1279,13 @@ def _proxy_connection_cls(cls, proxy):
     class ProxyConnection(cls):
         def execute(self, object, *multiparams, **params):
             return proxy.execute(self, super(ProxyConnection, self).execute, object, *multiparams, **params)
- 
+
         def _execute_clauseelement(self, elem, multiparams=None, params=None):
             return proxy.execute(self, super(ProxyConnection, self).execute, elem, *(multiparams or []), **(params or {}))
-            
+
         def _cursor_execute(self, cursor, statement, parameters, context=None):
             return proxy.cursor_execute(super(ProxyConnection, self)._cursor_execute, cursor, statement, parameters, context, False)
- 
+
         def _cursor_executemany(self, cursor, statement, parameters, context=None):
             return proxy.cursor_execute(super(ProxyConnection, self)._cursor_executemany, cursor, statement, parameters, context, True)
 
@@ -1302,7 +1302,7 @@ class RowProxy(object):
     """
 
     __slots__ = ['__parent', '__row']
-    
+
     def __init__(self, parent, row):
         """RowProxy objects are constructed by ResultProxy objects."""
 
@@ -1327,7 +1327,7 @@ class RowProxy(object):
             yield self.__parent._get_col(self.__row, i)
 
     __hash__ = None
-    
+
     def __eq__(self, other):
         return ((other is self) or
                 (other == tuple(self.__parent._get_col(self.__row, key)
@@ -1362,15 +1362,15 @@ class RowProxy(object):
         """Return the list of keys as strings represented by this RowProxy."""
 
         return self.__parent.keys
-    
+
     def iterkeys(self):
         return iter(self.__parent.keys)
-        
+
     def values(self):
         """Return the values represented by this RowProxy as a list."""
 
         return list(self)
-    
+
     def itervalues(self):
         return iter(self)
 
@@ -1413,7 +1413,7 @@ class ResultProxy(object):
         self.connection = context.root_connection
         self._echo = context.engine._should_log_info
         self._init_metadata()
-    
+
     @property
     def rowcount(self):
         if self._rowcount is None:
@@ -1437,7 +1437,7 @@ class ResultProxy(object):
             self._rowcount = self.context.get_rowcount()
             self.close()
             return
-            
+
         self._rowcount = None
         self._props = util.populate_column_dict(None)
         self._props.creator = self.__key_fallback()
@@ -1484,11 +1484,11 @@ class ResultProxy(object):
         if self._echo:
             self.context.engine.logger.debug(
                 "Col " + repr(tuple(x[0] for x in metadata)))
-    
+
     def __key_fallback(self):
         # create a closure without 'self' to avoid circular references
         props = self._props
-        
+
         def fallback(key):
             if isinstance(key, basestring):
                 key = key.lower()
@@ -1515,7 +1515,7 @@ class ResultProxy(object):
 
     def close(self):
         """Close this ResultProxy.
-        
+
         Closes the underlying DBAPI cursor corresponding to the execution.
 
         If this ResultProxy was generated from an implicit execution,
@@ -1523,10 +1523,10 @@ class ResultProxy(object):
         underlying DBAPI connection to the connection pool.)
 
         This method is called automatically when:
-        
+
             * all result rows are exhausted using the fetchXXX() methods.
             * cursor.description is None.
-        
+
         """
         if not self.closed:
             self.closed = True
@@ -1579,7 +1579,7 @@ class ResultProxy(object):
         """Return ``lastrow_has_defaults()`` from the underlying ExecutionContext.
 
         See ExecutionContext for details.
-        
+
         """
         return self.context.lastrow_has_defaults()
 
@@ -1587,16 +1587,16 @@ class ResultProxy(object):
         """Return ``postfetch_cols()`` from the underlying ExecutionContext.
 
         See ExecutionContext for details.
-        
+
         """
         return self.context.postfetch_cols
-    
+
     def prefetch_cols(self):
         return self.context.prefetch_cols
-        
+
     def supports_sane_rowcount(self):
         """Return ``supports_sane_rowcount`` from the dialect."""
-        
+
         return self.dialect.supports_sane_rowcount
 
     def supports_sane_multi_rowcount(self):
@@ -1675,7 +1675,7 @@ class ResultProxy(object):
         except Exception, e:
             self.connection._handle_dbapi_exception(e, None, None, self.cursor, self.context)
             raise
-            
+
         try:
             if row is not None:
                 return self._process_row(self, row)[0]
@@ -1697,7 +1697,7 @@ class BufferedRowResultProxy(ResultProxy):
     The pre-fetching behavior fetches only one row initially, and then
     grows its buffer size by a fixed amount with each successive need
     for additional rows up to a size of 100.
-    
+
     """
 
     def _init_metadata(self):
@@ -1752,7 +1752,7 @@ class BufferedColumnResultProxy(ResultProxy):
     of scope unless explicitly fetched.  Currently this includes just
     cx_Oracle LOB objects, but this behavior is known to exist in
     other DB-APIs as well (Pygresql, currently unsupported).
-    
+
     """
 
     _process_row = BufferedColumnRow
@@ -1796,7 +1796,7 @@ class SchemaIterator(schema.SchemaVisitor):
 
     def __init__(self, connection):
         """Construct a new SchemaIterator."""
-        
+
         self.connection = connection
         self.buffer = StringIO.StringIO()
 
@@ -1854,7 +1854,7 @@ class DefaultRunner(schema.SchemaVisitor):
 
     def execute_string(self, stmt, params=None):
         """execute a string statement, using the raw cursor, and return a scalar result."""
-        
+
         conn = self.context._connection
         if isinstance(stmt, unicode) and not self.dialect.supports_unicode_statements:
             stmt = stmt.encode(self.dialect.encoding)

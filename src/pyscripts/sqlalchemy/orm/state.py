@@ -17,7 +17,7 @@ class InstanceState(object):
     insert_order = None
     mutable_dict = None
     _strong_obj = None
-    
+
     def __init__(self, obj, manager):
         self.class_ = obj.__class__
         self.manager = manager
@@ -28,7 +28,7 @@ class InstanceState(object):
         self.committed_state = {}
         self.pending = {}
         self.parents = {}
-        
+
     def detach(self):
         if self.session_id:
             del self.session_id
@@ -37,16 +37,16 @@ class InstanceState(object):
         if self.session_id:
             del self.session_id
         del self.obj
-    
+
     def _cleanup(self, ref):
         instance_dict = self._instance_dict()
         if instance_dict:
             instance_dict.remove(self)
         self.dispose()
-    
+
     def obj(self):
         return None
-    
+
     @property
     def dict(self):
         o = self.obj()
@@ -54,7 +54,7 @@ class InstanceState(object):
             return attributes.instance_dict(o)
         else:
             return {}
-        
+
     @property
     def sort_key(self):
         return self.key and self.key[1] or (self.insert_order, )
@@ -69,7 +69,7 @@ class InstanceState(object):
 
         for fn in manager.events.on_init:
             fn(self, instance, args, kwargs)
-            
+
         # LESSTHANIDEAL:
         # adjust for the case where the InstanceState was created before
         # mapper compilation, and this actually needs to be a MutableAttrInstanceState
@@ -77,7 +77,7 @@ class InstanceState(object):
             self.__class__ = MutableAttrInstanceState
             self.obj = weakref.ref(self.obj(), self._cleanup)
             self.mutable_dict = {}
-            
+
         try:
             return manager.events.original_init(*mixed[1:], **kwargs)
         except:
@@ -125,20 +125,20 @@ class InstanceState(object):
 
         d.update(
             (k, self.__dict__[k]) for k in (
-                'committed_state', 'pending', 'parents', 'modified', 'expired', 
+                'committed_state', 'pending', 'parents', 'modified', 'expired',
                 'callables'
             ) if self.__dict__[k]
         )
-        
+
         d.update(
             (k, self.__dict__[k]) for k in (
                 'key', 'load_options', 'expired_attributes', 'mutable_dict'
-            ) if k in self.__dict__ 
+            ) if k in self.__dict__
         )
         if self.load_path:
             d['load_path'] = interfaces.serialize_path(self.load_path)
         return d
-        
+
     def __setstate__(self, state):
         self.obj = weakref.ref(state['instance'], self._cleanup)
         self.class_ = state['instance'].__class__
@@ -150,14 +150,14 @@ class InstanceState(object):
         self.modified = state.get('modified', False)
         self.expired = state.get('expired', False)
         self.callables = state.get('callables', {})
-        
+
         if self.modified:
             self._strong_obj = state['instance']
-            
+
         self.__dict__.update(
             (k, state[k]) for k in (
                 'key', 'load_options', 'expired_attributes', 'mutable_dict'
-            ) if k in state 
+            ) if k in state
         )
 
         if 'load_path' in state:
@@ -192,7 +192,7 @@ class InstanceState(object):
     @property
     def unmodified(self):
         """a set of keys which have no uncommitted changes"""
-        
+
         return set(self.manager).difference(self.committed_state)
 
     @property
@@ -220,13 +220,13 @@ class InstanceState(object):
                         instance_dict._modified.discard(self)
                 else:
                     instance_dict._modified.discard(self)
-                    
+
             self.modified = False
             filter_deferred = True
         else:
             filter_deferred = False
         dict_ = self.dict
-        
+
         for key in attribute_names:
             impl = self.manager[key].impl
             if not filter_deferred or \
@@ -240,7 +240,7 @@ class InstanceState(object):
             self.committed_state.pop(key, None)
             if self.mutable_dict:
                 self.mutable_dict.pop(key, None)
-                
+
     def reset(self, key, dict_):
         """remove the given attribute and any callables associated with it."""
 
@@ -252,7 +252,7 @@ class InstanceState(object):
 
     def _is_really_none(self):
         return self.obj()
-        
+
     def modified_event(self, dict_, attr, should_copy, previous, passive=PASSIVE_OFF):
         needs_committed = attr.key not in self.committed_state
 
@@ -318,10 +318,10 @@ class InstanceState(object):
         if a value was not populated in state.dict.
 
         """
-        
+
         self.committed_state = {}
         self.pending = {}
-        
+
         # unexpire attributes which have loaded
         if self.expired_attributes:
             for key in self.expired_attributes.intersection(dict_):
@@ -342,7 +342,7 @@ class MutableAttrInstanceState(InstanceState):
     def __init__(self, obj, manager):
         self.mutable_dict = {}
         InstanceState.__init__(self, obj, manager)
-        
+
     def _get_modified(self, dict_=None):
         if self.__dict__.get('modified', False):
             return True
@@ -354,12 +354,12 @@ class MutableAttrInstanceState(InstanceState):
                     return True
             else:
                 return False
-    
+
     def _set_modified(self, value):
         self.__dict__['modified'] = value
-        
+
     modified = property(_get_modified, _set_modified)
-    
+
     @property
     def unmodified(self):
         """a set of keys which have no uncommitted changes"""
@@ -373,12 +373,12 @@ class MutableAttrInstanceState(InstanceState):
 
     def _is_really_none(self):
         """do a check modified/resurrect.
-        
+
         This would be called in the extremely rare
         race condition that the weakref returned None but
-        the cleanup handler had not yet established the 
+        the cleanup handler had not yet established the
         __resurrect callable as its replacement.
-        
+
         """
         if self.modified:
             self.obj = self.__resurrect
@@ -389,19 +389,19 @@ class MutableAttrInstanceState(InstanceState):
     def reset(self, key, dict_):
         self.mutable_dict.pop(key, None)
         InstanceState.reset(self, key, dict_)
-    
+
     def _cleanup(self, ref):
         """weakref callback.
-        
+
         This method may be called by an asynchronous
         gc.
-        
+
         If the state shows pending changes, the weakref
         is replaced by the __resurrect callable which will
         re-establish an object reference on next access,
         else removes this InstanceState from the owning
         identity map, if any.
-        
+
         """
         if self._get_modified(self.mutable_dict):
             self.obj = self.__resurrect
@@ -410,13 +410,13 @@ class MutableAttrInstanceState(InstanceState):
             if instance_dict:
                 instance_dict.remove(self)
             self.dispose()
-            
+
     def __resurrect(self):
         """A substitute for the obj() weakref function which resurrects."""
-        
+
         # store strong ref'ed version of the object; will revert
         # to weakref when changes are persisted
-        
+
         obj = self.manager.new_instance(state=self)
         self.obj = weakref.ref(obj, self._cleanup)
         self._strong_obj = obj
@@ -424,12 +424,12 @@ class MutableAttrInstanceState(InstanceState):
 
         # re-establishes identity attributes from the key
         self.manager.events.run('on_resurrect', self, obj)
-        
+
         # TODO: don't really think we should run this here.
         # resurrect is only meant to preserve the minimal state needed to
         # do an UPDATE, not to produce a fully usable object
         self._run_on_load(obj)
-        
+
         return obj
 
 class PendingCollection(object):

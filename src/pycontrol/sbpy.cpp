@@ -80,7 +80,7 @@ static PyObject *eventsModule, *triggerEventFunc, *triggerPolicyEventFunc, *upda
 bool initPy()
 {
 	PyObject *pFunc = 0, *pArgs = 0, *pValue = 0, *pluginsModule = 0;
-	
+
 	eventsModule = PyImport_ImportModule("xsbs.events");
 	SBPY_ERR(eventsModule)
 	triggerEventFunc = PyObject_GetAttrString(eventsModule, "triggerServerEvent");
@@ -195,7 +195,7 @@ bool triggerFuncEvent(const char *name, std::vector<PyObject*> *args, PyObject *
 	PyObject *pArgs, *pArgsArgs, *pName, *pValue;
 	std::vector<PyObject*>::const_iterator itr;
 	int i = 0;
-	
+
 	if(!func)
 	{
 		fprintf(stderr, "Python Error: Invalid handler to triggerEvent function.\n");
@@ -262,7 +262,7 @@ bool triggerFuncEventIntBool(const char *name, int cn, bool b, PyObject *func)
 		pB = Py_False;
 	args.push_back(pCn);
 	args.push_back(pB);
-	
+
 	return triggerFuncEvent(name, &args, func);
 }
 

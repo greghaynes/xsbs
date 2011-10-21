@@ -1,7 +1,7 @@
 """Provides a thread-local transactional wrapper around the root Engine class.
 
 The ``threadlocal`` module is invoked when using the ``strategy="threadlocal"`` flag
-with :func:`~sqlalchemy.engine.create_engine`.  This module is semi-private and is 
+with :func:`~sqlalchemy.engine.create_engine`.  This module is semi-private and is
 invoked automatically when the threadlocal engine strategy is used.
 """
 
@@ -69,13 +69,13 @@ class TLSession(object):
                 self.reset()
         elif self.__tcount > 1:
             self.__tcount -= 1
-            
+
     def close(self):
         if self.__tcount == 1:
             self.rollback()
         elif self.__tcount > 1:
             self.__tcount -= 1
-        
+
     def is_begun(self):
         return self.__tcount > 0
 
@@ -113,10 +113,10 @@ class TLConnection(base.Connection):
 
     def begin_twophase(self, xid=None):
         return self.session.begin_twophase(xid=xid)
-    
+
     def begin_nested(self):
         raise NotImplementedError("SAVEPOINT transactions with the 'threadlocal' strategy")
-        
+
     def close(self):
         if self.__opencount == 1:
             base.Connection.close(self)
@@ -136,7 +136,7 @@ class TLTransaction(base.Transaction):
     def connection(self):
         return self._trans.connection
     connection = property(connection)
-    
+
     def is_active(self):
         return self._trans.is_active
     is_active = property(is_active)
@@ -198,13 +198,13 @@ class TLEngine(base.Engine):
 
     def begin_nested(self):
         raise NotImplementedError("SAVEPOINT transactions with the 'threadlocal' strategy")
-        
+
     def begin(self, **kwargs):
         return self.session.begin(**kwargs)
 
     def prepare(self):
         self.session.prepare()
-        
+
     def commit(self):
         self.session.commit()
 

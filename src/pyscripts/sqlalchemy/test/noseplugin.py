@@ -74,7 +74,7 @@ class NoseSQLAlchemy(Plugin):
         file_config.readfp(StringIO.StringIO(base_config))
         file_config.read(['test.cfg', os.path.expanduser('~/.satest.cfg')])
         config.file_config = file_config
-        
+
     def configure(self, options, conf):
         Plugin.configure(self, options, conf)
 
@@ -85,10 +85,10 @@ class NoseSQLAlchemy(Plugin):
         # Lazy setup of other options (post coverage)
         for fn in post_configure:
             fn(options, file_config)
-        
+
     def describeTest(self, test):
         return ""
-        
+
     def wantClass(self, cls):
         """Return true if you want the main test selector to collect
         tests from this class, false if you don't, and None if you don't
@@ -108,7 +108,7 @@ class NoseSQLAlchemy(Plugin):
                 return True
             else:
                 return not self.__should_skip_for(cls)
-    
+
     def __should_skip_for(self, cls):
         if hasattr(cls, '__requires__'):
             def test_suite(): return 'ok'
@@ -148,7 +148,7 @@ class NoseSQLAlchemy(Plugin):
 
     def afterTest(self, test):
         testing.resetwarnings()
-        
+
     #def handleError(self, test, err):
         #pass
 

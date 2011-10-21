@@ -18,28 +18,28 @@ namespace server
         int spawntime;
         char spawned;
     };
-	
+
     static const int DEATHMILLIS = 300;
-	
+
     struct clientinfo;
-	
+
     struct gameevent
     {
         virtual ~gameevent() {}
-		
+
         virtual bool flush(clientinfo *ci, int fmillis);
         virtual void process(clientinfo *ci) {}
-		
+
         virtual bool keepable() const { return false; }
     };
-	
+
     struct timedevent : gameevent
     {
         int millis;
-		
+
         bool flush(clientinfo *ci, int fmillis);
     };
-	
+
     struct hitinfo
     {
         int target;
@@ -51,54 +51,54 @@ namespace server
         };
         vec dir;
     };
-	
+
     struct shotevent : timedevent
     {
         int id, gun;
         vec from, to;
         vector<hitinfo> hits;
-		
+
         void process(clientinfo *ci);
     };
-	
+
     struct explodeevent : timedevent
     {
         int id, gun;
         vector<hitinfo> hits;
-		
+
         bool keepable() const { return true; }
-		
+
         void process(clientinfo *ci);
     };
-	
+
     struct suicideevent : gameevent
     {
         void process(clientinfo *ci);
     };
-	
+
     struct pickupevent : gameevent
     {
         int ent;
-		
+
         void process(clientinfo *ci);
     };
-	
+
     template <int N>
     struct projectilestate
     {
         int projs[N];
         int numprojs;
-		
+
         projectilestate() : numprojs(0) {}
-		
+
         void reset() { numprojs = 0; }
-		
+
         void add(int val)
         {
             if(numprojs>=N) numprojs = 0;
             projs[numprojs++] = val;
         }
-		
+
         bool remove(int val)
         {
             loopi(numprojs) if(projs[i]==val)
@@ -109,7 +109,7 @@ namespace server
             return false;
         }
     };
-	
+
     struct gamestate : fpsstate
     {
         vec o;
@@ -121,19 +121,19 @@ namespace server
         int lasttimeplayed, timeplayed;
         int shots, hits;
         float effectiveness;
-		
+
         gamestate() : state(CS_DEAD), editstate(CS_DEAD) {}
-		
+
         bool isalive(int gamemillis)
         {
             return state==CS_ALIVE || (state==CS_DEAD && gamemillis - lastdeath <= DEATHMILLIS);
         }
-		
+
         bool waitexpired(int gamemillis)
         {
             return gamemillis - lastshot >= gunwait;
         }
-		
+
         void reset()
         {
             if(state!=CS_SPECTATOR) state = editstate = CS_DEAD;
@@ -146,7 +146,7 @@ namespace server
             shots = hits = 0;
             respawn();
         }
-		
+
         void respawn()
         {
             fpsstate::respawn();
@@ -155,7 +155,7 @@ namespace server
             lastspawn = -1;
             lastshot = 0;
         }
-		
+
         void reassign()
         {
             respawn();
@@ -163,7 +163,7 @@ namespace server
             grenades.reset();
         }
     };
-	
+
     struct savedscore
     {
         uint ip;
@@ -171,7 +171,7 @@ namespace server
         int maxhealth, frags, flags, deaths, teamkills, shotdamage, damage;
         int timeplayed;
         float effectiveness;
-		
+
         void save(gamestate &gs)
         {
             maxhealth = gs.maxhealth;
@@ -184,7 +184,7 @@ namespace server
             timeplayed = gs.timeplayed;
             effectiveness = gs.effectiveness;
         }
-		
+
         void restore(gamestate &gs)
         {
             if(gs.health==gs.maxhealth) gs.health = maxhealth;
@@ -199,7 +199,7 @@ namespace server
             gs.effectiveness = effectiveness;
         }
     };
-	
+
     struct clientinfo
     {
         int clientnum, ownernum, connectmillis, sessionid, overflow;
@@ -220,16 +220,16 @@ namespace server
         string clientmap;
         int mapcrc;
         bool warned, gameclip, active;
-		
+
         clientinfo() { reset(); }
         ~clientinfo() { events.deletecontentsp(); }
-		
+
         void addevent(gameevent *e)
         {
             if(state.state==CS_SPECTATOR || events.length()>100) delete e;
             else events.add(e);
         }
-		
+
         void mapchange()
         {
             mapvote[0] = 0;
@@ -243,7 +243,7 @@ namespace server
             warned = false;
             gameclip = false;
         }
-		
+
         void reassign()
         {
             state.reassign();
@@ -251,7 +251,7 @@ namespace server
             timesync = false;
             lastevent = 0;
         }
-		
+
         void reset()
         {
             name[0] = team[0] = 0;
@@ -266,7 +266,7 @@ namespace server
             active = false;
             mapchange();
         }
-		
+
         int geteventmillis(int servmillis, int clientmillis)
         {
             if(!timesync || (events.empty() && state.waitexpired(servmillis)))
@@ -278,19 +278,19 @@ namespace server
             else return gameoffset + clientmillis;
         }
     };
-	
+
     struct worldstate
     {
         int uses;
         vector<uchar> positions, messages;
     };
-	
+
     struct ban
     {
         int time;
         uint ip;
     };
-	
+
     namespace aiman
     {
         extern void removeai(clientinfo *ci);

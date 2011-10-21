@@ -296,7 +296,7 @@ class _ConnectionFairy(object):
     """Proxies a DB-API connection and provides return-on-dereference support."""
 
     __slots__ = '_pool', '__counter', 'connection', '_connection_record', '__weakref__', '_detached_info'
-    
+
     def __init__(self, pool):
         self._pool = pool
         self.__counter = 0
@@ -426,7 +426,7 @@ class _CursorFairy(object):
         self.__parent = parent
         self.cursor = cursor
         self.execute = cursor.execute
-        
+
     def invalidate(self, e=None):
         self.__parent.invalidate(e=e)
 
@@ -458,9 +458,9 @@ class SingletonThreadPool(Pool):
 
     Options are the same as those of :class:`Pool`, as well as:
 
-    :param pool_size: The number of threads in which to maintain connections 
+    :param pool_size: The number of threads in which to maintain connections
         at once.  Defaults to five.
-      
+
     """
 
     def __init__(self, creator, pool_size=5, **params):
@@ -472,11 +472,11 @@ class SingletonThreadPool(Pool):
 
     def recreate(self):
         self.log("Pool recreating")
-        return SingletonThreadPool(self._creator, 
-            pool_size=self.size, 
-            recycle=self._recycle, 
-            echo=self._should_log_info, 
-            use_threadlocal=self._use_threadlocal, 
+        return SingletonThreadPool(self._creator,
+            pool_size=self.size,
+            recycle=self._recycle,
+            echo=self._should_log_info,
+            use_threadlocal=self._use_threadlocal,
             listeners=self.listeners)
 
     def dispose(self):
@@ -491,9 +491,9 @@ class SingletonThreadPool(Pool):
                 # pysqlite won't even let you close a conn from a thread
                 # that didn't create it
                 pass
-        
+
         self._all_conns.clear()
-            
+
     def dispose_local(self):
         if hasattr(self._conn, 'current'):
             conn = self._conn.current()
@@ -698,10 +698,10 @@ class NullPool(Pool):
     def recreate(self):
         self.log("Pool recreating")
 
-        return NullPool(self._creator, 
-            recycle=self._recycle, 
-            echo=self._should_log_info, 
-            use_threadlocal=self._use_threadlocal, 
+        return NullPool(self._creator,
+            recycle=self._recycle,
+            echo=self._should_log_info,
+            use_threadlocal=self._use_threadlocal,
             listeners=self.listeners)
 
     def dispose(self):
@@ -876,7 +876,7 @@ class _DBProxy(object):
         self.poolclass = poolclass
         self.pools = {}
         self._create_pool_mutex = threading.Lock()
-        
+
     def close(self):
         for key in self.pools.keys():
             del self.pools[key]
@@ -902,7 +902,7 @@ class _DBProxy(object):
                     return self.pools[key]
             finally:
                 self._create_pool_mutex.release()
-                
+
     def connect(self, *args, **params):
         """Activate a connection to the database.
 

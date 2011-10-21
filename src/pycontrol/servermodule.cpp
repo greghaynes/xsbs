@@ -57,7 +57,7 @@ static PyObject *players(PyObject *self, PyObject *args)
 	PyObject *pTuple;
 	PyObject *pInt;
 	int y = 0;
-	
+
 	loopv(server::clients)
 	{
 		ci = server::getinfo(i);
@@ -65,7 +65,7 @@ static PyObject *players(PyObject *self, PyObject *args)
 			spects.push_back(i);
 	}
 	pTuple = PyTuple_New(spects.size());
-	
+
 	for(itr = spects.begin(); itr != spects.end(); itr++)
 	{
 		pInt = PyInt_FromLong(*itr);
@@ -83,7 +83,7 @@ static PyObject *spectators(PyObject *self, PyObject *args)
 	PyObject *pTuple;
 	PyObject *pInt;
 	int y = 0;
-	
+
 	loopv(server::clients)
 	{
 		ci = server::getinfo(i);
@@ -93,7 +93,7 @@ static PyObject *spectators(PyObject *self, PyObject *args)
 		}
 	}
 	pTuple = PyTuple_New(spects.size());
-	
+
 	for(itr = spects.begin(); itr != spects.end(); itr++)
 	{
 		pInt = PyInt_FromLong(*itr);

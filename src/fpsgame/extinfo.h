@@ -17,7 +17,7 @@
     B: 0 EXT_PLAYERSTATS cn #a client number or -1 for all players#
     C: 0 EXT_TEAMSCORE
 
-    Server:  
+    Server:
     --------
     A: 0 EXT_UPTIME EXT_ACK EXT_VERSION uptime #in seconds#
     B: 0 EXT_PLAYERSTATS cn #send by client# EXT_ACK EXT_VERSION 0 or 1 #error, if cn was > -1 and client does not exist# ...
@@ -63,7 +63,7 @@
         vector<teamscore> scores;
 
         //most taken from scoreboard.h
-        if(smode && smode->hidefrags()) 
+        if(smode && smode->hidefrags())
         {
             smode->getteamscores(scores);
             loopv(clients) if(clients[i]->team[0])
@@ -98,7 +98,7 @@
 
     void extserverinforeply(ucharbuf &req, ucharbuf &p)
     {
-        int extcmd = getint(req); // extended commands  
+        int extcmd = getint(req); // extended commands
 
         //Build a new packet
         putint(p, EXT_ACK); //send ack
@@ -115,7 +115,7 @@
             case EXT_PLAYERSTATS:
             {
                 int cn = getint(req); //a special player, -1 for all
-                
+
                 clientinfo *ci = NULL;
                 if(cn >= 0)
                 {
@@ -129,13 +129,13 @@
                 }
 
                 putint(p, EXT_NO_ERROR); //so far no error can happen anymore
-                
+
                 ucharbuf q = p; //remember buffer position
                 putint(q, EXT_PLAYERSTATS_RESP_IDS); //send player ids following
                 if(ci) putint(q, ci->clientnum);
                 else loopv(clients) putint(q, clients[i]->clientnum);
                 sendserverinforeply(q);
-            
+
                 if(ci) extinfoplayer(p, ci);
                 else loopv(clients) extinfoplayer(p, clients[i]);
                 return;

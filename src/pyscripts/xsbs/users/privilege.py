@@ -56,7 +56,7 @@ def isUserMaster(user_id):
 		return True
 	except NoResultFound:
 		return False
-		
+
 def isUserAdmin(user_id):
 	try:
 		priv = dbmanager.query(UserPrivilege).filter(UserPrivilege.user_id==user_id).filter(UserPrivilege.privilege==ADMIN).one()

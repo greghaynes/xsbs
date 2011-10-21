@@ -18,7 +18,7 @@
  */
 
 #include "sbpy.h"
- 
+
 #ifndef SBPY_SERVERMODULE_H
 #define SBPY_SERVERMODULE_H
 

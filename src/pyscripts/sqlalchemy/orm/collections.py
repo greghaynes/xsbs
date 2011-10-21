@@ -884,7 +884,7 @@ def __set(collection, item, _sa_initiator=None):
         if executor:
             item = getattr(executor, 'fire_append_event')(item, _sa_initiator)
     return item
-    
+
 def __del(collection, item, _sa_initiator=None):
     """Run del events, may eventually be inlined into decorators."""
     if _sa_initiator is not False and item is not None:

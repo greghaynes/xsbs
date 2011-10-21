@@ -70,7 +70,7 @@ def onIntermission():
 		most_killapocalypses_cn = -1
 		most_killionaires = 0
 		most_killionaires_cn = -1
-	
+
 	for p in players:
 		try:
 			frags = p.frags()
@@ -91,51 +91,51 @@ def onIntermission():
 				most_accurate_cn = p.cn
 		except ValueError:
 			continue
-			
+
 		if newawards_enabled:
 			try:
 				try:
 					doublekills	= p.ownagedata.multikill_counts[2]
 				except KeyError:
 					doublekills = 0
-					
+
 				try:
 					triplekills = p.ownagedata.multikill_counts[3]
 				except KeyError:
 					triplekills = 0
-					
+
 				try:
 					overkills = p.ownagedata.multikill_counts[5]
 				except KeyError:
 					overkills = 0
-					
+
 				try:
 					killtaculars = p.ownagedata.multikill_counts[7]
 				except KeyError:
 					killtaculars = 0
-					
+
 				try:
 					killotrocities	= p.ownagedata.multikill_counts[10]
 				except KeyError:
 					killotrocities = 0
-					
+
 				try:
 					killtastrophes 	= p.ownagedata.multikill_counts[15]
 				except KeyError:
 					killtastrophes = 0
-					
+
 				try:
 					killapocalypses	= p.ownagedata.multikill_counts[20]
 				except KeyError:
 					killapocalypses = 0
-					
+
 				try:
 					killionaires = p.ownagedata.multikill_counts[25]
 				except KeyError:
 					killionaires = 0
-				
-				
-				
+
+
+
 				if newawards_enabled:
 					if doublekills > most_doublekills or most_doublekills_cn == -1:
 						most_doublekills = doublekills
@@ -163,7 +163,7 @@ def onIntermission():
 						most_killionaires_cn = p.cn
 			except (KeyError, ValueError):
 				continue
-	
+
 	msg = ''
 	if most_frags > 0:
 		msg += mftemp.substitute(colordict, name=player(most_frags_cn).name(), count=most_frags)
@@ -177,7 +177,7 @@ def onIntermission():
 	if most_accuracy > 0:
 		msg += matemp.substitute(colordict, name=player(most_accurate_cn).name(), count=most_accuracy)
 
-		
+
 	if newawards_enabled:
 		if most_doublekills > 0:
 			msg += most_doublekillstemp.substitute(colordict, name=player(most_doublekills_cn).name(), count=most_doublekills)
@@ -203,7 +203,7 @@ def onIntermission():
 		if most_killionaires > 0:
 			msg += most_killionairestemp.substitute(colordict, name=player(most_killionaires_cn).name(), count=most_killionaires)
 			msg += ' '
-	
+
 	if msg != '':
 		msg = awards_prefix + msg
 		serverMessage(msg)

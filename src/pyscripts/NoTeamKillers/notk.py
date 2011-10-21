@@ -18,7 +18,7 @@ def onTeamkill(cn, tcn):
 	try:
 		if player(cn).teamkills() >= limit:
 			ban(cn, duration, 'killing teammates', -1)
-		elif warn_tk_limit and player(cn).teamkills() == 1:	
+		elif warn_tk_limit and player(cn).teamkills() == 1:
 			player(cn).message(warning(warn_tk_message.substitute(colordict, limit=limit)))
 	except KeyError:
 		pass

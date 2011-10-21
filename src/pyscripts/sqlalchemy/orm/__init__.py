@@ -205,16 +205,16 @@ def relation(argument, secondary=None, **kwargs):
     :param backref:
       indicates the string name of a property to be placed on the related
       mapper's class that will handle this relationship in the other
-      direction. The other property will be created automatically 
+      direction. The other property will be created automatically
       when the mappers are configured.  Can also be passed as a
       :func:`backref` object to control the configuration of the
       new relation.
-      
+
     :param back_populates:
-      Takes a string name and has the same meaning as ``backref``, 
-      except the complementing property is **not** created automatically, 
-      and instead must be configured explicitly on the other mapper.  The 
-      complementing property should also indicate ``back_populates`` 
+      Takes a string name and has the same meaning as ``backref``,
+      except the complementing property is **not** created automatically,
+      and instead must be configured explicitly on the other mapper.  The
+      complementing property should also indicate ``back_populates``
       to this relation to ensure proper functioning.
 
     :param cascade:
@@ -395,9 +395,9 @@ def relation(argument, secondary=None, **kwargs):
       from being associated with more than one parent at a time.
       This is used for many-to-one or many-to-many relationships that
       should be treated either as one-to-one or one-to-many.  Its
-      usage is optional unless delete-orphan cascade is also 
+      usage is optional unless delete-orphan cascade is also
       set on this relation(), in which case its required (new in 0.5.2).
-      
+
     :param uselist=(True|False):
       a boolean that indicates if this property should be loaded as a
       list or a scalar. In most cases, this value is determined

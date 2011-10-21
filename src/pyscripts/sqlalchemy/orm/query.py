@@ -895,11 +895,11 @@ class Query(object):
             self.__reset_joinpoint()
 
         clause = replace_clause_index = None
-        
+
         # after the method completes,
         # the query's joinpoint will be set to this.
         right_entity = None
-        
+
         for arg1 in util.to_list(keys):
             aliased_entity = False
             alias_criterion = False
@@ -962,7 +962,7 @@ class Query(object):
                 replace_clause_index, clause = sql_util.find_join_source(self._from_obj, left_selectable)
                 if not clause:
                     clause = left_selectable
-                    
+
             if not clause:
                 for ent in self._entities:
                     if ent.corresponds_to(left_entity):
@@ -1119,7 +1119,7 @@ class Query(object):
         `from_obj` is a single table or selectable.
 
         """
-        
+
         if isinstance(from_obj, (tuple, list)):
             # from_obj is actually a list again as of 0.5.3.   so this restriction here
             # is somewhat artificial, but is still in place since select_from() implies aliasing all further
@@ -2063,7 +2063,7 @@ class _ColumnEntity(_QueryEntity):
             return entity is self.entity_zero
         else:
             return not _is_aliased_class(self.entity_zero) and entity.base_mapper.common_parent(self.entity_zero)
-            
+
     def _resolve_expr_against_query_aliases(self, query, expr, context):
         return query._adapt_clause(expr, False, True)
 

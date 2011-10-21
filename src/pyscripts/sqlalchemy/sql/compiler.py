@@ -131,11 +131,11 @@ class _CompileLabel(visitors.Visitable):
 
     __visit_name__ = 'label'
     __slots__ = 'element', 'name'
-    
+
     def __init__(self, col, name):
         self.element = col
         self.name = name
-        
+
     @property
     def quote(self):
         return self.element.quote
@@ -152,7 +152,7 @@ class DefaultCompiler(engine.Compiled):
     functions = FUNCTIONS
     extract_map = EXTRACT_MAP
 
-    # if we are insert/update/delete. 
+    # if we are insert/update/delete.
     # set to true when we visit an INSERT, UPDATE or DELETE
     isdelete = isinsert = isupdate = False
 
@@ -201,7 +201,7 @@ class DefaultCompiler(engine.Compiled):
         self.preparer = self.dialect.identifier_preparer
 
         self.label_length = self.dialect.label_length or self.dialect.max_identifier_length
-        
+
         # a map which tracks "anonymous" identifiers that are
         # created on the fly here
         self.anon_map = util.PopulateDict(self._process_anon)
@@ -274,7 +274,7 @@ class DefaultCompiler(engine.Compiled):
                         self.preparer.format_label(label, labelname)
         else:
             return self.process(label.element)
-            
+
     def visit_column(self, column, result_map=None, **kwargs):
         name = column.name
         if not column.is_literal and isinstance(name, sql._generated_label):
@@ -282,7 +282,7 @@ class DefaultCompiler(engine.Compiled):
 
         if result_map is not None:
             result_map[name.lower()] = (name, (column, ), column.type)
-        
+
         if column.is_literal:
             name = self.escape_literal_column(name)
         else:
@@ -298,7 +298,7 @@ class DefaultCompiler(engine.Compiled):
             tablename = column.table.name
             tablename = isinstance(tablename, sql._generated_label) and \
                             self._truncated_identifier("alias", tablename) or tablename
-            
+
             return schema_prefix + self.preparer.quote(tablename, column.table.quote) + "." + name
 
     def escape_literal_column(self, text):
@@ -318,7 +318,7 @@ class DefaultCompiler(engine.Compiled):
 
     def post_process_text(self, text):
         return text
-        
+
     def visit_textclause(self, textclause, **kwargs):
         if textclause.typemap is not None:
             for colname, type_ in textclause.typemap.iteritems():
@@ -448,7 +448,7 @@ class DefaultCompiler(engine.Compiled):
         if (ident_class, name) in self.truncated_names:
             return self.truncated_names[(ident_class, name)]
 
-        anonname = name % self.anon_map 
+        anonname = name % self.anon_map
 
         if len(anonname) > self.label_length:
             counter = self.truncated_names.get(ident_class, 1)
@@ -458,10 +458,10 @@ class DefaultCompiler(engine.Compiled):
             truncname = anonname
         self.truncated_names[(ident_class, name)] = truncname
         return truncname
-    
+
     def _anonymize(self, name):
         return name % self.anon_map
-        
+
     def _process_anon(self, key):
         (ident, derived) = key.split(' ', 1)
         anonymous_counter = self.anon_map.get(derived, 1)
@@ -479,7 +479,7 @@ class DefaultCompiler(engine.Compiled):
         if asfrom:
             alias_name = isinstance(alias.name, sql._generated_label) and \
                             self._truncated_identifier("alias", alias.name) or alias.name
-            
+
             return self.process(alias.original, asfrom=True, **kwargs) + " AS " + \
                     self.preparer.format_alias(alias, alias_name)
         else:
@@ -510,7 +510,7 @@ class DefaultCompiler(engine.Compiled):
     def visit_select(self, select, asfrom=False, parens=True, iswrapper=False, compound_index=1, **kwargs):
 
         entry = self.stack and self.stack[-1] or {}
-        
+
         existingfroms = entry.get('from', None)
 
         froms = select._get_display_froms(existingfroms)
@@ -533,14 +533,14 @@ class DefaultCompiler(engine.Compiled):
         inner_columns = util.unique_list(
             c for c in [
                 self.process(
-                    self.label_select_column(select, co, asfrom=asfrom), 
+                    self.label_select_column(select, co, asfrom=asfrom),
                     within_columns_clause=True,
-                    **column_clause_args) 
+                    **column_clause_args)
                 for co in select.inner_columns
             ]
             if c is not None
         )
-        
+
         text = "SELECT "  # we're off to a good start !
         if select._prefixes:
             text += " ".join(self.process(x) for x in select._prefixes) + " "
@@ -640,7 +640,7 @@ class DefaultCompiler(engine.Compiled):
         elif not colparams and self.dialect.supports_default_values:
             return (insert + " INTO %s DEFAULT VALUES" % (
                 (preparer.format_table(insert_stmt.table),)))
-        else: 
+        else:
             return (insert + " INTO %s (%s) VALUES (%s)" %
                 (preparer.format_table(insert_stmt.table),
                  ', '.join([preparer.format_column(c[0])
@@ -1059,7 +1059,7 @@ class IdentifierPreparer(object):
         self.final_quote = final_quote or self.initial_quote
         self.omit_schema = omit_schema
         self._strings = {}
-        
+
     def _escape_identifier(self, value):
         """Escape an identifier.
 
@@ -1098,7 +1098,7 @@ class IdentifierPreparer(object):
     def quote_schema(self, schema, force):
         """Quote a schema.
 
-        Subclasses should override this to provide database-dependent 
+        Subclasses should override this to provide database-dependent
         quoting behavior.
         """
         return self.quote(schema, force)
@@ -1135,7 +1135,7 @@ class IdentifierPreparer(object):
 
     def format_constraint(self, constraint):
         return self.quote(constraint.name, constraint.quote)
-    
+
     def format_table(self, table, use_schema=True, name=None):
         """Prepare a quoted table and schema name."""
 

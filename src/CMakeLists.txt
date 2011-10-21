@@ -20,7 +20,7 @@ set(XSBS_LIBS
 	${ZLIB_LIBRARIES}
 	${CMAKE_THREAD_LIBS_INIT}
 	-lutil)
-    
+
 IF(WIN32)
 set(XSBS_LIBS ${XSBS_LIBS} ws2_32 winmm)
 ENDIF(WIN32)

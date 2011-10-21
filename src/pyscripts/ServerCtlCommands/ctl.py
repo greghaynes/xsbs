@@ -301,7 +301,7 @@ def onPmCommand(cn, args):
 			args[1] += (" " + str(key))
 		i += 1
 	player(int(args[0])).message(pm_template.substitute(colordict, sender=player(cn).name(), message=args[1]))
-	
+
 @commandHandler('smite')
 @masterRequired
 def onSmiteCommand(cn, args):

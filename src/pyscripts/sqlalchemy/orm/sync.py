@@ -53,7 +53,7 @@ def populate_dict(source, source_mapper, dict_, synchronize_pairs):
 def source_modified(uowcommit, source, source_mapper, synchronize_pairs):
     """return true if the source object has changes from an old to a new value on the given
     synchronize pairs
-    
+
     """
     for l, r in synchronize_pairs:
         try:

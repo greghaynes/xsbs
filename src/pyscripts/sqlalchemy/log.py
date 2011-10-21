@@ -11,7 +11,7 @@ module.  The regular dotted module namespace is used, starting at
 'sqlalchemy'.  For class-level logging, the class name is appended.
 
 The "echo" keyword parameter which is available on SQLA ``Engine``
-and ``Pool`` objects corresponds to a logger specific to that 
+and ``Pool`` objects corresponds to a logger specific to that
 instance only.
 
 E.g.::
@@ -23,7 +23,7 @@ is equivalent to::
     import logging
     logger = logging.getLogger('sqlalchemy.engine.Engine.%s' % hex(id(engine)))
     logger.setLevel(logging.DEBUG)
-    
+
 """
 
 import logging
@@ -58,21 +58,21 @@ def class_logger(cls, enable=False):
 
 def instance_logger(instance, echoflag=None):
     """create a logger for an instance.
-    
+
     Warning: this is an expensive call which also results in a permanent
-    increase in memory overhead for each call.  Use only for 
+    increase in memory overhead for each call.  Use only for
     low-volume, long-time-spanning objects.
-    
+
     """
-    
+
     # limit the number of loggers by chopping off the hex(id).
-    # many novice users unfortunately create an unlimited number 
+    # many novice users unfortunately create an unlimited number
     # of Engines in their applications which would otherwise
     # cause the app to run out of memory.
     name = "%s.%s.0x...%s" % (instance.__class__.__module__,
                              instance.__class__.__name__,
                              hex(id(instance))[-4:])
-    
+
     if echoflag is not None:
         l = logging.getLogger(name)
         if echoflag == 'debug':

@@ -69,7 +69,7 @@ def loadPlugins():
 
 def reloadPlugins():
 	for p in plugins.values():
-		p.unloadModule()	
+		p.unloadModule()
 	xsbs.events.triggerServerEvent('reload', ())
 	for p in plugins.values():
 		p.loadModule()

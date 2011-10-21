@@ -29,7 +29,7 @@ from sqlalchemy import exc
 from sqlalchemy.util import pickle
 import sqlalchemy.util as util
 NoneType = type(None)
-    
+
 class AbstractType(object):
 
     def __init__(self, *args, **kwargs):
@@ -331,7 +331,7 @@ def to_instance(typeobj):
     if typeobj is None:
         return NULLTYPE
 
-    try: 
+    try:
         return typeobj()
     except TypeError:
         return typeobj
@@ -743,8 +743,8 @@ class PickleType(MutableType, TypeDecorator):
 
         :param mutable: defaults to True; implements
           :meth:`AbstractType.is_mutable`.   When ``True``, incoming
-          objects *must* provide an ``__eq__()`` method which 
-          performs the desired deep comparison of members, or the 
+          objects *must* provide an ``__eq__()`` method which
+          performs the desired deep comparison of members, or the
           ``comparator`` argument must be present.  Otherwise,
           comparisons are done by comparing pickle strings.
           The pickle form of comparison is a deprecated usage and will

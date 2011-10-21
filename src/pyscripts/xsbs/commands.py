@@ -57,11 +57,11 @@ class CommandManager:
 					p.message(error('Invalid argument. ' + str(e)))
 				except ValueError:
 					p.message(error('Value Error: Did you specify a valid cn?'))
-					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
+					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
 					logging.warn('Uncaught ValueError raised in command handler.')
 					logging.warn(traceback.format_exc())
 				except:
-					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()	
+					exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
 					logging.warn('Uncaught exception occured in command handler.')
 					logging.warn(traceback.format_exc())
 		else:

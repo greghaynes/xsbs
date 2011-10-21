@@ -57,9 +57,9 @@ class ScopedSession(object):
         "for information on how to replicate its behavior.")
     def mapper(self, *args, **kwargs):
         """return a mapper() function which associates this ScopedSession with the Mapper.
-        
+
         DEPRECATED.
-        
+
         """
 
         from sqlalchemy.orm import mapper

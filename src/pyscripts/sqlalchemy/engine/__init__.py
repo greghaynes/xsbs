@@ -112,13 +112,13 @@ def create_engine(*args, **kwargs):
     etc.  Alternatively, the URL can be an instance of
     :class:`~sqlalchemy.engine.url.URL`.
 
-    `**kwargs` takes a wide variety of options which are routed 
-    towards their appropriate components.  Arguments may be 
-    specific to the Engine, the underlying Dialect, as well as the 
+    `**kwargs` takes a wide variety of options which are routed
+    towards their appropriate components.  Arguments may be
+    specific to the Engine, the underlying Dialect, as well as the
     Pool.  Specific dialects also accept keyword arguments that
     are unique to that dialect.   Here, we describe the parameters
     that are common to most ``create_engine()`` usage.
-    
+
     :param assert_unicode=False: When set to ``True`` alongside
         convert_unicode=``True``, asserts that incoming string bind
         parameters are instances of ``unicode``, otherwise raises an
@@ -215,7 +215,7 @@ def create_engine(*args, **kwargs):
     :param strategy='plain': used to invoke alternate :class:`~sqlalchemy.engine.base.Engine.`
         implementations. Currently available is the ``threadlocal``
         strategy, which is described in :ref:`threadlocal_strategy`.
-    
+
     """
 
     strategy = kwargs.pop('strategy', default_strategy)

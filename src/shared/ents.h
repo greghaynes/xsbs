@@ -70,20 +70,20 @@ struct physent                                  // base entity type, can be affe
     uchar physstate;                            // one of PHYS_* above
     uchar state, editstate;                     // one of CS_* above
     uchar type;                                 // one of ENT_* above
-    uchar collidetype;                          // one of COLLIDE_* above           
+    uchar collidetype;                          // one of COLLIDE_* above
 
     bool blocked, moving;                       // used by physics to signal ai
     physent *onplayer;
     int lastmove, lastmoveattempt, collisions, stacks;
 
-    physent() : o(0, 0, 0), deltapos(0, 0, 0), newpos(0, 0, 0), yaw(270), pitch(0), roll(0), maxspeed(100), 
+    physent() : o(0, 0, 0), deltapos(0, 0, 0), newpos(0, 0, 0), yaw(270), pitch(0), roll(0), maxspeed(100),
                radius(4.1f), eyeheight(14), aboveeye(1), xradius(4.1f), yradius(4.1f), zmargin(0),
                state(CS_ALIVE), editstate(CS_ALIVE), type(ENT_PLAYER),
                collidetype(COLLIDE_ELLIPSE),
                blocked(false), moving(true),
                onplayer(NULL), lastmove(0), lastmoveattempt(0), collisions(0), stacks(0)
                { reset(); }
-              
+
     void resetinterp()
     {
         newpos = o;
@@ -174,8 +174,8 @@ struct dynent : physent                         // animated characters, or chara
     int occluded, lastrendered;
 
     dynent() : ragdoll(NULL), query(NULL), occluded(0), lastrendered(0)
-    { 
-        reset(); 
+    {
+        reset();
     }
 
     ~dynent()
@@ -185,14 +185,14 @@ struct dynent : physent                         // animated characters, or chara
         if(ragdoll) cleanragdoll(this);
 #endif
     }
-               
+
     void stopmoving()
     {
         k_left = k_right = k_up = k_down = jumping = false;
         move = strafe = 0;
         targetyaw = rotspeed = 0;
     }
-        
+
     void reset()
     {
         physent::reset();

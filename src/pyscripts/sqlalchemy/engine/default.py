@@ -38,11 +38,11 @@ class DefaultDialect(base.Dialect):
     supports_pk_autoincrement = True
     dbapi_type_map = {}
     default_paramstyle = 'named'
-    supports_default_values = False 
+    supports_default_values = False
     supports_empty_insert = True
 
     def __init__(self, convert_unicode=False, assert_unicode=False,
-                 encoding='utf-8', paramstyle=None, dbapi=None, 
+                 encoding='utf-8', paramstyle=None, dbapi=None,
                  label_length=None, **kwargs):
         self.convert_unicode = convert_unicode
         self.assert_unicode = assert_unicode
@@ -77,7 +77,7 @@ class DefaultDialect(base.Dialect):
     def validate_identifier(self, ident):
         if len(ident) > self.max_identifier_length:
             raise exc.IdentifierError("Identifier '%s' exceeds maximum length of %d characters" % (ident, self.max_identifier_length))
-        
+
     def do_begin(self, connection):
         """Implementations might want to put logic here for turning
         autocommit on/off, etc.
@@ -262,7 +262,7 @@ class DefaultExecutionContext(base.ExecutionContext):
 
     def post_exec(self):
         pass
-    
+
     def handle_dbapi_exception(self, e):
         pass
 
@@ -274,7 +274,7 @@ class DefaultExecutionContext(base.ExecutionContext):
             return self._rowcount
         else:
             return self.cursor.rowcount
-        
+
     def supports_sane_rowcount(self):
         return self.dialect.supports_sane_rowcount
 

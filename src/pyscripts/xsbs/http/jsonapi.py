@@ -71,13 +71,13 @@ class JsonAtLeastMasterSite(JsonUserSite):
 	def render_user_JSON(self, request, user):
 		if not isUserAtLeastMaster(user.id):
 			return response('insufficient_permissions', 'User does not have master permissions')
-		return self.render_master_JSON(request, user)		
+		return self.render_master_JSON(request, user)
 
 class JsonMasterSite(JsonUserSite):
 	def render_user_JSON(self, request, user):
 		if not isUserMaster(user.id):
 			return response('insufficient_permissions', 'User does not have master permissions')
-		return self.render_master_JSON(request, user)		
+		return self.render_master_JSON(request, user)
 
 site = JsonSite()
 httpServer.root_site.putChild('json', site)
