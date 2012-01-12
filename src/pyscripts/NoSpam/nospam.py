@@ -102,3 +102,16 @@ def checkforspammerstimer():
 	addTimer(1000, checkforspammerstimer, ())
 
 addTimer(1000, checkforspammerstimer, ())
+
+spam_last_votekick = {}
+
+# Check for players performing spam attack
+@eventHandler('player_kick')
+def check_kick_timeout(cn, victim):
+    t = time.time()
+    try:
+        if (t - spam_last_votekick[cn]) <= 2:
+            ban(playercn, ban_duration, 'spamming server', -1)
+    except KeyError:
+        pass
+    spam_last_votekick[cn] = t
